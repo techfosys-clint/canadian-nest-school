@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { verifyToken } from '@/lib/auth/auth'
@@ -50,11 +50,11 @@ export default async function StaffRegisterPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
+          <h1 className="text-2xl font-bold text-slate-800 tracking-tight flex items-center gap-2.5">
             <FiUserPlus className="text-[#615fff] h-6 w-6" />
             Staff & Faculty Registry
           </h1>
-          <p className="text-base font-semibold text-zinc-400 mt-1">
+          <p className="text-base font-semibold text-slate-500 mt-1">
             Register and manage administrative, teaching, and support accounts.
           </p>
         </div>

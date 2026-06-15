@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
@@ -101,8 +101,8 @@ export default function ManageEnrollmentsPage() {
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'Yes, remove enrollment',
       cancelButtonText: 'Cancel',
-      background: '#1a1a1a',
-      color: '#ffffff',
+      background: '#ffffff',
+      color: '#1a1a1a',
     })
 
     if (!result.isConfirmed) return
@@ -127,8 +127,8 @@ export default function ManageEnrollmentsPage() {
           position: 'top-end',
           showConfirmButton: false,
           timer: 3000,
-          background: '#1a1a1a',
-          color: '#ffffff',
+          background: '#ffffff',
+          color: '#1a1a1a',
         })
 
         // Refresh lists
@@ -139,8 +139,8 @@ export default function ManageEnrollmentsPage() {
         icon: 'error',
         title: 'Action Failed',
         text: err.message || 'Failed to remove enrollment',
-        background: '#1a1a1a',
-        color: '#ffffff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
     }
   }
@@ -172,10 +172,10 @@ export default function ManageEnrollmentsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center bg-[#121212]">
+      <div className="min-h-[70vh] flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-4">
           <div className="h-10 w-10 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
-          <p className="text-base font-bold text-zinc-400">Loading Enrollment console...</p>
+          <p className="text-base font-bold text-slate-500">Loading Enrollment console...</p>
         </div>
       </div>
     )
@@ -183,11 +183,11 @@ export default function ManageEnrollmentsPage() {
 
   if (error) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center p-6 bg-[#121212]">
-        <div className="text-center space-y-4 max-w-md bg-[#18181b] border border-zinc-800 p-6 rounded-lg">
+      <div className="min-h-[70vh] flex items-center justify-center p-6 bg-slate-50">
+        <div className="text-center space-y-4 max-w-md bg-white border border-slate-200 p-6 rounded-lg">
           <FiAlertCircle className="h-10 w-10 text-rose-500 mx-auto" />
-          <h2 className="text-lg font-bold text-white">Enrollment Load Error</h2>
-          <p className="text-base font-semibold text-zinc-400 leading-relaxed">{error}</p>
+          <h2 className="text-lg font-bold text-slate-800">Enrollment Load Error</h2>
+          <p className="text-base font-semibold text-slate-500 leading-relaxed">{error}</p>
           <button 
             onClick={fetchEnrollments} 
             className="w-full py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base cursor-pointer transition-all duration-200"
@@ -208,21 +208,21 @@ export default function ManageEnrollmentsPage() {
           <div className="flex items-center gap-2">
             <Link 
               href="/admin" 
-              className="inline-flex items-center justify-center text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-zinc-800 transition-colors"
+              className="inline-flex items-center justify-center text-slate-500 hover:text-slate-800 p-1 rounded-lg hover:bg-slate-100 transition-colors"
               title="Back to Dashboard"
             >
               <FiArrowLeft className="h-5 w-5" />
             </Link>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Manage Enrollments</h1>
+            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Manage Enrollments</h1>
           </div>
-          <p className="text-base font-semibold text-zinc-400 mt-1 pl-7">
+          <p className="text-base font-semibold text-slate-500 mt-1 pl-7">
             Search, filter, and unenroll active students from dynamic course subscriptions.
           </p>
         </div>
         <button
           onClick={handleRefresh}
           disabled={refreshing}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#18181b] border border-zinc-800 hover:border-zinc-700 text-zinc-350 hover:text-white font-semibold text-base transition-all duration-200 cursor-pointer disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-slate-200 hover:border-slate-300 text-slate-600 hover:text-slate-800 font-semibold text-base transition-all duration-200 cursor-pointer disabled:opacity-50"
         >
           <FiRefreshCw className={`h-4.5 w-4.5 ${refreshing ? 'animate-spin' : ''}`} />
           Refresh Records
@@ -233,58 +233,58 @@ export default function ManageEnrollmentsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         
         {/* Total Enrollments */}
-        <div className="bg-[#18181b] rounded-lg border border-zinc-800 p-5 shadow-sm space-y-3">
+        <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-base font-semibold text-zinc-400">Total Enrollments</p>
+            <p className="text-base font-semibold text-slate-500">Total Enrollments</p>
             <div className="h-10 w-10 rounded-lg bg-[#615fff]/10 border border-[#615fff]/20 flex items-center justify-center text-[#615fff]">
               <FiUsers className="h-5 w-5" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-white leading-tight">{totalCount}</p>
-          <p className="text-sm font-semibold text-zinc-500">gross transaction count</p>
+          <p className="text-2xl font-bold text-slate-800 leading-tight">{totalCount}</p>
+          <p className="text-sm font-semibold text-slate-400">gross transaction count</p>
         </div>
 
         {/* Completed Transactions */}
-        <div className="bg-[#18181b] rounded-lg border border-zinc-800 p-5 shadow-sm space-y-3">
+        <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-base font-semibold text-zinc-400">Active Students</p>
+            <p className="text-base font-semibold text-slate-500">Active Students</p>
             <div className="h-10 w-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
               <FiCheckCircle className="h-5 w-5" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-white leading-tight">{completedCount}</p>
+          <p className="text-2xl font-bold text-slate-800 leading-tight">{completedCount}</p>
           <p className="text-sm font-semibold text-emerald-500/80">Completed: {completedCount} accounts</p>
         </div>
 
         {/* Pending Transactions */}
-        <div className="bg-[#18181b] rounded-lg border border-zinc-800 p-5 shadow-sm space-y-3">
+        <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-base font-semibold text-zinc-400">Pending Orders</p>
+            <p className="text-base font-semibold text-slate-500">Pending Orders</p>
             <div className="h-10 w-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
               <FiClock className="h-5 w-5" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-white leading-tight">{pendingCount}</p>
+          <p className="text-2xl font-bold text-slate-800 leading-tight">{pendingCount}</p>
           <p className="text-sm font-semibold text-amber-500/80">awaiting payment confirmation</p>
         </div>
 
         {/* Refunded/Canceled */}
-        <div className="bg-[#18181b] rounded-lg border border-zinc-800 p-5 shadow-sm space-y-3">
+        <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-base font-semibold text-zinc-400">Refunded / Canceled</p>
+            <p className="text-base font-semibold text-slate-500">Refunded / Canceled</p>
             <div className="h-10 w-10 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
               <FiX className="h-5 w-5" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-white leading-tight">{refundedCount}</p>
+          <p className="text-2xl font-bold text-slate-800 leading-tight">{refundedCount}</p>
           <p className="text-sm font-semibold text-rose-450">revoked student profiles</p>
         </div>
 
       </div>
 
       {/* ─── Search & Filters Control Panel ─── */}
-      <div className="bg-[#18181b] border border-zinc-800 rounded-lg p-5 shadow-sm space-y-4">
-        <h2 className="text-base font-bold text-white uppercase tracking-wider">Search & Filtration Filters</h2>
+      <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-sm space-y-4">
+        <h2 className="text-base font-bold text-slate-800 uppercase tracking-wider">Search & Filtration Filters</h2>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
           
           {/* Large search input */}
@@ -294,14 +294,14 @@ export default function ManageEnrollmentsPage() {
               placeholder="Search student name, email, or course title..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 bg-[#121212] border border-zinc-800 hover:border-zinc-700 focus:border-[#615fff] rounded-lg text-white text-base font-semibold focus:outline-none placeholder-zinc-550 transition-colors"
+              className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-[#615fff] rounded-lg text-slate-800 text-base font-semibold focus:outline-none placeholder-zinc-550 transition-colors"
             />
-            <FiSearch className="absolute left-3 text-zinc-550 h-4.5 w-4.5" />
+            <FiSearch className="absolute left-3 text-slate-400 h-4.5 w-4.5" />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 text-zinc-500 hover:text-white cursor-pointer"
+                className="absolute right-3 text-slate-400 hover:text-slate-800 cursor-pointer"
               >
                 <FiX className="h-4.5 w-4.5" />
               </button>
@@ -313,7 +313,7 @@ export default function ManageEnrollmentsPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full px-3 py-2 bg-[#121212] border border-zinc-800 rounded-lg text-zinc-300 text-base font-semibold focus:outline-none focus:border-[#615fff] cursor-pointer"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 text-base font-semibold focus:outline-none focus:border-[#615fff] cursor-pointer"
             >
               <option value="all">All Payment Statuses</option>
               <option value="completed">Active (Completed)</option>
@@ -327,7 +327,7 @@ export default function ManageEnrollmentsPage() {
             <select
               value={courseFilter}
               onChange={(e) => setCourseFilter(e.target.value)}
-              className="w-full px-3 py-2 bg-[#121212] border border-zinc-800 rounded-lg text-zinc-300 text-base font-semibold focus:outline-none focus:border-[#615fff] cursor-pointer"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 text-base font-semibold focus:outline-none focus:border-[#615fff] cursor-pointer"
             >
               <option value="all">All Courses Assigned</option>
               {uniqueCourses.map(course => (
@@ -340,11 +340,11 @@ export default function ManageEnrollmentsPage() {
       </div>
 
       {/* ─── Main Table Card ─── */}
-      <div className="bg-[#18181b] border border-zinc-800 rounded-lg shadow-sm overflow-hidden">
-        <div className="px-6 py-5 border-b border-zinc-850 flex items-center justify-between">
+      <div className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+        <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-white">Enrollment Catalog</h2>
-            <p className="text-base font-semibold text-zinc-400 mt-0.5">
+            <h2 className="text-lg font-bold text-slate-800">Enrollment Catalog</h2>
+            <p className="text-base font-semibold text-slate-500 mt-0.5">
               Showing {filteredEnrollments.length} matching enrollments
             </p>
           </div>
@@ -356,7 +356,7 @@ export default function ManageEnrollmentsPage() {
         </div>
 
         {filteredEnrollments.length === 0 ? (
-          <div className="p-16 text-center text-zinc-550 font-semibold text-base space-y-4">
+          <div className="p-16 text-center text-slate-400 font-semibold text-base space-y-4">
             <FiUsers className="h-12 w-12 text-zinc-700 mx-auto" />
             <p>No enrollment records matching your filters were found.</p>
             {(searchQuery || statusFilter !== 'all' || courseFilter !== 'all') && (
@@ -376,7 +376,7 @@ export default function ManageEnrollmentsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-base">
               <thead>
-                <tr className="bg-[#121212] border-b border-zinc-800 text-zinc-400 font-bold text-base uppercase tracking-wider select-none">
+                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold text-base uppercase tracking-wider select-none">
                   <th className="px-6 py-3.5">Student Info</th>
                   <th className="px-6 py-3.5">Course Purchased</th>
                   <th className="px-4 py-3.5 text-center">Enroll Date</th>
@@ -385,9 +385,9 @@ export default function ManageEnrollmentsPage() {
                   <th className="px-6 py-3.5 text-center">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-850 font-semibold">
+              <tbody className="divide-y divide-slate-100 font-semibold">
                 {filteredEnrollments.map((e) => (
-                  <tr key={e.id} className="hover:bg-zinc-800/40 transition-colors">
+                  <tr key={e.id} className="hover:bg-slate-100/40 transition-colors">
                     
                     {/* Student Info */}
                     <td className="px-6 py-4">
@@ -396,19 +396,19 @@ export default function ManageEnrollmentsPage() {
                           {e.studentName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
                         </div>
                         <div>
-                          <p className="font-bold text-white">{e.studentName}</p>
-                          <p className="text-sm font-semibold text-zinc-500 mt-0.5">{e.studentEmail}</p>
+                          <p className="font-bold text-slate-800">{e.studentName}</p>
+                          <p className="text-sm font-semibold text-slate-400 mt-0.5">{e.studentEmail}</p>
                         </div>
                       </div>
                     </td>
 
                     {/* Course */}
-                    <td className="px-6 py-4 text-zinc-300 max-w-xs truncate leading-snug">
+                    <td className="px-6 py-4 text-slate-600 max-w-xs truncate leading-snug">
                       {e.courseTitle}
                     </td>
 
                     {/* Enroll Date */}
-                    <td className="px-4 py-4 text-center text-zinc-400 text-sm">
+                    <td className="px-4 py-4 text-center text-slate-500 text-sm">
                       {formatDate(e.createdAt)}
                     </td>
 

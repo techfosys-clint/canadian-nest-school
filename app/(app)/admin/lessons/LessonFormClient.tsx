@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -222,19 +222,19 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
     <form onSubmit={handleSave} className="container mx-auto px-6 py-8 space-y-6">
       
       {/* Back & Heading panel */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-zinc-800/40">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200/40">
         <div>
-          <h1 className="text-3xl font-bold font-display text-white">
+          <h1 className="text-3xl font-bold font-display text-slate-800">
             {isEditMode ? 'Edit Lesson' : 'Add Lesson'}
           </h1>
-          <p className="text-base font-semibold text-zinc-450 mt-1">
+          <p className="text-base font-semibold text-slate-500 mt-1">
             Build and sequence premium syllabus catalog programs
           </p>
         </div>
         <button
           type="button"
           onClick={() => router.push(courseId ? `/admin/lessons?courseId=${courseId}` : '/admin/lessons')}
-          className="px-4 py-2 bg-zinc-850 hover:bg-zinc-800 border border-zinc-800 text-zinc-350 hover:text-white rounded-lg text-base font-bold transition-colors cursor-pointer"
+          className="px-4 py-2 bg-slate-100 hover:bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-800 rounded-lg text-base font-bold transition-colors cursor-pointer"
         >
           Cancel & Back
         </button>
@@ -244,17 +244,17 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
         
         {/* Main Content */}
         <div className="lg:col-span-8 space-y-6">
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg p-6 space-y-5">
-            <h2 className="text-xl font-bold text-white tracking-tight border-b border-zinc-850 pb-3">Lesson Parameters</h2>
+          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-5">
+            <h2 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-3">Lesson Parameters</h2>
 
             {/* Course Dropdown */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Target Syllabus Course *</label>
+              <label className="text-base font-bold text-slate-600">Target Syllabus Course *</label>
               <select
                 required
                 value={courseId}
                 onChange={(e) => setCourseId(e.target.value)}
-                className="bg-[#070b16] border border-zinc-800 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
+                className="bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
               >
                 <option value="">-- Select Course --</option>
                 {courses.map((c) => (
@@ -267,24 +267,24 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
 
             {/* Title */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Lesson Title *</label>
+              <label className="text-base font-bold text-slate-600">Lesson Title *</label>
               <input
                 type="text"
                 required
                 value={title}
                 onChange={handleTitleChange}
                 placeholder="e.g. Introduction to Next.js routing structures"
-                className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
               />
             </div>
 
             {/* Target Module Selection */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Target Module *</label>
+              <label className="text-base font-bold text-slate-600">Target Module *</label>
               <select
                 value={moduleName}
                 onChange={(e) => setModuleName(e.target.value)}
-                className="bg-[#070b16] border border-zinc-800 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
+                className="bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
               >
                 <option value="General Module">General Module</option>
                 {existingModules.map((mod) => (
@@ -295,7 +295,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                   )
                 ))}
               </select>
-              <p className="text-base font-medium text-zinc-550 leading-relaxed">
+              <p className="text-base font-medium text-slate-400 leading-relaxed">
                 Select from the curriculum modules defined for this course. (Add/edit modules in the Course parameters page).
               </p>
             </div>
@@ -303,32 +303,32 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
             {/* Slug & Order Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
-                <label className="text-base font-bold text-zinc-300">URL path suffix (Slug) *</label>
+                <label className="text-base font-bold text-slate-600">URL path suffix (Slug) *</label>
                 <input
                   type="text"
                   required
                   value={slug}
                   onChange={(e) => setSlug(slugify(e.target.value))}
                   placeholder="intro-to-routing"
-                  className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
+                  className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-base font-bold text-zinc-300">Display / Lecture Order *</label>
+                <label className="text-base font-bold text-slate-600">Display / Lecture Order *</label>
                 <input
                   type="number"
                   required
                   min={1}
                   value={order}
                   onChange={(e) => setOrder(Number(e.target.value))}
-                  className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                  className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                 />
               </div>
             </div>
 
             {/* Lesson Format / Type Selector */}
             <div className="flex flex-col gap-2 pt-2">
-              <label className="text-base font-bold text-zinc-300">Lesson Format</label>
+              <label className="text-base font-bold text-slate-600">Lesson Format</label>
               <div className="flex flex-wrap gap-3">
                 {(['recorded', 'live', 'quiz', 'assignment'] as const).map((type) => (
                   <button
@@ -344,8 +344,8 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                     }}
                     className={`flex items-center gap-2 px-5 py-3 rounded-lg font-bold text-base border transition-all cursor-pointer ${
                       lessonType === type
-                        ? 'bg-[#615fff] border-[#615fff] text-white shadow-md shadow-[#615fff]/20'
-                        : 'bg-[#070b16] border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
+                        ? 'bg-[#615fff] border-[#615fff] text-slate-800 shadow-md shadow-[#615fff]/20'
+                        : 'bg-slate-100 border-slate-200 text-slate-500 hover:text-slate-800 hover:border-slate-300'
                     }`}
                   >
                     {type === 'recorded' ? (
@@ -373,7 +373,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
             {lessonType === 'recorded' ? (
               <div className="flex flex-col gap-4 animate-fadeIn">
                 <div className="space-y-2">
-                  <label className="text-base font-bold text-zinc-300">📹 Upload Video to R2 (Recommended)</label>
+                  <label className="text-base font-bold text-slate-600">📹 Upload Video to R2 (Recommended)</label>
                   <VideoUploadWidget
                     onUploadSuccess={(objectKey) => {
                       setVideoUrl(objectKey)
@@ -384,7 +384,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                         timer: 2000,
                         showConfirmButton: false,
                         background: '#121829',
-                        color: '#ffffff',
+                        color: '#1a1a1a',
                       })
                     }}
                   />
@@ -392,25 +392,25 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-zinc-700"></div>
+                    <div className="w-full border-t border-slate-300"></div>
                   </div>
                   <div className="relative flex justify-center text-base">
-                    <span className="px-2 bg-[#070b16] text-zinc-400">OR</span>
+                    <span className="px-2 bg-slate-100 text-slate-500">OR</span>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-base font-bold text-zinc-300">Or Paste Video URL</label>
+                  <label className="text-base font-bold text-slate-600">Or Paste Video URL</label>
                   <input
                     type="text"
                     value={videoUrl}
                     onChange={handleVideoUrlChange}
                     placeholder="https://www.youtube.com/embed/...  or  videos/lesson-1.mp4"
-                    className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
+                    className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
                   />
-                  <p className="text-base font-medium text-zinc-500 leading-relaxed">
-                    Paste a <span className="text-zinc-300 font-semibold">YouTube / Vimeo URL</span> to embed it,
-                    or an <span className="text-zinc-300 font-semibold">R2 object key</span> (e.g. <span className="font-mono text-[#8a88ff]">videos/lesson-1.mp4</span>).
+                  <p className="text-base font-medium text-slate-400 leading-relaxed">
+                    Paste a <span className="text-slate-600 font-semibold">YouTube / Vimeo URL</span> to embed it,
+                    or an <span className="text-slate-600 font-semibold">R2 object key</span> (e.g. <span className="font-mono text-[#8a88ff]">videos/lesson-1.mp4</span>).
                   </p>
                 </div>
               </div>
@@ -418,11 +418,11 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
               <div className="space-y-4 animate-fadeIn">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
-                    <label className="text-base font-bold text-zinc-300">Live Meeting Platform</label>
+                    <label className="text-base font-bold text-slate-600">Live Meeting Platform</label>
                     <select
                       value={livePlatform}
                       onChange={(e) => setLivePlatform(e.target.value)}
-                      className="bg-[#070b16] border border-zinc-800 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
+                      className="bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
                     >
                       <option value="zoom">Zoom</option>
                       <option value="meet">Google Meet</option>
@@ -431,17 +431,17 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                     </select>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-base font-bold text-zinc-300">Scheduled Time & Date</label>
+                    <label className="text-base font-bold text-slate-600">Scheduled Time & Date</label>
                     <input
                       type="datetime-local"
                       value={liveDate}
                       onChange={(e) => setLiveDate(e.target.value)}
-                      className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                      className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                     />
                   </div>
                 </div>
                 {livePlatform === 'zoom' && (
-                  <div className="bg-[#070b16] border border-zinc-800/80 rounded-lg p-4 flex flex-col gap-3 animate-fadeIn">
+                  <div className="bg-slate-100 border border-slate-200/80 rounded-lg p-4 flex flex-col gap-3 animate-fadeIn">
                     <label className="flex items-center gap-3 cursor-pointer select-none">
                       <div
                         className={`relative w-12 h-6 rounded-full transition-colors ${
@@ -455,16 +455,16 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                           }`}
                         />
                       </div>
-                      <span className="text-base font-bold text-zinc-300">Auto-generate Zoom Meeting Link</span>
+                      <span className="text-base font-bold text-slate-600">Auto-generate Zoom Meeting Link</span>
                     </label>
-                    <p className="text-base font-medium text-zinc-400">
+                    <p className="text-base font-medium text-slate-500">
                       When enabled, Tutor Space will automatically create a Zoom meeting using your Server-to-Server OAuth credentials.
                     </p>
                   </div>
                 )}
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-base font-bold text-zinc-300">
+                  <label className="text-base font-bold text-slate-600">
                     {autoGenerateZoom ? 'Meeting Join URL (Auto-generated)' : 'Meeting Join URL'}
                   </label>
                   <input
@@ -473,7 +473,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                     disabled={autoGenerateZoom}
                     onChange={(e) => setLiveUrl(e.target.value)}
                     placeholder={autoGenerateZoom ? 'Will be automatically generated upon save' : 'https://zoom.us/j/...'}
-                    className={`bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono ${
+                    className={`bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono ${
                       autoGenerateZoom ? 'opacity-50 cursor-not-allowed select-none' : ''
                     }`}
                   />
@@ -481,51 +481,51 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
               </div>
             ) : lessonType === 'assignment' ? (
               <div className="space-y-4 border border-[#615fff]/25 rounded-lg p-6 bg-gradient-to-b from-[#121829] to-[#0d1222] shadow-2xl shadow-[#615fff]/5 animate-fadeIn">
-                <h3 className="text-xl font-bold text-white flex items-center gap-2 border-b border-zinc-850 pb-3">
+                <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
                   <FiFileText className="text-[#615fff] h-6 w-6" /> Assignment Configuration
                 </h3>
                 
                 <div className="flex flex-col gap-2">
-                  <label className="text-base font-bold text-zinc-300">Assignment Evaluation Marks *</label>
+                  <label className="text-base font-bold text-slate-600">Assignment Evaluation Marks *</label>
                   <input
                     type="number"
                     min={1}
                     value={totalMarks}
                     onChange={(e) => setTotalMarks(Number(e.target.value))}
-                    className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors animate-fadeIn"
+                    className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors animate-fadeIn"
                   />
                 </div>
-                <p className="text-base font-semibold text-zinc-400">
+                <p className="text-base font-semibold text-slate-500">
                   Students will see this assignment and submit a secure Google Drive link containing their work for grading.
                 </p>
               </div>
             ) : (
               <div className="space-y-6 border border-[#615fff]/25 rounded-lg p-6 bg-gradient-to-b from-[#121829] to-[#0d1222] shadow-2xl shadow-[#615fff]/5 animate-fadeIn">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-800/60 pb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200/60 pb-4">
                   <div>
-                    <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
                       <FiHelpCircle className="text-[#615fff] h-6 w-6" /> Quiz Questions Builder
                     </h3>
-                    <p className="text-base font-medium text-zinc-400 mt-1">
+                    <p className="text-base font-medium text-slate-500 mt-1">
                       Configure dynamic evaluation queries with dynamic option selection
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                     {/* Quiz Total Marks */}
-                    <div className="flex items-center gap-2 bg-[#070b16] border border-zinc-800 px-3.5 py-2.5 rounded-lg">
-                      <span className="text-base font-bold text-zinc-400">Quiz Marks:</span>
+                    <div className="flex items-center gap-2 bg-slate-100 border border-slate-200 px-3.5 py-2.5 rounded-lg">
+                      <span className="text-base font-bold text-slate-500">Quiz Marks:</span>
                       <input
                         type="number"
                         min={1}
                         value={totalMarks}
                         onChange={(e) => setTotalMarks(Number(e.target.value))}
-                        className="bg-transparent border-none text-white w-16 text-base font-bold outline-none text-center"
+                        className="bg-transparent border-none text-slate-800 w-16 text-base font-bold outline-none text-center"
                       />
                     </div>
                     <button
                       type="button"
                       onClick={() => setQuizQuestions([...quizQuestions, { questionText: '', options: ['', '', '', ''], correctAnswerIndex: 0 }])}
-                      className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#615fff] to-[#5248e8] hover:from-[#5248e8] hover:to-[#4338ca] text-white rounded-lg text-base font-bold shadow-lg shadow-[#615fff]/20 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer border-none"
+                      className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#615fff] to-[#5248e8] hover:from-[#5248e8] hover:to-[#4338ca] text-slate-800 rounded-lg text-base font-bold shadow-lg shadow-[#615fff]/20 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer border-none"
                     >
                       <FiPlus className="h-5 w-5" /> Add Question
                     </button>
@@ -536,17 +536,17 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                   {quizQuestions.map((q, qIdx) => (
                     <div 
                       key={qIdx} 
-                      className="bg-slate-950/40 backdrop-blur border border-zinc-800/80 hover:border-[#615fff]/30 p-6 rounded-lg space-y-6 transition-all duration-300 relative"
+                      className="bg-slate-950/40 backdrop-blur border border-slate-200/80 hover:border-[#615fff]/30 p-6 rounded-lg space-y-6 transition-all duration-300 relative"
                     >
                       {/* Card Header */}
-                      <div className="flex items-center justify-between pb-4 border-b border-zinc-850/50">
+                      <div className="flex items-center justify-between pb-4 border-b border-slate-100/50">
                         <div className="flex items-center gap-3">
-                          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-[#615fff] to-[#5248e8] text-white font-bold text-base shadow-md shadow-[#615fff]/20 select-none">
+                          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-[#615fff] to-[#5248e8] text-slate-800 font-bold text-base shadow-md shadow-[#615fff]/20 select-none">
                             {String(qIdx + 1).padStart(2, '0')}
                           </span>
                           <div>
-                            <span className="text-base font-bold text-white block">Question Details</span>
-                            <span className="text-base font-medium text-zinc-400 block mt-0.5">Define your question and choices below</span>
+                            <span className="text-base font-bold text-slate-800 block">Question Details</span>
+                            <span className="text-base font-medium text-slate-500 block mt-0.5">Define your question and choices below</span>
                           </div>
                         </div>
                         {quizQuestions.length > 1 && (
@@ -565,7 +565,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
 
                       {/* Question Text */}
                       <div className="flex flex-col gap-2">
-                        <label className="text-base font-bold text-zinc-300">Question Title / Text *</label>
+                        <label className="text-base font-bold text-slate-600">Question Title / Text *</label>
                         <input
                           type="text"
                           required
@@ -576,15 +576,15 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                             setQuizQuestions(newQuestions)
                           }}
                           placeholder="e.g. What does CSS stand for in web development?"
-                          className="bg-[#121829] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3.5 text-base font-semibold outline-none w-full transition-colors"
+                          className="bg-[#121829] border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none w-full transition-colors"
                         />
                       </div>
 
                       {/* Options Section Header */}
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
                         <div>
-                          <h4 className="text-base font-bold text-zinc-300">Configure Options / Answers *</h4>
-                          <p className="text-base font-medium text-zinc-400 mt-0.5">Add up to 6 options and mark the correct one.</p>
+                          <h4 className="text-base font-bold text-slate-600">Configure Options / Answers *</h4>
+                          <p className="text-base font-medium text-slate-500 mt-0.5">Add up to 6 options and mark the correct one.</p>
                         </div>
                         {q.options.length < 6 && (
                           <button
@@ -594,7 +594,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                               newQuestions[qIdx].options.push('')
                               setQuizQuestions(newQuestions)
                             }}
-                            className="flex items-center gap-1.5 px-4 py-2 bg-[#615fff]/10 hover:bg-[#615fff]/20 border border-[#615fff]/20 hover:border-[#615fff]/40 text-[#8a88ff] hover:text-white rounded-lg text-base font-bold transition-all cursor-pointer"
+                            className="flex items-center gap-1.5 px-4 py-2 bg-[#615fff]/10 hover:bg-[#615fff]/20 border border-[#615fff]/20 hover:border-[#615fff]/40 text-[#8a88ff] hover:text-slate-800 rounded-lg text-base font-bold transition-all cursor-pointer"
                           >
                             <FiPlus className="h-5 w-5" /> Add Choice
                           </button>
@@ -611,12 +611,12 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                               className={`p-4 bg-[#121829] border rounded-lg flex flex-col gap-3.5 transition-all duration-300 relative group/opt ${
                                 isCorrect
                                   ? 'border-emerald-500/50 bg-emerald-950/10 shadow-sm shadow-emerald-500/5'
-                                  : 'border-zinc-800/80 hover:border-zinc-700/80'
+                                  : 'border-slate-200/80 hover:border-slate-300/80'
                               }`}
                             >
                               <div className="flex items-center justify-between select-none">
                                 <span className={`text-base font-bold ${
-                                  isCorrect ? 'text-emerald-400' : 'text-zinc-400'
+                                  isCorrect ? 'text-emerald-400' : 'text-slate-500'
                                 }`}>
                                   Option {String.fromCharCode(65 + optIdx)} *
                                 </span>
@@ -633,7 +633,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-base font-bold transition-all border cursor-pointer ${
                                       isCorrect
                                         ? 'bg-emerald-500/15 border-emerald-500/20 text-emerald-400'
-                                        : 'bg-zinc-850 border-zinc-800 text-zinc-550 hover:text-zinc-350'
+                                        : 'bg-slate-100 border-slate-200 text-slate-400 hover:text-slate-600'
                                     }`}
                                   >
                                     {isCorrect ? '✓ Correct' : 'Set Correct'}
@@ -676,10 +676,10 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                                   setQuizQuestions(newQuestions)
                                 }}
                                 placeholder={`Enter Option ${String.fromCharCode(65 + optIdx)} answer`}
-                                className={`bg-[#070b16] border rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors ${
+                                className={`bg-slate-100 border rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors ${
                                   isCorrect 
-                                    ? 'border-emerald-500/30 focus:border-emerald-500 text-white focus:ring-1 focus:ring-emerald-500' 
-                                    : 'border-zinc-800/80 focus:border-zinc-700/80 text-zinc-300 focus:text-white focus:ring-1 focus:ring-zinc-700'
+                                    ? 'border-emerald-500/30 focus:border-emerald-500 text-slate-800 focus:ring-1 focus:ring-emerald-500' 
+                                    : 'border-slate-200/80 focus:border-slate-300/80 text-slate-600 focus:text-slate-800 focus:ring-1 focus:ring-zinc-700'
                                 }`}
                               />
                             </div>
@@ -694,13 +694,13 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
 
             {/* Duration */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Lecture Duration (Minutes)</label>
+              <label className="text-base font-bold text-slate-600">Lecture Duration (Minutes)</label>
               <input
                 type="number"
                 min={1}
                 value={duration}
                 onChange={(e) => setDuration(Number(e.target.value))}
-                className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
               />
             </div>
 
@@ -709,8 +709,8 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
 
         {/* Sidebar settings */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg p-6 space-y-4">
-            <h3 className="text-xl font-bold text-white tracking-tight border-b border-zinc-850 pb-2.5">Settings</h3>
+          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-4">
+            <h3 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-2.5">Settings</h3>
 
             <label className="flex items-center gap-3 cursor-pointer select-none">
               <div
@@ -725,11 +725,11 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                   }`}
                 />
               </div>
-              <span className="text-base font-bold text-zinc-300">Free Preview Lecture</span>
+              <span className="text-base font-bold text-slate-600">Free Preview Lecture</span>
             </label>
           </div>
 
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg p-6">
+          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6">
             <button
               type="submit"
               disabled={saving}

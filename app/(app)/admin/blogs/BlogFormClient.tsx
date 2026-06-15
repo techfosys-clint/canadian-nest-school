@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -65,7 +65,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
         timer: 1300,
         showConfirmButton: false,
         background: '#121829',
-        color: '#ffffff',
+        color: '#1a1a1a',
       })
     } catch (err: any) {
       Swal.fire({
@@ -73,7 +73,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
         title: 'Upload Failed',
         text: err.message,
         background: '#121829',
-        color: '#ffffff',
+        color: '#1a1a1a',
       })
     } finally {
       setUploading(false)
@@ -88,11 +88,11 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
 
   async function handleSave() {
     if (!title) {
-      Swal.fire({ icon: 'warning', title: 'Blog Title Required', background: '#121829', color: '#ffffff' })
+      Swal.fire({ icon: 'warning', title: 'Blog Title Required', background: '#121829', color: '#1a1a1a' })
       return
     }
     if (!content || content.trim() === '<p></p>' || content.trim() === '') {
-      Swal.fire({ icon: 'warning', title: 'Blog Content Required', background: '#121829', color: '#ffffff' })
+      Swal.fire({ icon: 'warning', title: 'Blog Content Required', background: '#121829', color: '#1a1a1a' })
       return
     }
     
@@ -138,7 +138,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
         timer: 1800,
         showConfirmButton: false,
         background: '#121829',
-        color: '#ffffff',
+        color: '#1a1a1a',
       })
       
       router.push('/admin/blogs')
@@ -149,7 +149,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
         title: 'Failed to Save',
         text: err.message,
         background: '#121829',
-        color: '#ffffff',
+        color: '#1a1a1a',
       })
     } finally {
       setSaving(false)
@@ -160,21 +160,21 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
     <div className="container mx-auto px-6 py-8 space-y-8">
       
       {/* Top action header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-800/80 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200/80 pb-6">
         <div className="space-y-1">
           <div className="flex items-center gap-3">
             <button 
               type="button"
               onClick={() => router.push('/admin/blogs')}
-              className="h-10 w-10 border border-zinc-800 hover:border-zinc-700 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white bg-[#0e1422] transition-colors cursor-pointer"
+              className="h-10 w-10 border border-slate-200 hover:border-slate-300 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-800 bg-[#0e1422] transition-colors cursor-pointer"
             >
               <FiArrowLeft className="h-5 w-5" />
             </button>
-            <h1 className="text-3xl font-bold tracking-tight text-white font-display">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-800 font-display">
               {initialBlog ? 'Edit Blog Post' : 'Compose Blog Article'}
             </h1>
           </div>
-          <p className="text-base font-semibold text-zinc-450 pl-13">
+          <p className="text-base font-semibold text-slate-500 pl-13">
             Construct SEO-rich blog articles and product announcements for Tutor Space.
           </p>
         </div>
@@ -195,15 +195,15 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
         <div className="lg:col-span-8 space-y-6">
           
           {/* Article Info Section */}
-          <div className="bg-[#121829] border border-zinc-800/60 rounded-lg p-6 space-y-5">
+          <div className="bg-[#121829] border border-slate-200/60 rounded-lg p-6 space-y-5">
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Article Title <span className="text-red-400">*</span></label>
+              <label className="text-base font-bold text-slate-600">Article Title <span className="text-red-400">*</span></label>
               <input 
                 type="text" 
                 value={title} 
                 onChange={e => setTitle(e.target.value)}
                 placeholder="Write a captivating, keyword-rich title..."
-                className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/60 text-white rounded-lg p-3.5 text-base font-semibold outline-none transition-colors" 
+                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/60 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none transition-colors" 
               />
             </div>
             
@@ -223,24 +223,24 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
         <div className="lg:col-span-4 space-y-6">
           
           {/* Cover image card */}
-          <div className="bg-[#121829] border border-zinc-800/60 rounded-lg p-6 space-y-4">
-            <h3 className="text-base font-bold text-white uppercase tracking-wider pb-2 border-b border-zinc-800/50">Cover Image</h3>
+          <div className="bg-[#121829] border border-slate-200/60 rounded-lg p-6 space-y-4">
+            <h3 className="text-base font-bold text-slate-800 uppercase tracking-wider pb-2 border-b border-slate-200/50">Cover Image</h3>
             
             {coverImageUrl ? (
               <div className="space-y-3">
-                <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-zinc-800 bg-[#070b16]">
+                <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
                   <img src={coverImageUrl} alt="Cover Preview" className="w-full h-full object-cover" />
                   <button 
                     type="button"
                     onClick={() => { setCoverImageId(''); setCoverImageUrl('') }}
-                    className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/80 hover:bg-rose-600 text-zinc-400 hover:text-white transition-all cursor-pointer border border-white/5"
+                    className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/80 hover:bg-rose-600 text-slate-500 hover:text-slate-800 transition-all cursor-pointer border border-white/5"
                   >
                     <FiX className="h-4.5 w-4.5" />
                   </button>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-2">
-                  <label className={`flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-zinc-800/80 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-bold text-sm cursor-pointer transition-colors ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                  <label className={`flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-slate-100/80 hover:bg-slate-100 border border-slate-300 text-slate-600 font-bold text-sm cursor-pointer transition-colors ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
                     <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                     <FiUploadCloud className="h-4.5 w-4.5" />
                     <span>Upload</span>
@@ -258,11 +258,11 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
               </div>
             ) : (
               <div className="space-y-3">
-                <label className={`flex flex-col items-center justify-center aspect-[16/9] w-full bg-[#070b16] border-2 border-dashed border-zinc-800 hover:border-[#615fff]/50 rounded-lg cursor-pointer transition-colors p-4 text-center ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                <label className={`flex flex-col items-center justify-center aspect-[16/9] w-full bg-slate-100 border-2 border-dashed border-slate-200 hover:border-[#615fff]/50 rounded-lg cursor-pointer transition-colors p-4 text-center ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
                   <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                  <FiUploadCloud className="h-8 w-8 text-zinc-500 mb-2 animate-bounce" />
-                  <span className="text-base font-semibold text-zinc-400">{uploading ? 'Uploading Cover...' : 'Upload cover photo'}</span>
-                  <span className="text-xs font-semibold text-zinc-600 mt-1">PNG, JPG or WEBP up to 5MB</span>
+                  <FiUploadCloud className="h-8 w-8 text-slate-400 mb-2 animate-bounce" />
+                  <span className="text-base font-semibold text-slate-500">{uploading ? 'Uploading Cover...' : 'Upload cover photo'}</span>
+                  <span className="text-xs font-semibold text-slate-400 mt-1">PNG, JPG or WEBP up to 5MB</span>
                 </label>
                 
                 <button 
@@ -278,61 +278,61 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
           </div>
 
           {/* Tags settings card */}
-          <div className="bg-[#121829] border border-zinc-800/60 rounded-lg p-6 space-y-4">
-            <h3 className="text-base font-bold text-white uppercase tracking-wider pb-2 border-b border-zinc-800/50">Metadata & Tags</h3>
+          <div className="bg-[#121829] border border-slate-200/60 rounded-lg p-6 space-y-4">
+            <h3 className="text-base font-bold text-slate-800 uppercase tracking-wider pb-2 border-b border-slate-200/50">Metadata & Tags</h3>
             
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Article Tags</label>
+              <label className="text-base font-bold text-slate-600">Article Tags</label>
               <input 
                 type="text" 
                 value={tagsInput} 
                 onChange={e => setTagsInput(e.target.value)}
                 placeholder="e.g. Next.js, Design Patterns, Careers"
-                className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/60 text-white rounded-lg p-3.5 text-base font-semibold outline-none transition-colors" 
+                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/60 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none transition-colors" 
               />
-              <p className="text-xs font-semibold text-zinc-500 leading-normal">
+              <p className="text-xs font-semibold text-slate-400 leading-normal">
                 Separate multiple article tags using comma characters. Tag labels are parsed automatically.
               </p>
             </div>
           </div>
 
           {/* SEO Metadata Card (Moved to the Right Sidebar) */}
-          <div className="bg-[#121829] border border-zinc-800/60 rounded-lg p-6 space-y-5">
-            <div className="flex items-center gap-2 pb-2 border-b border-zinc-800/50">
+          <div className="bg-[#121829] border border-slate-200/60 rounded-lg p-6 space-y-5">
+            <div className="flex items-center gap-2 pb-2 border-b border-slate-200/50">
               <FiInfo className="text-[#615fff] h-5 w-5" />
-              <h3 className="text-base font-bold text-white uppercase tracking-wider">Search Engine Optimization (SEO)</h3>
+              <h3 className="text-base font-bold text-slate-800 uppercase tracking-wider">Search Engine Optimization (SEO)</h3>
             </div>
             
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">SEO Meta Title</label>
+              <label className="text-base font-bold text-slate-600">SEO Meta Title</label>
               <input 
                 type="text" 
                 value={metaTitle} 
                 onChange={e => setMetaTitle(e.target.value)}
                 placeholder="Alternative SEO title..."
-                className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/60 text-white rounded-lg p-3.5 text-base font-semibold outline-none transition-colors" 
+                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/60 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none transition-colors" 
               />
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">SEO Meta Description</label>
+              <label className="text-base font-bold text-slate-600">SEO Meta Description</label>
               <textarea 
                 rows={3}
                 value={metaDescription} 
                 onChange={e => setMetaDescription(e.target.value)}
                 placeholder="Write a summary under 160 characters..."
-                className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/60 text-white rounded-lg p-3.5 text-base font-semibold outline-none resize-none transition-colors" 
+                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/60 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none resize-none transition-colors" 
               />
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">SEO Keywords</label>
+              <label className="text-base font-bold text-slate-600">SEO Keywords</label>
               <input 
                 type="text" 
                 value={keywords} 
                 onChange={e => setKeywords(e.target.value)}
                 placeholder="e.g. coaching, tutor tips"
-                className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/60 text-white rounded-lg p-3.5 text-base font-semibold outline-none transition-colors" 
+                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/60 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none transition-colors" 
               />
             </div>
           </div>

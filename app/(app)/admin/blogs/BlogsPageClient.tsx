@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
@@ -106,7 +106,7 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
       confirmButtonColor: '#ef4444',
       cancelButtonColor: '#27272a',
       background: '#121829',
-      color: '#ffffff',
+      color: '#1a1a1a',
     })
     
     if (!result.isConfirmed) return
@@ -129,7 +129,7 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
         timer: 1300,
         showConfirmButton: false,
         background: '#121829',
-        color: '#ffffff',
+        color: '#1a1a1a',
       })
     } catch (err: any) {
       Swal.fire({
@@ -137,7 +137,7 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
         title: 'Failed to Delete',
         text: err.message,
         background: '#121829',
-        color: '#ffffff',
+        color: '#1a1a1a',
       })
     }
   }
@@ -146,10 +146,10 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
     <div className="px-6 py-8 space-y-8 container mx-auto">
       
       {/* ─── Premium Header ─── */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b border-zinc-800/80 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b border-slate-200/80 pb-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white font-display">Blog Editor Dashboard</h1>
-          <p className="text-base font-semibold text-zinc-450 mt-1">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-800 font-display">Blog Editor Dashboard</h1>
+          <p className="text-base font-semibold text-slate-500 mt-1">
             Publish SEO-rich educational resources, tips, and platform updates.
           </p>
         </div>
@@ -167,35 +167,35 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         
         {/* Total Articles card */}
-        <div className="bg-[#121829] border border-zinc-800/60 rounded-lg p-6 flex items-center gap-5 shadow-sm">
+        <div className="bg-[#121829] border border-slate-200/60 rounded-lg p-6 flex items-center gap-5 shadow-sm">
           <div className="h-12 w-12 rounded-lg bg-[#615fff]/10 border border-[#615fff]/20 flex items-center justify-center text-[#9693ff]">
             <FiFileText className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Total Articles</p>
-            <h3 className="text-2xl font-bold text-white mt-1">{stats.total}</h3>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Articles</p>
+            <h3 className="text-2xl font-bold text-slate-800 mt-1">{stats.total}</h3>
           </div>
         </div>
 
         {/* Unique tags card */}
-        <div className="bg-[#121829] border border-zinc-800/60 rounded-lg p-6 flex items-center gap-5 shadow-sm">
+        <div className="bg-[#121829] border border-slate-200/60 rounded-lg p-6 flex items-center gap-5 shadow-sm">
           <div className="h-12 w-12 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
             <FiTag className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Active Tags</p>
-            <h3 className="text-2xl font-bold text-white mt-1">{stats.uniqueTagsCount}</h3>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Active Tags</p>
+            <h3 className="text-2xl font-bold text-slate-800 mt-1">{stats.uniqueTagsCount}</h3>
           </div>
         </div>
 
         {/* Latest Announcement card */}
-        <div className="bg-[#121829] border border-zinc-800/60 rounded-lg p-6 flex items-center gap-5 shadow-sm">
+        <div className="bg-[#121829] border border-slate-200/60 rounded-lg p-6 flex items-center gap-5 shadow-sm">
           <div className="h-12 w-12 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
             <FiAward className="h-6 w-6" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Latest Post</p>
-            <h3 className="text-base font-bold text-white mt-1 truncate leading-snug" title={stats.latestPostTitle}>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Latest Post</p>
+            <h3 className="text-base font-bold text-slate-800 mt-1 truncate leading-snug" title={stats.latestPostTitle}>
               {stats.latestPostTitle}
             </h3>
           </div>
@@ -204,7 +204,7 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
       </div>
 
       {/* ─── Filter & Search Bar Controls ─── */}
-      <div className="bg-[#121829]/60 border border-zinc-800/60 rounded-lg p-5 flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm">
+      <div className="bg-[#121829]/60 border border-slate-200/60 rounded-lg p-5 flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm">
         
         {/* Search Input bar */}
         <div className="relative w-full md:max-w-md">
@@ -213,9 +213,9 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             placeholder="Search article titles or contents..."
-            className="w-full pl-10 pr-4 py-2.5 bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/60 text-white rounded-lg text-base font-semibold outline-none transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 bg-slate-100 border border-slate-200 focus:border-[#615fff]/60 text-slate-800 rounded-lg text-base font-semibold outline-none transition-colors"
           />
-          <FiSearch className="absolute left-3.5 top-3.5 text-zinc-500 h-4.5 w-4.5" />
+          <FiSearch className="absolute left-3.5 top-3.5 text-slate-400 h-4.5 w-4.5" />
         </div>
 
         {/* Filter tags pills list */}
@@ -225,7 +225,7 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
             className={`px-3.5 py-1.5 rounded-lg border font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer select-none ${
               selectedTag === null 
                 ? 'bg-[#615fff] text-white border-transparent' 
-                : 'bg-zinc-850 border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-800'
+                : 'bg-slate-100 border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-100'
             }`}
           >
             All
@@ -238,7 +238,7 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
               className={`px-3.5 py-1.5 rounded-lg border font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer select-none ${
                 selectedTag === tag 
                   ? 'bg-[#615fff] text-white border-transparent' 
-                  : 'bg-zinc-850 border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-800'
+                  : 'bg-slate-100 border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-100'
               }`}
             >
               #{tag}
@@ -250,41 +250,41 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
 
       {/* ─── Premium Blog Data Table ─── */}
       {filteredBlogs.length === 0 ? (
-        <div className="bg-[#121829]/60 border border-zinc-800/40 rounded-lg p-16 text-center space-y-4 shadow-sm">
+        <div className="bg-[#121829]/60 border border-slate-200/40 rounded-lg p-16 text-center space-y-4 shadow-sm">
           <FiFileText className="h-12 w-12 text-zinc-700 mx-auto" />
-          <h3 className="text-lg font-bold text-zinc-350">No blog posts found</h3>
-          <p className="text-base font-semibold text-zinc-550 max-w-sm mx-auto">
+          <h3 className="text-lg font-bold text-slate-600">No blog posts found</h3>
+          <p className="text-base font-semibold text-slate-400 max-w-sm mx-auto">
             {searchQuery || selectedTag 
               ? 'No articles match your search criteria. Try modifying your query or clearing active filters.' 
               : 'Construct your first educational resource by clicking write article above.'}
           </p>
         </div>
       ) : (
-        <div className="bg-[#121829] border border-zinc-800/60 rounded-lg overflow-hidden shadow-xl shadow-zinc-950/20">
+        <div className="bg-[#121829] border border-slate-200/60 rounded-lg overflow-hidden shadow-xl shadow-zinc-950/20">
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left text-white">
+            <table className="w-full border-collapse text-left text-slate-800">
               <thead>
-                <tr className="border-b border-zinc-800/80 bg-zinc-900/40">
-                  <th className="px-6 py-4 text-base font-bold text-zinc-400 uppercase tracking-wider">Article Title</th>
-                  <th className="px-6 py-4 text-base font-bold text-zinc-400 uppercase tracking-wider">Author</th>
-                  <th className="px-6 py-4 text-base font-bold text-zinc-400 uppercase tracking-wider">Date Published</th>
-                  <th className="px-6 py-4 text-base font-bold text-zinc-400 uppercase tracking-wider">Tags</th>
-                  <th className="px-6 py-4 text-base font-bold text-zinc-400 uppercase tracking-wider text-right">Actions</th>
+                <tr className="border-b border-slate-200/80 bg-slate-100/40">
+                  <th className="px-6 py-4 text-base font-bold text-slate-500 uppercase tracking-wider">Article Title</th>
+                  <th className="px-6 py-4 text-base font-bold text-slate-500 uppercase tracking-wider">Author</th>
+                  <th className="px-6 py-4 text-base font-bold text-slate-500 uppercase tracking-wider">Date Published</th>
+                  <th className="px-6 py-4 text-base font-bold text-slate-500 uppercase tracking-wider">Tags</th>
+                  <th className="px-6 py-4 text-base font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-800/50">
+              <tbody className="divide-y divide-slate-200/50">
                 {filteredBlogs.map(blog => {
                   const plainTextPreview = stripHtml(blog.content)
                   
                   return (
                     <tr 
                       key={blog.id} 
-                      className="hover:bg-zinc-800/20 transition-colors group"
+                      className="hover:bg-slate-100/20 transition-colors group"
                     >
                       {/* Title column with image preview */}
                       <td className="px-6 py-4 max-w-md">
                         <div className="flex items-center gap-4">
-                          <div className="h-12 w-16 rounded-lg bg-[#070b16] border border-zinc-800 flex-shrink-0 overflow-hidden">
+                          <div className="h-12 w-16 rounded-lg bg-slate-100 border border-slate-200 flex-shrink-0 overflow-hidden">
                             {blog.coverImageUrl ? (
                               <img 
                                 src={blog.coverImageUrl} 
@@ -292,16 +292,16 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                               />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center text-zinc-600 bg-gradient-to-br from-[#0f1b40] to-[#070b16]">
+                              <div className="w-full h-full flex items-center justify-center text-slate-400 bg-gradient-to-br from-[#0f1b40] to-[#070b16]">
                                 <FiFileText className="h-5 w-5" />
                               </div>
                             )}
                           </div>
                           <div className="min-w-0">
-                            <h3 className="font-bold text-white text-base truncate group-hover:text-[#b2b0ff] transition-colors" title={blog.title}>
+                            <h3 className="font-bold text-slate-800 text-base truncate group-hover:text-[#b2b0ff] transition-colors" title={blog.title}>
                               {blog.title}
                             </h3>
-                            <p className="text-base font-normal text-zinc-400 truncate mt-0.5" title={plainTextPreview}>
+                            <p className="text-base font-normal text-slate-500 truncate mt-0.5" title={plainTextPreview}>
                               {plainTextPreview || 'No content preview available.'}
                             </p>
                           </div>
@@ -314,15 +314,15 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
                           <div className="h-8 w-8 rounded-full bg-[#615fff]/15 border border-[#615fff]/25 flex items-center justify-center font-bold text-base text-[#9693ff] uppercase">
                             {blog.authorName[0]}
                           </div>
-                          <span className="text-base font-bold text-zinc-300">{blog.authorName}</span>
+                          <span className="text-base font-bold text-slate-600">{blog.authorName}</span>
                         </div>
                       </td>
 
                       {/* Date Column */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         {blog.publishedDate ? (
-                          <div className="flex items-center gap-2 text-base font-semibold text-zinc-400">
-                            <FiCalendar className="h-4.5 w-4.5 text-zinc-500" />
+                          <div className="flex items-center gap-2 text-base font-semibold text-slate-500">
+                            <FiCalendar className="h-4.5 w-4.5 text-slate-400" />
                             <span>
                               {new Date(blog.publishedDate).toLocaleDateString('en-US', { 
                                 month: 'short', 
@@ -332,7 +332,7 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
                             </span>
                           </div>
                         ) : (
-                          <span className="text-base font-semibold text-zinc-500">Not published</span>
+                          <span className="text-base font-semibold text-slate-400">Not published</span>
                         )}
                       </td>
 
@@ -357,7 +357,7 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
                               </button>
                             ))
                           ) : (
-                            <span className="text-base font-semibold text-zinc-600">—</span>
+                            <span className="text-base font-semibold text-slate-400">—</span>
                           )}
                         </div>
                       </td>
@@ -367,7 +367,7 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
                         <div className="flex items-center justify-end gap-2.5">
                           <button 
                             onClick={() => router.push(`/admin/blogs/${blog.id}/edit`)} 
-                            className="h-9 px-3.5 inline-flex items-center justify-center gap-1.5 rounded-lg bg-zinc-850 hover:bg-[#615fff] border border-zinc-800 text-base font-bold text-zinc-300 hover:text-white transition-all cursor-pointer hover:shadow-lg hover:shadow-[#615fff]/10"
+                            className="h-9 px-3.5 inline-flex items-center justify-center gap-1.5 rounded-lg bg-slate-100 hover:bg-[#615fff] border border-slate-200 text-base font-bold text-slate-600 hover:text-slate-800 transition-all cursor-pointer hover:shadow-lg hover:shadow-[#615fff]/10"
                             title="Edit Article"
                           >
                             <FiEdit className="h-4 w-4" />
@@ -375,7 +375,7 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
                           </button>
                           <button 
                             onClick={() => handleDelete(blog)} 
-                            className="h-9 px-3.5 inline-flex items-center justify-center gap-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500 border border-rose-500/20 text-base font-bold text-rose-400 hover:text-white transition-all cursor-pointer hover:shadow-lg hover:shadow-rose-500/10"
+                            className="h-9 px-3.5 inline-flex items-center justify-center gap-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500 border border-rose-500/20 text-base font-bold text-rose-400 hover:text-rose-600 transition-all cursor-pointer hover:shadow-lg hover:shadow-rose-500/10"
                             title="Delete Article"
                           >
                             <FiTrash2 className="h-4 w-4" />

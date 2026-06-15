@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import Link from 'next/link'
@@ -28,7 +28,7 @@ function FileTypeIcon({ mime }: { mime: string }) {
   if (mime.startsWith('image/')) return <FiImage className="h-5 w-5 text-[#615fff]" />
   if (mime.startsWith('video/')) return <FiFilm className="h-5 w-5 text-emerald-400" />
   if (mime === 'application/pdf') return <FiFileText className="h-5 w-5 text-rose-400" />
-  return <FiFile className="h-5 w-5 text-zinc-400" />
+  return <FiFile className="h-5 w-5 text-slate-500" />
 }
 
 let idCounter = 0
@@ -156,8 +156,8 @@ export default function MediaUploadClient() {
             <div className="h-28 w-28 rounded-full bg-[#615fff]/20 flex items-center justify-center animate-pulse">
               <FiUploadCloud className="h-14 w-14 text-[#615fff]" />
             </div>
-            <p className="text-3xl font-bold text-white">Drop files here</p>
-            <p className="text-base font-semibold text-zinc-400">Images, videos, and PDFs supported</p>
+            <p className="text-3xl font-bold text-slate-800">Drop files here</p>
+            <p className="text-base font-semibold text-slate-500">Images, videos, and PDFs supported</p>
           </div>
         </div>
       )}
@@ -167,13 +167,13 @@ export default function MediaUploadClient() {
         <div className="flex items-center gap-4">
           <Link
             href="/admin/media"
-            className="flex items-center justify-center h-10 w-10 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-400 hover:text-white transition-all shrink-0"
+            className="flex items-center justify-center h-10 w-10 rounded-lg bg-slate-100 hover:bg-zinc-700 border border-slate-300 text-slate-500 hover:text-slate-800 transition-all shrink-0"
           >
             <FiArrowLeft className="h-5 w-5" />
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-white">Upload File / Photo</h1>
-            <p className="text-base font-semibold text-zinc-500 mt-1">
+            <h1 className="text-3xl font-bold text-slate-800">Upload File / Photo</h1>
+            <p className="text-base font-semibold text-slate-400 mt-1">
               Upload one or many files at once. Drag &amp; drop anywhere on this page.
             </p>
           </div>
@@ -184,7 +184,7 @@ export default function MediaUploadClient() {
           className={`flex flex-col items-center justify-center gap-5 w-full min-h-60 rounded-lg border-2 border-dashed transition-all cursor-pointer ${
             dragOver
               ? 'border-[#615fff] bg-[#615fff]/8'
-              : 'border-zinc-700 bg-[#121829] hover:border-[#615fff]/50 hover:bg-[#121829]'
+              : 'border-slate-300 bg-[#121829] hover:border-[#615fff]/50 hover:bg-[#121829]'
           }`}
         >
           <input
@@ -200,10 +200,10 @@ export default function MediaUploadClient() {
             <FiUploadCloud className="h-10 w-10 text-[#615fff]" />
           </div>
           <div className="text-center space-y-2">
-            <p className="text-base font-bold text-white">
+            <p className="text-base font-bold text-slate-800">
               Drag &amp; drop files here, or <span className="text-[#615fff] underline underline-offset-2">click to browse</span>
             </p>
-            <p className="text-base font-semibold text-zinc-500">
+            <p className="text-base font-semibold text-slate-400">
               Images (JPG, PNG, WEBP, GIF, SVG), Videos (MP4, MOV), PDF — bulk supported
             </p>
           </div>
@@ -211,11 +211,11 @@ export default function MediaUploadClient() {
 
         {/* File Queue */}
         {hasEntries && (
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg overflow-hidden">
+          <div className="bg-[#121829] border border-slate-200 rounded-lg overflow-hidden">
             {/* Queue header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200">
               <div className="flex items-center gap-3">
-                <p className="text-base font-bold text-white">
+                <p className="text-base font-bold text-slate-800">
                   {entries.length} file{entries.length !== 1 ? 's' : ''} queued
                 </p>
                 {doneCount > 0 && (
@@ -232,7 +232,7 @@ export default function MediaUploadClient() {
               {!uploading && hasQueued && (
                 <button
                   onClick={() => setEntries(prev => prev.filter(e => e.status !== 'queued'))}
-                  className="text-zinc-500 hover:text-white text-sm font-bold transition-colors cursor-pointer"
+                  className="text-slate-400 hover:text-slate-800 text-sm font-bold transition-colors cursor-pointer"
                 >
                   Clear queue
                 </button>
@@ -240,7 +240,7 @@ export default function MediaUploadClient() {
             </div>
 
             {/* File rows */}
-            <div className="divide-y divide-zinc-800/60">
+            <div className="divide-y divide-slate-200/60">
               {entries.map(entry => (
                 <div
                   key={entry.id}
@@ -251,7 +251,7 @@ export default function MediaUploadClient() {
                   }`}
                 >
                   {/* Thumbnail or icon */}
-                  <div className="h-12 w-12 rounded-lg bg-[#0e1422] border border-zinc-800 overflow-hidden flex items-center justify-center shrink-0">
+                  <div className="h-12 w-12 rounded-lg bg-[#0e1422] border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
                     {entry.preview ? (
                       <img src={entry.preview} alt="" className="w-full h-full object-cover" />
                     ) : (
@@ -261,8 +261,8 @@ export default function MediaUploadClient() {
 
                   {/* File info */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-white font-bold text-base truncate">{entry.file.name}</p>
-                    <p className="text-zinc-500 text-sm font-semibold mt-0.5">
+                    <p className="text-slate-800 font-bold text-base truncate">{entry.file.name}</p>
+                    <p className="text-slate-400 text-sm font-semibold mt-0.5">
                       {formatBytes(entry.file.size)} · {entry.file.type || 'unknown'}
                     </p>
                     {entry.status === 'error' && entry.error && (
@@ -273,7 +273,7 @@ export default function MediaUploadClient() {
                   {/* Status */}
                   <div className="shrink-0 flex items-center gap-2">
                     {entry.status === 'queued' && (
-                      <span className="text-sm font-bold text-zinc-500">Queued</span>
+                      <span className="text-sm font-bold text-slate-400">Queued</span>
                     )}
                     {entry.status === 'uploading' && (
                       <div className="flex items-center gap-2 text-[#615fff]">
@@ -284,7 +284,7 @@ export default function MediaUploadClient() {
                     {entry.status === 'done' && (
                       <div className="flex items-center gap-1.5 text-emerald-400">
                         <div className="h-5 w-5 rounded-full bg-emerald-500 flex items-center justify-center">
-                          <FiCheck className="h-3 w-3 text-white" />
+                          <FiCheck className="h-3 w-3 text-slate-800" />
                         </div>
                         <span className="text-sm font-bold">Done</span>
                       </div>
@@ -295,7 +295,7 @@ export default function MediaUploadClient() {
                     {(entry.status === 'queued' || entry.status === 'error') && !uploading && (
                       <button
                         onClick={() => removeEntry(entry.id)}
-                        className="ml-2 text-zinc-600 hover:text-zinc-300 cursor-pointer transition-colors"
+                        className="ml-2 text-slate-400 hover:text-slate-600 cursor-pointer transition-colors"
                         title="Remove"
                       >
                         <FiX className="h-4 w-4" />
@@ -312,7 +312,7 @@ export default function MediaUploadClient() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link
             href="/admin/media"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 hover:text-white font-bold text-base transition-all"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-slate-100 hover:bg-zinc-700 border border-slate-300 text-slate-600 hover:text-slate-800 font-bold text-base transition-all"
           >
             <FiArrowLeft className="h-4 w-4" /> Back to Media Library
           </Link>
@@ -330,7 +330,7 @@ export default function MediaUploadClient() {
               <button
                 onClick={handleUpload}
                 disabled={uploading}
-                className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] disabled:opacity-60 disabled:pointer-events-none text-white font-bold text-base shadow-md shadow-[#615fff]/25 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] disabled:opacity-60 disabled:pointer-events-none text-slate-800 font-bold text-base shadow-md shadow-[#615fff]/25 transition-all cursor-pointer"
               >
                 {uploading ? (
                   <>

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -115,24 +115,24 @@ export default function StaffListPageClient({ initialStaff }: StaffListPageClien
       )}
       
       {/* Search and Filters Bar - Borderless */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#18181b] border-none rounded-lg p-4 shadow-md">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border-none rounded-lg p-4 shadow-md">
         
         {/* Search */}
         <div className="relative flex-1 max-w-md">
-          <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-450 h-5 w-5" />
+          <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 h-5 w-5" />
           <input
             type="text"
             placeholder="Search by name, email, or phone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-[#242427] border-none focus:ring-2 focus:ring-[#615fff]/40 text-white rounded-lg pl-11 pr-4 py-2.5 text-base font-semibold outline-none transition-all shadow-inner"
+            className="w-full bg-[#242427] border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-2.5 text-base font-semibold outline-none transition-all shadow-inner"
           />
         </div>
 
         {/* Filters and CTA */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2 bg-[#242427] p-1.5 rounded-lg shadow-inner">
-            <FiFilter className="text-zinc-550 h-4.5 w-4.5 ml-2" />
+            <FiFilter className="text-slate-400 h-4.5 w-4.5 ml-2" />
             <div className="flex gap-1">
               {(['all', 'admin', 'instructor', 'staff'] as const).map((r) => (
                 <button
@@ -141,7 +141,7 @@ export default function StaffListPageClient({ initialStaff }: StaffListPageClien
                   className={`px-3.5 py-1.5 rounded text-sm font-bold capitalize select-none cursor-pointer transition-all border-none ${
                     roleFilter === r
                       ? 'bg-[#615fff] text-white shadow-sm'
-                      : 'text-zinc-400 hover:text-white'
+                      : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
                   {r === 'all' ? 'All Roles' : r}
@@ -161,17 +161,17 @@ export default function StaffListPageClient({ initialStaff }: StaffListPageClien
       </div>
 
       {/* Faculty and Staff Table - Borderless */}
-      <div className="bg-[#18181b] border-none rounded-lg overflow-hidden shadow-lg">
+      <div className="bg-white border-none rounded-lg overflow-hidden shadow-lg">
         {filteredStaff.length === 0 ? (
           <div className="text-center py-16 space-y-2">
-            <FiUser className="h-12 w-12 text-zinc-600 mx-auto" />
-            <p className="text-base font-semibold text-zinc-400">No faculty or staff members match the query.</p>
+            <FiUser className="h-12 w-12 text-slate-400 mx-auto" />
+            <p className="text-base font-semibold text-slate-500">No faculty or staff members match the query.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-base font-sans border-collapse">
               <thead>
-                <tr className="border-b border-zinc-800/40 text-zinc-450 font-bold bg-[#141416]/50 text-sm tracking-wider uppercase">
+                <tr className="border-b border-slate-200/40 text-slate-500 font-bold bg-slate-50/50 text-sm tracking-wider uppercase">
                   <th className="px-6 py-4">Faculty Member</th>
                   <th className="px-6 py-4">Privilege Role</th>
                   <th className="px-6 py-4">Contact Details</th>
@@ -179,7 +179,7 @@ export default function StaffListPageClient({ initialStaff }: StaffListPageClien
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-800/20 font-semibold text-zinc-350">
+              <tbody className="divide-y divide-slate-200/20 font-semibold text-slate-600">
                 {filteredStaff.map((member) => (
                   <tr key={member.id} className="hover:bg-[#242427]/30 transition-colors">
                     
@@ -194,11 +194,11 @@ export default function StaffListPageClient({ initialStaff }: StaffListPageClien
                           </div>
                         )}
                         <div>
-                          <p className="text-white font-bold text-base leading-tight">{member.name}</p>
+                          <p className="text-slate-800 font-bold text-base leading-tight">{member.name}</p>
                           {member.designation && (
                             <p className="text-[#a5b4fc] text-xs font-bold mt-1 tracking-wide">{member.designation}</p>
                           )}
-                          <p className="text-zinc-500 text-[10px] font-semibold mt-1">ID: {member.id}</p>
+                          <p className="text-slate-400 text-[10px] font-semibold mt-1">ID: {member.id}</p>
                         </div>
                       </div>
                     </td>
@@ -210,7 +210,7 @@ export default function StaffListPageClient({ initialStaff }: StaffListPageClien
                           ? 'bg-rose-500/10 text-rose-400 border-none'
                           : member.role === 'instructor'
                           ? 'bg-emerald-500/10 text-emerald-400 border-none'
-                          : 'bg-zinc-850 text-zinc-300 border-none'
+                          : 'bg-slate-100 text-slate-600 border-none'
                       }`}>
                         {member.role}
                       </span>
@@ -219,13 +219,13 @@ export default function StaffListPageClient({ initialStaff }: StaffListPageClien
                     {/* Contact Details */}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="space-y-0.5">
-                        <div className="flex items-center gap-1.5 text-zinc-300 text-base">
-                          <FiMail className="h-4 w-4 text-zinc-500 shrink-0" />
+                        <div className="flex items-center gap-1.5 text-slate-600 text-base">
+                          <FiMail className="h-4 w-4 text-slate-400 shrink-0" />
                           <span>{member.email}</span>
                         </div>
                         {member.phone && (
-                          <div className="flex items-center gap-1.5 text-zinc-500 text-sm">
-                            <FiPhone className="h-3.5 w-3.5 text-zinc-600 shrink-0" />
+                          <div className="flex items-center gap-1.5 text-slate-400 text-sm">
+                            <FiPhone className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                             <span>{member.phone}</span>
                           </div>
                         )}
@@ -233,9 +233,9 @@ export default function StaffListPageClient({ initialStaff }: StaffListPageClien
                     </td>
 
                     {/* Registered Date */}
-                    <td className="px-6 py-4 whitespace-nowrap text-zinc-400">
+                    <td className="px-6 py-4 whitespace-nowrap text-slate-500">
                       <div className="flex items-center gap-1.5 text-base">
-                        <FiCalendar className="h-4.5 w-4.5 text-zinc-550" />
+                        <FiCalendar className="h-4.5 w-4.5 text-slate-400" />
                         <span>
                           {member.createdAt
                             ? new Date(member.createdAt).toLocaleDateString('en-US', {
@@ -255,13 +255,13 @@ export default function StaffListPageClient({ initialStaff }: StaffListPageClien
                           <span className="text-xs font-bold text-rose-400 px-1">Confirm?</span>
                           <button
                             onClick={() => executeDeleteStaff(member.id, member.name)}
-                            className="px-2 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded text-xs font-bold transition-colors cursor-pointer border-none"
+                            className="px-2 py-1 bg-rose-600 hover:bg-rose-700 text-slate-800 rounded text-xs font-bold transition-colors cursor-pointer border-none"
                           >
                             Yes
                           </button>
                           <button
                             onClick={() => setConfirmDeleteId(null)}
-                            className="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white rounded text-xs font-bold transition-colors cursor-pointer border-none"
+                            className="px-2 py-1 bg-slate-100 hover:bg-zinc-700 text-slate-600 hover:text-slate-800 rounded text-xs font-bold transition-colors cursor-pointer border-none"
                           >
                             No
                           </button>
@@ -270,14 +270,14 @@ export default function StaffListPageClient({ initialStaff }: StaffListPageClien
                         <>
                           <button
                             onClick={() => router.push(`/admin/staff-register/${member.id}/edit`)}
-                            className="p-2 text-zinc-500 hover:text-[#615fff] hover:bg-[#615fff]/10 rounded-lg transition-all cursor-pointer border-none inline-flex items-center"
+                            className="p-2 text-slate-400 hover:text-[#615fff] hover:bg-[#615fff]/10 rounded-lg transition-all cursor-pointer border-none inline-flex items-center"
                             title="Edit Profile"
                           >
                             <FiEdit2 className="h-4.5 w-4.5" />
                           </button>
                           <button
                             onClick={() => setConfirmDeleteId(member.id)}
-                            className="p-2 text-zinc-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all cursor-pointer border-none inline-flex items-center"
+                            className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all cursor-pointer border-none inline-flex items-center"
                             title="Delete Account"
                           >
                             <FiTrash2 className="h-4.5 w-4.5" />

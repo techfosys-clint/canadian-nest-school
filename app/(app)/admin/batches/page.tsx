@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
@@ -211,10 +211,10 @@ export default function BatchesAdminPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center bg-[#121212]">
+      <div className="min-h-[70vh] flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-4">
           <div className="h-12 w-12 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
-          <p className="text-base font-bold text-zinc-400">Loading Batches Workspace...</p>
+          <p className="text-base font-bold text-slate-500">Loading Batches Workspace...</p>
         </div>
       </div>
     )
@@ -229,10 +229,10 @@ export default function BatchesAdminPage() {
           <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-[#615fff]/15 border border-[#615fff]/30 text-base font-bold text-[#615fff] uppercase tracking-wider mb-3">
             Academic Operations
           </span>
-          <h1 className="text-3xl font-bold font-display text-white leading-tight">
+          <h1 className="text-3xl font-bold font-display text-slate-800 leading-tight">
             Batch Management
           </h1>
-          <p className="text-base font-semibold text-zinc-500 mt-1">
+          <p className="text-base font-semibold text-slate-400 mt-1">
             Configure active study intakes, group students, assign instructors, and schedule courses.
           </p>
         </div>
@@ -247,25 +247,25 @@ export default function BatchesAdminPage() {
       </div>
 
       {/* Main Batches Table Card */}
-      <div className="bg-[#18181b] border border-zinc-800 rounded-lg overflow-hidden shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
         
         {/* Search Toolbar */}
-        <div className="p-5 border-b border-zinc-800 flex items-center relative select-none">
-          <FiSearch className="absolute left-9 h-5 w-5 text-zinc-500" />
+        <div className="p-5 border-b border-slate-200 flex items-center relative select-none">
+          <FiSearch className="absolute left-9 h-5 w-5 text-slate-400" />
           <input
             type="text"
             value={batchSearchQuery}
             onChange={(e) => setBatchSearchQuery(e.target.value)}
             placeholder="Search batches by title or course name..."
-            className="w-full bg-[#121212] border border-zinc-800 focus:border-[#615fff]/60 rounded-lg pl-12 pr-4 py-3.5 text-base font-semibold text-white outline-none placeholder-zinc-500"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/60 rounded-lg pl-12 pr-4 py-3.5 text-base font-semibold text-slate-800 outline-none placeholder-slate-400"
           />
         </div>
 
         {filteredBatches.length === 0 ? (
           <div className="p-16 text-center select-none">
-            <FiUsers className="h-12 w-12 text-zinc-650 mx-auto mb-4 animate-pulse" />
-            <h3 className="text-xl font-bold text-white">No Batches Found</h3>
-            <p className="text-base font-semibold text-zinc-500 max-w-sm mx-auto mt-2 leading-relaxed">
+            <FiUsers className="h-12 w-12 text-slate-400 mx-auto mb-4 animate-pulse" />
+            <h3 className="text-xl font-bold text-slate-800">No Batches Found</h3>
+            <p className="text-base font-semibold text-slate-400 max-w-sm mx-auto mt-2 leading-relaxed">
               Launch a new academic intake batch using the top action button.
             </p>
           </div>
@@ -273,7 +273,7 @@ export default function BatchesAdminPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#141416] border-b border-zinc-800 text-zinc-400 font-bold text-base uppercase tracking-wider select-none">
+                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold text-base uppercase tracking-wider select-none">
                   <th className="p-5">Intake Batch</th>
                   <th className="p-5">Course</th>
                   <th className="p-5">Instructor</th>
@@ -283,29 +283,29 @@ export default function BatchesAdminPage() {
                   <th className="p-5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-800/60 font-semibold text-zinc-200">
+              <tbody className="divide-y divide-slate-200/60 font-semibold text-slate-700">
                 {filteredBatches.map((batch) => {
                   const isSelectedForStudents = selectedBatch?._id === batch._id
                   return (
                     <tr key={batch._id} className={`hover:bg-[#1a1a1c]/40 transition-colors ${isSelectedForStudents ? 'bg-[#615fff]/5 hover:bg-[#615fff]/8' : ''}`}>
                       <td className="p-5">
-                        <p className="text-base font-bold text-white">{batch.name}</p>
-                        <p className="text-xs text-zinc-500 font-semibold mt-0.5">ID: {batch._id.substring(18)}</p>
+                        <p className="text-base font-bold text-slate-800">{batch.name}</p>
+                        <p className="text-xs text-slate-400 font-semibold mt-0.5">ID: {batch._id.substring(18)}</p>
                       </td>
                       <td className="p-5">
-                        <p className="text-base font-bold text-zinc-300 flex items-center gap-1.5">
+                        <p className="text-base font-bold text-slate-600 flex items-center gap-1.5">
                           <FiBookOpen className="text-[#615fff] h-4.5 w-4.5 shrink-0" />
                           {batch.course?.title || 'Unknown Course'}
                         </p>
                       </td>
                       <td className="p-5">
-                        <p className="text-base font-bold text-zinc-400 flex items-center gap-1.5">
-                          <FiUser className="text-zinc-500 h-4.5 w-4.5 shrink-0" />
+                        <p className="text-base font-bold text-slate-500 flex items-center gap-1.5">
+                          <FiUser className="text-slate-400 h-4.5 w-4.5 shrink-0" />
                           {batch.instructor?.name || 'Expert Instructor'}
                         </p>
                       </td>
                       <td className="p-5">
-                        <div className="flex items-center gap-1.5 text-base font-semibold text-zinc-400 select-none">
+                        <div className="flex items-center gap-1.5 text-base font-semibold text-slate-500 select-none">
                           <FiCalendar className="text-zinc-655 h-4.5 w-4.5 shrink-0" />
                           <span>{new Date(batch.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                         </div>
@@ -315,7 +315,7 @@ export default function BatchesAdminPage() {
                           batch.status === 'active' 
                             ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-450' 
                             : batch.status === 'completed'
-                              ? 'bg-zinc-750/20 border border-zinc-700/30 text-zinc-400'
+                              ? 'bg-zinc-750/20 border border-slate-300/30 text-slate-500'
                               : 'bg-amber-500/10 border border-amber-500/20 text-amber-400'
                         }`}>
                           {batch.status}
@@ -326,8 +326,8 @@ export default function BatchesAdminPage() {
                           onClick={() => handleSelectBatchStudents(batch)}
                           className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-base font-bold transition-all cursor-pointer select-none whitespace-nowrap active:scale-[0.98] ${
                             isSelectedForStudents
-                              ? 'bg-[#615fff] border-transparent text-white shadow-md'
-                              : 'border-zinc-800 hover:border-zinc-700 bg-[#121212] hover:bg-[#222] text-zinc-350 hover:text-white'
+                              ? 'bg-[#615fff] border-transparent text-slate-800 shadow-md'
+                              : 'border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-[#222] text-slate-600 hover:text-slate-800'
                           }`}
                         >
                           <FiUsers className="h-4.5 w-4.5" />
@@ -338,7 +338,7 @@ export default function BatchesAdminPage() {
                         <div className="inline-flex items-center gap-2">
                           <button
                             onClick={() => router.push(`/admin/batches/${batch._id}/edit`)}
-                            className="p-2.5 rounded-lg border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-white bg-[#121212] hover:bg-[#222] transition-colors cursor-pointer"
+                            className="p-2.5 rounded-lg border border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-800 bg-slate-50 hover:bg-[#222] transition-colors cursor-pointer"
                             title="Edit Batch details"
                           >
                             <FiEdit2 className="h-4 w-4" />
@@ -346,7 +346,7 @@ export default function BatchesAdminPage() {
                           {sessionUser?.role === 'admin' && (
                             <button
                               onClick={() => handleDeleteBatch(batch._id)}
-                              className="p-2.5 rounded-lg border border-red-500/15 hover:border-red-500 bg-[#121212] text-red-500 hover:bg-red-550/10 transition-colors cursor-pointer"
+                              className="p-2.5 rounded-lg border border-red-500/15 hover:border-red-500 bg-slate-50 text-red-500 hover:bg-red-550/10 transition-colors cursor-pointer"
                               title="Delete Batch"
                             >
                               <FiTrash2 className="h-4 w-4" />
@@ -365,21 +365,21 @@ export default function BatchesAdminPage() {
 
       {/* ── Bottom Section: Inline Batch Student Manager (Completely Inline, Zero Popups) ── */}
       {selectedBatch && (
-        <div ref={studentManagerRef} className="bg-[#18181b] border border-zinc-800 rounded-lg overflow-hidden shadow-sm mt-10 animate-fadeIn">
+        <div ref={studentManagerRef} className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm mt-10 animate-fadeIn">
           
-          <div className="px-6 py-5 bg-[#141416] border-b border-zinc-800 flex items-center justify-between select-none">
+          <div className="px-6 py-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between select-none">
             <div>
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
                 <FiUsers className="text-[#615fff]" />
                 <span>Manage Students - {selectedBatch.name}</span>
               </h2>
-              <p className="text-sm font-semibold text-zinc-550 mt-1">
-                Course: <span className="text-white font-bold">{selectedBatch.course?.title}</span> — assign or remove student registrations from this intake.
+              <p className="text-sm font-semibold text-slate-400 mt-1">
+                Course: <span className="text-slate-800 font-bold">{selectedBatch.course?.title}</span> — assign or remove student registrations from this intake.
               </p>
             </div>
             <button 
               onClick={() => setSelectedBatch(null)}
-              className="p-2 rounded-lg border border-zinc-800 hover:bg-zinc-850 text-zinc-400 hover:text-white transition-colors cursor-pointer shrink-0"
+              className="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer shrink-0"
             >
               <FiX className="h-5 w-5" />
             </button>
@@ -399,28 +399,28 @@ export default function BatchesAdminPage() {
               
               {/* Left Side: Current Students List */}
               <div className="space-y-4">
-                <h3 className="text-base font-bold text-zinc-300 flex items-center gap-2 select-none">
+                <h3 className="text-base font-bold text-slate-600 flex items-center gap-2 select-none">
                   <FiCheckCircle className="text-emerald-500" />
                   <span>Currently Enrolled Students ({selectedBatch.students?.length || 0})</span>
                 </h3>
                 
-                <div className="border border-zinc-800 rounded-lg bg-[#121212] p-4 max-h-[350px] overflow-y-auto space-y-3 pr-2">
+                <div className="border border-slate-200 rounded-lg bg-slate-50 p-4 max-h-[350px] overflow-y-auto space-y-3 pr-2">
                   {selectedBatch.students?.length === 0 ? (
-                    <div className="text-center py-12 text-zinc-500 select-none">
+                    <div className="text-center py-12 text-slate-400 select-none">
                       <FiUsers className="h-10 w-10 mx-auto mb-2 text-zinc-655 animate-pulse" />
                       <p className="text-base font-semibold">No students registered in this batch yet.</p>
-                      <p className="text-xs text-zinc-550 mt-1">Use the search box on the right to enroll students.</p>
+                      <p className="text-xs text-slate-400 mt-1">Use the search box on the right to enroll students.</p>
                     </div>
                   ) : (
                     selectedBatch.students.map(s => (
-                      <div key={s._id} className="p-4 rounded-lg bg-[#18181b] border border-zinc-800 flex items-center justify-between gap-3 group">
+                      <div key={s._id} className="p-4 rounded-lg bg-white border border-slate-200 flex items-center justify-between gap-3 group">
                         <div className="min-w-0">
-                          <p className="text-base font-bold text-white truncate">{s.name}</p>
-                          <p className="text-base text-zinc-500 truncate mt-0.5">{s.email}</p>
+                          <p className="text-base font-bold text-slate-800 truncate">{s.name}</p>
+                          <p className="text-base text-slate-400 truncate mt-0.5">{s.email}</p>
                         </div>
                         <button
                           onClick={() => handleRemoveStudentFromBatch(s._id)}
-                          className="px-4 py-2 rounded-lg border border-red-500/15 hover:border-red-500 bg-[#121212] text-red-500 hover:bg-red-550/10 text-base font-bold transition-all cursor-pointer select-none"
+                          className="px-4 py-2 rounded-lg border border-red-500/15 hover:border-red-500 bg-slate-50 text-red-500 hover:bg-red-550/10 text-base font-bold transition-all cursor-pointer select-none"
                         >
                           Remove
                         </button>
@@ -432,35 +432,35 @@ export default function BatchesAdminPage() {
 
               {/* Right Side: Search and Enroll Students */}
               <div className="space-y-4">
-                <h3 className="text-base font-bold text-zinc-300 flex items-center gap-2 select-none">
+                <h3 className="text-base font-bold text-slate-600 flex items-center gap-2 select-none">
                   <FiPlus className="text-[#615fff]" />
                   <span>Enroll Registered Student</span>
                 </h3>
 
                 {/* Search Bar */}
                 <div className="relative select-none">
-                  <FiSearch className="absolute left-3.5 top-3.5 h-4.5 w-4.5 text-zinc-500" />
+                  <FiSearch className="absolute left-3.5 top-3.5 h-4.5 w-4.5 text-slate-400" />
                   <input
                     type="text"
                     value={studentSearchQuery}
                     onChange={(e) => setStudentSearchQuery(e.target.value)}
                     placeholder="Search by student name or email address..."
-                    className="w-full bg-[#121212] border border-zinc-800 focus:border-[#615fff]/60 rounded-lg pl-11 pr-4 py-3 text-base font-semibold text-white outline-none placeholder-zinc-550"
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/60 rounded-lg pl-11 pr-4 py-3 text-base font-semibold text-slate-800 outline-none placeholder-zinc-550"
                   />
                 </div>
 
                 {/* Search Results list */}
-                <div className="border border-zinc-800 rounded-lg bg-[#121212] p-4 max-h-[290px] overflow-y-auto space-y-3 pr-2">
+                <div className="border border-slate-200 rounded-lg bg-slate-50 p-4 max-h-[290px] overflow-y-auto space-y-3 pr-2">
                   {filteredAvailableStudents.length === 0 ? (
-                    <div className="text-center py-12 text-zinc-500 select-none">
+                    <div className="text-center py-12 text-slate-400 select-none">
                       <p className="text-base font-semibold">No matching unregistered students found.</p>
                     </div>
                   ) : (
                     filteredAvailableStudents.map(s => (
-                      <div key={s._id} className="p-4 rounded-lg bg-[#18181b] border border-zinc-850 hover:border-zinc-800 flex items-center justify-between gap-3 transition-colors">
+                      <div key={s._id} className="p-4 rounded-lg bg-white border border-slate-100 hover:border-slate-200 flex items-center justify-between gap-3 transition-colors">
                         <div className="min-w-0">
-                          <p className="text-base font-bold text-white truncate">{s.name}</p>
-                          <p className="text-base text-zinc-500 truncate mt-0.5">{s.email}</p>
+                          <p className="text-base font-bold text-slate-800 truncate">{s.name}</p>
+                          <p className="text-base text-slate-400 truncate mt-0.5">{s.email}</p>
                         </div>
                         <button
                           onClick={() => handleAddStudentToBatch(s)}

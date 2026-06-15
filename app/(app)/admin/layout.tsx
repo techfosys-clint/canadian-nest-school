@@ -103,8 +103,8 @@ export default function AdminLayout({
         text: 'Administrative session ended.',
         timer: 1500,
         showConfirmButton: false,
-        background: '#1a1a1a',
-        color: '#ffffff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
 
       setTimeout(() => {
@@ -117,10 +117,10 @@ export default function AdminLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#121212]">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-4">
           <div className="h-12 w-12 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
-          <p className="text-base font-bold text-zinc-300">Verifying Admin Access...</p>
+          <p className="text-base font-bold text-slate-500">Verifying Admin Access...</p>
         </div>
       </div>
     )
@@ -174,18 +174,18 @@ export default function AdminLayout({
   })
 
   return (
-    <div className="h-screen bg-[#121212] flex font-sans overflow-hidden text-zinc-100">
+    <div className="h-screen bg-slate-50 flex font-sans overflow-hidden text-slate-800">
       
-      {/* ── Desktop Sidebar Navigation (Sleek Dark Zinc) ── */}
-      <aside className="hidden lg:flex flex-col w-64 bg-[#18181b] border-r border-zinc-800 shrink-0 select-none h-full">
+      {/* ── Desktop Sidebar Navigation (Clean Light) ── */}
+      <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-slate-200 shrink-0 select-none h-full shadow-sm">
         
         {/* Sidebar Brand Header */}
-        <div className="h-20 flex items-center px-6 border-b border-zinc-800">
+        <div className="h-20 flex items-center px-6 border-b border-slate-200">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <span className="h-9 w-9 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white shadow-lg shadow-[#615fff]/30 transition-transform group-hover:scale-105 duration-300 text-base">
+            <span className="h-9 w-9 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-slate-800 shadow-lg shadow-[#615fff]/30 transition-transform group-hover:scale-105 duration-300 text-base">
               T
             </span>
-            <span className="text-xl font-bold font-display tracking-tight text-white">
+            <span className="text-xl font-bold font-display tracking-tight text-slate-800">
               Tutor Space
             </span>
           </Link>
@@ -193,7 +193,7 @@ export default function AdminLayout({
 
         {/* Sidebar Links */}
         <nav className="flex-1 px-4 py-3 space-y-1 overflow-y-auto">
-          <p className="text-base font-bold text-zinc-500 uppercase tracking-wider px-3 mb-2">Management</p>
+          <p className="text-base font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">Management</p>
           {sidebarLinks.map((link) => {
             const isActive = pathname === link.href
             const Icon = link.icon
@@ -204,10 +204,10 @@ export default function AdminLayout({
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-base font-semibold transition-all duration-200 group ${
                   isActive 
                     ? 'bg-[#615fff] text-white shadow-md shadow-[#615fff]/20 border border-[#615fff]/20' 
-                    : 'text-zinc-400 hover:bg-[#27272a] hover:text-white border border-transparent'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-transparent'
                 }`}
               >
-                <Icon className={`h-4.5 w-4.5 ${isActive ? 'text-white' : 'text-zinc-500 group-hover:text-white'}`} />
+                <Icon className={`h-4.5 w-4.5 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-700'}`} />
                 <span>{link.label}</span>
               </Link>
             )
@@ -215,9 +215,9 @@ export default function AdminLayout({
         </nav>
 
         {/* Sidebar Footer User Info */}
-        <div className="p-4 border-t border-zinc-800 bg-[#141416]">
+        <div className="p-4 border-t border-slate-200 bg-slate-50">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full border border-[#615fff]/35 bg-[#27272a] flex items-center justify-center text-base font-bold text-white overflow-hidden shrink-0">
+            <div className="h-10 w-10 rounded-full border border-[#615fff]/35 bg-slate-100 flex items-center justify-center text-base font-bold text-slate-700 overflow-hidden shrink-0">
               {user.profilePic ? (
                 <img src={user.profilePic} alt={user.name} className="h-full w-full object-cover" />
               ) : (
@@ -225,13 +225,13 @@ export default function AdminLayout({
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-base font-bold text-white truncate leading-tight">{user.name}</p>
+              <p className="text-base font-bold text-slate-800 truncate leading-tight">{user.name}</p>
               <p className="text-base font-semibold text-[#615fff] truncate mt-0.5 capitalize">{user.role}</p>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="w-full mt-4 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-red-500/25 hover:border-red-500 bg-red-550/5 hover:bg-red-550/10 text-red-400 font-bold text-base transition-all duration-200 cursor-pointer"
+            className="w-full mt-4 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-red-200 hover:border-red-400 bg-red-50 hover:bg-red-100 text-red-500 font-bold text-base transition-all duration-200 cursor-pointer"
           >
             <FiLogOut className="h-4.5 w-4.5" />
             <span>Sign Out</span>
@@ -244,34 +244,34 @@ export default function AdminLayout({
       {sidebarOpen && (
         <div 
           onClick={() => setSidebarOpen(false)} 
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm lg:hidden"
         />
       )}
 
       {/* ── Mobile Sidebar Drawer Panel ── */}
-      <aside className={`fixed top-0 bottom-0 left-0 z-50 w-64 bg-[#18181b] border-r border-zinc-800 flex flex-col justify-between select-none transition-transform duration-350 lg:hidden ${
+      <aside className={`fixed top-0 bottom-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col justify-between select-none transition-transform duration-350 lg:hidden ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div>
-          <div className="h-20 flex items-center px-6 border-b border-zinc-800 justify-between">
+          <div className="h-20 flex items-center px-6 border-b border-slate-200 justify-between">
             <Link href="/" className="flex items-center gap-2.5">
-              <span className="h-9 w-9 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white text-base">
+              <span className="h-9 w-9 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-slate-800 text-base">
                 T
               </span>
-              <span className="text-xl font-bold font-display tracking-tight text-white">
+              <span className="text-xl font-bold font-display tracking-tight text-slate-800">
                 Tutor Space
               </span>
             </Link>
             <button 
               onClick={() => setSidebarOpen(false)}
-              className="p-1.5 rounded-lg hover:bg-[#27272a] text-zinc-400 hover:text-white"
+              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800"
             >
               <FiX className="h-6 w-6" />
             </button>
           </div>
 
           <nav className="px-4 py-3 space-y-1">
-            <p className="text-base font-bold text-zinc-500 uppercase tracking-wider px-3 mb-2">Management</p>
+            <p className="text-base font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">Management</p>
             {sidebarLinks.map((link) => {
               const isActive = pathname === link.href
               const Icon = link.icon
@@ -283,10 +283,10 @@ export default function AdminLayout({
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-base font-semibold transition-all duration-200 group ${
                     isActive 
                       ? 'bg-[#615fff] text-white shadow-md' 
-                      : 'text-zinc-400 hover:bg-[#27272a] hover:text-white'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
-                  <Icon className={`h-4.5 w-4.5 ${isActive ? 'text-white' : 'text-zinc-505'}`} />
+                  <Icon className={`h-4.5 w-4.5 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                   <span>{link.label}</span>
                 </Link>
               )
@@ -294,9 +294,9 @@ export default function AdminLayout({
           </nav>
         </div>
 
-        <div className="p-4 border-t border-zinc-800 bg-[#141416]">
+        <div className="p-4 border-t border-slate-200 bg-slate-50">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full border border-[#615fff]/35 bg-[#27272a] flex items-center justify-center text-base font-bold text-white overflow-hidden shrink-0">
+            <div className="h-10 w-10 rounded-full border border-[#615fff]/35 bg-slate-100 flex items-center justify-center text-base font-bold text-slate-700 overflow-hidden shrink-0">
               {user.profilePic ? (
                 <img src={user.profilePic} alt={user.name} className="h-full w-full object-cover" />
               ) : (
@@ -304,13 +304,13 @@ export default function AdminLayout({
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-base font-bold text-white truncate leading-none">{user.name}</p>
+              <p className="text-base font-bold text-slate-800 truncate leading-none">{user.name}</p>
               <p className="text-base font-semibold text-[#615fff] truncate mt-1 capitalize">{user.role}</p>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="w-full mt-4 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-red-500/25 hover:border-red-500/50 bg-red-500/5 hover:bg-red-500/10 text-red-400 font-bold text-base transition-all duration-200 cursor-pointer"
+            className="w-full mt-4 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-red-200 hover:border-red-400 bg-red-50 hover:bg-red-100 text-red-500 font-bold text-base transition-all duration-200 cursor-pointer"
           >
             <FiLogOut className="h-4.5 w-4.5" />
             <span>Sign Out</span>
@@ -319,24 +319,24 @@ export default function AdminLayout({
       </aside>
 
       {/* ── Main View Panel Container ── */}
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#121212]">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-slate-50">
         
         {/* Sticky Top Header */}
-        <header className="sticky top-0 z-30 w-full h-20 bg-[#121212]/80 backdrop-blur-md border-b border-zinc-800/60 px-6 flex items-center justify-between select-none shrink-0">
+        <header className="sticky top-0 z-30 w-full h-20 bg-white/80 backdrop-blur-md border-b border-slate-200/80 px-6 flex items-center justify-between select-none shrink-0 shadow-sm">
           
           {/* Mobile hamburger menu toggle */}
           <div className="flex items-center gap-3 lg:hidden">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="p-2 rounded-lg border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-white bg-[#18181b] cursor-pointer"
+              className="p-2 rounded-lg border border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-800 bg-white cursor-pointer"
             >
               <FiMenu className="h-5 w-5" />
             </button>
             <Link href="/" className="flex items-center gap-2">
-              <span className="h-8 w-8 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white text-sm">
+              <span className="h-8 w-8 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-slate-800 text-sm">
                 T
               </span>
-              <span className="text-lg font-bold font-display tracking-tight text-white">
+              <span className="text-lg font-bold font-display tracking-tight text-slate-800">
                 Tutor Space
               </span>
             </Link>
@@ -345,7 +345,7 @@ export default function AdminLayout({
           {/* Page Badge Title Indicator */}
           <div className="hidden sm:flex items-center gap-2.5">
             <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-base font-bold text-zinc-450 uppercase tracking-widest">
+            <span className="text-base font-bold text-slate-400 uppercase tracking-widest">
               Live Console
             </span>
           </div>
@@ -356,7 +356,7 @@ export default function AdminLayout({
             {/* View Homepage Shortcut */}
             <Link
               href="/"
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-base font-semibold text-zinc-400 hover:text-white hover:bg-[#18181b] border border-transparent hover:border-zinc-800 transition-all duration-200"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-base font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-all duration-200"
             >
               <FiHome className="h-4.5 w-4.5" />
               <span className="hidden sm:inline">Portal Homepage</span>
@@ -365,23 +365,23 @@ export default function AdminLayout({
             {/* Student Portal Shortcut */}
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-base font-semibold text-zinc-400 hover:text-white hover:bg-[#18181b] border border-transparent hover:border-zinc-800 transition-all duration-200"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-base font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-all duration-200"
             >
               <FiUser className="h-4.5 w-4.5" />
               <span className="hidden sm:inline">Student Portal</span>
             </Link>
 
             {/* Admin Badge Info */}
-            <div className="flex items-center gap-3 border-l border-zinc-800 pl-4.5">
-              <div className="h-10 w-10 rounded-full border border-[#615fff]/30 bg-[#18181b] flex items-center justify-center overflow-hidden shrink-0">
+            <div className="flex items-center gap-3 border-l border-slate-200 pl-4.5">
+              <div className="h-10 w-10 rounded-full border border-[#615fff]/30 bg-slate-100 flex items-center justify-center overflow-hidden shrink-0">
                 {user.profilePic ? (
                   <img src={user.profilePic} alt={user.name} className="h-full w-full object-cover" />
                 ) : (
-                  <FiUser className="h-5 w-5 text-zinc-400" />
+                  <FiUser className="h-5 w-5 text-slate-400" />
                 )}
               </div>
               <div className="hidden md:block">
-                <p className="text-base font-bold text-white leading-none">{user.name}</p>
+                <p className="text-base font-bold text-slate-800 leading-none">{user.name}</p>
                 <p className="text-base font-semibold text-[#615fff] mt-1 capitalize">{user.role} Account</p>
               </div>
             </div>

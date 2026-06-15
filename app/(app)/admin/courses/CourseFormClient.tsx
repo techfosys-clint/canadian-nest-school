@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
@@ -94,7 +94,7 @@ export default function CourseFormClient({
         title: 'Duplicate Module',
         text: 'This module name already exists.',
         background: '#121829',
-        color: '#ffffff',
+        color: '#1a1a1a',
       })
       return
     }
@@ -301,7 +301,7 @@ export default function CourseFormClient({
         timer: 1500,
         showConfirmButton: false,
         background: '#121829',
-        color: '#ffffff',
+        color: '#1a1a1a',
       })
     } catch (err: any) {
       Swal.fire({
@@ -309,7 +309,7 @@ export default function CourseFormClient({
         title: 'Upload Failed',
         text: err.message || 'Could not upload file.',
         background: '#121829',
-        color: '#ffffff',
+        color: '#1a1a1a',
       })
     } finally {
       setUploadingStates(prev => ({ ...prev, [index]: false }))
@@ -334,9 +334,9 @@ export default function CourseFormClient({
       setThumbnailId(data.media.id)
       setThumbnailUrl(data.media.url)
       setThumbnailAlt(data.media.alt)
-      Swal.fire({ icon: 'success', title: 'Image Uploaded', text: 'Cover photo processed.', timer: 1500, showConfirmButton: false, background: '#121829', color: '#ffffff' })
+      Swal.fire({ icon: 'success', title: 'Image Uploaded', text: 'Cover photo processed.', timer: 1500, showConfirmButton: false, background: '#121829', color: '#1a1a1a' })
     } catch (err: any) {
-      Swal.fire({ icon: 'error', title: 'Upload Failed', text: err.message || 'Could not upload media.', background: '#121829', color: '#ffffff' })
+      Swal.fire({ icon: 'error', title: 'Upload Failed', text: err.message || 'Could not upload media.', background: '#121829', color: '#1a1a1a' })
     } finally {
       setUploadingImage(false)
       if (thumbnailFileRef.current) thumbnailFileRef.current.value = ''
@@ -360,7 +360,7 @@ export default function CourseFormClient({
         title: 'Validation Error',
         text: 'Please complete all required fields, including the Cover Image thumbnail.',
         background: '#121829',
-        color: '#ffffff',
+        color: '#1a1a1a',
       })
       return
     }
@@ -371,7 +371,7 @@ export default function CourseFormClient({
         title: 'Invalid Slug',
         text: 'This course URL slug is already taken. Please provide a unique one.',
         background: '#121829',
-        color: '#ffffff',
+        color: '#1a1a1a',
       })
       return
     }
@@ -423,7 +423,7 @@ export default function CourseFormClient({
         timer: 1500,
         showConfirmButton: false,
         background: '#121829',
-        color: '#ffffff',
+        color: '#1a1a1a',
       })
 
       router.push('/admin/courses')
@@ -434,7 +434,7 @@ export default function CourseFormClient({
         title: 'Operation Failed',
         text: err.message || 'Could not complete the write request.',
         background: '#121829',
-        color: '#ffffff',
+        color: '#1a1a1a',
       })
     } finally {
       setIsSubmitting(false)
@@ -445,19 +445,19 @@ export default function CourseFormClient({
     <form onSubmit={handleSubmit} className="container mx-auto px-6 py-8 space-y-6">
       
       {/* Back & Heading panel */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-zinc-800/40">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200/40">
         <div>
-          <h1 className="text-3xl font-bold font-display text-white">
+          <h1 className="text-3xl font-bold font-display text-slate-800">
             {isEditMode ? `Edit Course: ${initialData.title}` : 'Publish New Course'}
           </h1>
-          <p className="text-base font-semibold text-zinc-450 mt-1">
+          <p className="text-base font-semibold text-slate-500 mt-1">
             Build and optimize platform syllabus programs
           </p>
         </div>
         <button
           type="button"
           onClick={() => router.push('/admin/courses')}
-          className="px-4 py-2 bg-zinc-850 hover:bg-zinc-850 border border-zinc-800 text-zinc-350 hover:text-white rounded-lg text-base font-bold transition-colors cursor-pointer"
+          className="px-4 py-2 bg-slate-100 hover:bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-800 rounded-lg text-base font-bold transition-colors cursor-pointer"
         >
           Cancel & Back
         </button>
@@ -470,39 +470,39 @@ export default function CourseFormClient({
         <div className="lg:col-span-8 space-y-6">
           
           {/* Main info card */}
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg p-6 space-y-5">
-            <h2 className="text-xl font-bold text-white tracking-tight border-b border-zinc-850 pb-3">Course Parameters</h2>
+          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-5">
+            <h2 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-3">Course Parameters</h2>
 
             {/* Title field */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Course Title *</label>
+              <label className="text-base font-bold text-slate-600">Course Title *</label>
               <input
                 type="text"
                 required
                 value={title}
                 onChange={handleTitleChange}
                 placeholder="e.g. Master Next.js 16 and Mongoose Database Engineering"
-                className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
               />
             </div>
 
             {/* Slug URL selector */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">URL path suffix (Slug) *</label>
+              <label className="text-base font-bold text-slate-600">URL path suffix (Slug) *</label>
               <div className="flex items-center gap-2">
-                <span className="text-zinc-500 font-semibold select-none hidden sm:inline">{domainOrigin}/courses/</span>
+                <span className="text-slate-400 font-semibold select-none hidden sm:inline">{domainOrigin}/courses/</span>
                 <input
                   type="text"
                   required
                   value={slug}
                   onChange={(e) => setSlug(slugify(e.target.value))}
                   placeholder="master-nextjs-16"
-                  className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
+                  className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
                 />
               </div>
               <div className="flex items-center gap-1.5 mt-1 text-sm font-semibold">
                 {slugChecking ? (
-                  <span className="text-zinc-400">Checking URL availability...</span>
+                  <span className="text-slate-500">Checking URL availability...</span>
                 ) : slugStatus === 'valid' ? (
                   <span className="text-emerald-400 flex items-center gap-1"><FiCheck /> Unique slug registered. URL path suffix is available!</span>
                 ) : slugStatus === 'invalid' ? (
@@ -513,14 +513,14 @@ export default function CourseFormClient({
 
             {/* Summary field */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Short Summary *</label>
+              <label className="text-base font-bold text-slate-600">Short Summary *</label>
               <textarea
                 required
                 rows={2}
                 value={summary}
                 onChange={(e) => setSummary(e.target.value)}
                 placeholder="Give a quick, captivating 1-2 sentence sell for this syllabus catalog."
-                className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors resize-none"
+                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors resize-none"
               />
             </div>
 
@@ -537,9 +537,9 @@ export default function CourseFormClient({
           </div>
 
           {/* Outcomes list card */}
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-zinc-850 pb-3">
-              <h2 className="text-xl font-bold text-white tracking-tight">What You Will Learn</h2>
+          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h2 className="text-xl font-bold text-slate-800 tracking-tight">What You Will Learn</h2>
               <button
                 type="button"
                 onClick={handleAddOutcome}
@@ -550,7 +550,7 @@ export default function CourseFormClient({
             </div>
 
             {whatYouWillLearn.length === 0 ? (
-              <p className="text-base font-semibold text-zinc-550 py-2">
+              <p className="text-base font-semibold text-slate-400 py-2">
                 No outcomes defined yet. Define what achievements students gain.
               </p>
             ) : (
@@ -563,12 +563,12 @@ export default function CourseFormClient({
                       value={item.outcome}
                       onChange={(e) => handleOutcomeChange(idx, e.target.value)}
                       placeholder={`e.g. Master React 19 hooks and async Server Actions`}
-                      className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
+                      className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
                     />
                     <button
                       type="button"
                       onClick={() => handleRemoveOutcome(idx)}
-                      className="p-3 text-zinc-500 hover:text-red-400 bg-[#070b16] border border-zinc-800 rounded-lg transition-colors cursor-pointer"
+                      className="p-3 text-slate-400 hover:text-red-400 bg-slate-100 border border-slate-200 rounded-lg transition-colors cursor-pointer"
                     >
                       <FiTrash2 className="h-5 w-5" />
                     </button>
@@ -579,9 +579,9 @@ export default function CourseFormClient({
           </div>
 
           {/* Requirements list card */}
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-zinc-850 pb-3">
-              <h2 className="text-xl font-bold text-white tracking-tight">Syllabus Requirements</h2>
+          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h2 className="text-xl font-bold text-slate-800 tracking-tight">Syllabus Requirements</h2>
               <button
                 type="button"
                 onClick={handleAddRequirement}
@@ -592,7 +592,7 @@ export default function CourseFormClient({
             </div>
 
             {requirements.length === 0 ? (
-              <p className="text-base font-semibold text-zinc-550 py-2">
+              <p className="text-base font-semibold text-slate-400 py-2">
                 No prerequisites defined yet. Specify baseline developer competencies.
               </p>
             ) : (
@@ -605,12 +605,12 @@ export default function CourseFormClient({
                       value={item.requirement}
                       onChange={(e) => handleRequirementChange(idx, e.target.value)}
                       placeholder={`e.g. Fundamental knowledge of JavaScript (ES6)`}
-                      className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
+                      className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
                     />
                     <button
                       type="button"
                       onClick={() => handleRemoveRequirement(idx)}
-                      className="p-3 text-zinc-500 hover:text-red-400 bg-[#070b16] border border-zinc-800 rounded-lg transition-colors cursor-pointer"
+                      className="p-3 text-slate-400 hover:text-red-400 bg-slate-100 border border-slate-200 rounded-lg transition-colors cursor-pointer"
                     >
                       <FiTrash2 className="h-5 w-5" />
                     </button>
@@ -621,11 +621,11 @@ export default function CourseFormClient({
           </div>
 
           {/* Study Materials list card */}
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg p-6 space-y-6">
-            <div className="flex items-center justify-between border-b border-zinc-850 pb-4">
+          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
-                <h2 className="text-xl font-bold text-white tracking-tight">Study Materials & eBooks</h2>
-                <p className="text-sm font-semibold text-zinc-450 mt-1">Upload eBooks/PDFs or add external learning links</p>
+                <h2 className="text-xl font-bold text-slate-800 tracking-tight">Study Materials & eBooks</h2>
+                <p className="text-sm font-semibold text-slate-500 mt-1">Upload eBooks/PDFs or add external learning links</p>
               </div>
               <button
                 type="button"
@@ -637,21 +637,21 @@ export default function CourseFormClient({
             </div>
 
             {studyMaterials.length === 0 ? (
-              <div className="text-center py-8 bg-[#070b16] rounded-lg border border-dashed border-zinc-800 p-6">
-                <p className="text-base font-semibold text-zinc-450">
+              <div className="text-center py-8 bg-slate-100 rounded-lg border border-dashed border-slate-200 p-6">
+                <p className="text-base font-semibold text-slate-500">
                   No study materials added yet. Click "Add Material" to get started.
                 </p>
               </div>
             ) : (
               <div className="space-y-6">
                 {studyMaterials.map((item, idx) => (
-                  <div key={idx} className="bg-[#070b16] p-5 rounded-lg border border-zinc-800/80 space-y-4 relative group">
-                    <div className="flex justify-between items-center border-b border-zinc-850 pb-2">
+                  <div key={idx} className="bg-slate-100 p-5 rounded-lg border border-slate-200/80 space-y-4 relative group">
+                    <div className="flex justify-between items-center border-b border-slate-100 pb-2">
                       <span className="text-base font-bold text-[#615fff]">Material #{idx + 1}</span>
                       <button
                         type="button"
                         onClick={() => handleRemoveStudyMaterial(idx)}
-                        className="text-zinc-500 hover:text-red-400 p-1.5 bg-zinc-900/60 border border-zinc-800 rounded-lg transition-colors cursor-pointer"
+                        className="text-slate-400 hover:text-red-400 p-1.5 bg-slate-100/60 border border-slate-200 rounded-lg transition-colors cursor-pointer"
                         title="Remove material"
                       >
                         <FiTrash2 className="h-5 w-5" />
@@ -661,24 +661,24 @@ export default function CourseFormClient({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Title */}
                       <div className="flex flex-col gap-2">
-                        <label className="text-base font-bold text-zinc-300">Material Title *</label>
+                        <label className="text-base font-bold text-slate-600">Material Title *</label>
                         <input
                           type="text"
                           required
                           value={item.title}
                           onChange={(e) => handleStudyMaterialChange(idx, 'title', e.target.value)}
                           placeholder="e.g. JavaScript Cheat Sheet"
-                          className="bg-[#0e1422] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                          className="bg-[#0e1422] border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                         />
                       </div>
 
                       {/* Material Type */}
                       <div className="flex flex-col gap-2">
-                        <label className="text-base font-bold text-zinc-300">Material Type *</label>
+                        <label className="text-base font-bold text-slate-600">Material Type *</label>
                         <select
                           value={item.materialType}
                           onChange={(e) => handleStudyMaterialChange(idx, 'materialType', e.target.value)}
-                          className="bg-[#0e1422] border border-zinc-800 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
+                          className="bg-[#0e1422] border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
                         >
                           <option value="pdf">PDF Document</option>
                           <option value="epub">eBook (ePub)</option>
@@ -690,7 +690,7 @@ export default function CourseFormClient({
 
                     {/* URL & Upload */}
                     <div className="flex flex-col gap-2">
-                      <label className="text-base font-bold text-zinc-300">Resource URL / Upload *</label>
+                      <label className="text-base font-bold text-slate-600">Resource URL / Upload *</label>
                       <div className="flex flex-col sm:flex-row gap-3">
                         <input
                           type="text"
@@ -698,7 +698,7 @@ export default function CourseFormClient({
                           value={item.url}
                           onChange={(e) => handleStudyMaterialChange(idx, 'url', e.target.value)}
                           placeholder="https://example.com/material or upload below"
-                          className="bg-[#0e1422] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
+                          className="bg-[#0e1422] border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
                         />
                         <div className="relative shrink-0">
                           <input
@@ -710,7 +710,7 @@ export default function CourseFormClient({
                           />
                           <button
                             type="button"
-                            className="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 border border-zinc-750 text-zinc-200 hover:text-white rounded-lg text-base font-bold transition-colors w-full cursor-pointer flex items-center gap-2 justify-center"
+                            className="px-4 py-3 bg-slate-100 hover:bg-zinc-700 border border-zinc-750 text-slate-700 hover:text-slate-800 rounded-lg text-base font-bold transition-colors w-full cursor-pointer flex items-center gap-2 justify-center"
                           >
                             <FiUploadCloud className="h-5 w-5" />
                             <span>Upload File</span>
@@ -731,15 +731,15 @@ export default function CourseFormClient({
           </div>
 
           {/* Course Modules card */}
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg p-6 space-y-4">
-            <h2 className="text-xl font-bold text-white tracking-tight border-b border-zinc-850 pb-3">Course Modules</h2>
+          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-4">
+            <h2 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-3">Course Modules</h2>
             <div className="flex gap-3">
               <input
                 type="text"
                 value={newModuleName}
                 onChange={(e) => setNewModuleName(e.target.value)}
                 placeholder="e.g. Module 1: Introduction to React"
-                className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
+                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault()
@@ -755,23 +755,23 @@ export default function CourseFormClient({
                 Add Module
               </button>
             </div>
-            <p className="text-sm font-semibold text-zinc-500">
+            <p className="text-sm font-semibold text-slate-400">
               Create the curriculum modules for this course first. Later, you can select these modules when assigning lessons.
             </p>
 
             {modules.length === 0 ? (
-              <p className="text-base font-semibold text-zinc-550 py-2">
+              <p className="text-base font-semibold text-slate-400 py-2">
                 No modules defined yet. Course lessons will default to "General Module" if no modules are created.
               </p>
             ) : (
               <div className="space-y-2.5 pt-2">
                 {modules.map((modName, idx) => (
-                  <div key={idx} className="flex items-center justify-between bg-[#070b16] border border-zinc-800 hover:border-zinc-750 px-4 py-3 rounded-lg transition-colors">
-                    <span className="text-white font-bold text-base">{modName}</span>
+                  <div key={idx} className="flex items-center justify-between bg-slate-100 border border-slate-200 hover:border-zinc-750 px-4 py-3 rounded-lg transition-colors">
+                    <span className="text-slate-800 font-bold text-base">{modName}</span>
                     <button
                       type="button"
                       onClick={() => handleRemoveModule(idx)}
-                      className="p-2 text-zinc-500 hover:text-red-400 bg-zinc-900/60 border border-zinc-800 rounded-lg transition-colors cursor-pointer"
+                      className="p-2 text-slate-400 hover:text-red-400 bg-slate-100/60 border border-slate-200 rounded-lg transition-colors cursor-pointer"
                       title="Remove module"
                     >
                       <FiTrash2 className="h-5 w-5" />
@@ -784,9 +784,9 @@ export default function CourseFormClient({
 
           {/* ── Course Curriculum (edit mode only) ────────────────────── */}
           {isEditMode && (
-            <div className="bg-[#121829] border border-zinc-800 rounded-lg p-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-zinc-850 pb-3">
-                <h2 className="text-xl font-bold text-white tracking-tight">Course Curriculum</h2>
+            <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h2 className="text-xl font-bold text-slate-800 tracking-tight">Course Curriculum</h2>
                 <Link
                   href={`/admin/lessons/new?courseId=${initialData._id}`}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#615fff]/15 hover:bg-[#615fff]/25 text-[#615fff] border border-[#615fff]/20 rounded-lg text-base font-bold transition-colors"
@@ -802,7 +802,7 @@ export default function CourseFormClient({
               ) : lessons.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10 gap-3 text-center">
                   <FiVideo className="h-10 w-10 text-zinc-700" />
-                  <p className="text-base font-semibold text-zinc-500">No lessons yet. Add your first lesson to build the curriculum.</p>
+                  <p className="text-base font-semibold text-slate-400">No lessons yet. Add your first lesson to build the curriculum.</p>
                   <Link
                     href={`/admin/lessons/new?courseId=${initialData._id}`}
                     className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#615fff] hover:bg-[#5248e8] text-white rounded-lg font-bold text-base transition-all"
@@ -813,20 +813,20 @@ export default function CourseFormClient({
               ) : (
                 <div className="space-y-2">
                   {lessons.map((lesson, idx) => (
-                    <div key={lesson.id} className="flex items-center gap-3 bg-[#0e1422] border border-zinc-800 rounded-lg px-4 py-3 hover:border-zinc-700 transition-colors">
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-zinc-800 text-zinc-400 font-bold text-sm">
+                    <div key={lesson.id} className="flex items-center gap-3 bg-[#0e1422] border border-slate-200 rounded-lg px-4 py-3 hover:border-slate-300 transition-colors">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-slate-100 text-slate-500 font-bold text-sm">
                         {lesson.order}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-white font-bold text-base truncate">{lesson.title}</p>
-                        <p className="text-zinc-500 text-sm font-semibold">{lesson.duration} min</p>
+                        <p className="text-slate-800 font-bold text-base truncate">{lesson.title}</p>
+                        <p className="text-slate-400 text-sm font-semibold">{lesson.duration} min</p>
                       </div>
                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-sm font-bold ${
                         lesson.lessonType === 'live'
                           ? 'bg-rose-500/15 text-rose-400'
                           : lesson.lessonType === 'quiz'
                           ? 'bg-amber-500/15 text-amber-400'
-                          : 'bg-zinc-800 text-zinc-400'
+                          : 'bg-slate-100 text-slate-500'
                       }`}>
                         {lesson.lessonType === 'live' ? (
                           <FiRadio className="h-3 w-3" />
@@ -839,14 +839,14 @@ export default function CourseFormClient({
                       </span>
                       <Link
                         href={`/admin/lessons/${lesson.id}/edit`}
-                        className="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white transition-all"
+                        className="p-2 rounded-lg bg-slate-100 hover:bg-zinc-700 text-slate-500 hover:text-slate-800 transition-all"
                         title="Edit lesson"
                       >
                         <FiEdit2 className="h-4 w-4" />
                       </Link>
                     </div>
                   ))}
-                  <p className="text-sm font-semibold text-zinc-600 text-right pt-1">
+                  <p className="text-sm font-semibold text-slate-400 text-right pt-1">
                     {lessons.length} lesson{lessons.length !== 1 ? 's' : ''} — {lessons.reduce((a, l) => a + l.duration, 0)} min total
                   </p>
                 </div>
@@ -862,30 +862,30 @@ export default function CourseFormClient({
         <div className="lg:col-span-4 space-y-6">
           
           {/* Thumbnail media box */}
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg p-6 space-y-4">
-            <h3 className="text-xl font-bold text-white tracking-tight border-b border-zinc-850 pb-2.5">Course Thumbnail Cover</h3>
+          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-4">
+            <h3 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-2.5">Course Thumbnail Cover</h3>
 
             {thumbnailUrl ? (
               <div className="space-y-3">
-                <div className="relative aspect-[4/3] rounded-lg overflow-hidden border border-zinc-800 bg-[#070b16]">
+                <div className="relative aspect-[4/3] rounded-lg overflow-hidden border border-slate-200 bg-slate-100">
                   <img src={thumbnailUrl} alt={thumbnailAlt} className="w-full h-full object-cover" />
                   <button
                     type="button"
                     onClick={() => { setThumbnailId(''); setThumbnailUrl(''); setThumbnailAlt('') }}
-                    className="absolute top-2 right-2 p-1.5 rounded bg-black/70 hover:bg-rose-500 border border-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                    className="absolute top-2 right-2 p-1.5 rounded bg-black/70 hover:bg-rose-500 border border-slate-200 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
                     title="Remove cover"
                   >
                     <FiX className="h-4.5 w-4.5" />
                   </button>
                 </div>
-                <p className="text-xs font-semibold text-zinc-500"><span className="font-bold text-zinc-400">Alt:</span> &ldquo;{thumbnailAlt}&rdquo;</p>
+                <p className="text-xs font-semibold text-slate-400"><span className="font-bold text-slate-500">Alt:</span> &ldquo;{thumbnailAlt}&rdquo;</p>
                 {/* Change buttons */}
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => thumbnailFileRef.current?.click()}
                     disabled={uploadingImage}
-                    className="flex items-center justify-center gap-2 py-2 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-bold text-sm cursor-pointer transition-all disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 py-2 rounded-lg bg-slate-100/50 hover:bg-slate-100 border border-slate-300 text-slate-600 font-bold text-sm cursor-pointer transition-all disabled:opacity-50"
                   >
                     <FiUploadCloud className="h-4 w-4" /> Upload New
                   </button>
@@ -900,7 +900,7 @@ export default function CourseFormClient({
                 {uploadingImage ? (
                   <div className="flex flex-col items-center justify-center border-2 border-dashed border-[#615fff]/40 rounded-lg p-8 gap-3 bg-[#615fff]/5">
                     <div className="h-8 w-8 border-2 border-[#615fff] border-t-transparent rounded-full animate-spin" />
-                    <p className="text-base font-semibold text-zinc-400">Processing with Sharp...</p>
+                    <p className="text-base font-semibold text-slate-500">Processing with Sharp...</p>
                   </div>
                 ) : (
                   <>
@@ -908,16 +908,16 @@ export default function CourseFormClient({
                       type="button"
                       onClick={() => thumbnailFileRef.current?.click()}
                       disabled={uploadingImage}
-                      className="w-full flex flex-col items-center justify-center border-2 border-dashed border-zinc-800 hover:border-[#615fff]/60 rounded-lg p-6 text-center cursor-pointer transition-colors group disabled:opacity-50"
+                      className="w-full flex flex-col items-center justify-center border-2 border-dashed border-slate-200 hover:border-[#615fff]/60 rounded-lg p-6 text-center cursor-pointer transition-colors group disabled:opacity-50"
                     >
-                      <FiUploadCloud className="h-9 w-9 text-zinc-600 group-hover:text-[#615fff] transition-colors mb-2" />
-                      <p className="text-base font-bold text-white">Upload New File</p>
-                      <p className="text-sm font-semibold text-zinc-500">PNG, JPEG, WEBP — auto-resized</p>
+                      <FiUploadCloud className="h-9 w-9 text-slate-400 group-hover:text-[#615fff] transition-colors mb-2" />
+                      <p className="text-base font-bold text-slate-800">Upload New File</p>
+                      <p className="text-sm font-semibold text-slate-400">PNG, JPEG, WEBP — auto-resized</p>
                     </button>
                     <div className="flex items-center gap-3">
-                      <div className="flex-1 h-px bg-zinc-800" />
-                      <span className="text-sm font-bold text-zinc-600">or</span>
-                      <div className="flex-1 h-px bg-zinc-800" />
+                      <div className="flex-1 h-px bg-slate-100" />
+                      <span className="text-sm font-bold text-slate-400">or</span>
+                      <div className="flex-1 h-px bg-slate-100" />
                     </div>
                     <button
                       type="button"
@@ -952,12 +952,12 @@ export default function CourseFormClient({
 
 
           {/* Pricing & Status controls */}
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg p-6 space-y-4">
-            <h3 className="text-xl font-bold text-white tracking-tight border-b border-zinc-850 pb-2.5">Finance & Status</h3>
+          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-4">
+            <h3 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-2.5">Finance & Status</h3>
 
             {/* Price field */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Price (BDT) *</label>
+              <label className="text-base font-bold text-slate-600">Price (BDT) *</label>
               <input
                 type="number"
                 required
@@ -965,17 +965,17 @@ export default function CourseFormClient({
                 value={price}
                 onChange={(e) => setPrice(Number(e.target.value))}
                 placeholder="4500"
-                className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
               />
             </div>
 
             {/* Status Select */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Catalog Visibility Status</label>
+              <label className="text-base font-bold text-slate-600">Catalog Visibility Status</label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
-                className="bg-[#070b16] border border-zinc-800 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
+                className="bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
               >
                 <option value="draft">Draft (Restricted to Staff/Admin)</option>
                 <option value="published">Published (Render on Public Landing Page)</option>
@@ -984,17 +984,17 @@ export default function CourseFormClient({
           </div>
 
           {/* Categories & Classifications */}
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg p-6 space-y-4">
-            <h3 className="text-xl font-bold text-white tracking-tight border-b border-zinc-850 pb-2.5">Academic Scope</h3>
+          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-4">
+            <h3 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-2.5">Academic Scope</h3>
 
             {/* Categories Selector */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Course Category *</label>
+              <label className="text-base font-bold text-slate-600">Course Category *</label>
               <select
                 required
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="bg-[#070b16] border border-zinc-800 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
+                className="bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
               >
                 <option value="">-- Choose Category --</option>
                 {categories.map((cat) => (
@@ -1007,9 +1007,9 @@ export default function CourseFormClient({
 
             {/* Instructors Selector */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Lead Mentor (Instructor) *</label>
+              <label className="text-base font-bold text-slate-600">Lead Mentor (Instructor) *</label>
               {user.role === 'instructor' ? (
-                <div className="bg-[#070b16] border border-zinc-800 text-zinc-400 rounded-lg p-3 text-base font-semibold select-none flex items-center gap-2">
+                <div className="bg-slate-100 border border-slate-200 text-slate-500 rounded-lg p-3 text-base font-semibold select-none flex items-center gap-2">
                   <FiInfo className="text-[#615fff]" />
                   <span>
                     {instructors.find((ins) => ins.id === user.id)?.name || 'You (Assigned Mentor)'}
@@ -1020,7 +1020,7 @@ export default function CourseFormClient({
                   required
                   value={instructor}
                   onChange={(e) => setInstructor(e.target.value)}
-                  className="bg-[#070b16] border border-zinc-800 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
+                  className="bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
                 >
                   <option value="">-- Assign Instructor --</option>
                   {instructors.map((ins) => (
@@ -1034,11 +1034,11 @@ export default function CourseFormClient({
 
             {/* Level Selector */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Audience Tier Level</label>
+              <label className="text-base font-bold text-slate-600">Audience Tier Level</label>
               <select
                 value={level}
                 onChange={(e) => setLevel(e.target.value)}
-                className="bg-[#070b16] border border-zinc-800 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
+                className="bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
               >
                 <option value="all">All Levels</option>
                 <option value="beginner">Beginner</option>
@@ -1049,60 +1049,60 @@ export default function CourseFormClient({
 
             {/* Content Duration */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Course Duration</label>
+              <label className="text-base font-bold text-slate-600">Course Duration</label>
               <input
                 type="text"
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
                 placeholder="e.g. 14 Hours of video lectures"
-                className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
               />
             </div>
           </div>
 
           {/* SEO Accordion block */}
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg overflow-hidden">
+          <div className="bg-[#121829] border border-slate-200 rounded-lg overflow-hidden">
             <button
               type="button"
               onClick={() => setSeoOpen(!seoOpen)}
-              className="w-full px-6 py-4 flex items-center justify-between font-bold text-white text-xl hover:bg-zinc-800/10 transition-colors select-none"
+              className="w-full px-6 py-4 flex items-center justify-between font-bold text-slate-800 text-xl hover:bg-slate-100/10 transition-colors select-none"
             >
               <span>SEO Parameters</span>
-              <span className="text-zinc-500">{seoOpen ? '▲' : '▼'}</span>
+              <span className="text-slate-400">{seoOpen ? '▲' : '▼'}</span>
             </button>
 
             {seoOpen && (
-              <div className="p-6 border-t border-zinc-850 space-y-4.5 bg-[#0e1322]">
+              <div className="p-6 border-t border-slate-100 space-y-4.5 bg-[#0e1322]">
                 <div className="flex flex-col gap-2">
-                  <label className="text-base font-bold text-zinc-300">SEO Meta Title</label>
+                  <label className="text-base font-bold text-slate-600">SEO Meta Title</label>
                   <input
                     type="text"
                     value={metaTitle}
                     onChange={(e) => setMetaTitle(e.target.value)}
                     placeholder="Search snippet header title"
-                    className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                    className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-base font-bold text-zinc-300">SEO Meta Description</label>
+                  <label className="text-base font-bold text-slate-600">SEO Meta Description</label>
                   <textarea
                     rows={3}
                     value={metaDescription}
                     onChange={(e) => setMetaDescription(e.target.value)}
                     placeholder="Search snippet summary block (160 characters max recommendation)"
-                    className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors resize-none"
+                    className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors resize-none"
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-base font-bold text-zinc-300">Keywords (Comma separated)</label>
+                  <label className="text-base font-bold text-slate-600">Keywords (Comma separated)</label>
                   <input
                     type="text"
                     value={keywords}
                     onChange={(e) => setKeywords(e.target.value)}
                     placeholder="e.g. Next.js, Mongoose, MongoDB, Course"
-                    className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                    className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                   />
                 </div>
               </div>
@@ -1110,7 +1110,7 @@ export default function CourseFormClient({
           </div>
 
           {/* Submit Action block */}
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg p-6">
+          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6">
             <button
               type="submit"
               disabled={isSubmitting}

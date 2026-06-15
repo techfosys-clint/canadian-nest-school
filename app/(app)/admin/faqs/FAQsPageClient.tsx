@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useState } from 'react'
 import Link from 'next/link'
@@ -79,8 +79,8 @@ export default function FAQsPageClient({ initialFaqs }: { initialFaqs: FAQItem[]
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold font-display text-white">FAQs Management</h1>
-          <p className="text-base font-semibold text-zinc-450 mt-1">
+          <h1 className="text-3xl font-bold font-display text-slate-800">FAQs Management</h1>
+          <p className="text-base font-semibold text-slate-500 mt-1">
             Manage frequently asked questions shown on the landing page
           </p>
         </div>
@@ -95,9 +95,9 @@ export default function FAQsPageClient({ initialFaqs }: { initialFaqs: FAQItem[]
       {/* FAQs List */}
       <div className="space-y-3">
         {faqs.length === 0 ? (
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg p-16 text-center space-y-4">
+          <div className="bg-[#121829] border border-slate-200 rounded-lg p-16 text-center space-y-4">
             <FiHelpCircle className="h-10 w-10 text-zinc-700 mx-auto" />
-            <p className="text-base font-semibold text-zinc-500">No FAQs created yet.</p>
+            <p className="text-base font-semibold text-slate-400">No FAQs created yet.</p>
           </div>
         ) : (
           faqs
@@ -106,7 +106,7 @@ export default function FAQsPageClient({ initialFaqs }: { initialFaqs: FAQItem[]
               <div
                 key={f.id}
                 className={`bg-[#121829] border rounded-lg p-5 space-y-3 transition-colors ${
-                  f.isActive ? 'border-zinc-800' : 'border-zinc-800/40 opacity-60'
+                  f.isActive ? 'border-slate-200' : 'border-slate-200/40 opacity-60'
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">
@@ -115,8 +115,8 @@ export default function FAQsPageClient({ initialFaqs }: { initialFaqs: FAQItem[]
                       {f.order}
                     </span>
                     <div className="min-w-0">
-                      <p className="font-bold text-white text-base leading-snug">{f.question}</p>
-                      <p className="text-base font-semibold text-zinc-450 mt-2 leading-relaxed">
+                      <p className="font-bold text-slate-800 text-base leading-snug">{f.question}</p>
+                      <p className="text-base font-semibold text-slate-500 mt-2 leading-relaxed">
                         {f.answer}
                       </p>
                     </div>
@@ -127,8 +127,8 @@ export default function FAQsPageClient({ initialFaqs }: { initialFaqs: FAQItem[]
                       title={f.isActive ? 'Deactivate' : 'Activate'}
                       className={`p-2 rounded border transition-all cursor-pointer ${
                         f.isActive
-                          ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500 hover:text-white'
-                          : 'text-zinc-500 bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700 hover:text-white'
+                          ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500 hover:text-slate-800'
+                          : 'text-slate-400 bg-slate-100/50 border-slate-300 hover:bg-zinc-700 hover:text-slate-800'
                       }`}
                     >
                       {f.isActive ? (
@@ -139,13 +139,13 @@ export default function FAQsPageClient({ initialFaqs }: { initialFaqs: FAQItem[]
                     </button>
                     <Link
                       href={`/admin/faqs/${f.id}/edit`}
-                      className="p-2 rounded bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/20 hover:border-[#615fff] text-[#615fff] hover:text-white transition-all cursor-pointer"
+                      className="p-2 rounded bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/20 hover:border-[#615fff] text-[#615fff] hover:text-slate-800 transition-all cursor-pointer"
                     >
                       <FiEdit className="h-4.5 w-4.5" />
                     </Link>
                     <button
                       onClick={() => handleDelete(f)}
-                      className="p-2 rounded bg-rose-500/10 hover:bg-rose-500 border border-rose-500/20 text-rose-400 hover:text-white transition-all cursor-pointer"
+                      className="p-2 rounded bg-rose-500/10 hover:bg-rose-500 border border-rose-500/20 text-rose-400 hover:text-rose-600 transition-all cursor-pointer"
                     >
                       <FiTrash2 className="h-4.5 w-4.5" />
                     </button>

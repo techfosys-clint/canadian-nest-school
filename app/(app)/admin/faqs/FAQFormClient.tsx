@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -83,19 +83,19 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
     <form onSubmit={handleSave} className="container mx-auto px-6 py-8 space-y-6">
       
       {/* Back & Heading panel */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-zinc-800/40">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200/40">
         <div>
-          <h1 className="text-3xl font-bold font-display text-white">
+          <h1 className="text-3xl font-bold font-display text-slate-800">
             {isEditMode ? 'Edit FAQ' : 'New FAQ'}
           </h1>
-          <p className="text-base font-semibold text-zinc-450 mt-1">
+          <p className="text-base font-semibold text-slate-500 mt-1">
             Build and organize landing page FAQ answers
           </p>
         </div>
         <button
           type="button"
           onClick={() => router.push('/admin/faqs')}
-          className="px-4 py-2 bg-zinc-850 hover:bg-zinc-800 border border-zinc-800 text-zinc-350 hover:text-white rounded-lg text-base font-bold transition-colors cursor-pointer"
+          className="px-4 py-2 bg-slate-100 hover:bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-800 rounded-lg text-base font-bold transition-colors cursor-pointer"
         >
           Cancel & Back
         </button>
@@ -105,44 +105,44 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
         
         {/* Main Content */}
         <div className="lg:col-span-8 space-y-6">
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg p-6 space-y-5">
-            <h2 className="text-xl font-bold text-white tracking-tight border-b border-zinc-850 pb-3">FAQ Content</h2>
+          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-5">
+            <h2 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-3">FAQ Content</h2>
 
             {/* Question */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Question *</label>
+              <label className="text-base font-bold text-slate-600">Question *</label>
               <input
                 type="text"
                 required
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 placeholder="e.g. How do I access my course after purchase?"
-                className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
               />
             </div>
 
             {/* Answer */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Answer *</label>
+              <label className="text-base font-bold text-slate-600">Answer *</label>
               <textarea
                 required
                 rows={6}
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
                 placeholder="Provide a clear, helpful answer..."
-                className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors resize-none"
+                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors resize-none"
               />
             </div>
 
             {/* Display Order */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Display Order</label>
+              <label className="text-base font-bold text-slate-600">Display Order</label>
               <input
                 type="number"
                 min={0}
                 value={order}
                 onChange={(e) => setOrder(Number(e.target.value))}
-                className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
               />
             </div>
 
@@ -151,8 +151,8 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
 
         {/* Sidebar settings */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg p-6 space-y-4">
-            <h3 className="text-xl font-bold text-white tracking-tight border-b border-zinc-850 pb-2.5">Settings</h3>
+          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-4">
+            <h3 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-2.5">Settings</h3>
 
             <label className="flex items-center gap-3 cursor-pointer select-none">
               <div
@@ -167,11 +167,11 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
                   }`}
                 />
               </div>
-              <span className="text-base font-bold text-zinc-300">Active on site</span>
+              <span className="text-base font-bold text-slate-600">Active on site</span>
             </label>
           </div>
 
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg p-6">
+          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6">
             <button
               type="submit"
               disabled={saving}

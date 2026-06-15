@@ -68,7 +68,7 @@ export default async function EditLessonPage({ params }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-[#070b16] text-white">
+    <div className="min-h-screen bg-slate-100 text-slate-800">
       <LessonFormClient courses={courses} initialData={serializedLesson} />
     </div>
   )

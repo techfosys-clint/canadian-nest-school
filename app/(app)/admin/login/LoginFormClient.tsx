@@ -52,8 +52,8 @@ export default function LoginFormClient() {
         position: 'top-end',
         showConfirmButton: false,
         timer: 2000,
-        background: '#1a1a1a',
-        color: '#ffffff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
 
       // Force a hard refresh to load layout session properly
@@ -75,37 +75,37 @@ export default function LoginFormClient() {
 
       {/* Email Address */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-base font-bold text-zinc-300">Email Address</label>
+        <label className="text-base font-bold text-slate-600">Email Address</label>
         <div className="relative">
-          <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-550 h-5 w-5" />
+          <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
           <input
             type="email"
             required
             placeholder="admin@tutorspace.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-[#121212] border border-zinc-800 focus:border-[#615fff]/70 text-white rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
           />
         </div>
       </div>
 
       {/* Password */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-base font-bold text-zinc-300">Password</label>
+        <label className="text-base font-bold text-slate-600">Password</label>
         <div className="relative">
-          <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-550 h-5 w-5" />
+          <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
           <input
             type={showPassword ? 'text' : 'password'}
             required
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-[#121212] border border-zinc-800 focus:border-[#615fff]/70 text-white rounded-lg pl-11 pr-11 py-3 text-base font-semibold outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/70 text-slate-800 rounded-lg pl-11 pr-11 py-3 text-base font-semibold outline-none transition-colors"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-800 transition-colors cursor-pointer flex items-center justify-center"
           >
             {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
           </button>

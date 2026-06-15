@@ -71,7 +71,7 @@ export default async function EditCoursePage({ params }: Props) {
   const initialData = JSON.parse(JSON.stringify(course))
 
   return (
-    <div className="min-h-screen bg-[#070b16] text-white">
+    <div className="min-h-screen bg-slate-100 text-slate-800">
       <CourseFormClient
         initialData={initialData}
         categories={categories}

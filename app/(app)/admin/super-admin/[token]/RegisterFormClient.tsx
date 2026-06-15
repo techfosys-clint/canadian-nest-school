@@ -60,8 +60,8 @@ export default function RegisterFormClient() {
         icon: 'success',
         title: 'Initial Setup Complete',
         text: 'Root administrator account configured successfully! You can now log in.',
-        background: '#1a1a1a',
-        color: '#ffffff',
+        background: '#ffffff',
+        color: '#1a1a1a',
         confirmButtonColor: '#615fff',
         customClass: {
           popup: 'rounded-lg',
@@ -87,79 +87,79 @@ export default function RegisterFormClient() {
 
       {/* Full Name */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-base font-bold text-zinc-300">Full Name *</label>
+        <label className="text-base font-bold text-slate-600">Full Name *</label>
         <div className="relative">
-          <FiUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-550 h-5 w-5" />
+          <FiUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
           <input
             type="text"
             required
             placeholder="e.g. John Doe"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full bg-[#121212] border border-zinc-800 focus:border-[#615fff]/70 text-white rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
           />
         </div>
       </div>
 
       {/* Email Address */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-base font-bold text-zinc-300">Email Address *</label>
+        <label className="text-base font-bold text-slate-600">Email Address *</label>
         <div className="relative">
-          <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-550 h-5 w-5" />
+          <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
           <input
             type="email"
             required
             placeholder="e.g. admin@tutorspace.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-[#121212] border border-zinc-800 focus:border-[#615fff]/70 text-white rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
           />
         </div>
       </div>
 
       {/* Phone Number */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-base font-bold text-zinc-300">Phone Number (Optional)</label>
+        <label className="text-base font-bold text-slate-600">Phone Number (Optional)</label>
         <div className="relative">
-          <FiPhone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-550 h-5 w-5" />
+          <FiPhone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
           <input
             type="tel"
             placeholder="e.g. +88017XXXXXXXX"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="w-full bg-[#121212] border border-zinc-800 focus:border-[#615fff]/70 text-white rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
           />
         </div>
       </div>
 
       {/* Password */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-base font-bold text-zinc-300">Password *</label>
+        <label className="text-base font-bold text-slate-600">Password *</label>
         <div className="relative">
-          <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-550 h-5 w-5" />
+          <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
           <input
             type="password"
             required
             placeholder="Minimum 6 characters"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-[#121212] border border-zinc-800 focus:border-[#615fff]/70 text-white rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
           />
         </div>
       </div>
 
       {/* Confirm Password */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-base font-bold text-zinc-300">Confirm Password *</label>
+        <label className="text-base font-bold text-slate-600">Confirm Password *</label>
         <div className="relative">
-          <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-550 h-5 w-5" />
+          <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
           <input
             type="password"
             required
             placeholder="Retype password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full bg-[#121212] border border-zinc-800 focus:border-[#615fff]/70 text-white rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
           />
         </div>
       </div>

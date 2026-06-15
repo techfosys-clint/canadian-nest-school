@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -86,7 +86,7 @@ export default function CouponFormClient({ initialCoupon }: CouponFormClientProp
           timer: 1500,
           showConfirmButton: false,
           background: '#121829',
-          color: '#ffffff',
+          color: '#1a1a1a',
         })
         router.push('/admin/coupons')
         router.refresh()
@@ -104,29 +104,29 @@ export default function CouponFormClient({ initialCoupon }: CouponFormClientProp
     <div className="container mx-auto px-6 py-8 space-y-8">
       
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-800/80 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200/80 pb-6">
         <div className="space-y-1">
           <div className="flex items-center gap-3">
             <button 
               type="button"
               onClick={() => router.push('/admin/coupons')}
-              className="h-10 w-10 border border-zinc-800 hover:border-zinc-700 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white bg-[#0e1422] transition-colors cursor-pointer"
+              className="h-10 w-10 border border-slate-200 hover:border-slate-300 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-800 bg-[#0e1422] transition-colors cursor-pointer"
             >
               <FiArrowLeft className="h-5 w-5" />
             </button>
-            <h1 className="text-3xl font-bold tracking-tight text-white font-display flex items-center gap-2">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-800 font-display flex items-center gap-2">
               <FiTag className="text-[#615fff]" />
               <span>{initialCoupon ? 'Edit Coupon Code' : 'Generate Coupon Code'}</span>
             </h1>
           </div>
-          <p className="text-base font-semibold text-zinc-450 pl-13">
+          <p className="text-base font-semibold text-slate-500 pl-13">
             Create promotional campaigns and custom discount codes for checkout.
           </p>
         </div>
       </div>
 
       {/* Main Form Box */}
-      <div className="bg-[#121829] border border-zinc-800/60 rounded-lg p-6 shadow-sm">
+      <div className="bg-[#121829] border border-slate-200/60 rounded-lg p-6 shadow-sm">
         
         <form onSubmit={handleSave} className="space-y-5">
           {errorMsg && (
@@ -138,7 +138,7 @@ export default function CouponFormClient({ initialCoupon }: CouponFormClientProp
 
           {/* Promo Code Name */}
           <div className="flex flex-col gap-2">
-            <label className="text-base font-bold text-zinc-300">Promo Code (Uppercase, unique)</label>
+            <label className="text-base font-bold text-slate-600">Promo Code (Uppercase, unique)</label>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <input
                 type="text"
@@ -146,14 +146,14 @@ export default function CouponFormClient({ initialCoupon }: CouponFormClientProp
                 value={code}
                 disabled={!!initialCoupon}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
-                className="flex-1 px-4 py-3 rounded-lg bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/60 text-white font-bold text-base font-mono focus:outline-none disabled:opacity-50 transition-colors"
+                className="flex-1 px-4 py-3 rounded-lg bg-slate-100 border border-slate-200 focus:border-[#615fff]/60 text-slate-800 font-bold text-base font-mono focus:outline-none disabled:opacity-50 transition-colors"
                 required
               />
               {!initialCoupon && (
                 <button
                   type="button"
                   onClick={generateRandomCode}
-                  className="px-5 py-3 rounded-lg border border-zinc-800 hover:border-[#615fff]/50 hover:text-white bg-[#0e1422] text-[#615fff] font-bold text-base transition-all active:scale-[0.98] shrink-0"
+                  className="px-5 py-3 rounded-lg border border-slate-200 hover:border-[#615fff]/50 hover:text-slate-800 bg-[#0e1422] text-[#615fff] font-bold text-base transition-all active:scale-[0.98] shrink-0"
                 >
                   Auto-Generate
                 </button>
@@ -164,11 +164,11 @@ export default function CouponFormClient({ initialCoupon }: CouponFormClientProp
           {/* Discount Parameters Group */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Discount Type</label>
+              <label className="text-base font-bold text-slate-600">Discount Type</label>
               <select
                 value={discountType}
                 onChange={(e: any) => setDiscountType(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/60 text-white font-semibold text-base focus:outline-none transition-colors"
+                className="w-full px-4 py-3 rounded-lg bg-slate-100 border border-slate-200 focus:border-[#615fff]/60 text-slate-800 font-semibold text-base focus:outline-none transition-colors"
               >
                 <option value="fixed">Fixed cash deduction (৳)</option>
                 <option value="percentage">Percentage discount (%)</option>
@@ -176,7 +176,7 @@ export default function CouponFormClient({ initialCoupon }: CouponFormClientProp
             </div>
             
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">
+              <label className="text-base font-bold text-slate-600">
                 {discountType === 'percentage' ? 'Discount Percentage (%)' : 'Discount BDT Value (৳)'}
               </label>
               <input
@@ -186,7 +186,7 @@ export default function CouponFormClient({ initialCoupon }: CouponFormClientProp
                 onChange={(e) => setDiscountValue(e.target.value === '' ? '' : Number(e.target.value))}
                 min="0"
                 step="any"
-                className="w-full px-4 py-3 rounded-lg bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/60 text-white font-semibold text-base focus:outline-none transition-colors"
+                className="w-full px-4 py-3 rounded-lg bg-slate-100 border border-slate-200 focus:border-[#615fff]/60 text-slate-800 font-semibold text-base focus:outline-none transition-colors"
                 required
               />
             </div>
@@ -195,24 +195,24 @@ export default function CouponFormClient({ initialCoupon }: CouponFormClientProp
           {/* Limits Parameters Group */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Maximum Allowed Uses</label>
+              <label className="text-base font-bold text-slate-600">Maximum Allowed Uses</label>
               <input
                 type="number"
                 placeholder="Unlimited uses"
                 value={maxUses}
                 onChange={(e) => setMaxUses(e.target.value === '' ? '' : Number(e.target.value))}
                 min="1"
-                className="w-full px-4 py-3 rounded-lg bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/60 text-white font-semibold text-base focus:outline-none transition-colors"
+                className="w-full px-4 py-3 rounded-lg bg-slate-100 border border-slate-200 focus:border-[#615fff]/60 text-slate-800 font-semibold text-base focus:outline-none transition-colors"
               />
             </div>
             
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-zinc-300">Expiration Date</label>
+              <label className="text-base font-bold text-slate-600">Expiration Date</label>
               <input
                 type="date"
                 value={expirationDate}
                 onChange={(e) => setExpirationDate(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/60 text-white font-semibold text-base focus:outline-none transition-colors"
+                className="w-full px-4 py-3 rounded-lg bg-slate-100 border border-slate-200 focus:border-[#615fff]/60 text-slate-800 font-semibold text-base focus:outline-none transition-colors"
               />
             </div>
           </div>
@@ -226,17 +226,17 @@ export default function CouponFormClient({ initialCoupon }: CouponFormClientProp
               onChange={(e) => setIsActive(e.target.checked)}
               className="h-5 w-5 accent-[#615fff] rounded cursor-pointer"
             />
-            <label htmlFor="isActiveToggle" className="text-base font-bold text-zinc-300 cursor-pointer">
+            <label htmlFor="isActiveToggle" className="text-base font-bold text-slate-600 cursor-pointer">
               Activate promo coupon code immediately
             </label>
           </div>
 
           {/* Actions Button Footer */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-zinc-800/40 mt-6">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200/40 mt-6">
             <button
               type="button"
               onClick={() => router.push('/admin/coupons')}
-              className="px-5 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-base transition-colors cursor-pointer"
+              className="px-5 py-2.5 rounded-lg bg-slate-100 hover:bg-zinc-700 text-slate-600 font-bold text-base transition-colors cursor-pointer"
             >
               Cancel
             </button>

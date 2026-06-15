@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { connectToDatabase } from '@/lib/db/mongodb'
@@ -30,7 +30,7 @@ export default async function FAQsPage() {
   }))
 
   return (
-    <div className="min-h-screen bg-[#070b16] text-white">
+    <div className="min-h-screen bg-slate-100 text-slate-800">
       <FAQsPageClient initialFaqs={faqs} />
     </div>
   )

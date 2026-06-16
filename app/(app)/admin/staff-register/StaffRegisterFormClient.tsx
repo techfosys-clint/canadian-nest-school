@@ -113,7 +113,7 @@ export default function StaffRegisterFormClient() {
   }
 
   return (
-    <div className="w-full bg-white border-none rounded-lg p-6 md:p-8 shadow-xl space-y-6 select-text">
+    <div className="w-full bg-white border border-slate-200 rounded-lg p-6 md:p-8 shadow-xl space-y-6 select-text">
       
       {/* Header and Back Button - Borderless */}
       <div className="flex items-center justify-between pb-4 border-b border-slate-200/60">
@@ -129,7 +129,7 @@ export default function StaffRegisterFormClient() {
         <button
           type="button"
           onClick={() => router.push('/admin/staff-register')}
-          className="inline-flex items-center gap-1.5 px-4.5 py-2.5 bg-[#242427] hover:bg-slate-100 border-none text-slate-600 hover:text-slate-800 rounded-lg text-sm font-bold transition-all cursor-pointer shadow-sm"
+          className="inline-flex items-center gap-1.5 px-4.5 py-2.5 bg-slate-100 hover:bg-slate-100 border-none text-slate-600 hover:text-slate-800 rounded-lg text-sm font-bold transition-all cursor-pointer shadow-sm"
         >
           <FiArrowLeft className="h-4.5 w-4.5" />
           <span>Back to Registry</span>
@@ -157,7 +157,7 @@ export default function StaffRegisterFormClient() {
                   placeholder="e.g. Jane Doe"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-[#242427] border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
+                  className="w-full bg-slate-100 border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
                 />
               </div>
             </div>
@@ -173,7 +173,7 @@ export default function StaffRegisterFormClient() {
                   placeholder="e.g. jane@tutorspace.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-[#242427] border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
+                  className="w-full bg-slate-100 border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
                 />
               </div>
             </div>
@@ -191,7 +191,7 @@ export default function StaffRegisterFormClient() {
                   placeholder="e.g. +88017XXXXXXXX"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-[#242427] border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
+                  className="w-full bg-slate-100 border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
                 />
               </div>
             </div>
@@ -207,7 +207,7 @@ export default function StaffRegisterFormClient() {
                   placeholder="Minimum 6 characters"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[#242427] border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
+                  className="w-full bg-slate-100 border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
                 />
               </div>
             </div>
@@ -223,7 +223,7 @@ export default function StaffRegisterFormClient() {
                 placeholder="e.g. Software Engineer, UI/UX Designer, Project Manager"
                 value={designation}
                 onChange={(e) => setDesignation(e.target.value)}
-                className="w-full bg-[#242427] border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
+                className="w-full bg-slate-100 border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
               />
             </div>
             <p className="text-xs text-slate-400 font-semibold mt-1">This designation will display on public views (like the Mentors page).</p>
@@ -232,7 +232,7 @@ export default function StaffRegisterFormClient() {
           {/* Profile Picture Upload row */}
           <div className="flex flex-col gap-2 pt-2">
             <label className="text-base font-bold text-slate-600">Profile Picture (Optional)</label>
-            <div className="flex items-center gap-5 flex-wrap bg-[#242427] p-4 rounded-lg shadow-sm border-none">
+            <div className="flex items-center gap-5 flex-wrap bg-slate-100 p-4 rounded-lg shadow-sm border-none">
               <div className="h-16 w-16 rounded-full bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
                 {profilePicUrl ? (
                   <img src={profilePicUrl} alt="Preview" className="h-full w-full object-cover" />
@@ -241,7 +241,7 @@ export default function StaffRegisterFormClient() {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <label className={`flex items-center gap-1.5 px-4.5 py-2 rounded-lg bg-slate-100 hover:bg-zinc-700 text-slate-700 font-bold text-sm cursor-pointer transition-colors shadow-sm ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                <label className={`flex items-center gap-1.5 px-4.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm cursor-pointer transition-colors shadow-sm ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
                   <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                   <FiUploadCloud className="h-4.5 w-4.5" />
                   <span>{uploading ? 'Uploading...' : 'Upload Image'}</span>
@@ -279,7 +279,7 @@ export default function StaffRegisterFormClient() {
                 className={`flex items-start gap-3 p-4 rounded-lg border-none cursor-pointer transition-all duration-200 select-none ${
                   role === 'staff'
                     ? 'bg-[#615fff]/10 text-slate-800 shadow-md'
-                    : 'bg-[#242427] text-slate-500 hover:text-slate-800'
+                    : 'bg-slate-100 text-slate-500 hover:text-slate-800'
                 }`}
               >
                 <input
@@ -302,7 +302,7 @@ export default function StaffRegisterFormClient() {
                 className={`flex items-start gap-3 p-4 rounded-lg border-none cursor-pointer transition-all duration-200 select-none ${
                   role === 'instructor'
                     ? 'bg-[#615fff]/10 text-slate-800 shadow-md'
-                    : 'bg-[#242427] text-slate-500 hover:text-slate-800'
+                    : 'bg-slate-100 text-slate-500 hover:text-slate-800'
                 }`}
               >
                 <input
@@ -325,7 +325,7 @@ export default function StaffRegisterFormClient() {
                 className={`flex items-start gap-3 p-4 rounded-lg border-none cursor-pointer transition-all duration-200 select-none ${
                   role === 'admin'
                     ? 'bg-[#615fff]/10 text-slate-800 shadow-md'
-                    : 'bg-[#242427] text-slate-500 hover:text-slate-800'
+                    : 'bg-slate-100 text-slate-500 hover:text-slate-800'
                 }`}
               >
                 <input
@@ -368,7 +368,7 @@ export default function StaffRegisterFormClient() {
                       className={`flex items-center gap-3 p-3.5 rounded-lg border-none cursor-pointer select-none transition-all duration-200 ${
                         isChecked
                           ? 'bg-[#615fff]/10 text-slate-800'
-                          : 'bg-[#242427] text-slate-500 hover:text-slate-800'
+                          : 'bg-slate-100 text-slate-500 hover:text-slate-800'
                       }`}
                     >
                       <input

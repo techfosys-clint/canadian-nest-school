@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { useState } from 'react'
 import Link from 'next/link'
@@ -96,8 +96,8 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
       showCancelButton: true,
       confirmButtonColor: '#ef4444',
       confirmButtonText: 'Delete',
-      background: '#121829',
-      color: '#fff',
+      background: '#ffffff',
+      color: '#1a1a1a',
     })
     if (!result.isConfirmed) return
     try {
@@ -135,7 +135,7 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
       </div>
 
       {/* Search */}
-      <div className="flex items-center gap-2.5 bg-[#121829] border border-slate-200 px-4 py-3 rounded-lg focus-within:border-[#615fff]/50 transition-colors max-w-md">
+      <div className="flex items-center gap-2.5 bg-white border border-slate-200 px-4 py-3 rounded-lg focus-within:border-[#615fff]/50 transition-colors max-w-md shadow-sm">
         <FiSearch className="h-5 w-5 text-slate-400 shrink-0" />
         <input
           type="text"
@@ -153,8 +153,8 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
 
       {/* Table */}
       {sorted.length === 0 ? (
-        <div className="flex flex-col items-center justify-center bg-[#121829] border-2 border-dashed border-slate-200 rounded-lg p-20 text-center space-y-4">
-          <FiImage className="h-12 w-12 text-zinc-700 mx-auto" />
+        <div className="flex flex-col items-center justify-center bg-white border-2 border-dashed border-slate-200 rounded-lg p-20 text-center space-y-4 shadow-sm">
+          <FiImage className="h-12 w-12 text-slate-300 mx-auto" />
           <div>
             <p className="text-base font-bold text-slate-500">
               {search ? 'No assets match your search.' : 'No media yet — upload your first file'}
@@ -167,11 +167,11 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
           </div>
         </div>
       ) : (
-        <div className="bg-[#121829] border border-slate-200 rounded-lg overflow-hidden">
+        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="border-b border-slate-200 bg-[#0e1422]">
+                <tr className="border-b border-slate-200 bg-slate-50">
                   <th className={`${thClass} w-14`}>Preview</th>
                   <th className={thClass} onClick={() => toggleSort('filename')}>
                     Filename <SortIcon col="filename" />
@@ -198,11 +198,11 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
                     <tr
                       key={item.id}
                       onClick={() => setPreviewItem(prev => prev?.id === item.id ? null : item)}
-                      className={`border-b border-slate-200/60 cursor-pointer transition-colors hover:bg-[#1a2236] ${previewItem?.id === item.id ? 'bg-[#1a2236] border-l-2 border-l-[#615fff]' : ''} ${idx === sorted.length - 1 ? 'border-b-0' : ''}`}
+                      className={`border-b border-slate-100 cursor-pointer transition-colors hover:bg-slate-50 ${previewItem?.id === item.id ? 'bg-[#615fff]/5 border-l-2 border-l-[#615fff]' : ''} ${idx === sorted.length - 1 ? 'border-b-0' : ''}`}
                     >
                       {/* Thumbnail */}
                       <td className="px-4 py-3 align-middle">
-                        <div className="h-10 w-10 rounded-lg bg-[#0e1322] border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                        <div className="h-10 w-10 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
                           {isImg ? (
                             <img
                               src={item.thumbnailUrl || item.url}
@@ -227,7 +227,7 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
 
                       {/* Type */}
                       <td className={tdClass}>
-                        <span className="inline-flex items-center px-2.5 py-1 rounded bg-slate-100 text-slate-600 text-sm font-bold uppercase tracking-wide">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-sm font-bold uppercase tracking-wide">
                           {item.mimeType.split('/')[1]?.slice(0, 6) || item.mimeType.split('/')[0]}
                         </span>
                       </td>
@@ -253,9 +253,9 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
                           <button
                             onClick={e => handleCopyUrl(item, e)}
                             title="Copy URL"
-                            className="p-2 rounded-lg bg-slate-100/60 hover:bg-[#615fff]/20 border border-slate-300 hover:border-[#615fff]/40 text-slate-500 hover:text-[#615fff] transition-all cursor-pointer"
+                            className="p-2 rounded-lg bg-slate-100 hover:bg-[#615fff]/20 border border-slate-200 hover:border-[#615fff]/40 text-slate-500 hover:text-[#615fff] transition-all cursor-pointer"
                           >
-                            {isCopied ? <FiCheck className="h-4 w-4 text-emerald-400" /> : <FiCopy className="h-4 w-4" />}
+                            {isCopied ? <FiCheck className="h-4 w-4 text-emerald-500" /> : <FiCopy className="h-4 w-4" />}
                           </button>
                           <a
                             href={item.url}
@@ -263,14 +263,14 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
                             rel="noopener noreferrer"
                             onClick={e => e.stopPropagation()}
                             title="Open in new tab"
-                            className="p-2 rounded-lg bg-slate-100/60 hover:bg-zinc-700 border border-slate-300 text-slate-500 hover:text-slate-800 transition-all"
+                            className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-500 hover:text-slate-800 transition-all"
                           >
                             <FiExternalLink className="h-4 w-4" />
                           </a>
                           <button
                             onClick={e => handleDelete(item, e)}
                             title="Delete"
-                            className="p-2 rounded-lg bg-slate-100/60 hover:bg-rose-500/20 border border-slate-300 hover:border-rose-500/40 text-slate-500 hover:text-rose-400 transition-all cursor-pointer"
+                            className="p-2 rounded-lg bg-rose-50 hover:bg-rose-500/20 border border-rose-200 hover:border-rose-500/40 text-rose-400 hover:text-rose-500 transition-all cursor-pointer"
                           >
                             <FiTrash2 className="h-4 w-4" />
                           </button>
@@ -285,10 +285,10 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
 
           {/* Expandable preview row */}
           {previewItem && (
-            <div className="border-t border-[#615fff]/30 bg-[#0e1422] p-6">
+            <div className="border-t border-[#615fff]/20 bg-slate-50 p-6">
               <div className="flex flex-col sm:flex-row gap-6">
                 {/* Image preview */}
-                <div className="h-48 w-48 shrink-0 rounded-lg bg-[#121829] border border-slate-200 overflow-hidden flex items-center justify-center">
+                <div className="h-48 w-48 shrink-0 rounded-lg bg-white border border-slate-200 overflow-hidden flex items-center justify-center shadow-sm">
                   {previewItem.mimeType.startsWith('image/') ? (
                     <img src={previewItem.url} alt={previewItem.alt} className="w-full h-full object-contain" />
                   ) : (
@@ -316,7 +316,7 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
                       { label: 'Dimensions', value: previewItem.width && previewItem.height ? `${previewItem.width} × ${previewItem.height}` : '—' },
                       { label: 'Uploaded', value: formatDate(previewItem.createdAt) },
                     ].map(({ label, value }) => (
-                      <div key={label} className="bg-[#121829] border border-slate-200 rounded-lg px-3 py-2">
+                      <div key={label} className="bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-sm">
                         <p className="text-slate-400 text-sm font-bold">{label}</p>
                         <p className="text-slate-800 text-base font-semibold mt-0.5 truncate">{value}</p>
                       </div>
@@ -332,7 +332,7 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
                     />
                     <button
                       onClick={e => handleCopyUrl(previewItem, e)}
-                      className="px-4 py-2 rounded-lg bg-[#615fff]/15 hover:bg-[#615fff] border border-[#615fff]/30 hover:border-[#615fff] text-[#615fff] hover:text-slate-800 font-bold text-base transition-all cursor-pointer flex items-center gap-2 shrink-0"
+                      className="px-4 py-2 rounded-lg bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/30 hover:border-[#615fff] text-[#615fff] hover:text-white font-bold text-base transition-all cursor-pointer flex items-center gap-2 shrink-0"
                     >
                       {copiedId === previewItem.id ? <FiCheck className="h-4 w-4 text-emerald-400" /> : <FiCopy className="h-4 w-4" />}
                       {copiedId === previewItem.id ? 'Copied!' : 'Copy URL'}
@@ -341,13 +341,13 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
                       href={previewItem.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-zinc-700 border border-slate-300 text-slate-600 hover:text-slate-800 font-bold text-base transition-all flex items-center gap-2 shrink-0"
+                      className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-600 hover:text-slate-800 font-bold text-base transition-all flex items-center gap-2 shrink-0"
                     >
                       <FiExternalLink className="h-4 w-4" /> Open
                     </a>
                     <button
                       onClick={e => handleDelete(previewItem, e)}
-                      className="px-4 py-2 rounded-lg bg-rose-500/10 hover:bg-rose-500 border border-rose-500/20 hover:border-rose-500 text-rose-400 hover:text-rose-600 font-bold text-base transition-all cursor-pointer flex items-center gap-2 shrink-0"
+                      className="px-4 py-2 rounded-lg bg-rose-50 hover:bg-rose-500 border border-rose-200 hover:border-rose-500 text-rose-500 hover:text-white font-bold text-base transition-all cursor-pointer flex items-center gap-2 shrink-0"
                     >
                       <FiTrash2 className="h-4 w-4" /> Delete
                     </button>

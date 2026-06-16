@@ -81,8 +81,8 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
           icon: 'warning',
           title: 'Validation Error',
           text: 'Category name and slug are required.',
-          background: '#121829',
-          color: '#fff',
+          background: '#ffffff',
+          color: '#1a1a1a',
         })
         return
       }
@@ -94,8 +94,8 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
             icon: 'warning',
             title: 'Validation Error',
             text: 'All categories must have a name and slug.',
-            background: '#121829',
-            color: '#fff',
+            background: '#ffffff',
+            color: '#1a1a1a',
           })
           return
         }
@@ -137,8 +137,8 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
           : `${categoryRows.length} categories have been created successfully.`,
         timer: 1500,
         showConfirmButton: false,
-        background: '#121829',
-        color: '#fff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
 
       router.push('/admin/categories')
@@ -148,8 +148,8 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
         icon: 'error',
         title: 'Error',
         text: err.message || 'Failed to save categories.',
-        background: '#121829',
-        color: '#fff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
     } finally {
       setSaving(false)
@@ -184,7 +184,7 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
         
         {/* Main Content */}
         <div className="lg:col-span-8 space-y-6">
-          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-5">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h2 className="text-xl font-bold text-slate-800 tracking-tight">Category Classifications</h2>
               {!isEditMode && (
@@ -277,7 +277,7 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
 
         {/* Sidebar settings */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6">
+          <div className="bg-white border border-slate-200 rounded-lg p-6">
             <button
               type="submit"
               disabled={saving}

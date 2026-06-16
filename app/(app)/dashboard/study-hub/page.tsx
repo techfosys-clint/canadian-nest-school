@@ -27,7 +27,7 @@ export default function StudyHubPage() {
   const router = useRouter()
   const [user, setUser] = useState<UserSession | null>(null)
   const [loading, setLoading] = useState(true)
-  const [webinars, setWebinars] = useState<LiveWebinar[]>([])
+  const [webinars, setWebinars] = useState<any[]>([])
   const [streakCount, setStreakCount] = useState(5)
   const [loginDates, setLoginDates] = useState<string[]>([])
   const [enrollments, setEnrollments] = useState<any[]>([])
@@ -45,7 +45,7 @@ export default function StudyHubPage() {
 
         setUser(sessionData.user)
 
-        // Fetch upcoming live webinars
+        // Fetch upcoming live webinars count (for quick-link badge)
         const webinarsRes = await fetch('/api/live-webinars')
         if (webinarsRes.ok) {
           const webinarsData = await webinarsRes.json()
@@ -94,16 +94,6 @@ export default function StudyHubPage() {
     checkSessionAndFetchData()
   }, [router])
 
-  const handleRegisterSeat = (webinarTitle: string) => {
-    Swal.fire({
-      icon: 'success',
-      title: 'Seat Reserved!',
-      text: `You have successfully registered for: ${webinarTitle}. Join links are active below!`,
-      confirmButtonColor: '#615fff',
-      background: '#121829',
-      color: '#ffffff',
-    })
-  }
 
   const getWeekDays = () => {
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -171,7 +161,7 @@ export default function StudyHubPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* Study Streak (Left Column) */}
+        {/* Study Streak */}
         <div className="lg:col-span-5">
           <div className="bg-white p-6 border border-zinc-200/80 rounded-lg space-y-6">
             <div>
@@ -204,77 +194,45 @@ export default function StudyHubPage() {
           </div>
         </div>
 
-        {/* Live Webinars (Right Column) */}
+        {/* Live Classes Quick-Link Card */}
         <div className="lg:col-span-7">
-          <div className="bg-white p-6 border border-zinc-200/80 rounded-lg space-y-6">
-            <div>
-              <h3 className="text-xl font-bold text-zinc-800 flex items-center gap-2">
-                <FiCalendar className="text-[#615fff]" /> Live Webinar Broadcasts
-              </h3>
-              <p className="text-base font-semibold text-zinc-450 mt-1 leading-relaxed">
-                Join active webinar classrooms to ask live questions, share comments, and review assignments.
-              </p>
-            </div>
-            
-            <div className="space-y-4">
-              {webinars.length === 0 ? (
-                <div className="text-center py-10 bg-zinc-50/50 rounded-lg border border-zinc-100/60 p-6">
-                  <p className="text-base font-semibold text-zinc-450">No upcoming live classes are scheduled for your enrolled courses.</p>
-                </div>
-              ) : (
-                webinars.map((webinar) => {
-                  const dateObj = webinar.liveDate ? new Date(webinar.liveDate) : null
-                  const formattedDate = dateObj
-                    ? dateObj.toLocaleString('en-BD', {
-                        weekday: 'short',
-                        month: 'short',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: true,
-                      })
-                    : 'Not Scheduled'
-
-                  const isUpcoming = dateObj ? dateObj.getTime() > Date.now() : false
-
-                  return (
-                    <div key={webinar.id} className="p-5 rounded-lg bg-zinc-50/50 border border-zinc-150/80 space-y-3">
-                      <div className="flex justify-between items-start gap-4">
-                        <h4 className="text-base font-bold text-zinc-850 leading-snug line-clamp-2">{webinar.title}</h4>
-                        <span className={`px-2.5 py-0.5 rounded-lg text-xs font-bold uppercase tracking-wider shrink-0 ${
-                          isUpcoming ? 'bg-emerald-500/10 text-emerald-600' : 'bg-zinc-200 text-zinc-500'
-                        }`}>
-                          {isUpcoming ? 'Upcoming' : 'Ended'}
-                        </span>
-                      </div>
-                      <p className="text-sm font-semibold text-zinc-500 truncate">{webinar.courseTitle}</p>
-                      <p className="text-sm font-bold text-[#615fff]">{formattedDate} ({webinar.livePlatform.toUpperCase()})</p>
-                      
-                      {isUpcoming && webinar.liveUrl && (
-                        <div className="flex items-center gap-3 pt-2">
-                          <button 
-                            onClick={() => handleRegisterSeat(webinar.title)}
-                            className="px-4 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white text-sm font-bold transition-colors cursor-pointer border-none"
-                          >
-                            RSVP Seat
-                          </button>
-                          <a 
-                            href={webinar.liveUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-4 py-2.5 rounded-lg bg-zinc-150 hover:bg-zinc-200 text-zinc-700 text-sm font-bold transition-colors inline-flex items-center gap-1"
-                          >
-                            <span>Join Webinar</span>
-                            <FiExternalLink className="h-4 w-4" />
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })
+          <a
+            href="/dashboard/live-classes"
+            className="block bg-white p-6 border border-zinc-200/80 rounded-lg space-y-5 shadow-sm hover:border-[#615fff]/40 hover:shadow-md transition-all duration-300 group"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-bold text-zinc-800 flex items-center gap-2 group-hover:text-[#615fff] transition-colors">
+                  <FiRadio className="text-[#615fff]" /> Live Webinar Broadcasts
+                </h3>
+                <p className="text-base font-semibold text-zinc-450 mt-1 leading-relaxed">
+                  Join active webinar classrooms to ask live questions, share comments, and review assignments.
+                </p>
+              </div>
+              {webinars.filter(w => w.liveDate && new Date(w.liveDate).getTime() > Date.now()).length > 0 && (
+                <span className="shrink-0 inline-flex items-center justify-center h-8 w-8 rounded-full bg-emerald-500 text-white font-bold text-sm animate-pulse">
+                  {webinars.filter(w => w.liveDate && new Date(w.liveDate).getTime() > Date.now()).length}
+                </span>
               )}
             </div>
-          </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-[#615fff]/5 border border-[#615fff]/15 rounded-lg p-4 text-center">
+                <p className="text-3xl font-bold text-[#615fff]">{webinars.filter(w => w.liveDate && new Date(w.liveDate).getTime() > Date.now()).length}</p>
+                <p className="text-sm font-bold text-zinc-500 mt-1">Upcoming Classes</p>
+              </div>
+              <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-4 text-center">
+                <p className="text-3xl font-bold text-zinc-700">{webinars.length}</p>
+                <p className="text-sm font-bold text-zinc-500 mt-1">Total Sessions</p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end">
+              <span className="inline-flex items-center gap-2 text-base font-bold text-[#615fff] group-hover:gap-3 transition-all">
+                View All Live Classes <FiExternalLink className="h-4 w-4" />
+              </span>
+            </div>
+          </a>
         </div>
 
       </div>
@@ -319,17 +277,36 @@ export default function StudyHubPage() {
                 }
 
                 return (
-                  <div key={idx} className="p-5 bg-zinc-50/50 hover:bg-white border border-zinc-150/80 hover:border-[#615fff]/35 rounded-lg transition-all duration-300 flex flex-col justify-between group">
-                    <div className="space-y-3.5">
-                      <div className="flex justify-between items-start gap-2">
-                        <div className="p-2.5 bg-white rounded-lg border border-zinc-150 shadow-sm">
-                          {icon}
+                  <div key={idx} className="bg-zinc-50/50 hover:bg-white border border-zinc-150/80 hover:border-[#615fff]/35 rounded-lg transition-all duration-300 flex flex-col group overflow-hidden">
+                    
+                    {/* Cover image / placeholder */}
+                    <div className="relative w-full aspect-[4/3] bg-zinc-100 overflow-hidden shrink-0">
+                      {material.coverImage ? (
+                        <img
+                          src={material.coverImage}
+                          alt={material.title}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+                          <div className="p-4 bg-white rounded-lg border border-zinc-150 shadow-sm">
+                            {icon}
+                          </div>
+                          <span className={`px-2.5 py-0.5 rounded-lg text-xs font-bold uppercase tracking-wider border ${badgeColor}`}>
+                            {typeLabel}
+                          </span>
                         </div>
-                        <span className={`px-2.5 py-0.5 rounded-lg text-xs font-bold uppercase tracking-wider border ${badgeColor}`}>
+                      )}
+                      {/* Badge overlay when cover image exists */}
+                      {material.coverImage && (
+                        <span className={`absolute top-2 right-2 px-2.5 py-0.5 rounded-lg text-xs font-bold uppercase tracking-wider border backdrop-blur-sm ${badgeColor}`}>
                           {typeLabel}
                         </span>
-                      </div>
+                      )}
+                    </div>
 
+                    {/* Card body */}
+                    <div className="p-4 flex flex-col flex-1 gap-3">
                       <div>
                         <h4 className="text-base font-bold text-zinc-850 line-clamp-2 leading-snug group-hover:text-[#615fff] transition-colors">
                           {material.title}
@@ -338,18 +315,18 @@ export default function StudyHubPage() {
                           Course: <span className="font-bold text-zinc-600">{material.courseTitle}</span>
                         </p>
                       </div>
-                    </div>
 
-                    <div className="pt-5 border-t border-zinc-150/60 mt-5">
-                      <a
-                        href={material.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-white hover:bg-[#615fff] text-zinc-700 hover:text-white border border-zinc-250 hover:border-[#615fff] font-bold text-base transition-all duration-200 shadow-sm cursor-pointer"
-                      >
-                        <span>Access Material</span>
-                        <FiDownload className="h-4.5 w-4.5 shrink-0" />
-                      </a>
+                      <div className="mt-auto pt-3 border-t border-zinc-150/60">
+                        <a
+                          href={material.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-white hover:bg-[#615fff] text-zinc-700 hover:text-white border border-zinc-250 hover:border-[#615fff] font-bold text-base transition-all duration-200 shadow-sm cursor-pointer"
+                        >
+                          <span>Access Material</span>
+                          <FiDownload className="h-4.5 w-4.5 shrink-0" />
+                        </a>
+                      </div>
                     </div>
                   </div>
                 )

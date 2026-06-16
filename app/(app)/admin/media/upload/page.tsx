@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { verifyToken } from '@/lib/auth/auth'
@@ -25,7 +25,7 @@ export default async function MediaUploadPage() {
   if (!sessionUser || !['admin', 'staff', 'instructor'].includes(sessionUser.role)) redirect('/login')
 
   return (
-    <div className="min-h-screen bg-[#070b16] text-white">
+    <div className="min-h-screen bg-slate-100 text-slate-800">
       <MediaUploadClient />
     </div>
   )

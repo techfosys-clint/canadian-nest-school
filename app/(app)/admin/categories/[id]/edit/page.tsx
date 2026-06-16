@@ -49,7 +49,7 @@ export default async function EditCategoryPage({ params }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-[#070b16] text-white">
+    <div className="min-h-screen bg-slate-100 text-slate-800">
       <CategoryFormClient initialData={serializedCategory} />
     </div>
   )

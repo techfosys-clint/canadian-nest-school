@@ -33,9 +33,9 @@ export default function CouponsPageClient({
       confirmButtonText: 'Yes, delete',
       cancelButtonText: 'Cancel',
       confirmButtonColor: '#ef4444',
-      cancelButtonColor: '#27272a',
-      background: '#121829',
-      color: '#ffffff',
+      cancelButtonColor: '#6b7280',
+      background: '#ffffff',
+      color: '#1a1a1a',
     })
     
     if (!result.isConfirmed) return
@@ -54,8 +54,8 @@ export default function CouponsPageClient({
           title: 'Coupon Deleted',
           timer: 1200,
           showConfirmButton: false,
-          background: '#121829',
-          color: '#ffffff',
+          background: '#ffffff',
+          color: '#1a1a1a',
         })
       } else {
         throw new Error(data.error || 'Failed to delete coupon.')
@@ -65,8 +65,8 @@ export default function CouponsPageClient({
         icon: 'error',
         title: 'Error',
         text: err.message || 'Failed to delete coupon.',
-        background: '#121829',
-        color: '#ffffff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
     }
   }
@@ -91,8 +91,8 @@ export default function CouponsPageClient({
           position: 'top-end',
           showConfirmButton: false,
           timer: 1500,
-          background: '#121829',
-          color: '#ffffff',
+          background: '#ffffff',
+          color: '#1a1a1a',
         })
       }
     } catch (err) {
@@ -104,10 +104,10 @@ export default function CouponsPageClient({
     <div className="px-6 py-8 space-y-6 container mx-auto">
       
       {/* ─── Header ─── */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-800/80 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 pb-6">
         <div>
-          <h1 className="text-3xl font-bold font-display text-white">Coupons & Promo Codes</h1>
-          <p className="text-base font-semibold text-zinc-450 mt-1">
+          <h1 className="text-3xl font-bold font-display text-slate-800">Coupons &amp; Promo Codes</h1>
+          <p className="text-base font-semibold text-slate-500 mt-1">
             Create, manage, and edit promotional discount campaigns for platform checkouts.
           </p>
         </div>
@@ -123,12 +123,12 @@ export default function CouponsPageClient({
       </div>
 
       {/* ─── Coupons List Table ─── */}
-      <div className="bg-[#121829] border border-zinc-800/60 rounded-lg overflow-hidden shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
         {coupons.length === 0 ? (
           <div className="p-16 text-center space-y-4">
-            <FiTag className="h-12 w-12 text-zinc-700 mx-auto" />
-            <h3 className="text-lg font-bold text-zinc-350">No promotional coupons</h3>
-            <p className="text-base font-semibold text-zinc-550 max-w-sm mx-auto">
+            <FiTag className="h-12 w-12 text-slate-300 mx-auto" />
+            <h3 className="text-lg font-bold text-slate-600">No promotional coupons</h3>
+            <p className="text-base font-semibold text-slate-400 max-w-sm mx-auto">
               Create your first discount promo code to launch special campaigns.
             </p>
           </div>
@@ -136,7 +136,7 @@ export default function CouponsPageClient({
           <div className="overflow-x-auto">
             <table className="w-full text-left text-base">
               <thead>
-                <tr className="bg-[#0b0e17] border-b border-zinc-800/40 text-zinc-450 font-bold text-sm uppercase tracking-wider select-none">
+                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold text-sm uppercase tracking-wider select-none">
                   <th className="px-6 py-4">Promo Code</th>
                   <th className="px-6 py-4">Discount Value</th>
                   <th className="px-6 py-4">Expiry Date</th>
@@ -145,17 +145,17 @@ export default function CouponsPageClient({
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-800/40">
+              <tbody className="divide-y divide-slate-100">
                 {coupons.map((coupon) => (
-                  <tr key={coupon.id} className="hover:bg-[#152347]/10 transition-colors">
+                  <tr key={coupon.id} className="hover:bg-slate-50 transition-colors">
                     
                     {/* Code name */}
                     <td className="px-6 py-4 select-all">
                       <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-lg bg-[#615fff]/15 border border-[#615fff]/20 flex items-center justify-center shrink-0">
-                          <FiTag className="h-4.5 w-4.5 text-[#9693ff]" />
+                        <div className="h-9 w-9 rounded-lg bg-[#615fff]/10 border border-[#615fff]/20 flex items-center justify-center shrink-0">
+                          <FiTag className="h-4 w-4 text-[#615fff]" />
                         </div>
-                        <span className="font-bold text-white text-base tracking-wide font-mono bg-[#070b16] px-2.5 py-1 rounded border border-zinc-850">
+                        <span className="font-bold text-slate-800 text-base tracking-wide font-mono bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
                           {coupon.code}
                         </span>
                       </div>
@@ -163,7 +163,7 @@ export default function CouponsPageClient({
 
                     {/* Value */}
                     <td className="px-6 py-4">
-                      <span className="font-bold text-emerald-400 text-base">
+                      <span className="font-bold text-emerald-600 text-base">
                         {coupon.discountType === 'percentage'
                           ? `${coupon.discountValue}% Off`
                           : `৳${coupon.discountValue.toLocaleString('en-BD')} Off`}
@@ -172,7 +172,7 @@ export default function CouponsPageClient({
 
                     {/* Expiry */}
                     <td className="px-6 py-4">
-                      <span className="font-semibold text-zinc-400 text-base">
+                      <span className="font-semibold text-slate-500 text-base">
                         {coupon.expirationDate ? coupon.expirationDate : 'Never Expires'}
                       </span>
                     </td>
@@ -180,11 +180,11 @@ export default function CouponsPageClient({
                     {/* Stats */}
                     <td className="px-6 py-4 text-base">
                       <div className="flex flex-col">
-                        <span className="font-bold text-zinc-200">
+                        <span className="font-bold text-slate-700">
                           {coupon.usedCount} Used
                         </span>
                         {coupon.maxUses ? (
-                          <span className="text-xs font-semibold text-zinc-500 mt-0.5">
+                          <span className="text-xs font-semibold text-slate-400 mt-0.5">
                             Max Limit: {coupon.maxUses}
                           </span>
                         ) : null}
@@ -197,11 +197,11 @@ export default function CouponsPageClient({
                         onClick={() => toggleStatus(coupon)}
                         className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all border cursor-pointer select-none uppercase tracking-wide ${
                           coupon.isActive
-                            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
-                            : 'bg-zinc-800/60 border-zinc-700/60 text-zinc-400'
+                            ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
+                            : 'bg-slate-100 border-slate-200 text-slate-500'
                         }`}
                       >
-                        <span className={`h-1.5 w-1.5 rounded-full ${coupon.isActive ? 'bg-emerald-500 animate-pulse' : 'bg-zinc-500'}`} />
+                        <span className={`h-1.5 w-1.5 rounded-full ${coupon.isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
                         <span>{coupon.isActive ? 'Active' : 'Paused'}</span>
                       </button>
                     </td>
@@ -211,18 +211,18 @@ export default function CouponsPageClient({
                       <div className="flex items-center justify-end gap-2.5">
                         <button
                           onClick={() => router.push(`/admin/coupons/${coupon.id}/edit`)}
-                          className="p-2 rounded-lg bg-zinc-850 hover:bg-[#615fff] border border-zinc-800 text-zinc-450 hover:text-white transition-all cursor-pointer hover:shadow-lg hover:shadow-[#615fff]/10"
+                          className="p-2 rounded-lg bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/20 text-[#615fff] hover:text-white transition-all cursor-pointer hover:shadow-lg hover:shadow-[#615fff]/10"
                           title="Edit Coupon Settings"
                         >
-                          <FiEdit className="h-4.5 w-4.5" />
+                          <FiEdit className="h-4 w-4" />
                         </button>
                         
                         <button
                           onClick={() => handleDelete(coupon)}
-                          className="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500 border border-rose-500/20 text-rose-400 hover:text-white transition-all cursor-pointer hover:shadow-lg hover:shadow-rose-500/10"
+                          className="p-2 rounded-lg bg-rose-50 hover:bg-rose-500 border border-rose-200 text-rose-500 hover:text-white transition-all cursor-pointer hover:shadow-lg hover:shadow-rose-500/10"
                           title="Delete Coupon"
                         >
-                          <FiTrash2 className="h-4.5 w-4.5" />
+                          <FiTrash2 className="h-4 w-4" />
                         </button>
                       </div>
                     </td>

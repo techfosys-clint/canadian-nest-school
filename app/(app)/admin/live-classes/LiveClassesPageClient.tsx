@@ -37,8 +37,8 @@ export default function LiveClassesPageClient() {
         icon: 'error',
         title: 'Error',
         text: err.message || 'Failed to load live sessions.',
-        background: '#121829',
-        color: '#fff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
     } finally {
       setLoading(false)
@@ -58,17 +58,17 @@ export default function LiveClassesPageClient() {
   return (
     <div className="px-6 py-8 space-y-6 container mx-auto">
       {/* Page header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-800/40 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200/40 pb-4">
         <div>
-          <h1 className="text-3xl font-bold font-display text-white">Scheduled Live Classes</h1>
-          <p className="text-base font-semibold text-zinc-450 mt-1">
+          <h1 className="text-3xl font-bold font-display text-slate-800">Scheduled Live Classes</h1>
+          <p className="text-base font-semibold text-slate-500 mt-1">
             Coordinate and launch your upcoming active interactive lectures and meetings
           </p>
         </div>
         <button
           onClick={handleRefresh}
           disabled={refreshing}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#18181b] border border-zinc-800 hover:border-zinc-700 text-zinc-350 hover:text-white font-semibold text-base transition-all duration-200 cursor-pointer disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white border border-slate-200 hover:border-slate-300 text-slate-600 hover:text-slate-800 font-semibold text-base transition-all duration-200 cursor-pointer disabled:opacity-50"
         >
           <FiRefreshCw className={`h-4.5 w-4.5 ${refreshing ? 'animate-spin' : ''}`} />
           Refresh Registry
@@ -76,23 +76,23 @@ export default function LiveClassesPageClient() {
       </div>
 
       {/* Live classes container */}
-      <div className="bg-[#121829] border border-zinc-800 rounded-lg overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
         {loading ? (
           <div className="p-16 text-center">
             <div className="h-10 w-10 border-2 border-[#615fff] border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="text-base font-semibold text-zinc-500 mt-4">Loading active scheduled logs...</p>
+            <p className="text-base font-semibold text-slate-400 mt-4">Loading active scheduled logs...</p>
           </div>
         ) : lessons.length === 0 ? (
           <div className="p-16 text-center space-y-4">
-            <FiRadio className="h-10 w-10 text-zinc-700 mx-auto animate-pulse" />
-            <p className="text-base font-semibold text-zinc-500">
+            <FiRadio className="h-10 w-10 text-slate-300 mx-auto animate-pulse" />
+            <p className="text-base font-semibold text-slate-400">
               No live classes are scheduled at this time.
             </p>
           </div>
         ) : (
           <div>
-            <div className="px-6 py-4 border-b border-zinc-800/50 bg-[#0b0e17] flex items-center justify-between">
-              <p className="text-base font-bold text-zinc-450">
+            <div className="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+              <p className="text-base font-bold text-slate-500">
                 Scheduled Streams ({lessons.length} session{lessons.length !== 1 ? 's' : ''})
               </p>
             </div>
@@ -100,7 +100,7 @@ export default function LiveClassesPageClient() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-base">
                 <thead>
-                  <tr className="bg-[#121212] border-b border-zinc-800 text-zinc-400 font-bold text-sm uppercase tracking-wider font-display">
+                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold text-sm uppercase tracking-wider font-display">
                     <th className="px-6 py-3.5">Live Class Topic</th>
                     <th className="px-6 py-3.5">Course Name</th>
                     <th className="px-6 py-3.5">Scheduled Date & Time</th>
@@ -108,7 +108,7 @@ export default function LiveClassesPageClient() {
                     <th className="px-6 py-3.5 text-right w-32">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-800/60 font-semibold text-zinc-200">
+                <tbody className="divide-y divide-slate-100 font-semibold text-slate-700">
                   {lessons.map((lesson) => {
                     const dateObj = lesson.liveDate ? new Date(lesson.liveDate) : null
                     const formattedDate = dateObj
@@ -126,32 +126,32 @@ export default function LiveClassesPageClient() {
                     const isUpcoming = dateObj ? dateObj.getTime() > Date.now() : false
 
                     return (
-                      <tr key={lesson.id} className="hover:bg-zinc-800/20 transition-colors">
+                      <tr key={lesson.id} className="hover:bg-slate-50 transition-colors">
                         {/* Topic */}
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <span className="h-8 w-8 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-450 flex items-center justify-center shrink-0">
+                            <span className="h-8 w-8 rounded-lg bg-rose-50 border border-rose-200 text-rose-500 flex items-center justify-center shrink-0">
                               <FiRadio className="h-4.5 w-4.5 animate-pulse" />
                             </span>
                             <div>
-                              <p className="font-bold text-white text-base leading-snug line-clamp-1">{lesson.title}</p>
+                              <p className="font-bold text-slate-800 text-base leading-snug line-clamp-1">{lesson.title}</p>
                             </div>
                           </div>
                         </td>
                         {/* Course */}
-                        <td className="px-6 py-4 text-zinc-350 text-base">
+                        <td className="px-6 py-4 text-slate-600 text-base">
                           {lesson.courseTitle}
                         </td>
                         {/* Scheduled Date */}
                         <td className="px-6 py-4 text-base">
                           <div className="flex items-center gap-2">
-                            <span className={`h-2.5 w-2.5 rounded-full ${isUpcoming ? 'bg-amber-400 animate-pulse' : 'bg-zinc-500'}`} />
-                            <span className="text-zinc-200 font-bold">{formattedDate}</span>
+                            <span className={`h-2.5 w-2.5 rounded-full ${isUpcoming ? 'bg-amber-500 animate-pulse' : 'bg-slate-300'}`} />
+                            <span className="text-slate-700 font-bold">{formattedDate}</span>
                           </div>
                         </td>
                         {/* Platform */}
                         <td className="px-6 py-4 text-center">
-                          <span className="inline-flex px-2.5 py-1 rounded text-xs font-bold uppercase bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 select-none">
+                          <span className="inline-flex px-2.5 py-1 rounded text-xs font-bold uppercase bg-indigo-50 text-indigo-600 border border-indigo-200 select-none">
                             {lesson.livePlatform}
                           </span>
                         </td>
@@ -168,7 +168,7 @@ export default function LiveClassesPageClient() {
                               <FiExternalLink className="h-4 w-4" />
                             </a>
                           ) : (
-                            <span className="inline-flex items-center justify-center px-3.5 py-2 rounded-lg bg-zinc-800/40 border border-zinc-800 text-zinc-500 text-sm font-bold whitespace-nowrap select-none">
+                            <span className="inline-flex items-center justify-center px-3.5 py-2 rounded-lg bg-slate-100/40 border border-slate-200 text-slate-400 text-sm font-bold whitespace-nowrap select-none">
                               Link Pending
                             </span>
                           )}

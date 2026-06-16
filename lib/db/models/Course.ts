@@ -24,6 +24,7 @@ export interface ICourse extends Document {
     title: string
     url: string
     materialType: 'pdf' | 'epub' | 'link' | 'other'
+    coverImage?: string
   }>
   modules?: string[]
 }
@@ -62,6 +63,7 @@ const CourseSchema = new Schema<ICourse>(
         title: { type: String, required: true },
         url: { type: String, required: true },
         materialType: { type: String, enum: ['pdf', 'epub', 'link', 'other'], default: 'pdf', required: true },
+        coverImage: { type: String, default: '' },
       },
     ],
     modules: { type: [String], default: [] },

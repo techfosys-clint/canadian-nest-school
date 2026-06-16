@@ -70,10 +70,10 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#615fff',
-      cancelButtonColor: '#1f2937',
+      cancelButtonColor: '#6b7280',
       confirmButtonText: `Yes, ${nextStatus === 'published' ? 'Publish' : 'Draft'} it`,
-      background: '#121829',
-      color: '#ffffff',
+      background: '#ffffff',
+      color: '#1a1a1a',
     })
 
     if (!result.isConfirmed) return
@@ -99,16 +99,16 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
         text: `Course is now saved as ${nextStatus}.`,
         timer: 1500,
         showConfirmButton: false,
-        background: '#121829',
-        color: '#ffffff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
     } catch (err: any) {
       Swal.fire({
         icon: 'error',
         title: 'Action Failed',
         text: err.message || 'Could not update status.',
-        background: '#121829',
-        color: '#ffffff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
     }
   }
@@ -120,8 +120,8 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
         icon: 'error',
         title: 'Permission Denied',
         text: 'Only system Admins can delete courses.',
-        background: '#121829',
-        color: '#ffffff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
       return
     }
@@ -132,10 +132,10 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#ef4444',
-      cancelButtonColor: '#1f2937',
+      cancelButtonColor: '#6b7280',
       confirmButtonText: 'Yes, Delete Course',
-      background: '#121829',
-      color: '#ffffff',
+      background: '#ffffff',
+      color: '#1a1a1a',
     })
 
     if (!result.isConfirmed) return
@@ -146,10 +146,10 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
       html: `
         <div style="text-align: center;">
           <div style="margin: 20px 0;">
-            <div style="background: #1f2937; border-radius: 8px; overflow: hidden; height: 8px;">
+            <div style="background: #e2e8f0; border-radius: 8px; overflow: hidden; height: 8px;">
               <div id="progress-bar" style="background: linear-gradient(90deg, #ef4444, #dc2626); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
             </div>
-            <p id="progress-text" style="margin-top: 12px; font-size: 14px; color: #d1d5db;">Removing course data...</p>
+            <p id="progress-text" style="margin-top: 12px; font-size: 14px; color: #64748b;">Removing course data...</p>
           </div>
         </div>
       `,
@@ -161,8 +161,8 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
         if (progressBar) progressBar.style.width = '20%'
         if (progressText) progressText.textContent = 'Removing course data...'
       },
-      background: '#121829',
-      color: '#ffffff',
+      background: '#ffffff',
+      color: '#1a1a1a',
     })
 
     try {
@@ -209,8 +209,8 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
             </ul>
           `,
           confirmButtonColor: '#10b981',
-          background: '#121829',
-          color: '#ffffff',
+          background: '#ffffff',
+          color: '#1a1a1a',
         })
       }, 300)
     } catch (err: any) {
@@ -218,8 +218,8 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
         icon: 'error',
         title: 'Delete Failed',
         text: err.message || 'Could not remove course.',
-        background: '#121829',
-        color: '#ffffff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
     }
   }
@@ -234,56 +234,56 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
       {/* Metrics Cards Grid - Borderless */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
         {/* Card 1: Total Courses */}
-        <div className="bg-[#121829] border-none rounded-lg p-6 flex items-center justify-between shadow-lg">
+        <div className="bg-white border border-slate-200 rounded-lg p-6 flex items-center justify-between shadow-sm">
           <div className="space-y-1">
-            <p className="text-sm font-bold text-zinc-450 uppercase tracking-wider select-none">Total Courses</p>
-            <p className="text-3xl font-bold text-white tracking-tight">{totalCourses}</p>
+            <p className="text-sm font-bold text-slate-500 uppercase tracking-wider select-none">Total Courses</p>
+            <p className="text-3xl font-bold text-slate-800 tracking-tight">{totalCourses}</p>
           </div>
-          <div className="h-12 w-12 rounded-lg bg-[#615fff]/15 flex items-center justify-center select-none">
+          <div className="h-12 w-12 rounded-lg bg-[#615fff]/10 border border-[#615fff]/20 flex items-center justify-center select-none">
             <FiBookOpen className="h-6 w-6 text-[#615fff]" />
           </div>
         </div>
 
         {/* Card 2: Published Courses */}
-        <div className="bg-[#121829] border-none rounded-lg p-6 flex items-center justify-between shadow-lg">
+        <div className="bg-white border border-slate-200 rounded-lg p-6 flex items-center justify-between shadow-sm">
           <div className="space-y-1">
-            <p className="text-sm font-bold text-zinc-450 uppercase tracking-wider select-none">Published</p>
-            <p className="text-3xl font-bold text-emerald-400 tracking-tight">{publishedCourses}</p>
+            <p className="text-sm font-bold text-slate-500 uppercase tracking-wider select-none">Published</p>
+            <p className="text-3xl font-bold text-emerald-600 tracking-tight">{publishedCourses}</p>
           </div>
-          <div className="h-12 w-12 rounded-lg bg-emerald-500/15 flex items-center justify-center select-none">
-            <FiZap className="h-6 w-6 text-emerald-400" />
+          <div className="h-12 w-12 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center select-none">
+            <FiZap className="h-6 w-6 text-emerald-600" />
           </div>
         </div>
 
         {/* Card 3: Draft Courses */}
-        <div className="bg-[#121829] border-none rounded-lg p-6 flex items-center justify-between shadow-lg">
+        <div className="bg-white border border-slate-200 rounded-lg p-6 flex items-center justify-between shadow-sm">
           <div className="space-y-1">
-            <p className="text-sm font-bold text-zinc-450 uppercase tracking-wider select-none">Drafts</p>
-            <p className="text-3xl font-bold text-zinc-350 tracking-tight">{draftCourses}</p>
+            <p className="text-sm font-bold text-slate-500 uppercase tracking-wider select-none">Drafts</p>
+            <p className="text-3xl font-bold text-slate-600 tracking-tight">{draftCourses}</p>
           </div>
-          <div className="h-12 w-12 rounded-lg bg-zinc-800 flex items-center justify-center border-none select-none">
-            <FiList className="h-6 w-6 text-zinc-400" />
+          <div className="h-12 w-12 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center select-none">
+            <FiList className="h-6 w-6 text-slate-500" />
           </div>
         </div>
       </div>
 
-      {/* Search and Filters panel - Borderless */}
-      <div className="flex flex-col md:flex-row md:items-center gap-4 bg-[#121829] border-none p-4 rounded-lg shadow-lg">
+      {/* Search and Filters panel */}
+      <div className="flex flex-col md:flex-row md:items-center gap-4 bg-white border border-slate-200 p-4 rounded-lg shadow-sm">
         
         {/* Search Input */}
-        <div className="flex-1 flex items-center gap-2.5 px-3.5 py-2.5 bg-[#070b16] border-none focus-within:ring-2 focus-within:ring-[#615fff]/40 rounded-lg transition-all">
-          <FiSearch className="h-4.5 w-4.5 text-zinc-500" />
+        <div className="flex-1 flex items-center gap-2.5 px-3.5 py-2.5 bg-slate-50 border border-slate-200 focus-within:ring-2 focus-within:ring-[#615fff]/40 rounded-lg transition-all">
+          <FiSearch className="h-4.5 w-4.5 text-slate-400" />
           <input
             type="text"
             placeholder="Search by title, category, or mentor name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-transparent border-none outline-none w-full text-base font-semibold text-zinc-150 placeholder-zinc-500"
+            className="bg-transparent border-none outline-none w-full text-base font-semibold text-slate-800 placeholder-slate-400"
           />
         </div>
 
         {/* Tab Filters */}
-        <div className="flex bg-[#070b16] border-none p-1 rounded-lg">
+        <div className="flex bg-slate-100 border-none p-1 rounded-lg">
           {(['all', 'published', 'draft'] as const).map((tab) => (
             <button
               key={tab}
@@ -291,7 +291,7 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
               className={`px-4 py-1.5 rounded-md text-base font-bold capitalize transition-all duration-200 cursor-pointer ${
                 statusFilter === tab
                   ? 'bg-[#615fff] text-white'
-                  : 'text-zinc-400 hover:text-white'
+                  : 'text-slate-500 hover:text-slate-800'
               }`}
             >
               {tab}
@@ -301,18 +301,18 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
 
       </div>
 
-      {/* Courses Catalog Table - Borderless */}
-      <div className="bg-[#121829] border-none rounded-lg shadow-lg overflow-hidden">
+      {/* Courses Catalog Table */}
+      <div className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
         {filteredCourses.length === 0 ? (
-          <div className="p-16 text-center text-zinc-500 font-semibold text-base space-y-4">
-            <FiBookOpen className="h-10 w-10 text-zinc-700 mx-auto" />
+          <div className="p-16 text-center text-slate-400 font-semibold text-base space-y-4">
+            <FiBookOpen className="h-10 w-10 text-slate-300 mx-auto" />
             <p>No courses match your filter keywords.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-base">
               <thead>
-                <tr className="bg-[#070b16]/50 border-b border-zinc-800/40 text-zinc-400 font-bold text-sm uppercase tracking-wider">
+                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold text-sm uppercase tracking-wider">
                   <th className="px-6 py-4">Course Preview</th>
                   <th className="px-6 py-4">Price</th>
                   <th className="px-6 py-4">Category</th>
@@ -321,23 +321,23 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-800/10">
+              <tbody className="divide-y divide-slate-100">
                 {filteredCourses.map((c) => (
-                  <tr key={c.id} className="hover:bg-[#070b16]/30 transition-colors">
+                  <tr key={c.id} className="hover:bg-slate-50 transition-colors">
                     {/* Preview details */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
                         {/* Thumbnail */}
-                        <div className="h-12 w-20 rounded-md overflow-hidden bg-[#070b16] border-none shrink-0 relative flex items-center justify-center shadow-sm">
+                        <div className="h-12 w-20 rounded-md overflow-hidden bg-slate-100 border-none shrink-0 relative flex items-center justify-center shadow-sm">
                           {c.thumbnail ? (
                             <img src={c.thumbnail} alt={c.title} className="w-full h-full object-cover" />
                           ) : (
-                            <span className="text-xs font-bold text-zinc-650">Tutor</span>
+                            <span className="text-xs font-bold text-slate-400">Tutor</span>
                           )}
                         </div>
                         <div>
-                          <p className="font-bold text-white leading-snug line-clamp-1">{c.title}</p>
-                          <p className="text-xs font-bold text-zinc-500 mt-1 uppercase tracking-wider">
+                          <p className="font-bold text-slate-800 leading-snug line-clamp-1">{c.title}</p>
+                          <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-wider">
                             {c.level} • {c.duration}
                           </p>
                         </div>
@@ -350,12 +350,12 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
                     </td>
 
                     {/* Category */}
-                    <td className="px-6 py-4 font-semibold text-zinc-300">
+                    <td className="px-6 py-4 font-semibold text-slate-600">
                       {c.categoryName}
                     </td>
 
                     {/* Instructor */}
-                    <td className="px-6 py-4 font-semibold text-zinc-300">
+                    <td className="px-6 py-4 font-semibold text-slate-600">
                       {c.instructorName}
                     </td>
 
@@ -363,10 +363,10 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
                     <td className="px-4 py-4 text-center">
                       <button
                         onClick={() => handleToggleStatus(c.id, c.status)}
-                        className={`inline-flex px-3 py-1 rounded-full text-xs font-bold capitalize transition-all duration-200 cursor-pointer border-none ${
+                        className={`inline-flex px-3 py-1 rounded-full text-xs font-bold capitalize transition-all duration-200 cursor-pointer border ${
                           c.status === 'published'
-                            ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
-                            : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-750'
+                            ? 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100'
+                            : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200'
                         }`}
                       >
                         {c.status}
@@ -381,7 +381,7 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
                         <Link
                           href={`/admin/lessons?courseId=${c.id}`}
                           title="Manage Syllabus Lessons"
-                          className="p-2 rounded bg-zinc-850 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors border-none"
+                          className="p-2 rounded bg-slate-100 hover:bg-slate-100 text-slate-600 hover:text-slate-800 transition-colors border-none"
                         >
                           <FiList className="h-4.5 w-4.5" />
                         </Link>
@@ -390,7 +390,7 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
                         <Link
                           href={`/admin/courses/${c.id}/edit`}
                           title="Edit Course Parameters"
-                          className="p-2 rounded bg-[#615fff]/10 hover:bg-[#615fff] text-[#615fff] hover:text-white transition-all duration-200 border-none"
+                          className="p-2 rounded bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/20 text-[#615fff] hover:text-white transition-all duration-200"
                         >
                           <FiEdit className="h-4.5 w-4.5" />
                         </Link>
@@ -400,7 +400,7 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
                           <button
                             onClick={() => handleDeleteCourse(c.id, c.title)}
                             title="Delete Course Permanently"
-                            className="p-2 rounded bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white transition-all duration-200 cursor-pointer border-none"
+                            className="p-2 rounded bg-rose-50 hover:bg-rose-500 border border-rose-200 text-rose-500 hover:text-white transition-all duration-200 cursor-pointer"
                           >
                             <FiTrash2 className="h-4.5 w-4.5" />
                           </button>

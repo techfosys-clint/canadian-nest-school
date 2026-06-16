@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useState, useEffect } from 'react'
 import { 
@@ -212,10 +212,10 @@ export default function AttendanceAdminPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center bg-[#121212]">
+      <div className="min-h-[70vh] flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-4">
           <div className="h-12 w-12 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
-          <p className="text-base font-bold text-zinc-300">Loading Attendance Workspace...</p>
+          <p className="text-base font-bold text-slate-600">Loading Attendance Workspace...</p>
         </div>
       </div>
     )
@@ -229,22 +229,22 @@ export default function AttendanceAdminPage() {
         <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-[#615fff]/15 border border-[#615fff]/30 text-base font-bold text-[#615fff] uppercase tracking-wider mb-3">
           Academic Registry
         </span>
-        <h1 className="text-3xl font-bold font-display text-white leading-tight">
+        <h1 className="text-3xl font-bold font-display text-slate-800 leading-tight">
           Instructor Attendance Log
         </h1>
-        <p className="text-base font-semibold text-zinc-500 mt-1">
+        <p className="text-base font-semibold text-slate-400 mt-1">
           Select an active intake batch, specify the class date, and record student attendance.
         </p>
       </div>
 
       {/* Tabs header */}
-      <div className="flex items-center gap-2 border-b border-zinc-800 select-none mb-8">
+      <div className="flex items-center gap-2 border-b border-slate-200 select-none mb-8">
         <button
           onClick={() => setActiveTab('sheet')}
           className={`pb-3.5 px-5 font-bold text-base border-b-2 transition-colors cursor-pointer ${
             activeTab === 'sheet' 
-              ? 'border-[#615fff] text-white' 
-              : 'border-transparent text-zinc-500 hover:text-zinc-300'
+              ? 'border-[#615fff] text-slate-800' 
+              : 'border-transparent text-slate-400 hover:text-slate-600'
           }`}
         >
           Daily Attendance Sheet
@@ -253,8 +253,8 @@ export default function AttendanceAdminPage() {
           onClick={() => setActiveTab('history')}
           className={`pb-3.5 px-5 font-bold text-base border-b-2 transition-colors cursor-pointer ${
             activeTab === 'history' 
-              ? 'border-[#615fff] text-white' 
-              : 'border-transparent text-zinc-500 hover:text-zinc-300'
+              ? 'border-[#615fff] text-slate-800' 
+              : 'border-transparent text-slate-400 hover:text-slate-600'
           }`}
         >
           Attendance Logs History ({attendanceLogs.length})
@@ -266,21 +266,21 @@ export default function AttendanceAdminPage() {
         {/* Left Side: Select Batch and view metrics */}
         <div className="space-y-6 lg:col-span-1">
           
-          <div className="bg-[#18181b] border border-zinc-800 rounded-lg p-5 space-y-4">
-            <h3 className="text-base font-bold text-zinc-300 flex items-center gap-2 select-none">
+          <div className="bg-white border border-slate-200 rounded-lg p-5 space-y-4">
+            <h3 className="text-base font-bold text-slate-600 flex items-center gap-2 select-none">
               <FiList className="text-[#615fff]" />
               <span>Select Active Batch</span>
             </h3>
             
             {batches.length === 0 ? (
-              <p className="text-base font-semibold text-zinc-500 leading-relaxed select-none">
+              <p className="text-base font-semibold text-slate-400 leading-relaxed select-none">
                 No active batches found. Instructors must have launched batches to manage attendance.
               </p>
             ) : (
               <select
                 value={selectedBatchId}
                 onChange={(e) => setSelectedBatchId(e.target.value)}
-                className="w-full bg-[#121212] border border-zinc-800 focus:border-[#615fff]/60 rounded-lg px-4 py-3 text-base font-semibold text-white outline-none cursor-pointer"
+                className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/60 rounded-lg px-4 py-3 text-base font-semibold text-slate-800 outline-none cursor-pointer"
               >
                 {batches.map(b => (
                   <option key={b._id} value={b._id}>{b.name} ({b.course?.title.substring(0, 15)}...)</option>
@@ -290,35 +290,35 @@ export default function AttendanceAdminPage() {
           </div>
 
           {selectedBatch && (
-            <div className="bg-[#18181b] border border-zinc-800 rounded-lg p-5 space-y-5 select-none">
-              <h3 className="text-base font-bold text-zinc-300 flex items-center gap-2">
+            <div className="bg-white border border-slate-200 rounded-lg p-5 space-y-5 select-none">
+              <h3 className="text-base font-bold text-slate-600 flex items-center gap-2">
                 <FiInfo className="text-[#615fff]" />
                 <span>Daily Sheet Metrics</span>
               </h3>
               
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-[#121212] border border-zinc-850 p-4 rounded-lg text-center">
-                  <p className="text-base font-bold text-zinc-500 uppercase leading-none">Present</p>
+                <div className="bg-slate-50 border border-slate-100 p-4 rounded-lg text-center">
+                  <p className="text-base font-bold text-slate-400 uppercase leading-none">Present</p>
                   <p className="text-2xl font-bold text-emerald-500 mt-2">{presentCount}</p>
                 </div>
-                <div className="bg-[#121212] border border-zinc-850 p-4 rounded-lg text-center">
-                  <p className="text-base font-bold text-zinc-500 uppercase leading-none">Absent</p>
+                <div className="bg-slate-50 border border-slate-100 p-4 rounded-lg text-center">
+                  <p className="text-base font-bold text-slate-400 uppercase leading-none">Absent</p>
                   <p className="text-2xl font-bold text-rose-500 mt-2">{absentCount}</p>
                 </div>
-                <div className="bg-[#121212] border border-zinc-850 p-4 rounded-lg text-center">
-                  <p className="text-base font-bold text-zinc-500 uppercase leading-none">Excused</p>
+                <div className="bg-slate-50 border border-slate-100 p-4 rounded-lg text-center">
+                  <p className="text-base font-bold text-slate-400 uppercase leading-none">Excused</p>
                   <p className="text-2xl font-bold text-amber-500 mt-2">{excusedCount}</p>
                 </div>
-                <div className="bg-[#121212] border border-zinc-850 p-4 rounded-lg text-center">
-                  <p className="text-base font-bold text-zinc-500 uppercase leading-none">Attendance</p>
-                  <p className="text-2xl font-bold text-white mt-2">{attendanceRate}%</p>
+                <div className="bg-slate-50 border border-slate-100 p-4 rounded-lg text-center">
+                  <p className="text-base font-bold text-slate-400 uppercase leading-none">Attendance</p>
+                  <p className="text-2xl font-bold text-slate-800 mt-2">{attendanceRate}%</p>
                 </div>
               </div>
 
-              <div className="space-y-1.5 pt-2 border-t border-zinc-800">
-                <p className="text-base font-semibold text-zinc-500">Intake Course:</p>
-                <p className="text-base font-bold text-white truncate">{selectedBatch.course?.title}</p>
-                <p className="text-base font-semibold text-zinc-500 mt-2.5">Total Enrolled:</p>
+              <div className="space-y-1.5 pt-2 border-t border-slate-200">
+                <p className="text-base font-semibold text-slate-400">Intake Course:</p>
+                <p className="text-base font-bold text-slate-800 truncate">{selectedBatch.course?.title}</p>
+                <p className="text-base font-semibold text-slate-400 mt-2.5">Total Enrolled:</p>
                 <p className="text-base font-bold text-[#615fff]">{totalStudents} registered students</p>
               </div>
             </div>
@@ -332,19 +332,19 @@ export default function AttendanceAdminPage() {
           {activeTab === 'sheet' ? (
             /* Tab 1: Attendance Daily Sheet Form */
             selectedBatch ? (
-              <form onSubmit={handleSaveAttendance} className="bg-[#18181b] border border-zinc-800 rounded-lg overflow-hidden shadow-sm">
+              <form onSubmit={handleSaveAttendance} className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
                 
                 {/* Daily Setup Toolbar */}
-                <div className="p-5 bg-[#141416] border-b border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 select-none">
+                <div className="p-5 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 select-none">
                   <div className="flex items-center gap-2">
                     <FiCalendar className="text-[#615fff] h-5 w-5 shrink-0" />
-                    <span className="text-base font-bold text-white">Class Registry Date</span>
+                    <span className="text-base font-bold text-slate-800">Class Registry Date</span>
                     <input
                       type="date"
                       required
                       value={date}
                       onChange={(e) => setDate(e.target.value)}
-                      className="bg-[#121212] border border-zinc-800 focus:border-[#615fff]/60 rounded-lg px-3 py-2 text-base font-semibold text-white outline-none cursor-pointer"
+                      className="bg-slate-50 border border-slate-200 focus:border-[#615fff]/60 rounded-lg px-3 py-2 text-base font-semibold text-slate-800 outline-none cursor-pointer"
                     />
                   </div>
                   
@@ -372,25 +372,25 @@ export default function AttendanceAdminPage() {
                 {/* Students list for marking */}
                 {selectedBatch.students?.length === 0 ? (
                   <div className="p-12 text-center select-none">
-                    <FiUsers className="h-12 w-12 text-zinc-650 mx-auto mb-4" />
-                    <h3 className="text-lg font-bold text-white">No Students Registered</h3>
-                    <p className="text-base font-semibold text-zinc-500 max-w-sm mx-auto mt-2 leading-relaxed">
+                    <FiUsers className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-bold text-slate-800">No Students Registered</h3>
+                    <p className="text-base font-semibold text-slate-400 max-w-sm mx-auto mt-2 leading-relaxed">
                       This batch currently has no enrolled students. Please add students in the Batch Management page first.
                     </p>
                   </div>
                 ) : (
-                  <div className="divide-y divide-zinc-800/60 max-h-[500px] overflow-y-auto pr-1">
+                  <div className="divide-y divide-slate-200/60 max-h-[500px] overflow-y-auto pr-1">
                     {selectedBatch.students.map((student) => {
                       const currentStatus = attendanceRecords[student._id] || 'present'
                       return (
                         <div key={student._id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-[#1a1a1c]/30 transition-colors">
                           <div className="min-w-0">
-                            <p className="text-base font-bold text-white truncate">{student.name}</p>
-                            <p className="text-base text-zinc-500 truncate mt-0.5">{student.email}</p>
+                            <p className="text-base font-bold text-slate-800 truncate">{student.name}</p>
+                            <p className="text-base text-slate-400 truncate mt-0.5">{student.email}</p>
                           </div>
                           
                           {/* Attendance Status Radio Toggles */}
-                          <div className="flex items-center gap-2 select-none bg-[#121212] border border-zinc-800 p-1 rounded-lg shrink-0">
+                          <div className="flex items-center gap-2 select-none bg-slate-50 border border-slate-200 p-1 rounded-lg shrink-0">
                             {(['present', 'absent', 'excused'] as const).map((st) => (
                               <button
                                 key={st}
@@ -401,9 +401,9 @@ export default function AttendanceAdminPage() {
                                     ? st === 'present'
                                       ? 'bg-emerald-600 text-white shadow'
                                       : st === 'absent'
-                                        ? 'bg-rose-600 text-white shadow'
-                                        : 'bg-amber-600 text-white shadow'
-                                    : 'text-zinc-500 hover:text-zinc-350'
+                                        ? 'bg-rose-600 text-slate-800 shadow'
+                                        : 'bg-amber-600 text-slate-800 shadow'
+                                    : 'text-slate-400 hover:text-slate-600'
                                   }`}
                               >
                                 {st}
@@ -418,15 +418,15 @@ export default function AttendanceAdminPage() {
 
                 {/* Footer Save & Remarks bar */}
                 {selectedBatch.students?.length > 0 && (
-                  <div className="p-5 border-t border-zinc-800 bg-[#141416] space-y-4">
+                  <div className="p-5 border-t border-slate-200 bg-slate-50 space-y-4">
                     <div className="space-y-1.5">
-                      <label className="text-base font-bold text-zinc-400 block select-none">Class Session Remarks / Notes</label>
+                      <label className="text-base font-bold text-slate-500 block select-none">Class Session Remarks / Notes</label>
                       <input
                         type="text"
                         value={remarks}
                         onChange={(e) => setRemarks(e.target.value)}
                         placeholder="e.g. Completed module 3 review session / Q&A class"
-                        className="w-full bg-[#121212] border border-zinc-800 focus:border-[#615fff]/60 rounded-lg px-4 py-3 text-base font-semibold text-white outline-none placeholder-zinc-600"
+                        className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/60 rounded-lg px-4 py-3 text-base font-semibold text-slate-800 outline-none placeholder-zinc-600"
                       />
                     </div>
 
@@ -434,7 +434,7 @@ export default function AttendanceAdminPage() {
                       <button
                         type="submit"
                         disabled={saving}
-                        className="px-8 py-3.5 bg-[#615fff] hover:bg-[#5248e8] disabled:bg-[#615fff]/50 text-white font-bold text-base rounded-lg transition-all duration-300 flex items-center gap-2 cursor-pointer border-none"
+                        className="px-8 py-3.5 bg-[#615fff] hover:bg-[#5248e8] disabled:bg-[#615fff]/50 text-slate-800 font-bold text-base rounded-lg transition-all duration-300 flex items-center gap-2 cursor-pointer border-none"
                       >
                         {saving ? (
                           <>
@@ -454,23 +454,23 @@ export default function AttendanceAdminPage() {
 
               </form>
             ) : (
-              <div className="p-12 bg-[#18181b] border border-zinc-800 rounded-lg text-center select-none">
-                <p className="text-base font-semibold text-zinc-500">Please select or launch a batch intake from the sidebar to begin.</p>
+              <div className="p-12 bg-white border border-slate-200 rounded-lg text-center select-none">
+                <p className="text-base font-semibold text-slate-400">Please select or launch a batch intake from the sidebar to begin.</p>
               </div>
             )
           ) : (
             /* Tab 2: Historical Logs view */
             <div className="space-y-4">
               {fetchingLogs ? (
-                <div className="p-12 text-center bg-[#18181b] border border-zinc-800 rounded-lg">
+                <div className="p-12 text-center bg-white border border-slate-200 rounded-lg">
                   <div className="h-8 w-8 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                  <p className="text-base font-bold text-zinc-500">Fetching historical logs...</p>
+                  <p className="text-base font-bold text-slate-400">Fetching historical logs...</p>
                 </div>
               ) : attendanceLogs.length === 0 ? (
-                <div className="p-12 bg-[#18181b] border border-zinc-800 rounded-lg text-center select-none">
-                  <FiClock className="h-10 w-10 text-zinc-650 mx-auto mb-3" />
-                  <h3 className="text-xl font-bold text-white">No Historical Logs Found</h3>
-                  <p className="text-base font-semibold text-zinc-500 mt-1 max-w-sm mx-auto leading-relaxed">
+                <div className="p-12 bg-white border border-slate-200 rounded-lg text-center select-none">
+                  <FiClock className="h-10 w-10 text-slate-400 mx-auto mb-3" />
+                  <h3 className="text-xl font-bold text-slate-800">No Historical Logs Found</h3>
+                  <p className="text-base font-semibold text-slate-400 mt-1 max-w-sm mx-auto leading-relaxed">
                     Attendance logs will automatically display here historically once daily sheets are registered by the instructor.
                   </p>
                 </div>
@@ -483,31 +483,31 @@ export default function AttendanceAdminPage() {
                     const rate = totalRecords > 0 ? Math.round((pRecs / totalRecords) * 100) : 0
 
                     return (
-                      <div key={log._id} className="bg-[#18181b] border border-zinc-800 rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-5 shadow-sm">
+                      <div key={log._id} className="bg-white border border-slate-200 rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-5 shadow-sm">
                         <div className="space-y-1">
-                          <h4 className="text-lg font-bold text-white flex items-center gap-2">
+                          <h4 className="text-lg font-bold text-slate-800 flex items-center gap-2">
                             <FiCalendar className="text-[#615fff] h-5 w-5" />
                             {lDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
                           </h4>
                           {log.remarks && (
-                            <p className="text-base font-semibold text-zinc-400 italic">
+                            <p className="text-base font-semibold text-slate-500 italic">
                               Remarks: &ldquo;{log.remarks}&rdquo;
                             </p>
                           )}
-                          <p className="text-sm font-semibold text-zinc-500 uppercase tracking-wider">
+                          <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider">
                             Logged by: {log.instructor?.name || 'Expert Instructor'}
                           </p>
                         </div>
 
                         <div className="flex items-center gap-6 shrink-0 select-none">
                           <div className="text-right">
-                            <p className="text-base font-bold text-zinc-500 uppercase leading-none">Rate</p>
+                            <p className="text-base font-bold text-slate-400 uppercase leading-none">Rate</p>
                             <p className={`text-xl font-bold mt-1.5 ${
                               rate >= 80 ? 'text-emerald-500' : rate >= 50 ? 'text-amber-500' : 'text-rose-500'
                             }`}>{rate}% attendance</p>
                           </div>
 
-                          <div className="bg-[#121212] border border-zinc-850 px-4 py-2.5 rounded-lg flex items-center gap-3 text-base font-bold uppercase tracking-wider">
+                          <div className="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-lg flex items-center gap-3 text-base font-bold uppercase tracking-wider">
                             <span className="text-emerald-500">{pRecs} P</span>
                             <span className="text-rose-500">{log.records?.filter(r => r.status === 'absent').length || 0} A</span>
                             <span className="text-amber-500">{log.records?.filter(r => r.status === 'excused').length || 0} E</span>

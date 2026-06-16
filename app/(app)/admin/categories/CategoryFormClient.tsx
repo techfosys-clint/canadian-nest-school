@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -81,8 +81,8 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
           icon: 'warning',
           title: 'Validation Error',
           text: 'Category name and slug are required.',
-          background: '#121829',
-          color: '#fff',
+          background: '#ffffff',
+          color: '#1a1a1a',
         })
         return
       }
@@ -94,8 +94,8 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
             icon: 'warning',
             title: 'Validation Error',
             text: 'All categories must have a name and slug.',
-            background: '#121829',
-            color: '#fff',
+            background: '#ffffff',
+            color: '#1a1a1a',
           })
           return
         }
@@ -137,8 +137,8 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
           : `${categoryRows.length} categories have been created successfully.`,
         timer: 1500,
         showConfirmButton: false,
-        background: '#121829',
-        color: '#fff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
 
       router.push('/admin/categories')
@@ -148,8 +148,8 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
         icon: 'error',
         title: 'Error',
         text: err.message || 'Failed to save categories.',
-        background: '#121829',
-        color: '#fff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
     } finally {
       setSaving(false)
@@ -160,12 +160,12 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
     <form onSubmit={handleSave} className="container mx-auto px-6 py-8 space-y-6">
       
       {/* Back & Heading panel */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-zinc-800/40">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200/40">
         <div>
-          <h1 className="text-3xl font-bold font-display text-white">
+          <h1 className="text-3xl font-bold font-display text-slate-800">
             {isEditMode ? 'Edit Category' : 'New Categories (Bulk)'}
           </h1>
-          <p className="text-base font-semibold text-zinc-450 mt-1">
+          <p className="text-base font-semibold text-slate-500 mt-1">
             {isEditMode 
               ? 'Modify syllabus catalog category classification' 
               : 'Create and register multiple course categories simultaneously'}
@@ -174,7 +174,7 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
         <button
           type="button"
           onClick={() => router.push('/admin/categories')}
-          className="px-4 py-2 bg-zinc-850 hover:bg-zinc-800 border border-zinc-800 text-zinc-350 hover:text-white rounded-lg text-base font-bold transition-colors cursor-pointer"
+          className="px-4 py-2 bg-slate-100 hover:bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-800 rounded-lg text-base font-bold transition-colors cursor-pointer"
         >
           Cancel & Back
         </button>
@@ -184,9 +184,9 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
         
         {/* Main Content */}
         <div className="lg:col-span-8 space-y-6">
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg p-6 space-y-5">
-            <div className="flex items-center justify-between border-b border-zinc-850 pb-3">
-              <h2 className="text-xl font-bold text-white tracking-tight">Category Classifications</h2>
+          <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h2 className="text-xl font-bold text-slate-800 tracking-tight">Category Classifications</h2>
               {!isEditMode && (
                 <button
                   type="button"
@@ -202,26 +202,26 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
               /* Single Edit Mode Form */
               <div className="space-y-4">
                 <div className="flex flex-col gap-2">
-                  <label className="text-base font-bold text-zinc-300">Category Name *</label>
+                  <label className="text-base font-bold text-slate-600">Category Name *</label>
                   <input
                     type="text"
                     required
                     value={name}
                     onChange={handleNameChange}
                     placeholder="e.g. Web Development"
-                    className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                    className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-base font-bold text-zinc-300">URL path suffix (Slug) *</label>
+                  <label className="text-base font-bold text-slate-600">URL path suffix (Slug) *</label>
                   <input
                     type="text"
                     required
                     value={slug}
                     onChange={(e) => setSlug(slugify(e.target.value))}
                     placeholder="e.g. web-development"
-                    className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
+                    className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
                   />
                 </div>
               </div>
@@ -229,14 +229,14 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
               /* Bulk Create Mode Form */
               <div className="space-y-5">
                 {categoryRows.map((row, idx) => (
-                  <div key={idx} className="p-4 bg-[#070b16] rounded-lg space-y-4 relative animate-fadeIn">
-                    <div className="flex items-center justify-between border-b border-zinc-850/50 pb-2">
+                  <div key={idx} className="p-4 bg-slate-100 rounded-lg space-y-4 relative animate-fadeIn">
+                    <div className="flex items-center justify-between border-b border-slate-100/50 pb-2">
                       <span className="text-sm font-bold text-[#615fff]">Category #{idx + 1}</span>
                       {categoryRows.length > 1 && (
                         <button
                           type="button"
                           onClick={() => removeCategoryRow(idx)}
-                          className="text-zinc-500 hover:text-red-400 p-1 rounded hover:bg-zinc-800/20 transition-colors cursor-pointer"
+                          className="text-slate-400 hover:text-red-400 p-1 rounded hover:bg-slate-100/20 transition-colors cursor-pointer"
                           title="Remove row"
                         >
                           <FiTrash2 className="h-4.5 w-4.5" />
@@ -245,25 +245,25 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-sm font-bold text-zinc-400">Category Name *</label>
+                        <label className="text-sm font-bold text-slate-500">Category Name *</label>
                         <input
                           type="text"
                           required
                           value={row.name}
                           onChange={(e) => handleRowNameChange(idx, e.target.value)}
                           placeholder="e.g. Graphic Design"
-                          className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                          className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                         />
                       </div>
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-sm font-bold text-zinc-400">URL path suffix (Slug) *</label>
+                        <label className="text-sm font-bold text-slate-500">URL path suffix (Slug) *</label>
                         <input
                           type="text"
                           required
                           value={row.slug}
                           onChange={(e) => handleRowSlugChange(idx, e.target.value)}
                           placeholder="graphic-design"
-                          className="bg-[#070b16] border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
+                          className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
                         />
                       </div>
                     </div>
@@ -277,7 +277,7 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
 
         {/* Sidebar settings */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-[#121829] border border-zinc-800 rounded-lg p-6">
+          <div className="bg-white border border-slate-200 rounded-lg p-6">
             <button
               type="submit"
               disabled={saving}

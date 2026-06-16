@@ -21,9 +21,9 @@ import {
   FiRadio,
   FiTag,
   FiUsers,
-  FiTrendingUp,
-  FiPlus,
   FiAward,
+  FiChevronDown,
+  FiChevronRight,
 } from 'react-icons/fi'
 import Swal from 'sweetalert2'
 
@@ -34,6 +34,215 @@ interface AdminSessionUser {
   role: 'admin' | 'staff' | 'instructor'
   profilePic?: string | null
   permissions?: string[]
+}
+
+// ── Sidebar Link & Group Type Definitions ──
+interface SidebarLink {
+  label: string
+  href: string
+  icon: React.ComponentType<{ className?: string }>
+  roles: string[]
+  permission: string
+}
+
+interface SidebarGroup {
+  groupLabel: string
+  groupIcon: React.ComponentType<{ className?: string }>
+  links: SidebarLink[]
+}
+
+// ── All sidebar groups with nested links ──
+const NAV_GROUPS: SidebarGroup[] = [
+  {
+    groupLabel: 'Academic',
+    groupIcon: FiBookOpen,
+    links: [
+      { label: 'Courses', href: '/admin/courses', icon: FiBookOpen, roles: ['admin', 'instructor'], permission: 'courses' },
+      { label: 'Categories', href: '/admin/categories', icon: FiBookmark, roles: ['admin', 'staff'], permission: 'categories' },
+      { label: 'Lessons Syllabus', href: '/admin/lessons', icon: FiList, roles: ['admin', 'instructor'], permission: 'lessons' },
+      { label: 'Grading Submissions', href: '/admin/submissions', icon: FiFileText, roles: ['admin', 'instructor'], permission: 'lessons' },
+      { label: 'Live Classes', href: '/admin/live-classes', icon: FiRadio, roles: ['admin', 'instructor'], permission: 'live-classes' },
+      { label: 'Batches', href: '/admin/batches', icon: FiUsers, roles: ['admin', 'instructor'], permission: 'batches' },
+      { label: 'Attendance', href: '/admin/attendance', icon: FiList, roles: ['admin', 'instructor'], permission: 'attendance' },
+    ],
+  },
+  {
+    groupLabel: 'Students',
+    groupIcon: FiUsers,
+    links: [
+      { label: 'Enrollments', href: '/admin/enrollments', icon: FiUsers, roles: ['admin'], permission: 'overview' },
+      { label: 'Certificates', href: '/admin/certificates', icon: FiAward, roles: ['admin', 'staff'], permission: 'certificates' },
+      { label: 'Reviews', href: '/admin/reviews', icon: FiStar, roles: ['admin', 'staff'], permission: 'reviews' },
+    ],
+  },
+  {
+    groupLabel: 'Content',
+    groupIcon: FiFileText,
+    links: [
+      { label: 'Blog Posts', href: '/admin/blogs', icon: FiFileText, roles: ['admin', 'staff'], permission: 'blogs' },
+      { label: 'FAQs', href: '/admin/faqs', icon: FiHelpCircle, roles: ['admin', 'staff'], permission: 'faqs' },
+      { label: 'Media Library', href: '/admin/media', icon: FiImage, roles: ['admin', 'staff'], permission: 'media' },
+    ],
+  },
+  {
+    groupLabel: 'Commerce',
+    groupIcon: FiTag,
+    links: [
+      { label: 'Coupons', href: '/admin/coupons', icon: FiTag, roles: ['admin', 'staff'], permission: 'coupons' },
+    ],
+  },
+  {
+    groupLabel: 'People',
+    groupIcon: FiUserPlus,
+    links: [
+      { label: 'Staff Registry', href: '/admin/staff-register', icon: FiUserPlus, roles: ['admin'], permission: 'staff-register' },
+    ],
+  },
+]
+
+// ── Collapsible Group Component ──
+function NavGroup({
+  group,
+  pathname,
+  user,
+  onLinkClick,
+}: {
+  group: SidebarGroup
+  pathname: string
+  user: AdminSessionUser
+  onLinkClick?: () => void
+}) {
+  // Filter links by role/permission
+  const visibleLinks = group.links.filter((link) => {
+    if (user.role === 'admin') return true
+    if (user.permissions && user.permissions.length > 0) {
+      if (link.permission === 'overview') return true
+      return user.permissions.includes(link.permission)
+    }
+    return link.roles.includes(user.role)
+  })
+
+  if (visibleLinks.length === 0) return null
+
+  const isGroupActive = visibleLinks.some((l) => pathname.startsWith(l.href) && l.href !== '/admin')
+  const [open, setOpen] = useState(isGroupActive)
+  const GroupIcon = group.groupIcon
+
+  // Auto-open if a child is active
+  useEffect(() => {
+    if (isGroupActive) setOpen(true)
+  }, [pathname, isGroupActive])
+
+  return (
+    <div className="space-y-0.5">
+      {/* Group Header Button */}
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-bold transition-all duration-200 cursor-pointer group ${
+          isGroupActive
+            ? 'text-[#615fff] bg-[#615fff]/8'
+            : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+        }`}
+      >
+        <div className="flex items-center gap-2">
+          <GroupIcon
+            className={`h-4 w-4 ${isGroupActive ? 'text-[#615fff]' : 'text-slate-400 group-hover:text-slate-600'}`}
+          />
+          <span className="uppercase tracking-wider">{group.groupLabel}</span>
+        </div>
+        <span
+          className={`transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`}
+        >
+          <FiChevronDown className="h-3.5 w-3.5" />
+        </span>
+      </button>
+
+      {/* Collapsible Children */}
+      <div
+        className={`overflow-hidden transition-all duration-200 ease-in-out ${
+          open ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="ml-3 pl-3 border-l border-slate-200 space-y-0.5 py-1">
+          {visibleLinks.map((link) => {
+            const isActive = pathname === link.href
+            const Icon = link.icon
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={onLinkClick}
+                className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-base font-semibold transition-all duration-150 group/link ${
+                  isActive
+                    ? 'bg-[#615fff] text-white shadow-sm shadow-[#615fff]/20'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                }`}
+              >
+                <Icon
+                  className={`h-4 w-4 shrink-0 ${
+                    isActive ? 'text-white' : 'text-slate-400 group-hover/link:text-slate-600'
+                  }`}
+                />
+                <span className="truncate">{link.label}</span>
+                {isActive && (
+                  <span className="ml-auto h-1.5 w-1.5 rounded-full bg-white/70 shrink-0" />
+                )}
+              </Link>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Sidebar Nav Content (shared between desktop & mobile) ──
+function SidebarNav({
+  user,
+  pathname,
+  onLinkClick,
+}: {
+  user: AdminSessionUser
+  pathname: string
+  onLinkClick?: () => void
+}) {
+  const isOverviewActive = pathname === '/admin'
+
+  return (
+    <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
+      {/* Overview — standalone link */}
+      <Link
+        href="/admin"
+        onClick={onLinkClick}
+        className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-base font-semibold transition-all duration-200 group ${
+          isOverviewActive
+            ? 'bg-[#615fff] text-white shadow-md shadow-[#615fff]/20'
+            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+        }`}
+      >
+        <FiLayout
+          className={`h-4 w-4 ${isOverviewActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'}`}
+        />
+        <span>Overview</span>
+      </Link>
+
+      {/* Divider */}
+      <div className="pt-2 pb-1">
+        <div className="h-px bg-slate-100" />
+      </div>
+
+      {/* Collapsible Groups */}
+      {NAV_GROUPS.map((group) => (
+        <NavGroup
+          key={group.groupLabel}
+          group={group}
+          pathname={pathname}
+          user={user}
+          onLinkClick={onLinkClick}
+        />
+      ))}
+    </nav>
+  )
 }
 
 export default function AdminLayout({
@@ -48,8 +257,6 @@ export default function AdminLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const isPublicAdminRoute = pathname === '/admin/login' || pathname.startsWith('/admin/super-admin')
 
-
-
   useEffect(() => {
     async function verifyAdminSession() {
       try {
@@ -58,13 +265,11 @@ export default function AdminLayout({
 
         if (res.ok && data.authenticated) {
           if (data.user.role === 'student') {
-            // Students are strictly blocked from all admin routes and sent to their dashboard
             router.push('/dashboard')
             return
           }
 
           if (isPublicAdminRoute) {
-            // Logged-in admin/staff/instructor shouldn't see the admin login page, send to admin dashboard
             router.push('/admin')
             return
           }
@@ -76,7 +281,6 @@ export default function AdminLayout({
 
           setUser(data.user)
         } else {
-          // Not authenticated
           if (!isPublicAdminRoute) {
             router.push('/admin/login')
           }
@@ -103,8 +307,8 @@ export default function AdminLayout({
         text: 'Administrative session ended.',
         timer: 1500,
         showConfirmButton: false,
-        background: '#1a1a1a',
-        color: '#ffffff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
 
       setTimeout(() => {
@@ -117,10 +321,10 @@ export default function AdminLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#121212]">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-4">
           <div className="h-12 w-12 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
-          <p className="text-base font-bold text-zinc-300">Verifying Admin Access...</p>
+          <p className="text-base font-bold text-slate-500">Verifying Admin Access...</p>
         </div>
       </div>
     )
@@ -141,256 +345,170 @@ export default function AdminLayout({
       .substring(0, 2)
   }
 
-  // Filter links based on custom permissions and role authorization
-  const sidebarLinks = [
-    { label: 'Overview', href: '/admin', icon: FiLayout, roles: ['admin', 'staff', 'instructor'], permission: 'overview' },
-    { label: 'Manage Enrollments', href: '/admin/enrollments', icon: FiUsers, roles: ['admin'], permission: 'overview' },
-    { label: 'Certificate Requests', href: '/admin/certificates', icon: FiAward, roles: ['admin', 'staff'], permission: 'certificates' },
-    { label: 'Grading Submissions', href: '/admin/submissions', icon: FiFileText, roles: ['admin', 'instructor'], permission: 'lessons' },
-    { label: 'Courses', href: '/admin/courses', icon: FiBookOpen, roles: ['admin', 'instructor'], permission: 'courses' },
-    { label: 'Lessons Syllabus', href: '/admin/lessons', icon: FiList, roles: ['admin', 'instructor'], permission: 'lessons' },
-    { label: 'Live Classes', href: '/admin/live-classes', icon: FiRadio, roles: ['admin', 'instructor'], permission: 'live-classes' },
-    { label: 'Batches', href: '/admin/batches', icon: FiUsers, roles: ['admin', 'instructor'], permission: 'batches' },
-    { label: 'Attendance', href: '/admin/attendance', icon: FiList, roles: ['admin', 'instructor'], permission: 'attendance' },
-    { label: 'Reviews Moderate', href: '/admin/reviews', icon: FiStar, roles: ['admin', 'staff'], permission: 'reviews' },
-    { label: 'Categories', href: '/admin/categories', icon: FiBookmark, roles: ['admin', 'staff'], permission: 'categories' },
-    { label: 'FAQs Landing', href: '/admin/faqs', icon: FiHelpCircle, roles: ['admin', 'staff'], permission: 'faqs' },
-    { label: 'Blog Posts', href: '/admin/blogs', icon: FiFileText, roles: ['admin', 'staff'], permission: 'blogs' },
-    { label: 'Media Library', href: '/admin/media', icon: FiImage, roles: ['admin', 'staff'], permission: 'media' },
-    { label: 'Staff Registry', href: '/admin/staff-register', icon: FiUserPlus, roles: ['admin'], permission: 'staff-register' },
-    { label: 'Coupons Management', href: '/admin/coupons', icon: FiTag, roles: ['admin', 'staff'], permission: 'coupons' },
-  ].filter((link) => {
-    // 1. Root admin has access to everything
-    if (user.role === 'admin') return true
-
-    // 2. If user has custom permissions array, check if it contains the permission key
-    if (user.permissions && user.permissions.length > 0) {
-      if (link.permission === 'overview') return true
-      return user.permissions.includes(link.permission)
-    }
-
-    // 3. Fallback: Role-based authorization if permissions array is empty or undefined
-    return link.roles.includes(user.role)
-  })
+  // ── Sidebar Footer (shared) ──
+  const SidebarFooter = () => (
+    <div className="p-4 border-t border-slate-200 bg-slate-50 shrink-0">
+      <div className="flex items-center gap-3">
+        <div className="h-10 w-10 rounded-full border border-[#615fff]/35 bg-slate-100 flex items-center justify-center text-base font-bold text-slate-700 overflow-hidden shrink-0">
+          {user.profilePic ? (
+            <img src={user.profilePic} alt={user.name} className="h-full w-full object-cover" />
+          ) : (
+            getInitials(user.name)
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-base font-bold text-slate-800 truncate leading-tight">{user.name}</p>
+          <p className="text-base font-semibold text-[#615fff] truncate mt-0.5 capitalize">{user.role}</p>
+        </div>
+      </div>
+      <button
+        onClick={handleLogout}
+        className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-red-200 hover:border-red-400 bg-red-50 hover:bg-red-100 text-red-500 font-bold text-base transition-all duration-200 cursor-pointer"
+      >
+        <FiLogOut className="h-4 w-4" />
+        <span>Sign Out</span>
+      </button>
+    </div>
+  )
 
   return (
-    <div className="h-screen bg-[#121212] flex font-sans overflow-hidden text-zinc-100">
-      
-      {/* ── Desktop Sidebar Navigation (Sleek Dark Zinc) ── */}
-      <aside className="hidden lg:flex flex-col w-64 bg-[#18181b] border-r border-zinc-800 shrink-0 select-none h-full">
-        
-        {/* Sidebar Brand Header */}
-        <div className="h-20 flex items-center px-6 border-b border-zinc-800">
+    <div className="h-screen bg-slate-50 flex font-sans overflow-hidden text-slate-800">
+
+      {/* ── Desktop Sidebar ── */}
+      <aside className="hidden lg:flex flex-col w-60 bg-white border-r border-slate-200 shrink-0 select-none h-full shadow-sm">
+
+        {/* Brand Header */}
+        <div className="h-16 flex items-center px-5 border-b border-slate-200 shrink-0">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <span className="h-9 w-9 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white shadow-lg shadow-[#615fff]/30 transition-transform group-hover:scale-105 duration-300 text-base">
+            <span className="h-8 w-8 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white shadow-lg shadow-[#615fff]/30 transition-transform group-hover:scale-105 duration-300 text-base">
               T
             </span>
-            <span className="text-xl font-bold font-display tracking-tight text-white">
+            <span className="text-lg font-bold font-display tracking-tight text-slate-800">
               Tutor Space
             </span>
           </Link>
         </div>
 
-        {/* Sidebar Links */}
-        <nav className="flex-1 px-4 py-3 space-y-1 overflow-y-auto">
-          <p className="text-base font-bold text-zinc-500 uppercase tracking-wider px-3 mb-2">Management</p>
-          {sidebarLinks.map((link) => {
-            const isActive = pathname === link.href
-            const Icon = link.icon
-            return (
-              <Link
-                key={link.label}
-                href={link.href}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-base font-semibold transition-all duration-200 group ${
-                  isActive 
-                    ? 'bg-[#615fff] text-white shadow-md shadow-[#615fff]/20 border border-[#615fff]/20' 
-                    : 'text-zinc-400 hover:bg-[#27272a] hover:text-white border border-transparent'
-                }`}
-              >
-                <Icon className={`h-4.5 w-4.5 ${isActive ? 'text-white' : 'text-zinc-500 group-hover:text-white'}`} />
-                <span>{link.label}</span>
-              </Link>
-            )
-          })}
-        </nav>
+        {/* Tree Nav */}
+        <SidebarNav user={user} pathname={pathname} />
 
-        {/* Sidebar Footer User Info */}
-        <div className="p-4 border-t border-zinc-800 bg-[#141416]">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full border border-[#615fff]/35 bg-[#27272a] flex items-center justify-center text-base font-bold text-white overflow-hidden shrink-0">
-              {user.profilePic ? (
-                <img src={user.profilePic} alt={user.name} className="h-full w-full object-cover" />
-              ) : (
-                getInitials(user.name)
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-base font-bold text-white truncate leading-tight">{user.name}</p>
-              <p className="text-base font-semibold text-[#615fff] truncate mt-0.5 capitalize">{user.role}</p>
-            </div>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="w-full mt-4 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-red-500/25 hover:border-red-500 bg-red-550/5 hover:bg-red-550/10 text-red-400 font-bold text-base transition-all duration-200 cursor-pointer"
-          >
-            <FiLogOut className="h-4.5 w-4.5" />
-            <span>Sign Out</span>
-          </button>
-        </div>
-
+        {/* Footer */}
+        <SidebarFooter />
       </aside>
 
-      {/* ── Mobile Sidebar Drawer Overlay ── */}
+      {/* ── Mobile Overlay ── */}
       {sidebarOpen && (
-        <div 
-          onClick={() => setSidebarOpen(false)} 
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm lg:hidden"
         />
       )}
 
-      {/* ── Mobile Sidebar Drawer Panel ── */}
-      <aside className={`fixed top-0 bottom-0 left-0 z-50 w-64 bg-[#18181b] border-r border-zinc-800 flex flex-col justify-between select-none transition-transform duration-350 lg:hidden ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
-        <div>
-          <div className="h-20 flex items-center px-6 border-b border-zinc-800 justify-between">
-            <Link href="/" className="flex items-center gap-2.5">
-              <span className="h-9 w-9 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white text-base">
-                T
-              </span>
-              <span className="text-xl font-bold font-display tracking-tight text-white">
-                Tutor Space
-              </span>
-            </Link>
-            <button 
-              onClick={() => setSidebarOpen(false)}
-              className="p-1.5 rounded-lg hover:bg-[#27272a] text-zinc-400 hover:text-white"
-            >
-              <FiX className="h-6 w-6" />
-            </button>
-          </div>
-
-          <nav className="px-4 py-3 space-y-1">
-            <p className="text-base font-bold text-zinc-500 uppercase tracking-wider px-3 mb-2">Management</p>
-            {sidebarLinks.map((link) => {
-              const isActive = pathname === link.href
-              const Icon = link.icon
-              return (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-base font-semibold transition-all duration-200 group ${
-                    isActive 
-                      ? 'bg-[#615fff] text-white shadow-md' 
-                      : 'text-zinc-400 hover:bg-[#27272a] hover:text-white'
-                  }`}
-                >
-                  <Icon className={`h-4.5 w-4.5 ${isActive ? 'text-white' : 'text-zinc-505'}`} />
-                  <span>{link.label}</span>
-                </Link>
-              )
-            })}
-          </nav>
-        </div>
-
-        <div className="p-4 border-t border-zinc-800 bg-[#141416]">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full border border-[#615fff]/35 bg-[#27272a] flex items-center justify-center text-base font-bold text-white overflow-hidden shrink-0">
-              {user.profilePic ? (
-                <img src={user.profilePic} alt={user.name} className="h-full w-full object-cover" />
-              ) : (
-                getInitials(user.name)
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-base font-bold text-white truncate leading-none">{user.name}</p>
-              <p className="text-base font-semibold text-[#615fff] truncate mt-1 capitalize">{user.role}</p>
-            </div>
-          </div>
+      {/* ── Mobile Sidebar Drawer ── */}
+      <aside
+        className={`fixed top-0 bottom-0 left-0 z-50 w-60 bg-white border-r border-slate-200 flex flex-col select-none transition-transform duration-300 ease-in-out lg:hidden ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        {/* Brand Header */}
+        <div className="h-16 flex items-center px-5 border-b border-slate-200 justify-between shrink-0">
+          <Link href="/" className="flex items-center gap-2.5">
+            <span className="h-8 w-8 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white text-base">
+              T
+            </span>
+            <span className="text-lg font-bold font-display tracking-tight text-slate-800">
+              Tutor Space
+            </span>
+          </Link>
           <button
-            onClick={handleLogout}
-            className="w-full mt-4 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-red-500/25 hover:border-red-500/50 bg-red-500/5 hover:bg-red-500/10 text-red-400 font-bold text-base transition-all duration-200 cursor-pointer"
+            onClick={() => setSidebarOpen(false)}
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 cursor-pointer"
           >
-            <FiLogOut className="h-4.5 w-4.5" />
-            <span>Sign Out</span>
+            <FiX className="h-5 w-5" />
           </button>
         </div>
+
+        {/* Tree Nav */}
+        <SidebarNav
+          user={user}
+          pathname={pathname}
+          onLinkClick={() => setSidebarOpen(false)}
+        />
+
+        {/* Footer */}
+        <SidebarFooter />
       </aside>
 
-      {/* ── Main View Panel Container ── */}
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#121212]">
-        
+      {/* ── Main Content Area ── */}
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-slate-50">
+
         {/* Sticky Top Header */}
-        <header className="sticky top-0 z-30 w-full h-20 bg-[#121212]/80 backdrop-blur-md border-b border-zinc-800/60 px-6 flex items-center justify-between select-none shrink-0">
-          
-          {/* Mobile hamburger menu toggle */}
+        <header className="sticky top-0 z-30 w-full h-16 bg-white/80 backdrop-blur-md border-b border-slate-200/80 px-6 flex items-center justify-between select-none shrink-0 shadow-sm">
+
+          {/* Mobile hamburger */}
           <div className="flex items-center gap-3 lg:hidden">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="p-2 rounded-lg border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-white bg-[#18181b] cursor-pointer"
+              className="p-2 rounded-lg border border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-800 bg-white cursor-pointer"
             >
               <FiMenu className="h-5 w-5" />
             </button>
             <Link href="/" className="flex items-center gap-2">
-              <span className="h-8 w-8 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white text-sm">
+              <span className="h-7 w-7 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white text-sm">
                 T
               </span>
-              <span className="text-lg font-bold font-display tracking-tight text-white">
+              <span className="text-base font-bold font-display tracking-tight text-slate-800">
                 Tutor Space
               </span>
             </Link>
           </div>
 
-          {/* Page Badge Title Indicator */}
+          {/* Live Console Badge */}
           <div className="hidden sm:flex items-center gap-2.5">
-            <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-base font-bold text-zinc-450 uppercase tracking-widest">
+            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-base font-bold text-slate-400 uppercase tracking-widest">
               Live Console
             </span>
           </div>
 
-          {/* Header Action Shortcuts */}
-          <div className="flex items-center gap-4.5 ml-auto lg:ml-0">
-            
-            {/* View Homepage Shortcut */}
+          {/* Header Right Actions */}
+          <div className="flex items-center gap-4 ml-auto lg:ml-0">
+
             <Link
               href="/"
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-base font-semibold text-zinc-400 hover:text-white hover:bg-[#18181b] border border-transparent hover:border-zinc-800 transition-all duration-200"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-base font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-all duration-200"
             >
-              <FiHome className="h-4.5 w-4.5" />
+              <FiHome className="h-4 w-4" />
               <span className="hidden sm:inline">Portal Homepage</span>
             </Link>
 
-            {/* Student Portal Shortcut */}
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-base font-semibold text-zinc-400 hover:text-white hover:bg-[#18181b] border border-transparent hover:border-zinc-800 transition-all duration-200"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-base font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-all duration-200"
             >
-              <FiUser className="h-4.5 w-4.5" />
+              <FiUser className="h-4 w-4" />
               <span className="hidden sm:inline">Student Portal</span>
             </Link>
 
-            {/* Admin Badge Info */}
-            <div className="flex items-center gap-3 border-l border-zinc-800 pl-4.5">
-              <div className="h-10 w-10 rounded-full border border-[#615fff]/30 bg-[#18181b] flex items-center justify-center overflow-hidden shrink-0">
+            {/* Admin Badge */}
+            <div className="flex items-center gap-3 border-l border-slate-200 pl-4">
+              <div className="h-9 w-9 rounded-full border border-[#615fff]/30 bg-slate-100 flex items-center justify-center overflow-hidden shrink-0">
                 {user.profilePic ? (
                   <img src={user.profilePic} alt={user.name} className="h-full w-full object-cover" />
                 ) : (
-                  <FiUser className="h-5 w-5 text-zinc-400" />
+                  <FiUser className="h-4 w-4 text-slate-400" />
                 )}
               </div>
               <div className="hidden md:block">
-                <p className="text-base font-bold text-white leading-none">{user.name}</p>
+                <p className="text-base font-bold text-slate-800 leading-none">{user.name}</p>
                 <p className="text-base font-semibold text-[#615fff] mt-1 capitalize">{user.role} Account</p>
               </div>
             </div>
 
           </div>
-
         </header>
 
-        {/* Scrollable Dashboard View */}
+        {/* Scrollable Page Content */}
         <div className="flex-1 overflow-y-auto">
           {children}
         </div>

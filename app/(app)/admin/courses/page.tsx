@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Course } from '@/lib/db/models/Course'
 import { cookies } from 'next/headers'
@@ -60,11 +60,11 @@ export default async function AdminCoursesPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
+          <h1 className="text-2xl font-bold text-slate-800 tracking-tight flex items-center gap-2.5">
             <FiBookOpen className="text-[#615fff] h-6 w-6" />
             Courses Management
           </h1>
-          <p className="text-sm font-semibold text-zinc-400 mt-1">
+          <p className="text-sm font-semibold text-slate-500 mt-1">
             Configure curriculum catalogs, pricing schemas, and student visibility toggles.
           </p>
         </div>

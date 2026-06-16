@@ -127,23 +127,23 @@ export default function StaffEditFormClient({ initialStaff }: StaffEditFormClien
   }
 
   return (
-    <div className="w-full bg-[#18181b] border-none rounded-lg p-6 md:p-8 shadow-xl space-y-6 select-text">
+    <div className="w-full bg-white border-none rounded-lg p-6 md:p-8 shadow-xl space-y-6 select-text">
       
       {/* Header and Back Button - Borderless */}
-      <div className="flex items-center justify-between pb-4 border-b border-zinc-800/60">
+      <div className="flex items-center justify-between pb-4 border-b border-slate-200">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-lg bg-[#615fff]/15 flex items-center justify-center">
             <FiShield className="text-[#615fff] h-5.5 w-5.5" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white leading-none">Edit Faculty Member</h2>
-            <p className="text-sm font-semibold text-zinc-400 mt-1.5">Modify information for administrative or teacher account</p>
+            <h2 className="text-xl font-bold text-slate-800 leading-none">Edit Faculty Member</h2>
+            <p className="text-sm font-semibold text-slate-500 mt-1.5">Modify information for administrative or teacher account</p>
           </div>
         </div>
         <button
           type="button"
           onClick={() => router.push('/admin/staff-register')}
-          className="inline-flex items-center gap-1.5 px-4.5 py-2.5 bg-[#242427] hover:bg-zinc-800 border-none text-zinc-300 hover:text-white rounded-lg text-sm font-bold transition-all cursor-pointer shadow-sm"
+          className="inline-flex items-center gap-1.5 px-4.5 py-2.5 bg-[#242427] hover:bg-slate-100 border-none text-slate-600 hover:text-slate-800 rounded-lg text-sm font-bold transition-all cursor-pointer shadow-sm"
         >
           <FiArrowLeft className="h-4.5 w-4.5" />
           <span>Back to Registry</span>
@@ -162,32 +162,32 @@ export default function StaffEditFormClient({ initialStaff }: StaffEditFormClien
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Full Name */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-base font-bold text-zinc-300">Full Name *</label>
+              <label className="text-base font-bold text-slate-600">Full Name *</label>
               <div className="relative">
-                <FiUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 h-5 w-5" />
+                <FiUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
                 <input
                   type="text"
                   required
                   placeholder="e.g. Jane Doe"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-[#242427] border-none focus:ring-2 focus:ring-[#615fff]/40 text-white rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
+                  className="w-full bg-[#242427] border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
                 />
               </div>
             </div>
 
             {/* Email Address */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-base font-bold text-zinc-300">Email Address *</label>
+              <label className="text-base font-bold text-slate-600">Email Address *</label>
               <div className="relative">
-                <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 h-5 w-5" />
+                <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
                 <input
                   type="email"
                   required
                   placeholder="e.g. jane@tutorspace.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-[#242427] border-none focus:ring-2 focus:ring-[#615fff]/40 text-white rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
+                  className="w-full bg-[#242427] border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
                 />
               </div>
             </div>
@@ -197,30 +197,30 @@ export default function StaffEditFormClient({ initialStaff }: StaffEditFormClien
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Phone Number */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-base font-bold text-zinc-300">Phone Number (Optional)</label>
+              <label className="text-base font-bold text-slate-600">Phone Number (Optional)</label>
               <div className="relative">
-                <FiPhone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 h-5 w-5" />
+                <FiPhone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
                 <input
                   type="tel"
                   placeholder="e.g. +88017XXXXXXXX"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-[#242427] border-none focus:ring-2 focus:ring-[#615fff]/40 text-white rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
+                  className="w-full bg-[#242427] border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
                 />
               </div>
             </div>
 
             {/* Password */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-base font-bold text-zinc-300">Change Password (Optional)</label>
+              <label className="text-base font-bold text-slate-600">Change Password (Optional)</label>
               <div className="relative">
-                <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 h-5 w-5" />
+                <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
                 <input
                   type="text"
                   placeholder="Leave blank to keep current password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[#242427] border-none focus:ring-2 focus:ring-[#615fff]/40 text-white rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
+                  className="w-full bg-[#242427] border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
                 />
               </div>
             </div>
@@ -228,15 +228,15 @@ export default function StaffEditFormClient({ initialStaff }: StaffEditFormClien
 
           {/* Designation / Job Title Role field */}
           <div className="flex flex-col gap-1.5 pt-2">
-            <label className="text-base font-bold text-zinc-300">Staff Job Designation / Professional Role (Optional)</label>
+            <label className="text-base font-bold text-slate-600">Staff Job Designation / Professional Role (Optional)</label>
             <div className="relative">
-              <FiUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 h-5 w-5" />
+              <FiUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
               <input
                 type="text"
                 placeholder="e.g. Software Engineer, UI/UX Designer, Project Manager"
                 value={designation}
                 onChange={(e) => setDesignation(e.target.value)}
-                className="w-full bg-[#242427] border-none focus:ring-2 focus:ring-[#615fff]/40 text-white rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
+                className="w-full bg-[#242427] border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
               />
             </div>
             <p className="text-xs text-zinc-555 font-semibold mt-1">This designation will display on public views (like the Mentors page).</p>
@@ -244,17 +244,17 @@ export default function StaffEditFormClient({ initialStaff }: StaffEditFormClien
 
           {/* Profile Picture Upload row */}
           <div className="flex flex-col gap-2 pt-2">
-            <label className="text-base font-bold text-zinc-300">Profile Picture</label>
+            <label className="text-base font-bold text-slate-600">Profile Picture</label>
             <div className="flex items-center gap-5 flex-wrap bg-[#242427] p-4 rounded-lg shadow-sm border-none">
-              <div className="h-16 w-16 rounded-full bg-[#18181b] flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+              <div className="h-16 w-16 rounded-full bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
                 {profilePicUrl ? (
                   <img src={profilePicUrl} alt="Preview" className="h-full w-full object-cover" />
                 ) : (
-                  <FiUser className="h-6 w-6 text-zinc-500" />
+                  <FiUser className="h-6 w-6 text-slate-400" />
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <label className={`flex items-center gap-1.5 px-4.5 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold text-sm cursor-pointer transition-colors shadow-sm ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                <label className={`flex items-center gap-1.5 px-4.5 py-2 rounded-lg bg-slate-100 hover:bg-zinc-700 text-slate-700 font-bold text-sm cursor-pointer transition-colors shadow-sm ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
                   <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                   <FiUploadCloud className="h-4.5 w-4.5" />
                   <span>{uploading ? 'Uploading...' : 'Upload Image'}</span>
@@ -273,7 +273,7 @@ export default function StaffEditFormClient({ initialStaff }: StaffEditFormClien
                   <button
                     type="button"
                     onClick={() => { setProfilePicId(''); setProfilePicUrl('') }}
-                    className="p-2 bg-rose-600/10 hover:bg-rose-600 text-rose-500 hover:text-white rounded-lg transition-colors cursor-pointer"
+                    className="p-2 bg-rose-600/10 hover:bg-rose-600 text-rose-500 hover:text-slate-800 rounded-lg transition-colors cursor-pointer"
                   >
                     <FiX className="h-4.5 w-4.5" />
                   </button>
@@ -284,15 +284,15 @@ export default function StaffEditFormClient({ initialStaff }: StaffEditFormClien
 
           {/* Security Privilege Level */}
           <div className="flex flex-col gap-2 pt-2">
-            <label className="text-base font-bold text-zinc-300">Security Privilege Level *</label>
+            <label className="text-base font-bold text-slate-600">Security Privilege Level *</label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Staff Option */}
               <label
                 onClick={() => handleRoleChange('staff')}
                 className={`flex items-start gap-3 p-4 rounded-lg border-none cursor-pointer transition-all duration-200 select-none ${
                   role === 'staff'
-                    ? 'bg-[#615fff]/10 text-white shadow-md'
-                    : 'bg-[#242427] text-zinc-400 hover:text-white'
+                    ? 'bg-[#615fff]/10 text-slate-800 shadow-md'
+                    : 'bg-[#242427] text-slate-500 hover:text-slate-800'
                 }`}
               >
                 <input
@@ -302,10 +302,10 @@ export default function StaffEditFormClient({ initialStaff }: StaffEditFormClien
                   onChange={() => handleRoleChange('staff')}
                   className="hidden"
                 />
-                <FiShield className={`h-5 w-5 shrink-0 mt-0.5 ${role === 'staff' ? 'text-[#a5b4fc]' : 'text-zinc-500'}`} />
+                <FiShield className={`h-5 w-5 shrink-0 mt-0.5 ${role === 'staff' ? 'text-[#a5b4fc]' : 'text-slate-400'}`} />
                 <div className="text-left">
                   <p className="font-bold text-base leading-none">Console Staff</p>
-                  <p className="text-xs font-semibold text-zinc-500 mt-2 leading-relaxed">Manage FAQs, Blogs, Categories</p>
+                  <p className="text-xs font-semibold text-slate-400 mt-2 leading-relaxed">Manage FAQs, Blogs, Categories</p>
                 </div>
               </label>
 
@@ -314,8 +314,8 @@ export default function StaffEditFormClient({ initialStaff }: StaffEditFormClien
                 onClick={() => handleRoleChange('instructor')}
                 className={`flex items-start gap-3 p-4 rounded-lg border-none cursor-pointer transition-all duration-200 select-none ${
                   role === 'instructor'
-                    ? 'bg-[#615fff]/10 text-white shadow-md'
-                    : 'bg-[#242427] text-zinc-400 hover:text-white'
+                    ? 'bg-[#615fff]/10 text-slate-800 shadow-md'
+                    : 'bg-[#242427] text-slate-500 hover:text-slate-800'
                 }`}
               >
                 <input
@@ -325,10 +325,10 @@ export default function StaffEditFormClient({ initialStaff }: StaffEditFormClien
                   onChange={() => handleRoleChange('instructor')}
                   className="hidden"
                 />
-                <FiShield className={`h-5 w-5 shrink-0 mt-0.5 ${role === 'instructor' ? 'text-[#a5b4fc]' : 'text-zinc-500'}`} />
+                <FiShield className={`h-5 w-5 shrink-0 mt-0.5 ${role === 'instructor' ? 'text-[#a5b4fc]' : 'text-slate-400'}`} />
                 <div className="text-left">
                   <p className="font-bold text-base leading-none">Instructor</p>
-                  <p className="text-xs font-semibold text-zinc-500 mt-2 leading-relaxed">Manage Syllabus, Create Lessons</p>
+                  <p className="text-xs font-semibold text-slate-400 mt-2 leading-relaxed">Manage Syllabus, Create Lessons</p>
                 </div>
               </label>
 
@@ -337,8 +337,8 @@ export default function StaffEditFormClient({ initialStaff }: StaffEditFormClien
                 onClick={() => handleRoleChange('admin')}
                 className={`flex items-start gap-3 p-4 rounded-lg border-none cursor-pointer transition-all duration-200 select-none ${
                   role === 'admin'
-                    ? 'bg-[#615fff]/10 text-white shadow-md'
-                    : 'bg-[#242427] text-zinc-400 hover:text-white'
+                    ? 'bg-[#615fff]/10 text-slate-800 shadow-md'
+                    : 'bg-[#242427] text-slate-500 hover:text-slate-800'
                 }`}
               >
                 <input
@@ -348,10 +348,10 @@ export default function StaffEditFormClient({ initialStaff }: StaffEditFormClien
                   onChange={() => handleRoleChange('admin')}
                   className="hidden"
                 />
-                <FiShield className={`h-5 w-5 shrink-0 mt-0.5 ${role === 'admin' ? 'text-[#a5b4fc]' : 'text-zinc-500'}`} />
+                <FiShield className={`h-5 w-5 shrink-0 mt-0.5 ${role === 'admin' ? 'text-[#a5b4fc]' : 'text-slate-400'}`} />
                 <div className="text-left">
                   <p className="font-bold text-base leading-none">Operations</p>
-                  <p className="text-xs font-semibold text-zinc-500 mt-2 leading-relaxed">Full system access, Add other staff</p>
+                  <p className="text-xs font-semibold text-slate-400 mt-2 leading-relaxed">Full system access, Add other staff</p>
                 </div>
               </label>
             </div>
@@ -359,10 +359,10 @@ export default function StaffEditFormClient({ initialStaff }: StaffEditFormClien
 
           {/* Custom Page Permissions */}
           {role !== 'admin' && (
-            <div className="flex flex-col gap-3 pt-4 border-t border-zinc-800/60">
+            <div className="flex flex-col gap-3 pt-4 border-t border-slate-200">
               <div>
-                <label className="text-base font-bold text-zinc-300">Custom Page Permissions</label>
-                <p className="text-xs font-semibold text-zinc-400 mt-1">Configure exactly which pages this administrative account can read and write</p>
+                <label className="text-base font-bold text-slate-600">Custom Page Permissions</label>
+                <p className="text-xs font-semibold text-slate-500 mt-1">Configure exactly which pages this administrative account can read and write</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                 {[
@@ -380,8 +380,8 @@ export default function StaffEditFormClient({ initialStaff }: StaffEditFormClien
                       key={perm.key}
                       className={`flex items-center gap-3 p-3.5 rounded-lg border-none cursor-pointer select-none transition-all duration-200 ${
                         isChecked
-                          ? 'bg-[#615fff]/10 text-white'
-                          : 'bg-[#242427] text-zinc-400 hover:text-white'
+                          ? 'bg-[#615fff]/10 text-slate-800'
+                          : 'bg-[#242427] text-slate-500 hover:text-slate-800'
                       }`}
                     >
                       <input

@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { connectToDatabase } from '@/lib/db/mongodb'
@@ -53,7 +53,7 @@ export default async function NewReviewPage() {
   }))
 
   return (
-    <div className="min-h-screen bg-[#121212] text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-800">
       <ReviewFormClient
         courses={courses}
         students={students}

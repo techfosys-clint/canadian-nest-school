@@ -4,7 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
-  FiBookOpen, FiLayers, FiMessageCircle, FiAward, FiUsers, FiShoppingBag, FiCheck
+  FiBookOpen, FiLayers, FiMessageCircle, FiAward, FiUsers, FiShoppingBag, FiCheck, FiCompass
 } from 'react-icons/fi'
 
 interface CategoriesProps {
@@ -64,6 +64,15 @@ const CARDS_DATA = [
     iconColor: 'text-[#eab308]',
     borderColor: 'border-[#eab308]',
     bgColor: 'bg-[#eab308]/5',
+    href: '/courses',
+  },
+  {
+    title: 'Explore Courses',
+    description: 'Browse all available learning programs and resources.',
+    icon: <FiCompass className="h-6 w-6 text-[#6366f1]" />,
+    iconColor: 'text-[#6366f1]',
+    borderColor: 'border-[#6366f1]',
+    bgColor: 'bg-[#6366f1]/5',
     href: '/courses',
   },
 ]

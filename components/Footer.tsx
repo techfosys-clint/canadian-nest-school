@@ -71,36 +71,49 @@ export default function Footer() {
       <div className="container mx-auto px-6 pt-16 pb-10 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
 
-          {/* Col 1 – Newsletter */}
+          {/* Col 1 – Branding & Info */}
           <div className="lg:col-span-5 space-y-6">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white leading-tight">
-              Sign up for our<br />newsletter today.
-            </h2>
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <span className="h-9 w-9 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white shadow-lg shadow-[#615fff]/35 transition-transform group-hover:scale-105 duration-300 text-base">
+                C
+              </span>
+              <span className="text-xl font-bold font-display tracking-tight text-white transition-colors duration-300">
+                Canadian Nest
+              </span>
+            </Link>
 
-            <form
-              onSubmit={handleSubscribe}
-              className="flex items-stretch gap-0 w-full max-w-sm"
-            >
-              <input
-                type="email"
-                placeholder="Your email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 bg-transparent border border-zinc-700 border-r-0 rounded-l-lg px-4 py-3 text-base text-white outline-none placeholder:text-zinc-600 focus:border-[#615fff]/60 transition-colors"
-              />
-              <button
-                type="submit"
-                disabled={submitting}
-                className="bg-[#615fff] hover:bg-[#4f4fdd] text-white font-bold text-base px-6 py-3 rounded-r-lg transition-colors shrink-0 cursor-pointer disabled:opacity-60 whitespace-nowrap"
+            <div className="space-y-4 text-base text-zinc-400 leading-relaxed">
+              <p>
+                Empowering children, teens, adults, and educators through high-quality English education, phonics-based learning, IELTS preparation, and teacher training programs.
+              </p>
+              <p className="font-semibold text-white border-l-2 border-[#615fff] pl-3">
+                Building Confident English Learners Through Canadian Educational Standards.
+              </p>
+            </div>
+
+            <div className="pt-2">
+              <p className="text-base font-bold text-white mb-3">Subscribe to our Newsletter</p>
+              <form
+                onSubmit={handleSubscribe}
+                className="flex items-stretch gap-0 w-full max-w-sm"
               >
-                {submitting ? '...' : 'Subscribe'}
-              </button>
-            </form>
-
-            <p className="text-base text-zinc-500">
-              No spam, just valued update.
-            </p>
+                <input
+                  type="email"
+                  placeholder="Your email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="flex-1 bg-transparent border border-zinc-700 border-r-0 rounded-l-lg px-4 py-3 text-base text-white outline-none placeholder:text-zinc-650 focus:border-[#615fff]/60 transition-colors"
+                />
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="bg-[#615fff] hover:bg-[#4f4fdd] text-white font-bold text-base px-6 py-3 rounded-r-lg transition-colors shrink-0 cursor-pointer disabled:opacity-60 whitespace-nowrap"
+                >
+                  {submitting ? '...' : 'Subscribe'}
+                </button>
+              </form>
+            </div>
           </div>
 
           {/* Group Main Pages & Quick Links to display side-by-side on mobile */}
@@ -197,10 +210,15 @@ export default function Footer() {
           >
             Privacy policy
           </Link>
-          <p className="text-center">
-            © Copyright {new Date().getFullYear()} | Design &amp; Developed By{' '}
-            <span className="text-[#615fff] font-bold">Tutor Space</span>
-          </p>
+          <div className="text-center text-zinc-500">
+            <p>© 2026 Canadian Nest School. All Rights Reserved.</p>
+            <p className="mt-1">
+              Design &amp; Developed By{' '}
+              <a href="https://www.teachfosys.com/" target="_blank" rel="noopener noreferrer" className="text-[#615fff] hover:underline font-bold">
+                Teachfosys
+              </a>
+            </p>
+          </div>
           <Link
             href="/terms-of-service"
             className={pathname === '/terms-of-service' ? 'text-[#615fff] font-bold' : 'hover:text-zinc-300 transition-colors'}
@@ -216,7 +234,7 @@ export default function Footer() {
         className="select-none pointer-events-none text-center leading-none overflow-hidden pb-4"
       >
         <span className="text-[13vw] font-bold text-white/[0.04] uppercase tracking-tight whitespace-nowrap block">
-          Tutor Space
+          Canadian Nest
         </span>
       </div>
 

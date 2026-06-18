@@ -298,9 +298,9 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                       ) : null}
                       <div className={`css-placeholder w-full h-full bg-gradient-to-br from-[#0A163A] to-[#121212] flex flex-col items-center justify-center border border-white/5 absolute inset-0 ${getImageUrl(featuredCourse.thumbnail) ? 'hidden' : ''}`}>
                         <span className="h-14 w-14 rounded-lg bg-[#615fff]/20 flex items-center justify-center font-bold text-white shadow-lg text-lg mb-2">
-                          T
+                          C
                         </span>
-                        <span className="text-sm font-bold text-zinc-500 uppercase tracking-wider">Tutor Space</span>
+                        <span className="text-sm font-bold text-zinc-500 uppercase tracking-wider">Canadian Nest</span>
                       </div>
                       {/* Level badge on image */}
                       <span className="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-lg text-zinc-700 font-bold text-base shadow-sm border border-zinc-100">
@@ -429,9 +429,9 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                           ) : null}
                           <div className={`css-placeholder w-full h-full bg-gradient-to-br from-[#0A163A] to-[#121212] flex flex-col items-center justify-center border border-white/5 absolute inset-0 ${getImageUrl(course.thumbnail) ? 'hidden' : ''} rounded-t-lg`}>
                             <span className="h-10 w-10 rounded-lg bg-[#615fff]/20 flex items-center justify-center font-bold text-white shadow-lg text-base mb-1.5">
-                              T
+                              C
                             </span>
-                            <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Tutor Space</span>
+                            <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Canadian Nest</span>
                           </div>
                           
                           {/* Rating Badge Overlay */}

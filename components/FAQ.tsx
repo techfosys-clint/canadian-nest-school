@@ -103,7 +103,7 @@ export default function FAQ({ faqs }: FAQProps) {
             viewport={{ once: true, amount: 0.3 }}
             className="mt-4 text-base font-semibold text-zinc-500 max-w-xl mx-auto leading-relaxed"
           >
-            Everything you need to know about Tutor Space. Can&apos;t find the answer
+            Everything you need to know about Canadian Nest. Can&apos;t find the answer
             you&apos;re looking for? Feel free to reach out to us.
           </motion.p>
         </div>

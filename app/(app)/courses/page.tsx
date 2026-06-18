@@ -8,8 +8,8 @@ import type { CourseDoc, CategoryDoc } from '@/components/Courses'
 import CoursesPageClient from '@/components/CoursesPageClient'
 
 export const metadata = {
-  title: 'All Courses - Tutor Space',
-  description: 'Browse all premium courses on Tutor Space. Filter by category, level, and price.',
+  title: 'All Courses - Canadian Nest',
+  description: 'Browse all premium courses on Canadian Nest. Filter by category, level, and price.',
 }
 
 export default async function CoursesPage() {

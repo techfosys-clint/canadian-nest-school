@@ -123,12 +123,12 @@ export default function Navbar() {
           {/* Left Side: Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
             <span className="h-9 w-9 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white shadow-lg shadow-[#615fff]/35 transition-transform group-hover:scale-105 duration-300 text-base">
-              T
+              C
             </span>
             <span className={`text-xl font-bold font-display tracking-tight transition-colors duration-300 ${
               isScrolled ? 'text-zinc-900' : 'text-[#0A163A]'
             }`}>
-              Tutor Space
+              Canadian Nest
             </span>
           </Link>
 
@@ -273,7 +273,7 @@ export default function Navbar() {
                       <>
                         <div className="px-3 py-2.5 bg-zinc-50/70 rounded-lg mb-3">
                           <p className="text-base font-bold text-[#0A163A]">Welcome</p>
-                          <p className="text-base text-zinc-550 font-semibold mt-0.5">Join Tutor Space to access premium courses.</p>
+                          <p className="text-base text-zinc-550 font-semibold mt-0.5">Join Canadian Nest to access premium courses.</p>
                         </div>
 
                         <Link
@@ -347,10 +347,10 @@ export default function Navbar() {
               <div className="flex items-center justify-between p-6 border-b border-zinc-100">
                 <Link href="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5 group">
                   <span className="h-9 w-9 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white shadow-md text-base">
-                    T
+                    C
                   </span>
                   <span className="text-xl font-bold font-display text-[#0A163A]">
-                    Tutor Space
+                    Canadian Nest
                   </span>
                 </Link>
                 <button

@@ -18,7 +18,7 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Tutor Space - Premium Course Selling Platform",
+  title: "Canadian Nest - Premium Course Selling Platform",
   description: "Learn high-demand tech and design skills with industry expert mentors.",
 };
 

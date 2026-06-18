@@ -170,8 +170,8 @@ function CourseCard({ course, view }: { course: CourseDoc; view: 'grid' | 'list'
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#0A163A] to-[#1e1b4b] flex flex-col items-center justify-center rounded-t-lg">
-              <span className="h-12 w-12 rounded-lg bg-[#615fff]/25 flex items-center justify-center font-bold text-white mb-2 text-lg">T</span>
-              <span className="text-base font-bold text-zinc-400 uppercase tracking-wider">Tutor Space</span>
+              <span className="h-12 w-12 rounded-lg bg-[#615fff]/25 flex items-center justify-center font-bold text-white mb-2 text-lg">C</span>
+              <span className="text-base font-bold text-zinc-400 uppercase tracking-wider">Canadian Nest</span>
             </div>
           )}
           

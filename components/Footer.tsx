@@ -103,36 +103,39 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Col 2 – Main Pages */}
-          <div className="lg:col-span-2 lg:pl-2 space-y-4">
-            <h3 className="text-base font-bold text-white">
-              Main Pages
-            </h3>
-            <ul className="space-y-3 text-base">
-              {MAIN_PAGES.map(({ label, href, match }) => (
-                <li key={href}>
-                  <Link href={href} className={linkClass(match)}>
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Group Main Pages & Quick Links to display side-by-side on mobile */}
+          <div className="grid grid-cols-2 gap-8 lg:col-span-4 md:col-span-2 lg:pl-2">
+            {/* Col 2 – Main Pages */}
+            <div className="space-y-4">
+              <h3 className="text-base font-bold text-white">
+                Main Pages
+              </h3>
+              <ul className="space-y-3 text-base">
+                {MAIN_PAGES.map(({ label, href, match }) => (
+                  <li key={href}>
+                    <Link href={href} className={linkClass(match)}>
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          {/* Col 3 – Quick Links */}
-          <div className="lg:col-span-2 space-y-4">
-            <h3 className="text-base font-bold text-white">
-              Quick Links
-            </h3>
-            <ul className="space-y-3 text-base">
-              {QUICK_LINKS.map(({ label, href, match }) => (
-                <li key={href}>
-                  <Link href={href} className={linkClass(match)}>
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {/* Col 3 – Quick Links */}
+            <div className="space-y-4">
+              <h3 className="text-base font-bold text-white">
+                Quick Links
+              </h3>
+              <ul className="space-y-3 text-base">
+                {QUICK_LINKS.map(({ label, href, match }) => (
+                  <li key={href}>
+                    <Link href={href} className={linkClass(match)}>
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           {/* Col 4 – Get in Touch + Follow Us */}

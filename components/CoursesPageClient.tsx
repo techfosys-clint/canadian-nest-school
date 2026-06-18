@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   FiSearch, FiX, FiClock, FiUsers, FiStar,
   FiArrowUpRight, FiUser, FiGrid, FiList, FiChevronDown, FiChevronRight,
-  FiBookOpen, FiArrowRight
+  FiBookOpen, FiArrowRight, FiSliders
 } from 'react-icons/fi'
 import type { CourseDoc, CategoryDoc } from '@/components/Courses'
 
@@ -294,9 +294,18 @@ export default function CoursesPageClient({
   const [priceTier, setPriceTier] = useState('all')
   const [activeLanguages, setActiveLanguages] = useState<string[]>([])
   const [view, setView] = useState<'grid' | 'list'>('grid')
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false)
   
   // Category list pagination toggle (Show More / Show Less)
   const [showAllCategories, setShowAllCategories] = useState(false)
+
+  const activeFiltersCount = useMemo(() => {
+    let count = 0
+    if (activeLevels.length > 0) count += activeLevels.length
+    if (priceTier !== 'all') count += 1
+    if (activeLanguages.length > 0) count += activeLanguages.length
+    return count
+  }, [activeLevels, priceTier, activeLanguages])
 
   const toggleLevel = (lvl: string) => {
     setActiveLevels((prev) =>
@@ -439,7 +448,7 @@ export default function CoursesPageClient({
         <div className="flex flex-col lg:flex-row gap-8 items-start relative mt-4">
           
           {/* ── STICKY SIDEBAR (Left Column, border-based design without shadow) ── */}
-          <aside className="w-full lg:w-72 shrink-0 space-y-6 lg:sticky lg:top-28 z-20">
+          <aside className="hidden lg:block w-72 shrink-0 space-y-6 lg:sticky lg:top-28 z-20">
             
             {/* Browse Categories Box */}
             <div className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow space-y-4 border-none">
@@ -590,6 +599,43 @@ export default function CoursesPageClient({
           {/* ── MAIN CONTENT (Right Column) ── */}
           <main className="flex-grow min-w-0 w-full space-y-6">
             
+            {/* Horizontal category scroll bar for mobile */}
+            <div 
+              className="lg:hidden flex items-center gap-2 overflow-x-auto pb-4 pt-1 -mx-6 px-6 no-scrollbar"
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+              }}
+            >
+              <button
+                onClick={() => setActiveCategory('all')}
+                className={`shrink-0 px-4 py-2 rounded-lg text-base font-bold transition-all border cursor-pointer ${
+                  activeCategory === 'all'
+                    ? 'bg-[#615fff] text-white border-[#615fff]'
+                    : 'bg-white text-zinc-650 border-zinc-200 hover:bg-zinc-50'
+                }`}
+              >
+                All ({courses.length})
+              </button>
+              {categories.map((cat) => {
+                const count = courses.filter((c) => getCategorySlug(c.category) === cat.slug).length
+                const active = activeCategory === cat.slug
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveCategory(cat.slug)}
+                    className={`shrink-0 px-4 py-2 rounded-lg text-base font-semibold transition-all border capitalize cursor-pointer ${
+                      active
+                        ? 'bg-[#615fff]/10 text-[#615fff] border-[#615fff] font-bold'
+                        : 'bg-white text-zinc-650 border-zinc-200 hover:bg-zinc-50'
+                    }`}
+                  >
+                    {cat.name} ({count})
+                  </button>
+                )
+              })}
+            </div>
+
             {/* Search + View Toggle bar matching design (completely shadowless) */}
             <div className="flex flex-col sm:flex-row gap-4 items-center bg-white rounded-lg p-3 border border-zinc-200">
               <div className="flex-grow flex items-center gap-3 pl-3 w-full">
@@ -608,21 +654,39 @@ export default function CoursesPageClient({
                 )}
               </div>
               
-              <div className="flex items-center bg-zinc-100/80 rounded-lg p-1.5 gap-1.5 shrink-0">
+              <div className="flex items-center gap-2.5 w-full sm:w-auto shrink-0 justify-between sm:justify-end">
+                {/* Mobile Filter Button */}
                 <button
-                  onClick={() => setView('grid')}
-                  className={`p-2.5 rounded-lg cursor-pointer transition-all duration-200 ${view === 'grid' ? 'bg-white text-[#615fff] font-bold border border-zinc-200' : 'bg-transparent text-zinc-500 hover:text-[#0A163A]'}`}
+                  onClick={() => setIsMobileFiltersOpen(true)}
+                  className="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-white border border-zinc-200 rounded-lg text-base font-bold text-[#0A163A] hover:bg-zinc-50 transition-all cursor-pointer flex-grow sm:flex-grow-0 justify-center"
                 >
-                  <FiGrid className="h-5 w-5" />
+                  <FiSliders className="h-4.5 w-4.5 text-zinc-500" />
+                  <span>Filters</span>
+                  {activeFiltersCount > 0 && (
+                    <span className="bg-[#615fff] text-white text-xs font-bold rounded-full w-5.5 h-5.5 flex items-center justify-center">
+                      {activeFiltersCount}
+                    </span>
+                  )}
                 </button>
-                <button
-                  onClick={() => setView('list')}
-                  className={`p-2.5 rounded-lg cursor-pointer transition-all duration-200 ${view === 'list' ? 'bg-white text-[#615fff] font-bold border border-zinc-200' : 'bg-transparent text-zinc-500 hover:text-[#0A163A]'}`}
-                >
-                  <FiList className="h-5 w-5" />
-                </button>
+
+                <div className="flex items-center bg-zinc-100/80 rounded-lg p-1.5 gap-1.5 shrink-0">
+                  <button
+                    onClick={() => setView('grid')}
+                    className={`p-2.5 rounded-lg cursor-pointer transition-all duration-200 ${view === 'grid' ? 'bg-white text-[#615fff] font-bold border border-zinc-200' : 'bg-transparent text-zinc-500 hover:text-[#0A163A]'}`}
+                  >
+                    <FiGrid className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => setView('list')}
+                    className={`p-2.5 rounded-lg cursor-pointer transition-all duration-200 ${view === 'list' ? 'bg-white text-[#615fff] font-bold border border-zinc-200' : 'bg-transparent text-zinc-500 hover:text-[#0A163A]'}`}
+                  >
+                    <FiList className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
             </div>
+
+
 
             {/* Title / Counter Row */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
@@ -690,6 +754,144 @@ export default function CoursesPageClient({
           </main>
         </div>
       </div>
+
+      {/* Mobile Filters Drawer - Rendered at root level with high z-index to overlay navbar and prevent stacking/scrolling issues */}
+      <AnimatePresence>
+        {isMobileFiltersOpen && (
+          <>
+            {/* Backdrop Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileFiltersOpen(false)}
+              className="fixed inset-0 bg-zinc-900/40 backdrop-blur-xs z-[100] lg:hidden"
+            />
+
+            {/* Drawer Panel */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 250 }}
+              className="fixed inset-y-0 right-0 w-[300px] bg-white shadow-2xl z-[100] flex flex-col lg:hidden border-l border-zinc-200"
+            >
+              {/* Header inside the drawer */}
+              <div className="flex items-center justify-between p-6 border-b border-zinc-100">
+                <div className="flex items-center gap-2">
+                  <FiSliders className="h-5 w-5 text-[#615fff]" />
+                  <h3 className="text-lg font-bold text-[#0A163A]">Filters</h3>
+                </div>
+                <button
+                  onClick={() => setIsMobileFiltersOpen(false)}
+                  className="p-2 -mr-2 rounded-lg text-zinc-500 hover:text-[#0A163A] hover:bg-zinc-100 transition-colors"
+                >
+                  <FiX className="h-6 w-6" />
+                </button>
+              </div>
+
+              {/* Filter Content */}
+              <div className="flex-grow overflow-y-auto p-6 space-y-6">
+                {/* Price Tier Filter */}
+                <div className="space-y-3">
+                  <p className="text-base font-bold text-[#0A163A] uppercase tracking-wider">Tier</p>
+                  <div className="space-y-2.5">
+                    {PRICE_TIERS.map((tier) => (
+                      <label key={tier.value} className="flex items-center gap-3 cursor-pointer group">
+                        <input
+                          type="radio"
+                          name="mobile-tier"
+                          value={tier.value}
+                          checked={priceTier === tier.value || (tier.value === 'all' && priceTier === 'all')}
+                          onChange={() => {
+                            if (tier.value === 'subscription') return
+                            setPriceTier(tier.value)
+                          }}
+                          disabled={tier.value === 'subscription'}
+                          className="w-5 h-5 accent-[#615fff] cursor-pointer"
+                        />
+                        <span className={`text-base font-semibold transition-colors duration-200 ${
+                          priceTier === tier.value ? 'text-[#615fff] font-bold' : 'text-zinc-650 group-hover:text-zinc-800'
+                        } ${tier.value === 'subscription' ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                          {tier.label}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Language Filter */}
+                <div className="space-y-3">
+                  <p className="text-base font-bold text-[#0A163A] uppercase tracking-wider">Language</p>
+                  <div className="space-y-2.5">
+                    {LANGUAGES.map((lang) => (
+                      <label key={lang.value} className="flex items-center gap-3 cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          value={lang.value}
+                          checked={activeLanguages.includes(lang.value)}
+                          onChange={() => toggleLanguage(lang.value)}
+                          className="w-5 h-5 accent-[#615fff] cursor-pointer rounded"
+                        />
+                        <span className={`text-base font-semibold transition-colors duration-200 ${
+                          activeLanguages.includes(lang.value) ? 'text-[#615fff] font-bold' : 'text-zinc-650 group-hover:text-zinc-800'
+                        }`}>
+                          {lang.label}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Levels Filter */}
+                <div className="space-y-3">
+                  <p className="text-base font-bold text-[#0A163A] uppercase tracking-wider">Level</p>
+                  <div className="space-y-2.5">
+                    {LEVELS.map((lvl) => (
+                      <label key={lvl.value} className="flex items-center gap-3 cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          value={lvl.value}
+                          checked={activeLevels.includes(lvl.value)}
+                          onChange={() => toggleLevel(lvl.value)}
+                          className="w-5 h-5 accent-[#615fff] cursor-pointer rounded"
+                        />
+                        <span className={`text-base font-semibold transition-colors duration-200 ${
+                          activeLevels.includes(lvl.value) ? 'text-[#615fff] font-bold' : 'text-zinc-650 group-hover:text-zinc-800'
+                        }`}>
+                          {lvl.label}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons inside Drawer */}
+              <div className="p-6 border-t border-zinc-100 bg-zinc-50/50 flex flex-col gap-3">
+                {hasFilters && (
+                  <button
+                    onClick={() => {
+                      clearAll()
+                      setIsMobileFiltersOpen(false)
+                    }}
+                    className="w-full text-base font-bold text-rose-500 hover:text-white hover:bg-rose-500 bg-rose-50 rounded-lg py-3 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <FiX className="h-5 w-5" />
+                    <span>Clear All Filters</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsMobileFiltersOpen(false)}
+                  className="w-full text-center py-3 rounded-lg text-base font-bold bg-[#615fff] hover:bg-[#543cdf] text-white shadow-md shadow-[#615fff]/15 transition-all cursor-pointer"
+                >
+                  Apply Filters
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

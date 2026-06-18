@@ -87,73 +87,36 @@ export default function Features() {
             </div>
           </motion.div>
 
-          {/* Right Column: Cards Stack & Action Buttons */}
-          <div className="flex flex-col gap-6 justify-between">
-            <div className="flex flex-col gap-6">
-              {featuresList.map((item, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-100px' }}
-                  transition={{ duration: 0.6, delay: idx * 0.15, ease: 'easeOut' }}
-                  className="p-6 md:p-8 bg-white border border-[#E2E8F0] rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:border-zinc-200 hover:-translate-y-0.5 transition-all duration-300 group flex flex-col md:flex-row gap-5 items-start"
+          {/* Right Column: Cards Stack */}
+          <div className="flex flex-col gap-6">
+            {featuresList.map((item, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-100px' }}
+                transition={{ duration: 0.6, delay: idx * 0.15, ease: 'easeOut' }}
+                className="p-6 md:p-8 bg-white border border-[#E2E8F0] rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:border-zinc-200 hover:-translate-y-0.5 transition-all duration-300 group flex flex-col md:flex-row gap-5 items-start"
+              >
+                {/* Icon Wrapper (Circular) */}
+                <div
+                  className={`flex-shrink-0 w-12 h-12 rounded-full ${item.iconBg} ${item.iconColor} border ${item.iconBorder} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}
                 >
-                  {/* Icon Wrapper (Circular) */}
-                  <div
-                    className={`flex-shrink-0 w-12 h-12 rounded-full ${item.iconBg} ${item.iconColor} border ${item.iconBorder} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}
-                  >
-                    {item.icon}
-                  </div>
+                  {item.icon}
+                </div>
 
-                  {/* Content */}
-                  <div className="space-y-2">
-                    <h3 className="text-lg md:text-xl font-bold text-[#0A163A] transition-colors duration-200">
-                      {item.title}
-                    </h3>
-                    <p className="text-base text-[#4b5563] font-normal leading-relaxed">
-                      {item.description}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Small Action Buttons (same as screenshot: Lesson plans, Worksheets, Flashcards, Songs, Readers) */}
-            <div className="flex flex-wrap items-center gap-2.5 pt-2">
-              <Link
-                href="/courses"
-                className="px-4 py-2 bg-[#E61C24] hover:bg-[#c3131a] text-white font-bold text-base rounded-lg transition-all duration-200 cursor-pointer border-none shadow-sm"
-              >
-                Lesson plans
-              </Link>
-              <Link
-                href="/courses"
-                className="px-4 py-2 bg-[#E61C24] hover:bg-[#c3131a] text-white font-bold text-base rounded-lg transition-all duration-200 cursor-pointer border-none shadow-sm"
-              >
-                Worksheets
-              </Link>
-              <Link
-                href="/courses"
-                className="px-4 py-2 bg-[#E61C24] hover:bg-[#c3131a] text-white font-bold text-base rounded-lg transition-all duration-200 cursor-pointer border-none shadow-sm"
-              >
-                Flashcards
-              </Link>
-              <Link
-                href="/courses"
-                className="px-4 py-2 bg-[#E61C24] hover:bg-[#c3131a] text-white font-bold text-base rounded-lg transition-all duration-200 cursor-pointer border-none shadow-sm"
-              >
-                Songs
-              </Link>
-              <Link
-                href="/courses"
-                className="px-4 py-2 bg-[#E61C24] hover:bg-[#c3131a] text-white font-bold text-base rounded-lg transition-all duration-200 cursor-pointer border-none shadow-sm"
-              >
-                Readers
-              </Link>
-            </div>
+                {/* Content */}
+                <div className="space-y-2">
+                  <h3 className="text-lg md:text-xl font-bold text-[#0A163A] transition-colors duration-200">
+                    {item.title}
+                  </h3>
+                  <p className="text-base text-[#4b5563] font-normal leading-relaxed">
+                    {item.description}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
           </div>
-
         </div>
 
       </div>

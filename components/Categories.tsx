@@ -58,15 +58,6 @@ const CARDS_DATA = [
     href: '/courses?category=teacher-training',
   },
   {
-    title: 'Academic Tutoring',
-    description: 'Personalized school support and exam preparation.',
-    icon: <FiBookOpen className="h-6 w-6 text-[#ec4899]" />,
-    iconColor: 'text-[#ec4899]',
-    borderColor: 'border-[#ec4899]',
-    bgColor: 'bg-[#ec4899]/5',
-    href: '/courses',
-  },
-  {
     title: 'Educational Shop',
     description: 'Books, worksheets, courses, teaching resources.',
     icon: <FiShoppingBag className="h-6 w-6 text-[#eab308]" />,
@@ -154,8 +145,8 @@ export default function Categories({ categories }: CategoriesProps) {
             viewport={{ once: true, amount: 0.2 }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#000000] tracking-tight leading-[1.2] max-w-4xl mx-auto"
           >
-            <span className="block mb-1"><span className="text-[#E61C24]">ESL resources</span> for teaching</span>
-            <span className="block">English to kids & teens</span>
+            <span className="block mb-1">Explore diverse learning paths</span>
+            <span className="block">within our <span className="text-[#E61C24]">course categories</span></span>
           </motion.h2>
           
           <motion.p
@@ -165,7 +156,7 @@ export default function Categories({ categories }: CategoriesProps) {
             viewport={{ once: true, amount: 0.2 }}
             className="text-base sm:text-lg font-semibold text-[#4b5563] max-w-2xl mx-auto pt-2 leading-relaxed"
           >
-            Discover our wide range of English language learning programs, academic courses, and international teacher training resources.
+            Our carefully curated course categories are designed to help you explore different fields, gain new skills, and advance your knowledge.
           </motion.p>
         </div>
 

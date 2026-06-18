@@ -161,16 +161,16 @@ export default function Categories({ categories }: CategoriesProps) {
             >
               <Link
                 href={card.href}
-                className={`flex flex-col h-full bg-white rounded-lg border-2 ${card.borderColor} ${card.bgColor} px-4 py-8 text-center shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 group cursor-pointer`}
+                className={`flex flex-col h-full bg-white rounded-lg border-2 ${card.borderColor} ${card.bgColor} px-4 py-8 text-center shadow-md -translate-y-1 transition-all duration-300 group cursor-pointer hover:shadow-lg hover:-translate-y-1.5`}
               >
                 {/* Top Middle Icon Badge overlapping the border */}
-                <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border-2 ${card.borderColor} p-2.5 rounded-lg shadow-xs flex items-center justify-center transition-transform duration-300 group-hover:scale-110 z-20`}>
+                <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border-2 ${card.borderColor} p-2.5 rounded-lg shadow-xs flex items-center justify-center transition-transform duration-300 scale-110 group-hover:scale-115 z-20`}>
                   {card.icon}
                 </div>
 
                 {/* Content */}
                 <div className="flex flex-col justify-between h-full pt-4 space-y-2.5">
-                  <h3 className="text-lg font-bold text-[#0A163A] group-hover:text-[#615fff] transition-colors leading-snug">
+                  <h3 className="text-lg font-bold text-[#615fff] group-hover:text-[#d97706] transition-colors leading-snug">
                     {card.title}
                   </h3>
                   <p className="text-base text-zinc-500 font-semibold leading-relaxed flex-grow">

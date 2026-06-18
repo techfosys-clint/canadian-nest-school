@@ -1,8 +1,9 @@
 'use client'
 
 import React from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { FiBookOpen, FiAward, FiCalendar } from 'react-icons/fi'
+import { FiBookOpen, FiAward, FiCalendar, FiArrowRight } from 'react-icons/fi'
 
 export default function Features() {
   const featuresList = [
@@ -65,20 +66,24 @@ export default function Features() {
         {/* Section Grid */}
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           
-          {/* Left Column: Image with micro-animation */}
+          {/* Left Column: Responsive Video Wrapper */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-100px' }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="relative w-full h-[400px] md:h-[500px]"
+            className="relative w-full aspect-video h-[300px] sm:h-[400px] lg:h-[420px] xl:h-[450px]"
           >
-            <div className="w-full h-full relative overflow-hidden rounded-lg shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-zinc-100/50">
-              <img
-                src="/media/learning-journey.png"
-                alt="Student writing in notebook"
-                className="w-full h-full object-cover transform hover:scale-[1.03] transition-transform duration-700 ease-out"
-              />
+            <div className="w-full h-full relative overflow-hidden rounded-lg shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-zinc-250 bg-zinc-950">
+              <iframe
+                src="https://www.youtube-nocookie.com/embed/0qfeLi_pzQU?si=VyI93xJvpKXckiQ3&amp;start=13"
+                title="Canadian Nest Presentation Video"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full rounded-lg"
+              ></iframe>
             </div>
           </motion.div>
 
@@ -111,6 +116,23 @@ export default function Features() {
                 </div>
               </motion.div>
             ))}
+
+            {/* Action Buttons Row */}
+            <div className="flex flex-wrap items-center gap-4 pt-4">
+              <Link
+                href="/courses"
+                className="px-6 py-3.5 bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base rounded-lg shadow-md shadow-[#615fff]/15 hover:shadow-[#615fff]/25 transition-all duration-300 flex items-center gap-2 group cursor-pointer border-none"
+              >
+                <span>Browse All Courses</span>
+                <FiArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5" />
+              </Link>
+              <Link
+                href="/about"
+                className="px-6 py-3.5 bg-white hover:bg-zinc-50 text-[#0A163A] font-bold text-base rounded-lg border border-zinc-200/85 transition-all duration-300 flex items-center gap-2 cursor-pointer"
+              >
+                <span>Learn More About Us</span>
+              </Link>
+            </div>
           </div>
 
         </div>

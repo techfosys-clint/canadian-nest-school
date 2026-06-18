@@ -4,7 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
-  FiBookOpen, FiLayers, FiMessageCircle, FiAward, FiUsers, FiShoppingBag
+  FiBookOpen, FiLayers, FiMessageCircle, FiAward, FiUsers, FiShoppingBag, FiCheck
 } from 'react-icons/fi'
 
 interface CategoriesProps {
@@ -16,6 +16,7 @@ const CARDS_DATA = [
     title: 'English for Kids',
     description: 'Game based phonics with grammar, Reading, Speaking, Writing .',
     icon: <FiBookOpen className="h-6 w-6 text-[#3b82f6]" />,
+    iconColor: 'text-[#3b82f6]',
     borderColor: 'border-[#3b82f6]',
     bgColor: 'bg-[#3b82f6]/5',
     href: '/courses?category=kids',
@@ -24,6 +25,7 @@ const CARDS_DATA = [
     title: 'English for Teens',
     description: 'Academic English and communication skills.',
     icon: <FiLayers className="h-6 w-6 text-[#10b981]" />,
+    iconColor: 'text-[#10b981]',
     borderColor: 'border-[#10b981]',
     bgColor: 'bg-[#10b981]/5',
     href: '/courses?category=teens',
@@ -32,6 +34,7 @@ const CARDS_DATA = [
     title: 'English for Adults',
     description: 'Speak confidently in everyday situations.',
     icon: <FiMessageCircle className="h-6 w-6 text-[#f97316]" />,
+    iconColor: 'text-[#f97316]',
     borderColor: 'border-[#f97316]',
     bgColor: 'bg-[#f97316]/5',
     href: '/courses?category=adults',
@@ -40,6 +43,7 @@ const CARDS_DATA = [
     title: 'IELTS Preparation',
     description: 'Achieve your target IELTS score.',
     icon: <FiAward className="h-6 w-6 text-[#ef4444]" />,
+    iconColor: 'text-[#ef4444]',
     borderColor: 'border-[#ef4444]',
     bgColor: 'bg-[#ef4444]/5',
     href: '/courses?category=ielts',
@@ -48,6 +52,7 @@ const CARDS_DATA = [
     title: 'Teacher Training',
     description: 'International teaching methods and strategies.',
     icon: <FiUsers className="h-6 w-6 text-[#a855f7]" />,
+    iconColor: 'text-[#a855f7]',
     borderColor: 'border-[#a855f7]',
     bgColor: 'bg-[#a855f7]/5',
     href: '/courses?category=teacher-training',
@@ -56,6 +61,7 @@ const CARDS_DATA = [
     title: 'Educational Shop',
     description: 'Books, worksheets, courses, teaching resources.',
     icon: <FiShoppingBag className="h-6 w-6 text-[#eab308]" />,
+    iconColor: 'text-[#eab308]',
     borderColor: 'border-[#eab308]',
     bgColor: 'bg-[#eab308]/5',
     href: '/courses',
@@ -147,7 +153,7 @@ export default function Categories({ categories }: CategoriesProps) {
 
         {/* ── Category Cards Grid ── */}
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 pt-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-8"
           variants={gridVariants}
           initial="hidden"
           whileInView="visible"
@@ -165,7 +171,12 @@ export default function Categories({ categories }: CategoriesProps) {
               >
                 {/* Top Middle Icon Badge overlapping the border */}
                 <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border-2 ${card.borderColor} p-2.5 rounded-lg shadow-xs flex items-center justify-center transition-transform duration-300 scale-110 group-hover:scale-115 z-20`}>
-                  {card.icon}
+                  <span className="block group-hover:hidden transition-all duration-300">
+                    {card.icon}
+                  </span>
+                  <span className={`hidden group-hover:block ${card.iconColor} transition-all duration-300`}>
+                    <FiCheck className="h-6 w-6" />
+                  </span>
                 </div>
 
                 {/* Content */}

@@ -64,7 +64,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
         title: 'Cover Image Uploaded',
         timer: 1300,
         showConfirmButton: false,
-        background: '#121829',
+        background: '#ffffff',
         color: '#1a1a1a',
       })
     } catch (err: any) {
@@ -72,7 +72,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
         icon: 'error',
         title: 'Upload Failed',
         text: err.message,
-        background: '#121829',
+        background: '#ffffff',
         color: '#1a1a1a',
       })
     } finally {
@@ -88,11 +88,11 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
 
   async function handleSave() {
     if (!title) {
-      Swal.fire({ icon: 'warning', title: 'Blog Title Required', background: '#121829', color: '#1a1a1a' })
+      Swal.fire({ icon: 'warning', title: 'Blog Title Required', background: '#ffffff', color: '#1a1a1a' })
       return
     }
     if (!content || content.trim() === '<p></p>' || content.trim() === '') {
-      Swal.fire({ icon: 'warning', title: 'Blog Content Required', background: '#121829', color: '#1a1a1a' })
+      Swal.fire({ icon: 'warning', title: 'Blog Content Required', background: '#ffffff', color: '#1a1a1a' })
       return
     }
     
@@ -137,7 +137,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
         text: initialBlog?.id ? 'The changes have been saved.' : 'The article is now live on the platform.',
         timer: 1800,
         showConfirmButton: false,
-        background: '#121829',
+        background: '#ffffff',
         color: '#1a1a1a',
       })
       
@@ -148,7 +148,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
         icon: 'error',
         title: 'Failed to Save',
         text: err.message,
-        background: '#121829',
+        background: '#ffffff',
         color: '#1a1a1a',
       })
     } finally {
@@ -166,7 +166,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
             <button 
               type="button"
               onClick={() => router.push('/admin/blogs')}
-              className="h-10 w-10 border border-slate-200 hover:border-slate-300 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-800 bg-[#0e1422] transition-colors cursor-pointer"
+              className="h-10 w-10 border border-slate-200 hover:border-slate-300 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-800 bg-white transition-colors cursor-pointer"
             >
               <FiArrowLeft className="h-5 w-5" />
             </button>
@@ -195,7 +195,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
         <div className="lg:col-span-8 space-y-6">
           
           {/* Article Info Section */}
-          <div className="bg-[#121829] border border-slate-200/60 rounded-lg p-6 space-y-5">
+          <div className="bg-white border border-slate-200/60 rounded-lg p-6 space-y-5">
             <div className="flex flex-col gap-2">
               <label className="text-base font-bold text-slate-600">Article Title <span className="text-red-400">*</span></label>
               <input 
@@ -223,7 +223,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
         <div className="lg:col-span-4 space-y-6">
           
           {/* Cover image card */}
-          <div className="bg-[#121829] border border-slate-200/60 rounded-lg p-6 space-y-4">
+          <div className="bg-white border border-slate-200/60 rounded-lg p-6 space-y-4">
             <h3 className="text-base font-bold text-slate-800 uppercase tracking-wider pb-2 border-b border-slate-200/50">Cover Image</h3>
             
             {coverImageUrl ? (
@@ -278,7 +278,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
           </div>
 
           {/* Tags settings card */}
-          <div className="bg-[#121829] border border-slate-200/60 rounded-lg p-6 space-y-4">
+          <div className="bg-white border border-slate-200/60 rounded-lg p-6 space-y-4">
             <h3 className="text-base font-bold text-slate-800 uppercase tracking-wider pb-2 border-b border-slate-200/50">Metadata & Tags</h3>
             
             <div className="flex flex-col gap-2">
@@ -297,7 +297,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
           </div>
 
           {/* SEO Metadata Card (Moved to the Right Sidebar) */}
-          <div className="bg-[#121829] border border-slate-200/60 rounded-lg p-6 space-y-5">
+          <div className="bg-white border border-slate-200/60 rounded-lg p-6 space-y-5">
             <div className="flex items-center gap-2 pb-2 border-b border-slate-200/50">
               <FiInfo className="text-[#615fff] h-5 w-5" />
               <h3 className="text-base font-bold text-slate-800 uppercase tracking-wider">Search Engine Optimization (SEO)</h3>

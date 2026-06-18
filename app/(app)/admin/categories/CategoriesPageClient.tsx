@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { useState } from 'react'
 import Link from 'next/link'
@@ -25,8 +25,8 @@ export default function CategoriesPageClient({
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#ef4444',
-      background: '#121829',
-      color: '#fff',
+      background: '#ffffff',
+      color: '#1a1a1a',
     })
     if (!result.isConfirmed) return
 
@@ -44,8 +44,8 @@ export default function CategoriesPageClient({
           text: 'Category successfully deleted.',
           timer: 1200,
           showConfirmButton: false,
-          background: '#121829',
-          color: '#fff',
+          background: '#ffffff',
+          color: '#1a1a1a',
         })
       }
     } catch {
@@ -53,8 +53,8 @@ export default function CategoriesPageClient({
         icon: 'error',
         title: 'Error',
         text: 'Failed to delete category.',
-        background: '#121829',
-        color: '#fff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
     }
   }
@@ -78,10 +78,10 @@ export default function CategoriesPageClient({
       </div>
 
       {/* Categories Table */}
-      <div className="bg-[#121829] border border-slate-200 rounded-lg overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
         {categories.length === 0 ? (
           <div className="p-16 text-center space-y-4">
-            <FiBookmark className="h-10 w-10 text-zinc-700 mx-auto" />
+            <FiBookmark className="h-10 w-10 text-slate-300 mx-auto" />
             <p className="text-base font-semibold text-slate-400">
               No categories yet. Create your first category above.
             </p>
@@ -90,18 +90,18 @@ export default function CategoriesPageClient({
           <div className="overflow-x-auto">
             <table className="w-full text-left text-base">
               <thead>
-                <tr className="bg-[#0b0e17] border-b border-slate-200/40 text-slate-500 font-bold text-sm uppercase tracking-wider">
+                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold text-sm uppercase tracking-wider">
                   <th className="px-6 py-4">Category Name</th>
                   <th className="px-6 py-4">URL Slug</th>
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200/40">
+              <tbody className="divide-y divide-slate-100">
                 {categories.map((cat) => (
-                  <tr key={cat.id} className="hover:bg-[#152347]/10 transition-colors">
+                  <tr key={cat.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-lg bg-[#615fff]/15 border border-[#615fff]/20 flex items-center justify-center shrink-0">
+                        <div className="h-9 w-9 rounded-lg bg-[#615fff]/10 border border-[#615fff]/20 flex items-center justify-center shrink-0">
                           <FiBookmark className="h-4 w-4 text-[#615fff]" />
                         </div>
                         <span className="font-bold text-slate-800 text-base">{cat.name}</span>
@@ -116,15 +116,15 @@ export default function CategoriesPageClient({
                       <div className="flex items-center justify-end gap-2.5">
                         <Link
                           href={`/admin/categories/${cat.id}/edit`}
-                          className="p-2 rounded bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/20 hover:border-[#615fff] text-[#615fff] hover:text-slate-800 transition-all cursor-pointer"
+                          className="p-2 rounded-lg bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/20 hover:border-[#615fff] text-[#615fff] hover:text-white transition-all cursor-pointer"
                         >
-                          <FiEdit className="h-4.5 w-4.5" />
+                          <FiEdit className="h-4 w-4" />
                         </Link>
                         <button
                           onClick={() => handleDelete(cat)}
-                          className="p-2 rounded bg-rose-500/10 hover:bg-rose-500 border border-rose-500/20 text-rose-400 hover:text-rose-600 transition-all cursor-pointer"
+                          className="p-2 rounded-lg bg-rose-50 hover:bg-rose-500 border border-rose-200 text-rose-500 hover:text-white transition-all cursor-pointer"
                         >
-                          <FiTrash2 className="h-4.5 w-4.5" />
+                          <FiTrash2 className="h-4 w-4" />
                         </button>
                       </div>
                     </td>

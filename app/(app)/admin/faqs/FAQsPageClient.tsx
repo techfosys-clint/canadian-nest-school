@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { useState } from 'react'
 import Link from 'next/link'
@@ -23,8 +23,8 @@ export default function FAQsPageClient({ initialFaqs }: { initialFaqs: FAQItem[]
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#ef4444',
-      background: '#121829',
-      color: '#fff',
+      background: '#ffffff',
+      color: '#1a1a1a',
     })
     if (!result.isConfirmed) return
 
@@ -42,8 +42,8 @@ export default function FAQsPageClient({ initialFaqs }: { initialFaqs: FAQItem[]
           text: 'FAQ successfully deleted.',
           timer: 1200,
           showConfirmButton: false,
-          background: '#121829',
-          color: '#fff',
+          background: '#ffffff',
+          color: '#1a1a1a',
         })
       }
     } catch {
@@ -51,8 +51,8 @@ export default function FAQsPageClient({ initialFaqs }: { initialFaqs: FAQItem[]
         icon: 'error',
         title: 'Error',
         text: 'Failed to delete FAQ.',
-        background: '#121829',
-        color: '#fff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
     }
   }
@@ -95,8 +95,8 @@ export default function FAQsPageClient({ initialFaqs }: { initialFaqs: FAQItem[]
       {/* FAQs List */}
       <div className="space-y-3">
         {faqs.length === 0 ? (
-          <div className="bg-[#121829] border border-slate-200 rounded-lg p-16 text-center space-y-4">
-            <FiHelpCircle className="h-10 w-10 text-zinc-700 mx-auto" />
+          <div className="bg-white border border-slate-200 rounded-lg p-16 text-center space-y-4 shadow-sm">
+            <FiHelpCircle className="h-10 w-10 text-slate-300 mx-auto" />
             <p className="text-base font-semibold text-slate-400">No FAQs created yet.</p>
           </div>
         ) : (
@@ -105,13 +105,13 @@ export default function FAQsPageClient({ initialFaqs }: { initialFaqs: FAQItem[]
             .map((f) => (
               <div
                 key={f.id}
-                className={`bg-[#121829] border rounded-lg p-5 space-y-3 transition-colors ${
-                  f.isActive ? 'border-slate-200' : 'border-slate-200/40 opacity-60'
+                className={`bg-white border rounded-lg p-5 space-y-3 transition-colors shadow-sm ${
+                  f.isActive ? 'border-slate-200' : 'border-slate-200 opacity-60'
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <span className="h-7 w-7 rounded bg-[#615fff]/15 border border-[#615fff]/20 flex items-center justify-center font-bold text-[#615fff] text-sm shrink-0 mt-0.5">
+                    <span className="h-7 w-7 rounded-lg bg-[#615fff]/10 border border-[#615fff]/20 flex items-center justify-center font-bold text-[#615fff] text-sm shrink-0 mt-0.5">
                       {f.order}
                     </span>
                     <div className="min-w-0">
@@ -125,29 +125,29 @@ export default function FAQsPageClient({ initialFaqs }: { initialFaqs: FAQItem[]
                     <button
                       onClick={() => toggleActive(f)}
                       title={f.isActive ? 'Deactivate' : 'Activate'}
-                      className={`p-2 rounded border transition-all cursor-pointer ${
+                      className={`p-2 rounded-lg border transition-all cursor-pointer ${
                         f.isActive
-                          ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500 hover:text-slate-800'
-                          : 'text-slate-400 bg-slate-100/50 border-slate-300 hover:bg-zinc-700 hover:text-slate-800'
+                          ? 'text-emerald-500 bg-emerald-50 border-emerald-200 hover:bg-emerald-500 hover:text-white'
+                          : 'text-slate-400 bg-slate-100 border-slate-200 hover:bg-slate-200 hover:text-slate-600'
                       }`}
                     >
                       {f.isActive ? (
-                        <FiToggleRight className="h-4.5 w-4.5" />
+                        <FiToggleRight className="h-4 w-4" />
                       ) : (
-                        <FiToggleLeft className="h-4.5 w-4.5" />
+                        <FiToggleLeft className="h-4 w-4" />
                       )}
                     </button>
                     <Link
                       href={`/admin/faqs/${f.id}/edit`}
-                      className="p-2 rounded bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/20 hover:border-[#615fff] text-[#615fff] hover:text-slate-800 transition-all cursor-pointer"
+                      className="p-2 rounded-lg bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/20 hover:border-[#615fff] text-[#615fff] hover:text-white transition-all cursor-pointer"
                     >
-                      <FiEdit className="h-4.5 w-4.5" />
+                      <FiEdit className="h-4 w-4" />
                     </Link>
                     <button
                       onClick={() => handleDelete(f)}
-                      className="p-2 rounded bg-rose-500/10 hover:bg-rose-500 border border-rose-500/20 text-rose-400 hover:text-rose-600 transition-all cursor-pointer"
+                      className="p-2 rounded-lg bg-rose-50 hover:bg-rose-500 border border-rose-200 text-rose-500 hover:text-white transition-all cursor-pointer"
                     >
-                      <FiTrash2 className="h-4.5 w-4.5" />
+                      <FiTrash2 className="h-4 w-4" />
                     </button>
                   </div>
                 </div>

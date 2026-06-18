@@ -151,7 +151,7 @@ export default function MediaUploadClient() {
     >
       {/* Drag overlay */}
       {dragOver && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0e1422]/92 border-4 border-dashed border-[#615fff] pointer-events-none">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/92 border-4 border-dashed border-[#615fff] pointer-events-none">
           <div className="flex flex-col items-center gap-5 text-center">
             <div className="h-28 w-28 rounded-full bg-[#615fff]/20 flex items-center justify-center animate-pulse">
               <FiUploadCloud className="h-14 w-14 text-[#615fff]" />
@@ -167,7 +167,7 @@ export default function MediaUploadClient() {
         <div className="flex items-center gap-4">
           <Link
             href="/admin/media"
-            className="flex items-center justify-center h-10 w-10 rounded-lg bg-slate-100 hover:bg-zinc-700 border border-slate-300 text-slate-500 hover:text-slate-800 transition-all shrink-0"
+            className="flex items-center justify-center h-10 w-10 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-500 hover:text-slate-800 transition-all shrink-0"
           >
             <FiArrowLeft className="h-5 w-5" />
           </Link>
@@ -184,7 +184,7 @@ export default function MediaUploadClient() {
           className={`flex flex-col items-center justify-center gap-5 w-full min-h-60 rounded-lg border-2 border-dashed transition-all cursor-pointer ${
             dragOver
               ? 'border-[#615fff] bg-[#615fff]/8'
-              : 'border-slate-300 bg-[#121829] hover:border-[#615fff]/50 hover:bg-[#121829]'
+              : 'border-slate-300 bg-white hover:border-[#615fff]/50 hover:bg-white'
           }`}
         >
           <input
@@ -211,7 +211,7 @@ export default function MediaUploadClient() {
 
         {/* File Queue */}
         {hasEntries && (
-          <div className="bg-[#121829] border border-slate-200 rounded-lg overflow-hidden">
+          <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
             {/* Queue header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200">
               <div className="flex items-center gap-3">
@@ -251,7 +251,7 @@ export default function MediaUploadClient() {
                   }`}
                 >
                   {/* Thumbnail or icon */}
-                  <div className="h-12 w-12 rounded-lg bg-[#0e1422] border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                  <div className="h-12 w-12 rounded-lg bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
                     {entry.preview ? (
                       <img src={entry.preview} alt="" className="w-full h-full object-cover" />
                     ) : (
@@ -312,7 +312,7 @@ export default function MediaUploadClient() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link
             href="/admin/media"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-slate-100 hover:bg-zinc-700 border border-slate-300 text-slate-600 hover:text-slate-800 font-bold text-base transition-all"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-600 hover:text-slate-800 font-bold text-base transition-all"
           >
             <FiArrowLeft className="h-4 w-4" /> Back to Media Library
           </Link>

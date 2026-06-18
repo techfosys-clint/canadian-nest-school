@@ -33,8 +33,8 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
         icon: 'warning',
         title: 'Validation Error',
         text: 'Question and answer are required.',
-        background: '#121829',
-        color: '#fff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
       return
     }
@@ -60,8 +60,8 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
         text: isEditMode ? 'FAQ has been updated successfully.' : 'FAQ has been created successfully.',
         timer: 1200,
         showConfirmButton: false,
-        background: '#121829',
-        color: '#fff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
 
       router.push('/admin/faqs')
@@ -71,8 +71,8 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
         icon: 'error',
         title: 'Error',
         text: err.message || 'Failed to save FAQ.',
-        background: '#121829',
-        color: '#fff',
+        background: '#ffffff',
+        color: '#1a1a1a',
       })
     } finally {
       setSaving(false)
@@ -105,7 +105,7 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
         
         {/* Main Content */}
         <div className="lg:col-span-8 space-y-6">
-          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-5">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-5">
             <h2 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-3">FAQ Content</h2>
 
             {/* Question */}
@@ -151,13 +151,13 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
 
         {/* Sidebar settings */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-4">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4">
             <h3 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-2.5">Settings</h3>
 
             <label className="flex items-center gap-3 cursor-pointer select-none">
               <div
                 className={`relative w-12 h-6 rounded-full transition-colors ${
-                  isActive ? 'bg-[#615fff]' : 'bg-zinc-700'
+                  isActive ? 'bg-[#615fff]' : 'bg-slate-200'
                 }`}
                 onClick={() => setIsActive(!isActive)}
               >
@@ -171,7 +171,7 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
             </label>
           </div>
 
-          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6">
+          <div className="bg-white border border-slate-200 rounded-lg p-6">
             <button
               type="submit"
               disabled={saving}

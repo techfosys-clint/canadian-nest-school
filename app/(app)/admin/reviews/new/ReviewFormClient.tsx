@@ -148,7 +148,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
             <button
               type="button"
               onClick={() => router.push('/admin/reviews')}
-              className="h-10 w-10 border-none rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-800 bg-white hover:bg-[#242427] transition-all cursor-pointer shadow-md"
+              className="h-10 w-10 border-none rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-800 bg-white hover:bg-slate-100 transition-all cursor-pointer shadow-md"
             >
               <FiArrowLeft className="h-5 w-5" />
             </button>
@@ -161,7 +161,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
         <button
           type="button"
           onClick={() => router.push('/admin/reviews')}
-          className="px-5 py-2.5 bg-white hover:bg-[#242427] border-none text-slate-600 hover:text-slate-800 rounded-lg text-base font-bold transition-all cursor-pointer shadow-md"
+          className="px-5 py-2.5 bg-white hover:bg-slate-100 border-none text-slate-600 hover:text-slate-800 rounded-lg text-base font-bold transition-all cursor-pointer shadow-md"
         >
           Cancel & Back
         </button>
@@ -172,7 +172,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
         
         {/* Left Column: Form parameters */}
         <div className="lg:col-span-8 space-y-6">
-          <div className="bg-white border-none rounded-lg p-6 md:p-8 space-y-6 shadow-xl">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 md:p-8 space-y-6 shadow-xl">
             <h2 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-200/60 pb-3">Review Parameters</h2>
 
             {/* Course Selector - Borderless Input */}
@@ -182,7 +182,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
                 required
                 value={courseId}
                 onChange={(e) => setCourseId(e.target.value)}
-                className="bg-[#242427] border-none text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none w-full transition-all focus:ring-2 focus:ring-[#615fff]/40 cursor-pointer shadow-sm"
+                className="bg-slate-50 border border-slate-200 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none w-full transition-all focus:ring-2 focus:ring-[#615fff]/40 cursor-pointer shadow-sm"
               >
                 <option value="">-- Select Target Course --</option>
                 {courses.map((c) => (
@@ -202,14 +202,14 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
                     type="checkbox"
                     checked={isCustomStudent}
                     onChange={(e) => setIsCustomStudent(e.target.checked)}
-                    className="rounded border-none bg-[#242427] text-[#615fff] focus:ring-0 h-4.5 w-4.5"
+                    className="rounded border-none bg-slate-100 text-[#615fff] focus:ring-0 h-4.5 w-4.5"
                   />
                   <span className="text-base font-semibold text-slate-500">Add Custom Student on the fly</span>
                 </label>
               </div>
 
               {isCustomStudent ? (
-                <div className="space-y-5 p-5 md:p-6 bg-[#242427] border-none rounded-lg animate-fadeIn shadow-md">
+                <div className="space-y-5 p-5 md:p-6 bg-slate-50 border border-slate-200 rounded-lg animate-fadeIn">
                   
                   {/* Custom student details */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -252,7 +252,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <label className={`flex items-center gap-1.5 px-4.5 py-2 rounded-lg bg-slate-100 hover:bg-zinc-700 text-slate-700 font-bold text-sm cursor-pointer transition-colors shadow-sm ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                        <label className={`flex items-center gap-1.5 px-4.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm cursor-pointer transition-colors shadow-sm ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
                           <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                           <FiUploadCloud className="h-4.5 w-4.5" />
                           <span>{uploading ? 'Uploading...' : 'Upload Image'}</span>
@@ -287,7 +287,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
                   required
                   value={selectedStudentId}
                   onChange={(e) => setSelectedStudentId(e.target.value)}
-                  className="bg-[#242427] border-none text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none w-full transition-all focus:ring-2 focus:ring-[#615fff]/40 cursor-pointer shadow-sm"
+                  className="bg-slate-50 border border-slate-200 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none w-full transition-all focus:ring-2 focus:ring-[#615fff]/40 cursor-pointer shadow-sm"
                 >
                   <option value="">-- Choose Existing Student Profile --</option>
                   {students.map((s) => (
@@ -302,7 +302,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
             {/* Star Rating Picker - Borderless */}
             <div className="flex flex-col gap-2 pt-2">
               <label className="text-base font-bold text-slate-600">Rating Tier *</label>
-              <div className="flex items-center gap-1 bg-[#242427] p-3 rounded-lg w-fit shadow-inner">
+              <div className="flex items-center gap-1 bg-slate-100 p-3 rounded-lg w-fit shadow-inner">
                 {[1, 2, 3, 4, 5].map((star) => {
                   const isFilled = star <= (hoveredStar ?? rating)
                   return (
@@ -337,7 +337,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Write student testimonial / experience feedback..."
-                className="bg-[#242427] border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg p-4 text-base font-semibold outline-none w-full transition-all resize-none shadow-sm"
+                className="bg-slate-100 border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg p-4 text-base font-semibold outline-none w-full transition-all resize-none shadow-sm"
               />
             </div>
 
@@ -348,7 +348,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
         <div className="lg:col-span-4 space-y-6">
           
           {/* Moderation Card - Borderless */}
-          <div className="bg-white border-none rounded-lg p-6 space-y-4 shadow-xl">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4 shadow-xl">
             <h3 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-200/60 pb-2.5">Visibility Status</h3>
             
             <div className="flex flex-col gap-2">
@@ -356,7 +356,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as any)}
-                className="bg-[#242427] border-none text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-all focus:ring-2 focus:ring-[#615fff]/40 cursor-pointer shadow-sm"
+                className="bg-slate-50 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-all focus:ring-2 focus:ring-[#615fff]/40 cursor-pointer shadow-sm"
               >
                 <option value="approved">Approved & Live (Instant Publish)</option>
                 <option value="pending">Pending Admin Review</option>
@@ -365,7 +365,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
           </div>
 
           {/* Action button - Borderless */}
-          <div className="bg-white border-none rounded-lg p-6 shadow-xl">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-xl">
             <button
               type="submit"
               disabled={isSubmitting}

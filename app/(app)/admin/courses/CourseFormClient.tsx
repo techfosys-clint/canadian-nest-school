@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
@@ -93,7 +93,7 @@ export default function CourseFormClient({
         icon: 'warning',
         title: 'Duplicate Module',
         text: 'This module name already exists.',
-        background: '#121829',
+        background: '#ffffff',
         color: '#1a1a1a',
       })
       return
@@ -106,10 +106,11 @@ export default function CourseFormClient({
     setModules(modules.filter((_, idx) => idx !== indexToRemove))
   }
 
-  const [studyMaterials, setStudyMaterials] = useState<Array<{ title: string; url: string; materialType: 'pdf' | 'epub' | 'link' | 'other' }>>(
+  const [studyMaterials, setStudyMaterials] = useState<Array<{ title: string; url: string; materialType: 'pdf' | 'epub' | 'link' | 'other'; coverImage?: string }>>(
     initialData?.studyMaterials || []
   )
   const [uploadingStates, setUploadingStates] = useState<Record<number, boolean>>({})
+  const [uploadingCoverStates, setUploadingCoverStates] = useState<Record<number, boolean>>({})
 
   // SEO accordion
   const [metaTitle, setMetaTitle] = useState(initialData?.seo?.metaTitle || '')
@@ -241,7 +242,7 @@ export default function CourseFormClient({
   }
 
   const handleAddStudyMaterial = () => {
-    setStudyMaterials([...studyMaterials, { title: '', url: '', materialType: 'pdf' }])
+    setStudyMaterials([...studyMaterials, { title: '', url: '', materialType: 'pdf', coverImage: '' }])
   }
 
   const handleStudyMaterialChange = (index: number, field: 'title' | 'url' | 'materialType', val: string) => {
@@ -252,6 +253,54 @@ export default function CourseFormClient({
 
   const handleRemoveStudyMaterial = (index: number) => {
     setStudyMaterials(studyMaterials.filter((_, i) => i !== index))
+  }
+
+  const handleStudyMaterialCoverUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingCoverStates(prev => ({ ...prev, [index]: true }))
+
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('alt', `Cover for ${studyMaterials[index]?.title || 'Study Material'}`)
+
+    try {
+      const res = await fetch('/api/admin/media/upload', {
+        method: 'POST',
+        body: formData,
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to upload cover image.')
+      }
+
+      const updated = [...studyMaterials]
+      updated[index] = { ...updated[index], coverImage: data.media.url }
+      setStudyMaterials(updated)
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Cover Uploaded',
+        text: 'Cover image saved successfully.',
+        timer: 1200,
+        showConfirmButton: false,
+        background: '#ffffff',
+        color: '#1a1a1a',
+      })
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Upload Failed',
+        text: err.message || 'Could not upload cover image.',
+        background: '#ffffff',
+        color: '#1a1a1a',
+      })
+    } finally {
+      setUploadingCoverStates(prev => ({ ...prev, [index]: false }))
+      e.target.value = ''
+    }
   }
 
   const handleStudyMaterialUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -300,7 +349,7 @@ export default function CourseFormClient({
         text: `${file.name} uploaded successfully.`,
         timer: 1500,
         showConfirmButton: false,
-        background: '#121829',
+        background: '#ffffff',
         color: '#1a1a1a',
       })
     } catch (err: any) {
@@ -308,7 +357,7 @@ export default function CourseFormClient({
         icon: 'error',
         title: 'Upload Failed',
         text: err.message || 'Could not upload file.',
-        background: '#121829',
+        background: '#ffffff',
         color: '#1a1a1a',
       })
     } finally {
@@ -334,9 +383,9 @@ export default function CourseFormClient({
       setThumbnailId(data.media.id)
       setThumbnailUrl(data.media.url)
       setThumbnailAlt(data.media.alt)
-      Swal.fire({ icon: 'success', title: 'Image Uploaded', text: 'Cover photo processed.', timer: 1500, showConfirmButton: false, background: '#121829', color: '#1a1a1a' })
+      Swal.fire({ icon: 'success', title: 'Image Uploaded', text: 'Cover photo processed.', timer: 1500, showConfirmButton: false, background: '#ffffff', color: '#1a1a1a' })
     } catch (err: any) {
-      Swal.fire({ icon: 'error', title: 'Upload Failed', text: err.message || 'Could not upload media.', background: '#121829', color: '#1a1a1a' })
+      Swal.fire({ icon: 'error', title: 'Upload Failed', text: err.message || 'Could not upload media.', background: '#ffffff', color: '#1a1a1a' })
     } finally {
       setUploadingImage(false)
       if (thumbnailFileRef.current) thumbnailFileRef.current.value = ''
@@ -359,7 +408,7 @@ export default function CourseFormClient({
         icon: 'warning',
         title: 'Validation Error',
         text: 'Please complete all required fields, including the Cover Image thumbnail.',
-        background: '#121829',
+        background: '#ffffff',
         color: '#1a1a1a',
       })
       return
@@ -370,7 +419,7 @@ export default function CourseFormClient({
         icon: 'error',
         title: 'Invalid Slug',
         text: 'This course URL slug is already taken. Please provide a unique one.',
-        background: '#121829',
+        background: '#ffffff',
         color: '#1a1a1a',
       })
       return
@@ -422,7 +471,7 @@ export default function CourseFormClient({
         text: isEditMode ? 'Syllabus parameters successfully edited.' : 'New curriculum published.',
         timer: 1500,
         showConfirmButton: false,
-        background: '#121829',
+        background: '#ffffff',
         color: '#1a1a1a',
       })
 
@@ -433,7 +482,7 @@ export default function CourseFormClient({
         icon: 'error',
         title: 'Operation Failed',
         text: err.message || 'Could not complete the write request.',
-        background: '#121829',
+        background: '#ffffff',
         color: '#1a1a1a',
       })
     } finally {
@@ -470,7 +519,7 @@ export default function CourseFormClient({
         <div className="lg:col-span-8 space-y-6">
           
           {/* Main info card */}
-          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-5">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-5">
             <h2 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-3">Course Parameters</h2>
 
             {/* Title field */}
@@ -537,7 +586,7 @@ export default function CourseFormClient({
           </div>
 
           {/* Outcomes list card */}
-          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-4">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h2 className="text-xl font-bold text-slate-800 tracking-tight">What You Will Learn</h2>
               <button
@@ -579,7 +628,7 @@ export default function CourseFormClient({
           </div>
 
           {/* Requirements list card */}
-          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-4">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h2 className="text-xl font-bold text-slate-800 tracking-tight">Syllabus Requirements</h2>
               <button
@@ -621,7 +670,7 @@ export default function CourseFormClient({
           </div>
 
           {/* Study Materials list card */}
-          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-6">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-6">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
                 <h2 className="text-xl font-bold text-slate-800 tracking-tight">Study Materials & eBooks</h2>
@@ -668,7 +717,7 @@ export default function CourseFormClient({
                           value={item.title}
                           onChange={(e) => handleStudyMaterialChange(idx, 'title', e.target.value)}
                           placeholder="e.g. JavaScript Cheat Sheet"
-                          className="bg-[#0e1422] border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                          className="bg-white border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                         />
                       </div>
 
@@ -678,13 +727,61 @@ export default function CourseFormClient({
                         <select
                           value={item.materialType}
                           onChange={(e) => handleStudyMaterialChange(idx, 'materialType', e.target.value)}
-                          className="bg-[#0e1422] border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
+                          className="bg-white border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
                         >
                           <option value="pdf">PDF Document</option>
                           <option value="epub">eBook (ePub)</option>
                           <option value="link">External Link / Website</option>
                           <option value="other">Other Resource</option>
                         </select>
+                      </div>
+                    </div>
+
+                    {/* Cover Image Upload */}
+                    <div className="flex flex-col gap-2">
+                      <label className="text-base font-bold text-slate-600">Material Cover Image <span className="text-slate-400 font-semibold">(shown in student portal)</span></label>
+                      <div className="flex items-center gap-4">
+                        {/* Preview */}
+                        <div className="h-20 w-32 rounded-lg border border-slate-200 bg-slate-50 overflow-hidden flex items-center justify-center shrink-0">
+                          {uploadingCoverStates[idx] ? (
+                            <div className="h-5 w-5 border-2 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+                          ) : item.coverImage ? (
+                            <img src={item.coverImage} alt="Cover" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="flex flex-col items-center gap-1 text-slate-400">
+                              <FiImage className="h-6 w-6" />
+                              <span className="text-xs font-semibold">No cover</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Upload / Remove buttons */}
+                        <div className="flex flex-col gap-2">
+                          <label className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#615fff]/10 hover:bg-[#615fff]/20 border border-[#615fff]/20 text-[#615fff] font-bold text-sm cursor-pointer transition-all ${uploadingCoverStates[idx] ? 'opacity-50 pointer-events-none' : ''}`}>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleStudyMaterialCoverUpload(idx, e)}
+                              className="hidden"
+                            />
+                            <FiUploadCloud className="h-4 w-4" />
+                            {uploadingCoverStates[idx] ? 'Uploading...' : item.coverImage ? 'Change Cover' : 'Upload Cover'}
+                          </label>
+                          {item.coverImage && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updated = [...studyMaterials]
+                                updated[idx] = { ...updated[idx], coverImage: '' }
+                                setStudyMaterials(updated)
+                              }}
+                              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-500 font-bold text-sm cursor-pointer transition-all"
+                            >
+                              <FiTrash2 className="h-4 w-4" /> Remove
+                            </button>
+                          )}
+                          <p className="text-xs font-semibold text-slate-400">JPG, PNG, WEBP — 4:3 ratio recommended</p>
+                        </div>
                       </div>
                     </div>
 
@@ -698,7 +795,7 @@ export default function CourseFormClient({
                           value={item.url}
                           onChange={(e) => handleStudyMaterialChange(idx, 'url', e.target.value)}
                           placeholder="https://example.com/material or upload below"
-                          className="bg-[#0e1422] border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
+                          className="bg-white border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
                         />
                         <div className="relative shrink-0">
                           <input
@@ -731,7 +828,7 @@ export default function CourseFormClient({
           </div>
 
           {/* Course Modules card */}
-          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-4">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4">
             <h2 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-3">Course Modules</h2>
             <div className="flex gap-3">
               <input
@@ -784,7 +881,7 @@ export default function CourseFormClient({
 
           {/* ── Course Curriculum (edit mode only) ────────────────────── */}
           {isEditMode && (
-            <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-4">
+            <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h2 className="text-xl font-bold text-slate-800 tracking-tight">Course Curriculum</h2>
                 <Link
@@ -813,7 +910,7 @@ export default function CourseFormClient({
               ) : (
                 <div className="space-y-2">
                   {lessons.map((lesson, idx) => (
-                    <div key={lesson.id} className="flex items-center gap-3 bg-[#0e1422] border border-slate-200 rounded-lg px-4 py-3 hover:border-slate-300 transition-colors">
+                    <div key={lesson.id} className="flex items-center gap-3 bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-slate-300 transition-colors">
                       <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-slate-100 text-slate-500 font-bold text-sm">
                         {lesson.order}
                       </div>
@@ -862,7 +959,7 @@ export default function CourseFormClient({
         <div className="lg:col-span-4 space-y-6">
           
           {/* Thumbnail media box */}
-          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-4">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4">
             <h3 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-2.5">Course Thumbnail Cover</h3>
 
             {thumbnailUrl ? (
@@ -952,7 +1049,7 @@ export default function CourseFormClient({
 
 
           {/* Pricing & Status controls */}
-          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-4">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4">
             <h3 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-2.5">Finance & Status</h3>
 
             {/* Price field */}
@@ -984,7 +1081,7 @@ export default function CourseFormClient({
           </div>
 
           {/* Categories & Classifications */}
-          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6 space-y-4">
+          <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4">
             <h3 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-2.5">Academic Scope</h3>
 
             {/* Categories Selector */}
@@ -1061,7 +1158,7 @@ export default function CourseFormClient({
           </div>
 
           {/* SEO Accordion block */}
-          <div className="bg-[#121829] border border-slate-200 rounded-lg overflow-hidden">
+          <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
             <button
               type="button"
               onClick={() => setSeoOpen(!seoOpen)}
@@ -1072,7 +1169,7 @@ export default function CourseFormClient({
             </button>
 
             {seoOpen && (
-              <div className="p-6 border-t border-slate-100 space-y-4.5 bg-[#0e1322]">
+              <div className="p-6 border-t border-slate-100 space-y-4.5 bg-slate-50">
                 <div className="flex flex-col gap-2">
                   <label className="text-base font-bold text-slate-600">SEO Meta Title</label>
                   <input
@@ -1110,7 +1207,7 @@ export default function CourseFormClient({
           </div>
 
           {/* Submit Action block */}
-          <div className="bg-[#121829] border border-slate-200 rounded-lg p-6">
+          <div className="bg-white border border-slate-200 rounded-lg p-6">
             <button
               type="submit"
               disabled={isSubmitting}

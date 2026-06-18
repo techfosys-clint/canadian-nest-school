@@ -85,7 +85,7 @@ export default function CouponFormClient({ initialCoupon }: CouponFormClientProp
           text: `Coupon code "${payload.code}" was successfully saved.`,
           timer: 1500,
           showConfirmButton: false,
-          background: '#121829',
+          background: '#ffffff',
           color: '#1a1a1a',
         })
         router.push('/admin/coupons')
@@ -110,7 +110,7 @@ export default function CouponFormClient({ initialCoupon }: CouponFormClientProp
             <button 
               type="button"
               onClick={() => router.push('/admin/coupons')}
-              className="h-10 w-10 border border-slate-200 hover:border-slate-300 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-800 bg-[#0e1422] transition-colors cursor-pointer"
+              className="h-10 w-10 border border-slate-200 hover:border-slate-300 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-800 bg-white transition-colors cursor-pointer"
             >
               <FiArrowLeft className="h-5 w-5" />
             </button>
@@ -126,7 +126,7 @@ export default function CouponFormClient({ initialCoupon }: CouponFormClientProp
       </div>
 
       {/* Main Form Box */}
-      <div className="bg-[#121829] border border-slate-200/60 rounded-lg p-6 shadow-sm">
+      <div className="bg-white border border-slate-200/60 rounded-lg p-6 shadow-sm">
         
         <form onSubmit={handleSave} className="space-y-5">
           {errorMsg && (
@@ -153,7 +153,7 @@ export default function CouponFormClient({ initialCoupon }: CouponFormClientProp
                 <button
                   type="button"
                   onClick={generateRandomCode}
-                  className="px-5 py-3 rounded-lg border border-slate-200 hover:border-[#615fff]/50 hover:text-slate-800 bg-[#0e1422] text-[#615fff] font-bold text-base transition-all active:scale-[0.98] shrink-0"
+                  className="px-5 py-3 rounded-lg border border-slate-200 hover:border-[#615fff]/50 hover:text-slate-800 bg-white text-[#615fff] font-bold text-base transition-all active:scale-[0.98] shrink-0"
                 >
                   Auto-Generate
                 </button>
@@ -236,7 +236,7 @@ export default function CouponFormClient({ initialCoupon }: CouponFormClientProp
             <button
               type="button"
               onClick={() => router.push('/admin/coupons')}
-              className="px-5 py-2.5 rounded-lg bg-slate-100 hover:bg-zinc-700 text-slate-600 font-bold text-base transition-colors cursor-pointer"
+              className="px-5 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-base transition-colors cursor-pointer"
             >
               Cancel
             </button>

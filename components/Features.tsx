@@ -64,17 +64,17 @@ export default function Features() {
         </div>
 
         {/* Section Grid */}
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-stretch">
           
-          {/* Left Column: Responsive Video Wrapper */}
+          {/* Left Column: Responsive Video Wrapper stretched to match cards stack height on desktop */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-100px' }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="relative w-full aspect-video h-[300px] sm:h-[400px] lg:h-[420px] xl:h-[450px]"
+            className="relative w-full h-[300px] sm:h-[400px] lg:h-auto lg:min-h-full"
           >
-            <div className="w-full h-full relative overflow-hidden rounded-lg shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-zinc-250 bg-zinc-950">
+            <div className="w-full h-full absolute inset-0 overflow-hidden rounded-lg shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-zinc-200/80 bg-zinc-950">
               <iframe
                 src="https://www.youtube-nocookie.com/embed/0qfeLi_pzQU?si=VyI93xJvpKXckiQ3&amp;start=13"
                 title="Canadian Nest Presentation Video"
@@ -82,55 +82,74 @@ export default function Features() {
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerPolicy="strict-origin-when-cross-origin"
                 allowFullScreen
-                className="absolute inset-0 w-full h-full rounded-lg"
+                className="w-full h-full rounded-lg"
               ></iframe>
             </div>
           </motion.div>
 
-          {/* Right Column: Cards Stack */}
-          <div className="flex flex-col gap-6">
-            {featuresList.map((item, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
-                transition={{ duration: 0.6, delay: idx * 0.15, ease: 'easeOut' }}
-                className="p-6 md:p-8 bg-white border border-[#E2E8F0] rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:border-zinc-200 hover:-translate-y-0.5 transition-all duration-300 group flex flex-col md:flex-row gap-5 items-start"
-              >
-                {/* Icon Wrapper (Circular) */}
-                <div
-                  className={`flex-shrink-0 w-12 h-12 rounded-full ${item.iconBg} ${item.iconColor} border ${item.iconBorder} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}
+          {/* Right Column: Cards Stack & Action Buttons */}
+          <div className="flex flex-col gap-6 justify-between">
+            <div className="flex flex-col gap-6">
+              {featuresList.map((item, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-100px' }}
+                  transition={{ duration: 0.6, delay: idx * 0.15, ease: 'easeOut' }}
+                  className="p-6 md:p-8 bg-white border border-[#E2E8F0] rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:border-zinc-200 hover:-translate-y-0.5 transition-all duration-300 group flex flex-col md:flex-row gap-5 items-start"
                 >
-                  {item.icon}
-                </div>
+                  {/* Icon Wrapper (Circular) */}
+                  <div
+                    className={`flex-shrink-0 w-12 h-12 rounded-full ${item.iconBg} ${item.iconColor} border ${item.iconBorder} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}
+                  >
+                    {item.icon}
+                  </div>
 
-                {/* Content */}
-                <div className="space-y-2">
-                  <h3 className="text-lg md:text-xl font-bold text-[#0A163A] transition-colors duration-200">
-                    {item.title}
-                  </h3>
-                  <p className="text-base text-[#4F5B7C] font-normal leading-relaxed">
-                    {item.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+                  {/* Content */}
+                  <div className="space-y-2">
+                    <h3 className="text-lg md:text-xl font-bold text-[#0A163A] transition-colors duration-200">
+                      {item.title}
+                    </h3>
+                    <p className="text-base text-[#4F5B7C] font-normal leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
 
-            {/* Action Buttons Row */}
-            <div className="flex flex-wrap items-center gap-4 pt-4">
+            {/* Small Action Buttons (same as screenshot: Lesson plans, Worksheets, Flashcards, Songs, Readers) */}
+            <div className="flex flex-wrap items-center gap-2.5 pt-2">
               <Link
                 href="/courses"
-                className="px-6 py-3.5 bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base rounded-lg shadow-md shadow-[#615fff]/15 hover:shadow-[#615fff]/25 transition-all duration-300 flex items-center gap-2 group cursor-pointer border-none"
+                className="px-4 py-2 bg-[#d97706] hover:bg-[#c26405] text-white font-bold text-base rounded transition-all duration-200 cursor-pointer border-none shadow-sm"
               >
-                <span>Browse All Courses</span>
-                <FiArrowRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5" />
+                Lesson plans
               </Link>
               <Link
-                href="/about"
-                className="px-6 py-3.5 bg-white hover:bg-zinc-50 text-[#0A163A] font-bold text-base rounded-lg border border-zinc-200/85 transition-all duration-300 flex items-center gap-2 cursor-pointer"
+                href="/courses"
+                className="px-4 py-2 bg-[#d97706] hover:bg-[#c26405] text-white font-bold text-base rounded transition-all duration-200 cursor-pointer border-none shadow-sm"
               >
-                <span>Learn More About Us</span>
+                Worksheets
+              </Link>
+              <Link
+                href="/courses"
+                className="px-4 py-2 bg-[#d97706] hover:bg-[#c26405] text-white font-bold text-base rounded transition-all duration-200 cursor-pointer border-none shadow-sm"
+              >
+                Flashcards
+              </Link>
+              <Link
+                href="/courses"
+                className="px-4 py-2 bg-[#d97706] hover:bg-[#c26405] text-white font-bold text-base rounded transition-all duration-200 cursor-pointer border-none shadow-sm"
+              >
+                Songs
+              </Link>
+              <Link
+                href="/courses"
+                className="px-4 py-2 bg-[#d97706] hover:bg-[#c26405] text-white font-bold text-base rounded transition-all duration-200 cursor-pointer border-none shadow-sm"
+              >
+                Readers
               </Link>
             </div>
           </div>

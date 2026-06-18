@@ -121,16 +121,14 @@ export default function Navbar() {
         <div className="container mx-auto px-6 h-22 flex items-center justify-between">
 
           {/* Left Side: Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <span className="h-9 w-9 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white shadow-lg shadow-[#615fff]/35 transition-transform group-hover:scale-105 duration-300 text-base">
-              C
-            </span>
-            <span className={`text-xl font-bold font-display tracking-tight transition-colors duration-300 ${
-              isScrolled ? 'text-zinc-900' : 'text-[#0A163A]'
-            }`}>
-              Canadian Nest
-            </span>
+          <Link href="/" className="flex items-center group">
+            <img
+              src="/logo.png"
+              alt="Canadian Nest School"
+              className="h-15 w-auto object-contain transition-transform group-hover:scale-102 duration-300"
+            />
           </Link>
+
 
           {/* Middle: Navigation Menu (Desktop) */}
           <nav className="hidden lg:flex items-center gap-8 text-base font-semibold">
@@ -142,7 +140,7 @@ export default function Navbar() {
                   href={link.href}
                   className={`relative pb-1.5 pt-1 transition-colors duration-200 group ${
                     active
-                      ? 'text-[#615fff]'
+                      ? 'text-[#E61C24]'
                       : isScrolled
                         ? 'text-zinc-500 hover:text-zinc-900'
                         : 'text-[#0A163A]/80 hover:text-[#0A163A]'
@@ -150,7 +148,7 @@ export default function Navbar() {
                 >
                   <span>{link.label}</span>
                   <span
-                    className={`absolute bottom-0 left-0 h-[2px] bg-[#615fff] transition-all duration-300 origin-left ${
+                    className={`absolute bottom-0 left-0 h-[2px] bg-[#E61C24] transition-all duration-300 origin-left ${
                       active ? 'w-full' : 'w-0 group-hover:w-full'
                     }`}
                   />
@@ -166,7 +164,7 @@ export default function Navbar() {
             {!loading && user && (
               <Link
                 href={user.role === 'student' ? '/dashboard' : '/admin'}
-                className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#615fff]/10 hover:bg-[#615fff] text-[#615fff] hover:text-white font-bold text-base transition-all duration-300 cursor-pointer gap-2 shadow-sm shadow-[#615fff]/5"
+                className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[#E61C24]/10 hover:bg-[#E61C24] text-[#E61C24] hover:text-white font-bold text-base transition-all duration-300 cursor-pointer gap-2 shadow-sm shadow-[#E61C24]/5"
               >
                 <FiLayout className="h-4.5 w-4.5" />
                 <span className="hidden sm:inline">Dashboard</span>
@@ -183,7 +181,7 @@ export default function Navbar() {
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center gap-1.5 focus:outline-none group cursor-pointer"
                 >
-                  <div className="h-8 w-8 rounded-full bg-zinc-50 flex items-center justify-center text-xs font-bold text-[#615fff] shadow-md shadow-[#615fff]/10 transition-all overflow-hidden">
+                  <div className="h-8 w-8 rounded-full bg-zinc-50 flex items-center justify-center text-xs font-bold text-[#E61C24] shadow-md shadow-[#E61C24]/10 transition-all overflow-hidden">
                     {user.profilePic ? (
                       <img 
                         src={typeof user.profilePic === 'object' && (user.profilePic as any).url ? (user.profilePic as any).url : user.profilePic} 
@@ -225,7 +223,7 @@ export default function Navbar() {
                           <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Signed in as</p>
                           <p className="text-base font-bold text-zinc-800 truncate">{user.name}</p>
                           <p className="text-base text-zinc-550 font-semibold truncate">{user.email}</p>
-                          <span className="inline-block mt-2 px-2.5 py-0.5 rounded-lg bg-[#615fff]/10 text-xs font-bold text-[#615fff] uppercase">
+                          <span className="inline-block mt-2 px-2.5 py-0.5 rounded-lg bg-[#E61C24]/10 text-xs font-bold text-[#E61C24] uppercase">
                             {['admin', 'staff', 'instructor'].includes(user.role) ? 'student' : user.role}
                           </span>
                         </div>
@@ -237,7 +235,7 @@ export default function Navbar() {
                               onClick={() => setUserMenuOpen(false)}
                               className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-base font-semibold text-zinc-650 hover:text-[#121212] hover:bg-zinc-50 transition-all duration-200"
                             >
-                              <FiLayout className="h-4.5 w-4.5 text-[#615fff]" />
+                              <FiLayout className="h-4.5 w-4.5 text-[#E61C24]" />
                               Admin Console
                             </Link>
                             <Link
@@ -245,7 +243,7 @@ export default function Navbar() {
                               onClick={() => setUserMenuOpen(false)}
                               className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-base font-semibold text-zinc-650 hover:text-[#121212] hover:bg-zinc-50 transition-all duration-200"
                             >
-                              <FiUser className="h-4.5 w-4.5 text-[#615fff]" />
+                              <FiUser className="h-4.5 w-4.5 text-[#E61C24]" />
                               Student Portal
                             </Link>
                           </>
@@ -255,7 +253,7 @@ export default function Navbar() {
                             onClick={() => setUserMenuOpen(false)}
                             className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-base font-semibold text-zinc-650 hover:text-[#121212] hover:bg-zinc-50 transition-all duration-200"
                           >
-                            <FiLayout className="h-4.5 w-4.5 text-[#615fff]" />
+                            <FiLayout className="h-4.5 w-4.5 text-[#E61C24]" />
                             Dashboard
                           </Link>
                         )}
@@ -279,7 +277,7 @@ export default function Navbar() {
                         <Link
                           href="/login"
                           onClick={() => setUserMenuOpen(false)}
-                          className="block w-full text-center px-3 py-2.5 rounded-lg text-base font-bold bg-[#615fff] hover:bg-[#615fff]/90 text-white shadow-md shadow-[#615fff]/15 transition-all mb-2"
+                          className="block w-full text-center px-3 py-2.5 rounded-lg text-base font-bold bg-[#E61C24] hover:bg-[#E61C24]/90 text-white shadow-md shadow-[#E61C24]/15 transition-all mb-2"
                         >
                           Sign In
                         </Link>
@@ -302,7 +300,7 @@ export default function Navbar() {
             {!loading && !user && (
               <Link
                 href="/register"
-                className="hidden sm:inline-flex items-center justify-center px-10 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#615fff]/95 text-white font-bold text-base shadow-md shadow-[#615fff]/15 hover:shadow-[#615fff]/25 transition-all duration-300 cursor-pointer"
+                className="hidden sm:inline-flex items-center justify-center px-10 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#E61C24]/95 text-white font-bold text-base shadow-md shadow-[#E61C24]/15 hover:shadow-[#E61C24]/25 transition-all duration-300 cursor-pointer"
               >
                 Register
               </Link>
@@ -345,13 +343,12 @@ export default function Navbar() {
             >
               {/* Header inside the sidebar */}
               <div className="flex items-center justify-between p-6 border-b border-zinc-100">
-                <Link href="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2.5 group">
-                  <span className="h-9 w-9 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white shadow-md text-base">
-                    C
-                  </span>
-                  <span className="text-xl font-bold font-display text-[#0A163A]">
-                    Canadian Nest
-                  </span>
+                <Link href="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center group">
+                  <img
+                    src="/logo.png"
+                    alt="Canadian Nest School"
+                    className="h-13 w-auto object-contain"
+                  />
                 </Link>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
@@ -372,8 +369,8 @@ export default function Navbar() {
                       onClick={() => setMobileMenuOpen(false)}
                       className={`py-3 px-4 transition-all rounded-lg text-base font-semibold ${
                         active
-                          ? 'text-[#615fff] bg-[#615fff]/8 font-bold'
-                          : 'text-zinc-650 hover:text-[#0A163A] hover:bg-[#615fff]/5'
+                          ? 'text-[#E61C24] bg-[#E61C24]/8 font-bold'
+                          : 'text-zinc-650 hover:text-[#0A163A] hover:bg-[#E61C24]/5'
                       }`}
                     >
                       {link.label}
@@ -389,14 +386,14 @@ export default function Navbar() {
                     <Link
                       href="/login"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="block w-full text-center py-3 rounded-lg text-base font-bold text-[#615fff] bg-[#615fff]/8 hover:bg-[#615fff]/15 transition-all"
+                      className="block w-full text-center py-3 rounded-lg text-base font-bold text-[#E61C24] bg-[#E61C24]/8 hover:bg-[#E61C24]/15 transition-all"
                     >
                       Sign In
                     </Link>
                     <Link
                       href="/register"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="block w-full text-center py-3 rounded-lg text-base font-bold bg-[#615fff] hover:bg-[#543cdf] text-white shadow-md shadow-[#615fff]/15 transition-all"
+                      className="block w-full text-center py-3 rounded-lg text-base font-bold bg-[#E61C24] hover:bg-[#c3131a] text-white shadow-md shadow-[#E61C24]/15 transition-all"
                     >
                       Register
                     </Link>
@@ -405,7 +402,7 @@ export default function Navbar() {
                 {!loading && user && (
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-zinc-200/60 shadow-xs">
-                      <div className="h-10 w-10 shrink-0 rounded-full bg-zinc-50 flex items-center justify-center text-xs font-bold text-[#615fff] shadow-sm overflow-hidden">
+                      <div className="h-10 w-10 shrink-0 rounded-full bg-zinc-50 flex items-center justify-center text-xs font-bold text-[#E61C24] shadow-sm overflow-hidden">
                         {user.profilePic ? (
                           <img
                             src={typeof user.profilePic === 'object' && (user.profilePic as any).url ? (user.profilePic as any).url : user.profilePic}
@@ -425,7 +422,7 @@ export default function Navbar() {
                     <Link
                       href={user.role === 'student' ? '/dashboard' : '/admin'}
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center gap-2 w-full py-3 rounded-lg text-base font-bold text-[#615fff] bg-[#615fff]/8 hover:bg-[#615fff]/15 transition-all"
+                      className="flex items-center justify-center gap-2 w-full py-3 rounded-lg text-base font-bold text-[#E61C24] bg-[#E61C24]/8 hover:bg-[#E61C24]/15 transition-all"
                     >
                       <FiLayout className="h-4.5 w-4.5" />
                       <span>Go to Dashboard</span>

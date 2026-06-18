@@ -82,7 +82,7 @@ function ReviewAvatar({ student }: { student: ReviewDoc['student'] }) {
     )
   }
   return (
-    <div className="h-12 w-12 rounded-full bg-[#615fff]/15 border-2 border-white shadow-sm flex items-center justify-center font-bold text-base text-[#615fff] shrink-0 select-none">
+    <div className="h-12 w-12 rounded-full bg-[#E61C24]/15 border-2 border-white shadow-sm flex items-center justify-center font-bold text-base text-[#E61C24] shrink-0 select-none">
       {getInitials(name)}
     </div>
   )
@@ -90,7 +90,7 @@ function ReviewAvatar({ student }: { student: ReviewDoc['student'] }) {
 
 function ReviewCard({ review }: { review: ReviewDoc }) {
   return (
-    <div className="relative bg-white border border-zinc-100 rounded-lg p-6 flex flex-col gap-4 shadow-sm hover:shadow-md hover:border-[#615fff]/20 transition-all">
+    <div className="relative bg-white border border-zinc-100 rounded-lg p-6 flex flex-col gap-4 shadow-sm hover:shadow-md hover:border-[#E61C24]/20 transition-all">
       {/* Star rating */}
       <StarDisplay rating={review.rating} />
 
@@ -146,7 +146,7 @@ export default function Reviews({ reviews }: ReviewsProps) {
   const col3 = getColumnItems(2)
 
   return (
-    <section className="py-20 md:py-28 px-6 bg-[#fcfdfe] border-t border-zinc-100 relative overflow-hidden">
+    <section className="py-20 md:py-28 px-6 bg-white border-t border-zinc-100 relative overflow-hidden">
       {/* CSS Keyframe injections for infinite continuous scroll */}
       <style
         dangerouslySetInnerHTML={{
@@ -174,26 +174,26 @@ export default function Reviews({ reviews }: ReviewsProps) {
       />
 
       {/* Ambient background glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#615fff]/3 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#E61C24]/3 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="container mx-auto relative z-10">
         {/* Title / Heading Section */}
         <div className="text-center mb-16">
-          <p className="text-base font-bold text-[#615fff] mb-3 tracking-wide uppercase">
+          <p className="text-base font-bold text-[#E61C24] mb-3 tracking-wide uppercase">
             Hear from our students
           </p>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold font-sans text-[#0A163A] tracking-tight leading-[1.2] max-w-2xl mx-auto">
-            Hear directly from our learners! Discover their experiences and insights as they navigate their educational.
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold font-sans text-[#000000] tracking-tight leading-[1.2] max-w-2xl mx-auto">
+            Hear directly from <span className="text-[#E61C24]">our learners!</span> Discover their experiences and insights as they navigate their educational.
           </h2>
         </div>
 
         {/* 3-Column Marquee Grid */}
         <div className="relative h-[680px] overflow-hidden rounded-lg">
           {/* Top Fade Gradient */}
-          <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#fcfdfe] to-transparent z-20 pointer-events-none" />
+          <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white to-transparent z-20 pointer-events-none" />
 
           {/* Bottom Fade Gradient */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#fcfdfe] to-transparent z-20 pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent z-20 pointer-events-none" />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-full">
             {/* Column 1: Scrolls Up */}

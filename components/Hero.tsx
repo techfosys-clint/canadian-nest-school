@@ -103,7 +103,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
           transition={{ duration: 0.8, delay: 0.25, ease: 'easeOut' }}
           className="text-base sm:text-lg md:text-xl text-[#4F5B7C] font-semibold text-center max-w-3xl mx-auto mb-10 leading-relaxed font-sans"
         >
-          {"On my website, you'll find resources and trainings to help you find"} <br className="hidden md:block" /> {"aliveness and vitality in your relationships."}
+          {"Discover high-quality English language learning programs, academic courses,"} <br className="hidden md:block" /> {"and expert teacher training built on Canadian educational standards."}
         </motion.p>
 
         {/* Action Button - Zoom pop in */}
@@ -114,7 +114,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
         >
           <Link 
             href="/courses" 
-            className="inline-block px-8 py-4 rounded-lg bg-[#543CDF] hover:bg-[#543CDF]/95 text-white font-bold text-base shadow-lg shadow-[#543CDF]/25 hover:shadow-[#543CDF]/35 transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer text-center"
+            className="inline-block px-8 py-4 rounded-lg bg-[#E61C24] hover:bg-[#c3131a] text-white font-bold text-base shadow-lg shadow-[#E61C24]/25 hover:shadow-[#E61C24]/35 transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer text-center"
           >
             Start Learning Today
           </Link>

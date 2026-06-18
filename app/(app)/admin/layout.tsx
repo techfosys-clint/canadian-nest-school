@@ -379,13 +379,12 @@ export default function AdminLayout({
 
         {/* Brand Header */}
         <div className="h-16 flex items-center px-5 border-b border-slate-200 shrink-0">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <span className="h-8 w-8 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white shadow-lg shadow-[#615fff]/30 transition-transform group-hover:scale-105 duration-300 text-base">
-              T
-            </span>
-            <span className="text-lg font-bold font-display tracking-tight text-slate-800">
-              Tutor Space
-            </span>
+          <Link href="/" className="flex items-center group">
+            <img
+              src="/logo.png"
+              alt="Canadian Nest School"
+              className="h-12 w-auto object-contain"
+            />
           </Link>
         </div>
 
@@ -412,13 +411,12 @@ export default function AdminLayout({
       >
         {/* Brand Header */}
         <div className="h-16 flex items-center px-5 border-b border-slate-200 justify-between shrink-0">
-          <Link href="/" className="flex items-center gap-2.5">
-            <span className="h-8 w-8 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white text-base">
-              T
-            </span>
-            <span className="text-lg font-bold font-display tracking-tight text-slate-800">
-              Tutor Space
-            </span>
+          <Link href="/" className="flex items-center group">
+            <img
+              src="/logo.png"
+              alt="Canadian Nest School"
+              className="h-12 w-auto object-contain"
+            />
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -453,13 +451,12 @@ export default function AdminLayout({
             >
               <FiMenu className="h-5 w-5" />
             </button>
-            <Link href="/" className="flex items-center gap-2">
-              <span className="h-7 w-7 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white text-sm">
-                T
-              </span>
-              <span className="text-base font-bold font-display tracking-tight text-slate-800">
-                Tutor Space
-              </span>
+            <Link href="/" className="flex items-center group">
+              <img
+                src="/logo.png"
+                alt="Canadian Nest School"
+                className="h-10 w-auto object-contain"
+              />
             </Link>
           </div>
 

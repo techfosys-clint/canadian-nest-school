@@ -88,7 +88,7 @@ export default function DashboardLayout({
       <div className="min-h-screen flex items-center justify-center bg-zinc-50">
         <div className="flex flex-col items-center gap-4">
           <div className="h-12 w-12 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
-          <p className="text-base font-bold text-zinc-600">Loading Student Space...</p>
+          <p className="text-base font-bold text-zinc-600">Loading Student Portal...</p>
         </div>
       </div>
     )
@@ -127,13 +127,12 @@ export default function DashboardLayout({
         
         {/* Sidebar Brand Header */}
         <div className="h-20 flex items-center px-6 border-b border-[#152347] justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <span className="h-9 w-9 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white transition-transform group-hover:scale-105 duration-300 text-base">
-              T
-            </span>
-            <span className="text-xl font-bold font-display tracking-tight text-white">
-              Tutor Space
-            </span>
+          <Link href="/" className="flex items-center group bg-white px-3 py-1.5 rounded-lg shadow-sm">
+            <img
+              src="/logo.png"
+              alt="Canadian Nest School"
+              className="h-13 w-auto object-contain"
+            />
           </Link>
         </div>
 
@@ -202,13 +201,12 @@ export default function DashboardLayout({
       }`}>
         <div>
           <div className="h-20 flex items-center px-6 border-b border-[#152347] justify-between">
-            <Link href="/" className="flex items-center gap-2.5">
-              <span className="h-9 w-9 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white text-base">
-                T
-              </span>
-              <span className="text-xl font-bold font-display tracking-tight text-white">
-                Tutor Space
-              </span>
+            <Link href="/" className="flex items-center group bg-white px-3 py-1.5 rounded-lg shadow-sm">
+              <img
+                src="/logo.png"
+                alt="Canadian Nest School"
+                className="h-13 w-auto object-contain"
+              />
             </Link>
             <button 
               onClick={() => setSidebarOpen(false)}
@@ -282,13 +280,12 @@ export default function DashboardLayout({
             >
               <FiMenu className="h-5 w-5" />
             </button>
-            <Link href="/" className="flex items-center gap-2">
-              <span className="h-8 w-8 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white text-sm">
-                T
-              </span>
-              <span className="text-lg font-bold font-display tracking-tight text-zinc-900">
-                Tutor Space
-              </span>
+            <Link href="/" className="flex items-center group">
+              <img
+                src="/logo.png"
+                alt="Canadian Nest School"
+                className="h-11 w-auto object-contain"
+              />
             </Link>
           </div>
 

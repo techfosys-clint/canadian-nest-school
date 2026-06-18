@@ -82,13 +82,12 @@ export default function LoginForm() {
         <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#543cdf]/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Top: Logo */}
-        <Link href="/" className="flex items-center gap-2.5 z-10 group self-start">
-          <span className="h-9 w-9 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white shadow-lg shadow-[#615fff]/30 transition-transform group-hover:scale-105 duration-300 text-base">
-            T
-          </span>
-          <span className="text-xl font-bold font-display tracking-tight text-white">
-            Tutor Space
-          </span>
+        <Link href="/" className="flex items-center group bg-white px-3 py-1.5 rounded-lg shadow-sm z-10 self-start">
+          <img
+            src="/logo.png"
+            alt="Canadian Nest School"
+            className="h-13 w-auto object-contain"
+          />
         </Link>
 
         {/* Middle: Brand Messages */}
@@ -107,7 +106,7 @@ export default function LoginForm() {
 
         {/* Bottom: Copyright Footer */}
         <div className="text-zinc-500 text-base font-semibold z-10">
-          &copy; 2026 Tutor Space Inc. All rights reserved.
+          &copy; 2026 Canadian Nest School. All rights reserved.
         </div>
       </div>
 
@@ -121,13 +120,12 @@ export default function LoginForm() {
         >
           {/* Logo visible only on mobile */}
           <div className="flex justify-start lg:hidden mb-8">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <span className="h-9 w-9 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white shadow-lg shadow-[#615fff]/30 transition-transform group-hover:scale-105 duration-300 text-base">
-                T
-              </span>
-              <span className="text-xl font-bold font-display tracking-tight text-zinc-900">
-                Tutor Space
-              </span>
+            <Link href="/" className="flex items-center group">
+              <img
+                src="/logo.png"
+                alt="Canadian Nest School"
+                className="h-12 w-auto object-contain"
+              />
             </Link>
           </div>
 

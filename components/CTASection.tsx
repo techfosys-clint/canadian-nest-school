@@ -7,14 +7,14 @@ import { FiArrowRight } from 'react-icons/fi'
 
 export default function CTASection() {
   return (
-    <section className="relative bg-[#615fff] overflow-hidden select-text py-20 md:py-28 w-full border-none">
+    <section className="relative bg-[#E61C24] overflow-hidden select-text py-20 md:py-28 w-full border-none">
       {/* Subtle vertical glow columns on the sides */}
       <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white/5 to-transparent pointer-events-none" />
       <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white/5 to-transparent pointer-events-none" />
 
       {/* Dot Pattern Overlay */}
       <div 
-        className="absolute inset-0 opacity-[0.25] pointer-events-none"
+        className="absolute inset-0 opacity-[0.6] pointer-events-none"
         style={{
           backgroundImage: 'radial-gradient(white 1px, transparent 1px)',
           backgroundSize: '24px 24px',
@@ -53,7 +53,7 @@ export default function CTASection() {
         >
           <Link
             href="/courses"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3 bg-white hover:bg-zinc-100 text-[#615fff] font-bold text-base rounded-lg transition-all duration-300 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] group cursor-pointer border-none"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3 bg-white hover:bg-zinc-100 text-[#E61C24] font-bold text-base rounded-lg transition-all duration-300 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] group cursor-pointer border-none"
           >
             <span>Browse Course</span>
             <FiArrowRight className="h-4.5 w-4.5 transition-transform duration-300 group-hover:translate-x-0.5" />

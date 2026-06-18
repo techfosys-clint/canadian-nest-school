@@ -27,9 +27,9 @@ export default function Features() {
     },
     {
       icon: <FiCalendar className="h-6 w-6" />,
-      iconColor: 'text-[#8B5CF6]',
-      iconBg: 'bg-[#8B5CF6]/10',
-      iconBorder: 'border-[#8B5CF6]/20',
+      iconColor: 'text-[#3b82f6]',
+      iconBg: 'bg-[#3b82f6]/10',
+      iconBorder: 'border-[#3b82f6]/20',
       title: 'Flexible Study Schedule',
       description:
         'Study when it works for you with 24/7 access to all materials. Pause, rewind, and replay lessons at your own pace.',
@@ -47,9 +47,9 @@ export default function Features() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
-            className="text-3xl md:text-5xl font-bold font-display text-[#0A163A] tracking-tight mb-6 leading-tight"
+            className="text-3xl md:text-5xl font-bold font-display text-[#000000] tracking-tight mb-6 leading-tight"
           >
-            Empower Your Learning Journey
+            Empower Your <span className="text-[#E61C24]">Learning Journey</span>
           </motion.h2>
           
           <motion.p
@@ -57,7 +57,7 @@ export default function Features() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
             transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}
-            className="text-base md:text-lg text-[#4F5B7C] font-medium leading-relaxed"
+            className="text-base md:text-lg text-[#4b5563] font-medium leading-relaxed"
           >
             Discover interactive courses, expert instructors, and flexible study options designed to help you reach your goals anytime, anywhere.
           </motion.p>
@@ -111,7 +111,7 @@ export default function Features() {
                     <h3 className="text-lg md:text-xl font-bold text-[#0A163A] transition-colors duration-200">
                       {item.title}
                     </h3>
-                    <p className="text-base text-[#4F5B7C] font-normal leading-relaxed">
+                    <p className="text-base text-[#4b5563] font-normal leading-relaxed">
                       {item.description}
                     </p>
                   </div>
@@ -123,31 +123,31 @@ export default function Features() {
             <div className="flex flex-wrap items-center gap-2.5 pt-2">
               <Link
                 href="/courses"
-                className="px-4 py-2 bg-[#d97706] hover:bg-[#c26405] text-white font-bold text-base rounded transition-all duration-200 cursor-pointer border-none shadow-sm"
+                className="px-4 py-2 bg-[#E61C24] hover:bg-[#c3131a] text-white font-bold text-base rounded-lg transition-all duration-200 cursor-pointer border-none shadow-sm"
               >
                 Lesson plans
               </Link>
               <Link
                 href="/courses"
-                className="px-4 py-2 bg-[#d97706] hover:bg-[#c26405] text-white font-bold text-base rounded transition-all duration-200 cursor-pointer border-none shadow-sm"
+                className="px-4 py-2 bg-[#E61C24] hover:bg-[#c3131a] text-white font-bold text-base rounded-lg transition-all duration-200 cursor-pointer border-none shadow-sm"
               >
                 Worksheets
               </Link>
               <Link
                 href="/courses"
-                className="px-4 py-2 bg-[#d97706] hover:bg-[#c26405] text-white font-bold text-base rounded transition-all duration-200 cursor-pointer border-none shadow-sm"
+                className="px-4 py-2 bg-[#E61C24] hover:bg-[#c3131a] text-white font-bold text-base rounded-lg transition-all duration-200 cursor-pointer border-none shadow-sm"
               >
                 Flashcards
               </Link>
               <Link
                 href="/courses"
-                className="px-4 py-2 bg-[#d97706] hover:bg-[#c26405] text-white font-bold text-base rounded transition-all duration-200 cursor-pointer border-none shadow-sm"
+                className="px-4 py-2 bg-[#E61C24] hover:bg-[#c3131a] text-white font-bold text-base rounded-lg transition-all duration-200 cursor-pointer border-none shadow-sm"
               >
                 Songs
               </Link>
               <Link
                 href="/courses"
-                className="px-4 py-2 bg-[#d97706] hover:bg-[#c26405] text-white font-bold text-base rounded transition-all duration-200 cursor-pointer border-none shadow-sm"
+                className="px-4 py-2 bg-[#E61C24] hover:bg-[#c3131a] text-white font-bold text-base rounded-lg transition-all duration-200 cursor-pointer border-none shadow-sm"
               >
                 Readers
               </Link>

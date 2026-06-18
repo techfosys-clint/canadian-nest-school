@@ -67,7 +67,7 @@ function CourseCard({ course, view }: { course: CourseDoc; view: 'grid' | 'list'
     return (
       <Link
         href={`/courses/${course.slug}`}
-        className="flex flex-col md:flex-row gap-6 bg-white rounded-lg p-5 border border-[#615fff]/20 hover:border-[#615fff]/50 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(97,95,255,0.10)] hover:-translate-y-1 transition-all duration-300 group w-full"
+        className="flex flex-col md:flex-row gap-6 bg-white rounded-lg p-5 border border-[#E61C24]/20 hover:border-[#E61C24]/50 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(230,28,36,0.10)] hover:-translate-y-1 transition-all duration-300 group w-full"
       >
         {/* Aspect-ratio constrained image wrapper */}
         <div className="shrink-0 w-full md:w-60 aspect-[16/10] rounded-lg overflow-hidden bg-zinc-50 relative">
@@ -79,7 +79,7 @@ function CourseCard({ course, view }: { course: CourseDoc; view: 'grid' | 'list'
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#0A163A] to-[#1e1b4b] flex items-center justify-center rounded-lg">
-              <span className="h-10 w-10 rounded-lg bg-[#615fff]/30 flex items-center justify-center font-bold text-white text-base">T</span>
+              <span className="h-10 w-10 rounded-lg bg-[#E61C24]/30 flex items-center justify-center font-bold text-white text-base">T</span>
             </div>
           )}
           
@@ -98,7 +98,7 @@ function CourseCard({ course, view }: { course: CourseDoc; view: 'grid' | 'list'
         <div className="flex-grow min-w-0 flex flex-col justify-between py-1 gap-4">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-3 text-base">
-              <span className="font-bold text-[#615fff] bg-[#615fff]/8 px-3 py-1 rounded-lg text-base uppercase">
+              <span className="font-bold text-[#E61C24] bg-[#E61C24]/8 px-3 py-1 rounded-lg text-base uppercase">
                 {getCategoryName(course.category)}
               </span>
               
@@ -121,7 +121,7 @@ function CourseCard({ course, view }: { course: CourseDoc; view: 'grid' | 'list'
               ) : null}
             </div>
             
-            <h3 className="font-bold text-[#0A163A] text-xl leading-snug group-hover:text-[#615fff] transition-colors line-clamp-2">
+            <h3 className="font-bold text-[#0A163A] text-xl leading-snug group-hover:text-[#E61C24] transition-colors line-clamp-2">
               {course.title}
             </h3>
             
@@ -143,7 +143,7 @@ function CourseCard({ course, view }: { course: CourseDoc; view: 'grid' | 'list'
               </span>
             </div>
 
-            <div className="px-4 py-2 border border-[#615fff] bg-[#615fff] group-hover:bg-[#543cdf] group-hover:border-[#543cdf] rounded-lg text-base font-semibold text-white transition-all duration-300 flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+            <div className="px-4 py-2 border border-[#E61C24] bg-[#E61C24] group-hover:bg-[#c3131a] group-hover:border-[#c3131a] rounded-lg text-base font-semibold text-white transition-all duration-300 flex items-center gap-1.5 shrink-0 whitespace-nowrap">
               <span>Enroll Now</span>
               <FiArrowRight className="h-4 w-4 text-white transition-transform duration-300 group-hover:translate-x-0.5 shrink-0" />
             </div>
@@ -158,7 +158,7 @@ function CourseCard({ course, view }: { course: CourseDoc; view: 'grid' | 'list'
     <div className="w-full flex justify-center sm:justify-start">
       <Link
         href={`/courses/${course.slug}`}
-        className="bg-white rounded-lg overflow-hidden border border-[#615fff]/20 hover:border-[#615fff]/50 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(97,95,255,0.10)] hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full w-full max-w-[380px]"
+        className="bg-white rounded-lg overflow-hidden border border-[#E61C24]/20 hover:border-[#E61C24]/50 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(230,28,36,0.10)] hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full w-full max-w-[380px]"
       >
         {/* Aspect-ratio constrained image wrapper */}
         <div className="relative aspect-[16/10] bg-zinc-50 overflow-hidden rounded-t-lg">
@@ -170,7 +170,7 @@ function CourseCard({ course, view }: { course: CourseDoc; view: 'grid' | 'list'
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#0A163A] to-[#1e1b4b] flex flex-col items-center justify-center rounded-t-lg">
-              <span className="h-12 w-12 rounded-lg bg-[#615fff]/25 flex items-center justify-center font-bold text-white mb-2 text-lg">C</span>
+              <span className="h-12 w-12 rounded-lg bg-[#E61C24]/25 flex items-center justify-center font-bold text-white mb-2 text-lg">C</span>
               <span className="text-base font-bold text-zinc-400 uppercase tracking-wider">Canadian Nest</span>
             </div>
           )}
@@ -216,7 +216,7 @@ function CourseCard({ course, view }: { course: CourseDoc; view: 'grid' | 'list'
             </div>
 
             {/* Title */}
-            <h3 className="font-bold text-[#0A163A] text-lg sm:text-xl leading-snug group-hover:text-[#615fff] transition-colors line-clamp-2">
+            <h3 className="font-bold text-[#0A163A] text-lg sm:text-xl leading-snug group-hover:text-[#E61C24] transition-colors line-clamp-2">
               {course.title}
             </h3>
             
@@ -237,7 +237,7 @@ function CourseCard({ course, view }: { course: CourseDoc; view: 'grid' | 'list'
                 </span>
               </div>
 
-              <div className="px-4 py-2 border border-[#615fff] bg-[#615fff] group-hover:bg-[#543cdf] group-hover:border-[#543cdf] rounded-lg text-base font-semibold text-white transition-all duration-300 flex items-center gap-2 shrink-0 whitespace-nowrap">
+              <div className="px-4 py-2 border border-[#E61C24] bg-[#E61C24] group-hover:bg-[#c3131a] group-hover:border-[#c3131a] rounded-lg text-base font-semibold text-white transition-all duration-300 flex items-center gap-2 shrink-0 whitespace-nowrap">
                 <span>Enroll Now</span>
                 <FiArrowRight className="h-4.5 w-4.5 text-white transition-transform duration-300 group-hover:translate-x-0.5 shrink-0" />
               </div>
@@ -257,7 +257,7 @@ function SidebarSection({ title, children }: { title: string; children: React.Re
     <div className="py-1">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between text-base font-bold text-[#0A163A] cursor-pointer hover:text-[#615fff] transition-colors py-1"
+        className="w-full flex items-center justify-between text-base font-bold text-[#0A163A] cursor-pointer hover:text-[#E61C24] transition-colors py-1"
       >
         <span>{title}</span>
         <FiChevronDown className={`h-5 w-5 text-zinc-400 transition-transform duration-200 ${open ? '' : '-rotate-90'}`} />
@@ -378,10 +378,10 @@ export default function CoursesPageClient({
   const displayedCategories = showAllCategories ? categories : categories.slice(0, 5)
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#ffffff] via-[#fbfcff] to-[#f5f8ff] font-sans pb-20 relative flex flex-col pt-22">
+    <div className="min-h-screen bg-gradient-to-b from-white via-[#fafafa] to-[#f9fafb] font-sans pb-20 relative flex flex-col pt-22">
       {/* Background glow accents (confined to absolute layer to prevent sticky scroll breaking) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] bg-[#615fff]/3 rounded-full blur-[120px]" />
+        <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] bg-[#E61C24]/3 rounded-full blur-[120px]" />
         <div className="absolute bottom-[20%] left-[-10%] w-[500px] h-[500px] bg-[#FDBF2D]/3 rounded-full blur-[120px]" />
       </div>
 
@@ -390,7 +390,7 @@ export default function CoursesPageClient({
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="relative bg-[#615fff] py-12 md:py-16 text-center overflow-hidden shadow-lg select-text w-full z-10 border-none"
+        className="relative bg-[#E61C24] py-12 md:py-16 text-center overflow-hidden shadow-lg select-text w-full z-10 border-none"
       >
         {/* Glowing gradient circles behind */}
         <div className="absolute -top-12 -left-12 w-48 h-48 bg-white/10 rounded-full blur-3xl pointer-events-none" />
@@ -398,7 +398,7 @@ export default function CoursesPageClient({
 
         {/* Premium Dot grid background inside the card */}
         <div
-          className="absolute inset-0 opacity-[0.2] pointer-events-none"
+          className="absolute inset-0 opacity-[0.6] pointer-events-none"
           style={{ 
             backgroundImage: 'radial-gradient(white 1.2px, transparent 1.2px)', 
             backgroundSize: '24px 24px',
@@ -459,8 +459,8 @@ export default function CoursesPageClient({
                   onClick={() => setActiveCategory('all')}
                   className={`w-full flex items-center justify-between px-3.5 py-3 rounded-lg text-base font-bold transition-all cursor-pointer ${
                     activeCategory === 'all'
-                      ? 'bg-[#615fff] text-white'
-                      : 'text-zinc-650 hover:text-[#0A163A] hover:bg-[#615fff]/5'
+                      ? 'bg-[#E61C24] text-white'
+                      : 'text-zinc-650 hover:text-[#0A163A] hover:bg-[#E61C24]/5'
                   }`}
                 >
                   <span>All Categories</span>
@@ -478,15 +478,15 @@ export default function CoursesPageClient({
                       onClick={() => setActiveCategory(cat.slug)}
                       className={`w-full flex items-center justify-between px-3.5 py-3 rounded-lg text-base font-semibold transition-all cursor-pointer capitalize ${
                         active 
-                          ? 'text-[#615fff] font-bold bg-[#615fff]/8' 
-                          : 'text-zinc-650 hover:text-[#0A163A] hover:bg-[#615fff]/5'
+                          ? 'text-[#E61C24] font-bold bg-[#E61C24]/8' 
+                          : 'text-zinc-650 hover:text-[#0A163A] hover:bg-[#E61C24]/5'
                       }`}
                     >
                       <span className="flex items-center gap-2 truncate">
-                        <FiChevronRight className={`h-4.5 w-4.5 transition-transform ${active ? 'text-[#615fff] translate-x-0.5' : 'text-zinc-400'}`} />
+                        <FiChevronRight className={`h-4.5 w-4.5 transition-transform ${active ? 'text-[#E61C24] translate-x-0.5' : 'text-zinc-400'}`} />
                         <span className="truncate">{cat.name}</span>
                       </span>
-                      <span className={`text-base font-bold rounded-lg px-2.5 py-0.5 ${active ? 'bg-[#615fff]/15 text-[#615fff]' : 'bg-zinc-150 text-zinc-500'}`}>
+                      <span className={`text-base font-bold rounded-lg px-2.5 py-0.5 ${active ? 'bg-[#E61C24]/15 text-[#E61C24]' : 'bg-zinc-150 text-zinc-500'}`}>
                         {count}
                       </span>
                     </button>
@@ -497,7 +497,7 @@ export default function CoursesPageClient({
                 {categories.length > 5 && (
                   <button
                     onClick={() => setShowAllCategories(!showAllCategories)}
-                    className="w-full text-left px-3.5 py-3 text-base font-bold text-[#615fff] hover:text-[#543cdf] transition-colors cursor-pointer mt-1"
+                    className="w-full text-left px-3.5 py-3 text-base font-bold text-[#E61C24] hover:text-[#c3131a] transition-colors cursor-pointer mt-1"
                   >
                     {showAllCategories ? 'Show Less' : 'Show More'}
                   </button>
@@ -525,10 +525,10 @@ export default function CoursesPageClient({
                           setPriceTier(tier.value)
                         }}
                         disabled={tier.value === 'subscription'}
-                        className="w-5 h-5 accent-[#615fff] cursor-pointer"
+                        className="w-5 h-5 accent-[#E61C24] cursor-pointer"
                       />
                       <span className={`text-base font-semibold transition-colors duration-200 ${
-                        priceTier === tier.value ? 'text-[#615fff] font-bold' : 'text-zinc-650 group-hover:text-zinc-800'
+                        priceTier === tier.value ? 'text-[#E61C24] font-bold' : 'text-zinc-650 group-hover:text-zinc-800'
                       } ${tier.value === 'subscription' ? 'opacity-50 cursor-not-allowed' : ''}`}>
                         {tier.label}
                       </span>
@@ -548,10 +548,10 @@ export default function CoursesPageClient({
                         value={lang.value}
                         checked={activeLanguages.includes(lang.value)}
                         onChange={() => toggleLanguage(lang.value)}
-                        className="w-5 h-5 accent-[#615fff] cursor-pointer rounded"
+                        className="w-5 h-5 accent-[#E61C24] cursor-pointer rounded"
                       />
                       <span className={`text-base font-semibold transition-colors duration-200 ${
-                        activeLanguages.includes(lang.value) ? 'text-[#615fff] font-bold' : 'text-zinc-650 group-hover:text-zinc-800'
+                        activeLanguages.includes(lang.value) ? 'text-[#E61C24] font-bold' : 'text-zinc-650 group-hover:text-zinc-800'
                       }`}>
                         {lang.label}
                       </span>
@@ -571,10 +571,10 @@ export default function CoursesPageClient({
                         value={lvl.value}
                         checked={activeLevels.includes(lvl.value)}
                         onChange={() => toggleLevel(lvl.value)}
-                        className="w-5 h-5 accent-[#615fff] cursor-pointer rounded"
+                        className="w-5 h-5 accent-[#E61C24] cursor-pointer rounded"
                       />
                       <span className={`text-base font-semibold transition-colors duration-200 ${
-                        activeLevels.includes(lvl.value) ? 'text-[#615fff] font-bold' : 'text-zinc-650 group-hover:text-zinc-800'
+                        activeLevels.includes(lvl.value) ? 'text-[#E61C24] font-bold' : 'text-zinc-650 group-hover:text-zinc-800'
                       }`}>
                         {lvl.label}
                       </span>
@@ -611,7 +611,7 @@ export default function CoursesPageClient({
                 onClick={() => setActiveCategory('all')}
                 className={`shrink-0 px-4 py-2 rounded-lg text-base font-bold transition-all border cursor-pointer ${
                   activeCategory === 'all'
-                    ? 'bg-[#615fff] text-white border-[#615fff]'
+                    ? 'bg-[#E61C24] text-white border-[#E61C24]'
                     : 'bg-white text-zinc-650 border-zinc-200 hover:bg-zinc-50'
                 }`}
               >
@@ -626,7 +626,7 @@ export default function CoursesPageClient({
                     onClick={() => setActiveCategory(cat.slug)}
                     className={`shrink-0 px-4 py-2 rounded-lg text-base font-semibold transition-all border capitalize cursor-pointer ${
                       active
-                        ? 'bg-[#615fff]/10 text-[#615fff] border-[#615fff] font-bold'
+                        ? 'bg-[#E61C24]/10 text-[#E61C24] border-[#E61C24] font-bold'
                         : 'bg-white text-zinc-650 border-zinc-200 hover:bg-zinc-50'
                     }`}
                   >
@@ -663,7 +663,7 @@ export default function CoursesPageClient({
                   <FiSliders className="h-4.5 w-4.5 text-zinc-500" />
                   <span>Filters</span>
                   {activeFiltersCount > 0 && (
-                    <span className="bg-[#615fff] text-white text-xs font-bold rounded-full w-5.5 h-5.5 flex items-center justify-center">
+                    <span className="bg-[#E61C24] text-white text-xs font-bold rounded-full w-5.5 h-5.5 flex items-center justify-center">
                       {activeFiltersCount}
                     </span>
                   )}
@@ -672,13 +672,13 @@ export default function CoursesPageClient({
                 <div className="flex items-center bg-zinc-100/80 rounded-lg p-1.5 gap-1.5 shrink-0">
                   <button
                     onClick={() => setView('grid')}
-                    className={`p-2.5 rounded-lg cursor-pointer transition-all duration-200 ${view === 'grid' ? 'bg-white text-[#615fff] font-bold border border-zinc-200' : 'bg-transparent text-zinc-500 hover:text-[#0A163A]'}`}
+                    className={`p-2.5 rounded-lg cursor-pointer transition-all duration-200 ${view === 'grid' ? 'bg-white text-[#E61C24] font-bold border border-zinc-200' : 'bg-transparent text-zinc-500 hover:text-[#0A163A]'}`}
                   >
                     <FiGrid className="h-5 w-5" />
                   </button>
                   <button
                     onClick={() => setView('list')}
-                    className={`p-2.5 rounded-lg cursor-pointer transition-all duration-200 ${view === 'list' ? 'bg-white text-[#615fff] font-bold border border-zinc-200' : 'bg-transparent text-zinc-500 hover:text-[#0A163A]'}`}
+                    className={`p-2.5 rounded-lg cursor-pointer transition-all duration-200 ${view === 'list' ? 'bg-white text-[#E61C24] font-bold border border-zinc-200' : 'bg-transparent text-zinc-500 hover:text-[#0A163A]'}`}
                   >
                     <FiList className="h-5 w-5" />
                   </button>
@@ -695,7 +695,7 @@ export default function CoursesPageClient({
                   All Courses
                 </h1>
                 <p className="text-base text-zinc-550 font-semibold mt-1">
-                  Showing <span className="font-bold text-[#615fff]">{filtered.length}</span> courses found
+                  Showing <span className="font-bold text-[#E61C24]">{filtered.length}</span> courses found
                 </p>
               </div>
               
@@ -720,14 +720,14 @@ export default function CoursesPageClient({
                   exit={{ opacity: 0 }}
                   className="flex flex-col items-center justify-center py-28 text-center bg-white rounded-lg border border-zinc-200"
                 >
-                  <div className="h-14 w-14 rounded-lg bg-[#615fff]/8 flex items-center justify-center mb-4">
-                    <FiSearch className="h-6 w-6 text-[#615fff]" />
+                  <div className="h-14 w-14 rounded-lg bg-[#E61C24]/8 flex items-center justify-center mb-4">
+                    <FiSearch className="h-6 w-6 text-[#E61C24]" />
                   </div>
                   <h3 className="text-lg font-bold text-zinc-800 mb-1">No courses found</h3>
                   <p className="text-base text-zinc-450 max-w-xs mb-6 font-semibold">Try adjusting filters or searching different keywords.</p>
                   <button
                     onClick={clearAll}
-                    className="px-6 py-3.5 bg-[#615fff] hover:bg-[#615fff]/95 text-white font-bold text-base rounded-lg transition-all duration-300 cursor-pointer"
+                    className="px-6 py-3.5 bg-[#E61C24] hover:bg-[#c3131a] text-white font-bold text-base rounded-lg transition-all duration-300 cursor-pointer"
                   >
                     Clear All Filters
                   </button>
@@ -779,7 +779,7 @@ export default function CoursesPageClient({
               {/* Header inside the drawer */}
               <div className="flex items-center justify-between p-6 border-b border-zinc-100">
                 <div className="flex items-center gap-2">
-                  <FiSliders className="h-5 w-5 text-[#615fff]" />
+                  <FiSliders className="h-5 w-5 text-[#E61C24]" />
                   <h3 className="text-lg font-bold text-[#0A163A]">Filters</h3>
                 </div>
                 <button
@@ -808,10 +808,10 @@ export default function CoursesPageClient({
                             setPriceTier(tier.value)
                           }}
                           disabled={tier.value === 'subscription'}
-                          className="w-5 h-5 accent-[#615fff] cursor-pointer"
+                          className="w-5 h-5 accent-[#E61C24] cursor-pointer"
                         />
                         <span className={`text-base font-semibold transition-colors duration-200 ${
-                          priceTier === tier.value ? 'text-[#615fff] font-bold' : 'text-zinc-650 group-hover:text-zinc-800'
+                          priceTier === tier.value ? 'text-[#E61C24] font-bold' : 'text-zinc-650 group-hover:text-zinc-800'
                         } ${tier.value === 'subscription' ? 'opacity-50 cursor-not-allowed' : ''}`}>
                           {tier.label}
                         </span>
@@ -831,10 +831,10 @@ export default function CoursesPageClient({
                           value={lang.value}
                           checked={activeLanguages.includes(lang.value)}
                           onChange={() => toggleLanguage(lang.value)}
-                          className="w-5 h-5 accent-[#615fff] cursor-pointer rounded"
+                          className="w-5 h-5 accent-[#E61C24] cursor-pointer rounded"
                         />
                         <span className={`text-base font-semibold transition-colors duration-200 ${
-                          activeLanguages.includes(lang.value) ? 'text-[#615fff] font-bold' : 'text-zinc-650 group-hover:text-zinc-800'
+                          activeLanguages.includes(lang.value) ? 'text-[#E61C24] font-bold' : 'text-zinc-650 group-hover:text-zinc-800'
                         }`}>
                           {lang.label}
                         </span>
@@ -854,10 +854,10 @@ export default function CoursesPageClient({
                           value={lvl.value}
                           checked={activeLevels.includes(lvl.value)}
                           onChange={() => toggleLevel(lvl.value)}
-                          className="w-5 h-5 accent-[#615fff] cursor-pointer rounded"
+                          className="w-5 h-5 accent-[#E61C24] cursor-pointer rounded"
                         />
                         <span className={`text-base font-semibold transition-colors duration-200 ${
-                          activeLevels.includes(lvl.value) ? 'text-[#615fff] font-bold' : 'text-zinc-650 group-hover:text-zinc-800'
+                          activeLevels.includes(lvl.value) ? 'text-[#E61C24] font-bold' : 'text-zinc-650 group-hover:text-zinc-800'
                         }`}>
                           {lvl.label}
                         </span>
@@ -883,7 +883,7 @@ export default function CoursesPageClient({
                 )}
                 <button
                   onClick={() => setIsMobileFiltersOpen(false)}
-                  className="w-full text-center py-3 rounded-lg text-base font-bold bg-[#615fff] hover:bg-[#543cdf] text-white shadow-md shadow-[#615fff]/15 transition-all cursor-pointer"
+                  className="w-full text-center py-3 rounded-lg text-base font-bold bg-[#E61C24] hover:bg-[#c3131a] text-white shadow-md shadow-[#E61C24]/15 transition-all cursor-pointer"
                 >
                   Apply Filters
                 </button>

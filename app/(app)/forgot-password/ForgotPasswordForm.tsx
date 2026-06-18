@@ -85,13 +85,12 @@ export default function ForgotPasswordForm() {
 
         {/* Top Brand Logo */}
         <div className="relative z-10">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <span className="h-9 w-9 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white shadow-lg shadow-[#615fff]/30 transition-transform group-hover:scale-105 duration-300 text-base">
-              T
-            </span>
-            <span className="text-xl font-bold font-display tracking-tight text-white">
-              Tutor Space
-            </span>
+          <Link href="/" className="flex items-center group bg-white px-3 py-1.5 rounded-lg shadow-sm">
+            <img
+              src="/logo.png"
+              alt="Canadian Nest School"
+              className="h-13 w-auto object-contain"
+            />
           </Link>
         </div>
 
@@ -112,7 +111,7 @@ export default function ForgotPasswordForm() {
         {/* Bottom Footer Info */}
         <div className="relative z-10 flex items-center justify-between border-t border-zinc-800/40 pt-6">
           <p className="text-zinc-500 font-bold text-base">
-            &copy; 2026 Tutor Space Inc. All rights reserved.
+            &copy; 2026 Canadian Nest School. All rights reserved.
           </p>
         </div>
 
@@ -124,13 +123,12 @@ export default function ForgotPasswordForm() {
           
           {/* Mobile Top Header (Displays only on small screens) */}
           <div className="flex items-center justify-between md:hidden mb-6">
-            <Link href="/" className="flex items-center gap-2">
-              <span className="h-8 w-8 rounded-lg bg-[#615fff] flex items-center justify-center font-bold text-white text-sm">
-                T
-              </span>
-              <span className="text-lg font-bold text-zinc-900">
-                Tutor Space
-              </span>
+            <Link href="/" className="flex items-center group">
+              <img
+                src="/logo.png"
+                alt="Canadian Nest School"
+                className="h-11 w-auto object-contain"
+              />
             </Link>
             <span className="px-2.5 py-0.5 text-base font-bold text-[#615fff] bg-[#615fff]/10 rounded-lg border border-[#615fff]/20 uppercase">
               Forgot Password

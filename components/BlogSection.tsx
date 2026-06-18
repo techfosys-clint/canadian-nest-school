@@ -67,10 +67,10 @@ export default function BlogSection({ blogs }: BlogSectionProps) {
   if (!blogs || blogs.length === 0) return null
 
   return (
-    <section className="py-20 md:py-28 px-6 bg-white relative overflow-hidden">
+    <section className="py-20 md:py-28 px-6 bg-[#f9fafb] relative overflow-hidden">
       
       {/* Subtle background glow */}
-      <div className="absolute top-0 right-1/4 w-[600px] h-[400px] bg-[#615fff]/5 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-[600px] h-[400px] bg-[#E61C24]/5 rounded-full blur-[130px] pointer-events-none" />
 
       <div className="container mx-auto relative z-10">
         
@@ -79,17 +79,17 @@ export default function BlogSection({ blogs }: BlogSectionProps) {
           <div className="space-y-4 max-w-2xl">
             {/* Blogs Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-zinc-100/80 rounded-lg">
-              <span className="w-2 h-2 rounded-full bg-[#615fff]" />
-              <span className="text-sm font-bold text-[#4F5B7C]">Blogs</span>
+              <span className="w-2 h-2 rounded-full bg-[#E61C24]" />
+              <span className="text-sm font-bold text-[#4b5563]">Blogs</span>
             </div>
             
             {/* Title */}
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#0A163A] tracking-tight leading-[1.2]">
-              The Canadian Nest <span className="text-[#615fff]">Knowledge Hub</span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#000000] tracking-tight leading-[1.2]">
+              The Canadian Nest <span className="text-[#E61C24]">Knowledge Hub</span>
             </h2>
             
             {/* Description */}
-            <p className="text-base font-semibold text-[#4F5B7C] leading-relaxed">
+            <p className="text-base font-semibold text-[#4b5563] leading-relaxed">
               Get expert insights, coding tutorials, career advice, and industry deep dives to fuel your learning journey.
             </p>
           </div>
@@ -97,10 +97,10 @@ export default function BlogSection({ blogs }: BlogSectionProps) {
           {/* View All Articles Button */}
           <Link
             href="/blogs"
-            className="hidden md:inline-flex items-center gap-3.5 px-6 py-3 bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base rounded-lg transition-all duration-300 shadow-lg shadow-[#615fff]/20 group shrink-0 cursor-pointer w-fit"
+            className="hidden md:inline-flex items-center gap-3.5 px-6 py-3 bg-[#E61C24] hover:bg-[#c3131a] text-white font-bold text-base rounded-lg transition-all duration-300 shadow-lg shadow-[#E61C24]/20 group shrink-0 cursor-pointer w-fit"
           >
             <span>View All Articles</span>
-            <span className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-[#615fff] transition-transform group-hover:translate-x-0.5">
+            <span className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-[#E61C24] transition-transform group-hover:translate-x-0.5">
               <FiArrowRight className="h-3.5 w-3.5" />
             </span>
           </Link>
@@ -146,20 +146,20 @@ export default function BlogSection({ blogs }: BlogSectionProps) {
                   </Link>
 
                   {/* Title */}
-                  <h3 className="text-lg sm:text-xl font-bold text-[#0A163A] tracking-tight line-clamp-2 leading-snug hover:text-[#615fff] transition-colors duration-200 cursor-pointer mb-2.5">
+                  <h3 className="text-lg sm:text-xl font-bold text-[#0A163A] tracking-tight line-clamp-2 leading-snug hover:text-[#E61C24] transition-colors duration-200 cursor-pointer mb-2.5">
                     <Link href={`/blogs/${blog.id}`}>
                       {blog.title}
                     </Link>
                   </h3>
 
                   {/* Description */}
-                  <p className="text-base font-medium text-[#4F5B7C] line-clamp-2 leading-relaxed mb-5">
+                  <p className="text-base font-medium text-[#4b5563] line-clamp-2 leading-relaxed mb-5">
                     {previewText || 'Dive into this article to learn more about this topic.'}
                   </p>
                 </div>
 
                 {/* Author Info Row (Matching Screenshot) */}
-                <div className="flex items-center gap-2.5 text-sm font-semibold text-[#4F5B7C]/80 mt-1">
+                <div className="flex items-center gap-2.5 text-sm font-semibold text-[#4b5563]/80 mt-1">
                   {blog.authorProfilePicUrl ? (
                     <img
                       src={blog.authorProfilePicUrl}
@@ -167,7 +167,7 @@ export default function BlogSection({ blogs }: BlogSectionProps) {
                       className="h-6 w-6 rounded-full object-cover shrink-0"
                     />
                   ) : (
-                    <div className="h-6 w-6 rounded-full bg-[#615fff]/10 flex items-center justify-center text-[#615fff] font-bold text-xs uppercase shrink-0">
+                    <div className="h-6 w-6 rounded-full bg-[#E61C24]/10 flex items-center justify-center text-[#E61C24] font-bold text-xs uppercase shrink-0">
                       {blog.authorName[0]}
                     </div>
                   )}

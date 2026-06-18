@@ -161,16 +161,16 @@ export default async function CourseDetailPage({ params }: Props) {
       
       {/* Background glow accents */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[25%] right-[-10%] w-[500px] h-[500px] bg-[#615fff]/3 rounded-full blur-[120px]" />
+        <div className="absolute top-[25%] right-[-10%] w-[500px] h-[500px] bg-[#E61C24]/3 rounded-full blur-[120px]" />
         <div className="absolute bottom-[25%] left-[-10%] w-[500px] h-[500px] bg-[#FDBF2D]/3 rounded-full blur-[120px]" />
       </div>
 
       {/* ── Breadcrumb bar (Premium Glassmorphism Style) ── */}
-      <div className="relative border-b border-[#E9E6FF] bg-gradient-to-r from-[#FAF9FF] to-[#F5F3FF] select-text z-10">
+      <div className="relative border-b border-zinc-200/80 bg-gradient-to-r from-[#FAF9FF] to-[#F5F3FF] select-text z-10">
         <div className="container mx-auto px-6 py-4 flex flex-wrap items-center gap-2 text-base font-semibold text-zinc-500">
-          <Link href="/" className="hover:text-[#615fff] transition-colors flex items-center gap-1">Home</Link>
+          <Link href="/" className="hover:text-[#E61C24] transition-colors flex items-center gap-1">Home</Link>
           <FiChevronRight className="h-4 w-4 text-zinc-400 shrink-0" />
-          <Link href="/courses" className="hover:text-[#615fff] transition-colors">Courses</Link>
+          <Link href="/courses" className="hover:text-[#E61C24] transition-colors">Courses</Link>
           <FiChevronRight className="h-4 w-4 text-zinc-400 shrink-0" />
           <span className="text-zinc-800 font-bold line-clamp-1">{course.title}</span>
         </div>
@@ -179,14 +179,13 @@ export default async function CourseDetailPage({ params }: Props) {
       {/* ── Breathtaking Hero Section (Premium Dark Sapphire Glow) ── */}
       <div className="relative bg-gradient-to-br from-[#0A163A] via-[#121F4C] to-[#0A163A] text-white border-b border-[#1A2E66] overflow-hidden select-text z-10">
         {/* Soft decorative glows inside banner */}
-        <div className="absolute -top-12 -left-12 w-96 h-96 bg-[#615fff]/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-12 -right-12 w-96 h-96 bg-[#615fff]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-12 -right-12 w-96 h-96 bg-[#E61C24]/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Premium Dot grid overlay */}
         <div
           className="absolute inset-0 opacity-[0.22] pointer-events-none"
           style={{ 
-            backgroundImage: 'radial-gradient(#615fff 1.2px, transparent 1.2px)', 
+            backgroundImage: 'radial-gradient(#E61C24 1.2px, transparent 1.2px)', 
             backgroundSize: '24px 24px',
             maskImage: 'radial-gradient(ellipse at center, black, transparent 80%)',
             WebkitMaskImage: 'radial-gradient(ellipse at center, black, transparent 80%)'
@@ -208,7 +207,7 @@ export default async function CourseDetailPage({ params }: Props) {
             {/* Badges */}
             <div className="flex flex-wrap items-center gap-2.5">
               {categoryName && (
-                <span className="px-3.5 py-1.5 bg-[#615fff]/18 border border-[#615fff]/25 text-[#b2b0ff] rounded-lg font-bold text-base uppercase tracking-wide">
+                <span className="px-3.5 py-1.5 bg-[#E61C24]/15 border border-[#E61C24]/25 text-[#ff8e91] rounded-lg font-bold text-base uppercase tracking-wide">
                   {categoryName}
                 </span>
               )}
@@ -231,18 +230,18 @@ export default async function CourseDetailPage({ params }: Props) {
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-2 text-base font-bold text-zinc-300 border-t border-white/5">
               {course.duration && (
                 <span className="flex items-center gap-2">
-                  <FiClock className="h-5 w-5 text-[#615fff] shrink-0" />
+                  <FiClock className="h-5 w-5 text-[#E61C24] shrink-0" />
                   <span>{course.duration}</span>
                 </span>
               )}
               {lessonCount > 0 && (
                 <span className="flex items-center gap-2">
-                  <FiList className="h-5 w-5 text-[#615fff] shrink-0" />
+                  <FiList className="h-5 w-5 text-[#E61C24] shrink-0" />
                   <span>{lessonCount} {lessonCount === 1 ? 'Lesson' : 'Lessons'}</span>
                 </span>
               )}
               <span className="flex items-center gap-2">
-                <FiAward className="h-5 w-5 text-[#615fff] shrink-0" />
+                <FiAward className="h-5 w-5 text-[#E61C24] shrink-0" />
                 <span>{getLevelLabel(course.level)}</span>
               </span>
               {reviews.length > 0 && (
@@ -256,7 +255,7 @@ export default async function CourseDetailPage({ params }: Props) {
 
             {/* Instructor Details Bar */}
             <div className="flex items-center gap-3 pt-3">
-              <div className="h-11 w-11 rounded-lg bg-[#615fff]/20 border border-[#615fff]/35 flex items-center justify-center font-bold text-white text-base">
+              <div className="h-11 w-11 rounded-lg bg-[#E61C24]/20 border border-[#E61C24]/30 flex items-center justify-center font-bold text-white text-base">
                 {initials}
               </div>
               <div>
@@ -284,11 +283,11 @@ export default async function CourseDetailPage({ params }: Props) {
               <h2 className="text-2xl font-bold text-[#0A163A] tracking-tight">
                 What you&apos;ll learn in this course
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white border border-[#E9E6FF] rounded-lg p-6 shadow-[0_4px_20px_rgba(97,95,255,0.02)]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white border border-zinc-200/80 rounded-lg p-6 shadow-[0_4px_20px_rgba(230,28,36,0.02)]">
                 {course.whatYouWillLearn.map((item: any, i: number) => (
                   <div key={i} className="flex items-start gap-3">
-                    <div className="h-6 w-6 rounded-lg bg-[#615fff]/8 border border-[#615fff]/15 flex items-center justify-center shrink-0 mt-0.5">
-                      <FiCheck className="h-4 w-4 text-[#615fff]" />
+                    <div className="h-6 w-6 rounded-lg bg-[#E61C24]/8 border border-[#E61C24]/15 flex items-center justify-center shrink-0 mt-0.5">
+                      <FiCheck className="h-4 w-4 text-[#E61C24]" />
                     </div>
                     <span className="text-base font-semibold text-zinc-700 leading-relaxed">
                       {item.outcome}
@@ -305,7 +304,7 @@ export default async function CourseDetailPage({ params }: Props) {
               <h2 className="text-2xl font-bold text-[#0A163A] tracking-tight">
                 Course Description
               </h2>
-              <div className="bg-white border border-[#E9E6FF] rounded-lg p-6 shadow-[0_4px_20px_rgba(97,95,255,0.02)]">
+              <div className="bg-white border border-zinc-200/80 rounded-lg p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
                 <div 
                   className="course-description-content font-sans select-text"
                   dangerouslySetInnerHTML={{ __html: course.description }}
@@ -336,7 +335,7 @@ export default async function CourseDetailPage({ params }: Props) {
                 }
                 .course-description-content pre code { background: none; color: inherit; padding: 0; }
                 .course-description-content blockquote {
-                  border-left: 4px solid #615fff; padding-left: 1rem;
+                  border-left: 4px solid #E61C24; padding-left: 1rem;
                   margin: 1rem 0; color: #4b5563; font-style: italic;
                   background: #f8fafc; padding-top: 0.5rem; padding-bottom: 0.5rem;
                   border-top-right-radius: 4px; border-bottom-right-radius: 4px;
@@ -348,7 +347,7 @@ export default async function CourseDetailPage({ params }: Props) {
                   border: none; border-top: 1px solid #e2e8f0;
                   margin: 1.5rem 0;
                 }
-                .course-description-content a { color: #615fff; text-decoration: underline; font-weight: 600; }
+                .course-description-content a { color: #E61C24; text-decoration: underline; font-weight: 600; }
                 .course-description-content img {
                   max-width: 100%; border-radius: 8px; margin: 1rem 0;
                 }
@@ -362,7 +361,7 @@ export default async function CourseDetailPage({ params }: Props) {
                   border: 1px solid #e2e8f0;
                 }
                 .course-description-content th {
-                  background: #f8fafc; color: #0A163A; font-weight: 750;
+                  background: #f8fafc; color: #0A163A; font-weight: 700;
                   padding: 0.75rem 1rem; border: 1px solid #e2e8f0;
                   text-align: left; font-size: 0.95rem;
                 }
@@ -433,7 +432,7 @@ export default async function CourseDetailPage({ params }: Props) {
                           {picUrl ? (
                             <img src={picUrl} alt={studentName} className="h-11 w-11 rounded-lg object-cover border border-zinc-200" />
                           ) : (
-                            <div className="h-11 w-11 rounded-lg bg-[#615fff]/8 border border-[#615fff]/15 flex items-center justify-center font-bold text-base text-[#615fff]">
+                            <div className="h-11 w-11 rounded-lg bg-[#E61C24]/8 border border-[#E61C24]/15 flex items-center justify-center font-bold text-base text-[#E61C24]">
                               {sInitials}
                             </div>
                           )}
@@ -457,8 +456,8 @@ export default async function CourseDetailPage({ params }: Props) {
         </div>
 
         {/* Right Area: Premium Sticky Pricing Card (4 cols) */}
-        <div className="lg:col-span-4 relative z-20 lg:-mt-[280px] w-full order-1 lg:order-2">
-          <div className="sticky top-28 bg-white border border-zinc-200 rounded-lg shadow-[0_12px_45px_rgba(97,95,255,0.09)] overflow-hidden">
+        <div className="lg:col-span-4 relative z-20 lg:-mt-[591px] w-full order-1 lg:order-2">
+          <div className="sticky top-28 bg-white border border-zinc-200 rounded-lg shadow-[0_12px_45px_rgba(0,0,0,0.06)] overflow-hidden">
             
             {/* Aspect image header on widget */}
             {imageUrl ? (
@@ -477,7 +476,7 @@ export default async function CourseDetailPage({ params }: Props) {
               <div className="space-y-1">
                 <p className="text-base font-bold text-zinc-400 uppercase tracking-wide">Investment</p>
                 <div className="flex items-baseline gap-2">
-                  <span className={`text-4xl font-bold ${course.price === 0 ? 'text-emerald-600' : 'text-[#615fff]'}`}>
+                  <span className={`text-4xl font-bold ${course.price === 0 ? 'text-emerald-600' : 'text-[#E61C24]'}`}>
                     {formatPrice(course.price)}
                   </span>
                 </div>
@@ -498,30 +497,30 @@ export default async function CourseDetailPage({ params }: Props) {
                 
                 {course.duration && (
                   <div className="flex items-center gap-3 text-base font-semibold text-zinc-600">
-                    <FiClock className="h-5 w-5 text-[#615fff] shrink-0" />
+                    <FiClock className="h-5 w-5 text-[#E61C24] shrink-0" />
                     <span>{course.duration} on-demand video</span>
                   </div>
                 )}
                 
                 {lessonCount > 0 && (
                   <div className="flex items-center gap-3 text-base font-semibold text-zinc-600">
-                    <FiList className="h-5 w-5 text-[#615fff] shrink-0" />
+                    <FiList className="h-5 w-5 text-[#E61C24] shrink-0" />
                     <span>{lessonCount} {lessonCount === 1 ? 'recorded lesson' : 'recorded lessons'}</span>
                   </div>
                 )}
                 
                 <div className="flex items-center gap-3 text-base font-semibold text-zinc-600">
-                  <FiAward className="h-5 w-5 text-[#615fff] shrink-0" />
+                  <FiAward className="h-5 w-5 text-[#E61C24] shrink-0" />
                   <span>{getLevelLabel(course.level)} material</span>
                 </div>
                 
                 <div className="flex items-center gap-3 text-base font-semibold text-zinc-600">
-                  <FiUsers className="h-5 w-5 text-[#615fff] shrink-0" />
+                  <FiUsers className="h-5 w-5 text-[#E61C24] shrink-0" />
                   <span>Full lifetime access</span>
                 </div>
                 
                 <div className="flex items-center gap-3 text-base font-semibold text-zinc-600">
-                  <FiBook className="h-5 w-5 text-[#615fff] shrink-0" />
+                  <FiBook className="h-5 w-5 text-[#E61C24] shrink-0" />
                   <span>Certificate of completion</span>
                 </div>
               </div>

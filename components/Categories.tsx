@@ -58,6 +58,15 @@ const CARDS_DATA = [
     href: '/courses?category=teacher-training',
   },
   {
+    title: 'Academic Tutoring',
+    description: 'Personalized school support and exam preparation.',
+    icon: <FiBookOpen className="h-6 w-6 text-[#ec4899]" />,
+    iconColor: 'text-[#ec4899]',
+    borderColor: 'border-[#ec4899]',
+    bgColor: 'bg-[#ec4899]/5',
+    href: '/courses',
+  },
+  {
     title: 'Educational Shop',
     description: 'Books, worksheets, courses, teaching resources.',
     icon: <FiShoppingBag className="h-6 w-6 text-[#eab308]" />,
@@ -99,7 +108,7 @@ const cardVariants = {
 
 export default function Categories({ categories }: CategoriesProps) {
   return (
-    <section className="py-20 md:py-28 px-6 bg-[#f5f8ff] border-t border-zinc-100 relative overflow-hidden">
+    <section className="py-20 md:py-28 px-6 bg-[#f9fafb] border-t border-zinc-100 relative overflow-hidden">
       
       <style jsx>{`
         @keyframes floatY {
@@ -115,7 +124,7 @@ export default function Categories({ categories }: CategoriesProps) {
       {/* Dot grid background */}
       <div
         className="absolute inset-0 opacity-[0.07] pointer-events-none"
-        style={{ backgroundImage: 'radial-gradient(#615fff 0.5px, transparent 0.5px)', backgroundSize: '24px 24px' }}
+        style={{ backgroundImage: 'radial-gradient(#E61C24 0.5px, transparent 0.5px)', backgroundSize: '24px 24px' }}
       />
 
       {/* Floating decoration images */}
@@ -137,16 +146,16 @@ export default function Categories({ categories }: CategoriesProps) {
       <div className="container mx-auto relative z-10">
         
         {/* ── Heading Block matching ESL resources title ── */}
-        <div className="text-center mb-16 space-y-4 relative z-30 py-2">
+        <div className="text-center mb-8 space-y-4 relative z-30 py-2">
           <motion.h2
             variants={headingVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
-            className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#0A163A] tracking-tight leading-[1.2] max-w-4xl mx-auto"
+            className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#000000] tracking-tight leading-[1.2] max-w-4xl mx-auto"
           >
-            <span className="text-[#10B981]">ESL resources</span>{' '}
-            <span className="text-[#d97706]">for teaching English to kids & teens</span>
+            <span className="block mb-1"><span className="text-[#E61C24]">ESL resources</span> for teaching</span>
+            <span className="block">English to kids & teens</span>
           </motion.h2>
           
           <motion.p
@@ -154,7 +163,7 @@ export default function Categories({ categories }: CategoriesProps) {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
-            className="text-base sm:text-lg font-semibold text-[#4F5B7C] max-w-2xl mx-auto pt-2 leading-relaxed"
+            className="text-base sm:text-lg font-semibold text-[#4b5563] max-w-2xl mx-auto pt-2 leading-relaxed"
           >
             Discover our wide range of English language learning programs, academic courses, and international teacher training resources.
           </motion.p>
@@ -162,7 +171,7 @@ export default function Categories({ categories }: CategoriesProps) {
 
         {/* ── Category Cards Grid ── */}
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-2"
           variants={gridVariants}
           initial="hidden"
           whileInView="visible"
@@ -179,18 +188,20 @@ export default function Categories({ categories }: CategoriesProps) {
                 className={`flex flex-col h-full bg-white rounded-lg border-2 ${card.borderColor} ${card.bgColor} px-4 py-8 text-center shadow-md -translate-y-1 transition-all duration-300 group cursor-pointer hover:shadow-lg hover:-translate-y-1.5`}
               >
                 {/* Top Middle Icon Badge overlapping the border */}
-                <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border-2 ${card.borderColor} p-2.5 rounded-lg shadow-xs flex items-center justify-center transition-transform duration-300 scale-110 group-hover:scale-115 z-20`}>
-                  <span className="block group-hover:hidden transition-all duration-300">
+                <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border-2 ${card.borderColor} rounded-lg shadow-xs flex items-center justify-center transition-all duration-500 scale-110 group-hover:scale-115 z-20 w-12 h-12`}>
+                  {/* Default Icon: fades out and rotates on hover */}
+                  <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 ease-out opacity-100 scale-100 group-hover:opacity-0 group-hover:scale-75 group-hover:rotate-45">
                     {card.icon}
-                  </span>
-                  <span className={`hidden group-hover:block ${card.iconColor} transition-all duration-300`}>
+                  </div>
+                  {/* Checkmark Icon: fades in, scales up, and rotates into place on hover */}
+                  <div className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ease-out opacity-0 scale-50 -rotate-45 group-hover:opacity-100 group-hover:scale-100 group-hover:rotate-0 ${card.iconColor}`}>
                     <FiCheck className="h-6 w-6" />
-                  </span>
+                  </div>
                 </div>
 
                 {/* Content */}
                 <div className="flex flex-col justify-between h-full pt-4 space-y-2.5">
-                  <h3 className="text-lg font-bold text-[#615fff] group-hover:text-[#d97706] transition-colors leading-snug">
+                  <h3 className="text-lg font-bold text-[#0A163A] group-hover:text-[#E61C24] transition-colors leading-snug">
                     {card.title}
                   </h3>
                   <p className="text-base text-zinc-500 font-semibold leading-relaxed flex-grow">

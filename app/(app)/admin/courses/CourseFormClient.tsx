@@ -562,10 +562,16 @@ export default function CourseFormClient({
 
             {/* Summary field */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-slate-600">Short Summary *</label>
+              <div className="flex items-center justify-between">
+                <label className="text-base font-bold text-slate-600">Short Summary *</label>
+                <span className="text-sm font-semibold text-slate-450">
+                  {summary.length}/160 characters
+                </span>
+              </div>
               <textarea
                 required
                 rows={2}
+                maxLength={160}
                 value={summary}
                 onChange={(e) => setSummary(e.target.value)}
                 placeholder="Give a quick, captivating 1-2 sentence sell for this syllabus catalog."

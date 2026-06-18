@@ -69,7 +69,7 @@ export default function FAQ({ faqs }: FAQProps) {
     <section className="py-20 md:py-28 px-6 bg-[#f5f8ff]/50 border-t border-zinc-100 relative overflow-hidden">
 
       {/* Ambient glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-[#615fff]/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-[#E61C24]/5 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="container mx-auto relative z-10">
 
@@ -80,7 +80,7 @@ export default function FAQ({ faqs }: FAQProps) {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
-            className="text-base font-bold text-[#615fff] mb-3 tracking-wide uppercase"
+            className="text-base font-bold text-[#E61C24] mb-3 tracking-wide uppercase"
           >
             Got Questions?
           </motion.p>
@@ -93,7 +93,7 @@ export default function FAQ({ faqs }: FAQProps) {
             className="text-3xl sm:text-4xl md:text-5xl font-bold text-zinc-900 tracking-tight leading-[1.2]"
           >
             Frequently Asked{' '}
-            <span className="text-[#615fff]">Questions</span>
+            <span className="text-[#E61C24]">Questions</span>
           </motion.h2>
 
           <motion.p
@@ -124,8 +124,8 @@ export default function FAQ({ faqs }: FAQProps) {
                 <div
                   className={`rounded-lg border cursor-pointer select-none overflow-hidden transition-all duration-300 ${
                     isOpen
-                      ? 'bg-[#615fff] border-[#615fff] shadow-lg shadow-[#615fff]/20'
-                      : 'bg-white border-zinc-200/80 hover:border-[#615fff]/40 hover:shadow-md'
+                      ? 'bg-[#E61C24] border-[#E61C24] shadow-lg shadow-[#E61C24]/20'
+                      : 'bg-white border-zinc-200/80 hover:border-[#E61C24]/40 hover:shadow-md'
                   }`}
                 >
                   {/* Question row */}
@@ -189,18 +189,18 @@ export default function FAQ({ faqs }: FAQProps) {
           transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
           className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 p-6 rounded-lg bg-white border border-zinc-200/80 shadow-sm max-w-3xl mx-auto"
         >
-          <div className="h-11 w-11 rounded-lg bg-[#615fff]/10 flex items-center justify-center shrink-0">
-            <FiHelpCircle className="h-5 w-5 text-[#615fff]" />
+          <div className="h-11 w-11 rounded-lg bg-[#E61C24]/10 flex items-center justify-center shrink-0">
+            <FiHelpCircle className="h-5 w-5 text-[#E61C24]" />
           </div>
           <div className="text-center sm:text-left">
             <p className="text-base font-bold text-zinc-800">Still have questions?</p>
-            <p className="text-base font-semibold text-zinc-500">
+            <p className="text-base font-semibold text-zinc-550">
               Our support team is happy to help you out.
             </p>
           </div>
           <a
             href="mailto:support@tutorspace.com"
-            className="shrink-0 px-5 py-3 bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base rounded-lg shadow-md shadow-[#615fff]/20 transition-all duration-300"
+            className="shrink-0 px-5 py-3 bg-[#E61C24] hover:bg-[#c5141b] text-white font-bold text-base rounded-lg shadow-md shadow-[#E61C24]/20 transition-all duration-300"
           >
             Contact Support
           </a>

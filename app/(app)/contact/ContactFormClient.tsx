@@ -39,7 +39,7 @@ export default function ContactFormClient() {
         icon: 'warning',
         title: 'Fields Required',
         text: 'Please fill in all the required form fields.',
-        confirmButtonColor: '#615fff'
+        confirmButtonColor: '#E61C24'
       })
       return
     }
@@ -53,7 +53,7 @@ export default function ContactFormClient() {
         icon: 'success',
         title: 'Message Sent!',
         text: 'Thank you for reaching out. A support representative will get back to you shortly.',
-        confirmButtonColor: '#615fff',
+        confirmButtonColor: '#E61C24',
         background: '#ffffff',
         color: '#0A163A'
       })
@@ -69,7 +69,7 @@ export default function ContactFormClient() {
         icon: 'error',
         title: 'Error Occurred',
         text: 'Failed to send message. Please try again later.',
-        confirmButtonColor: '#615fff'
+        confirmButtonColor: '#E61C24'
       })
     } finally {
       setSubmitting(false)
@@ -90,7 +90,7 @@ export default function ContactFormClient() {
         >
           <div className="bg-[#f8fafc] rounded-lg p-8 shadow-sm space-y-8 relative overflow-hidden">
             {/* Ambient card background element */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#615fff]/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#E61C24]/5 rounded-full blur-3xl pointer-events-none" />
 
             <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight pb-4 border-b border-zinc-200">
               Contact Information
@@ -99,12 +99,12 @@ export default function ContactFormClient() {
             <div className="space-y-6">
               {/* Phone */}
               <div className="flex items-start gap-4">
-                <div className="h-11 w-11 rounded-lg bg-[#615fff]/10 flex items-center justify-center text-[#615fff] shrink-0 border border-[#615fff]/20">
+                <div className="h-11 w-11 rounded-lg bg-[#E61C24]/10 flex items-center justify-center text-[#E61C24] shrink-0 border border-[#E61C24]/20">
                   <FiPhone className="h-5 w-5" />
                 </div>
                 <div className="space-y-1">
                   <p className="text-base font-bold text-zinc-800">Phone</p>
-                  <a href="tel:+8801617643566" className="text-base font-semibold text-zinc-550 hover:text-[#615fff] transition-colors block">
+                  <a href="tel:+8801617643566" className="text-base font-semibold text-zinc-550 hover:text-[#E61C24] transition-colors block">
                     +880 1617-643566
                   </a>
                   <p className="text-sm font-semibold text-zinc-400">Sun - Fri, 9am - 6pm</p>
@@ -192,7 +192,7 @@ export default function ContactFormClient() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Shahriar Rahman"
-                  className="w-full bg-[#f8fafc] border border-[#615fff]/60 focus:border-[#615fff] text-zinc-850 rounded-lg p-3 text-base font-semibold outline-none transition-all"
+                  className="w-full bg-[#f8fafc] border border-zinc-200 focus:border-[#E61C24] text-zinc-850 rounded-lg p-3 text-base font-semibold outline-none transition-all"
                 />
               </div>
 
@@ -208,7 +208,7 @@ export default function ContactFormClient() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="e.g. user@tutorspace.com"
-                  className="w-full bg-[#f8fafc] border border-[#615fff]/60 text-zinc-850 rounded-lg p-3 text-base font-semibold outline-none transition-all"
+                  className="w-full bg-[#f8fafc] border border-zinc-200 focus:border-[#E61C24] text-zinc-850 rounded-lg p-3 text-base font-semibold outline-none transition-all"
                 />
               </div>
             </div>
@@ -225,7 +225,7 @@ export default function ContactFormClient() {
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="How can we help you?"
-                className="w-full bg-[#f8fafc] border border-[#615fff]/60 text-zinc-850 rounded-lg p-3 text-base font-semibold outline-none transition-all"
+                className="w-full bg-[#f8fafc] border border-zinc-200 focus:border-[#E61C24] text-zinc-850 rounded-lg p-3 text-base font-semibold outline-none transition-all"
               />
             </div>
 
@@ -241,7 +241,7 @@ export default function ContactFormClient() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Tell us what you need support with..."
-                className="w-full bg-[#f8fafc] border border-[#615fff]/60 text-zinc-850 rounded-lg p-3 text-base font-semibold outline-none transition-all resize-none"
+                className="w-full bg-[#f8fafc] border border-zinc-200 focus:border-[#E61C24] text-zinc-850 rounded-lg p-3 text-base font-semibold outline-none transition-all resize-none"
               />
             </div>
 
@@ -249,7 +249,7 @@ export default function ContactFormClient() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base rounded-lg transition-all duration-300 shadow-md shadow-[#615fff]/20 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-[#E61C24] hover:bg-[#c5141b] text-white font-bold text-base rounded-lg transition-all duration-300 shadow-md shadow-[#E61C24]/20 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {submitting ? (
                 <span>Sending Message...</span>

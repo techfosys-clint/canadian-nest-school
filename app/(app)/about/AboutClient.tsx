@@ -7,29 +7,7 @@ import { FiBookOpen, FiClock, FiLayers, FiShield, FiGlobe, FiSettings, FiArrowRi
 import CTASection from '@/components/CTASection'
 
 export default function AboutClient() {
-  const [activeTab, setActiveTab] = useState<'story' | 'mission' | 'vision'>('story')
-
-  // Dynamic tab content for Section 3
-  const tabContent = {
-    story: {
-      paragraphs: [
-        'Tutor Space was founded with a simple idea — to make learning easier, more engaging, and results-driven.',
-        'What started as a small group of passionate educators is now a growing platform helping thousands of learners around the world gain new skills and opportunities.',
-      ]
-    },
-    mission: {
-      paragraphs: [
-        'Our mission is to democratize education and make high-quality learning accessible, interactive, and impactful for anyone, anywhere.',
-        'We bridge the gap between classroom theory and real-world implementation, providing training designed for current industry needs.',
-      ]
-    },
-    vision: {
-      paragraphs: [
-        'Our vision is to build the world\'s most supportive and engaging learning ecosystem, where anyone can acquire skills and transition their careers with absolute confidence.',
-        'We envision a future where high-quality technical and creative skills are within reach of every aspiring mind.',
-      ]
-    }
-  }
+  // Framer Motion Animation Variants
 
   // Framer Motion Animation Variants
   const fadeInUp = {
@@ -59,7 +37,7 @@ export default function AboutClient() {
       <section className="pt-36 pb-24 px-6 relative overflow-hidden bg-white">
         
         {/* Subtle background glow */}
-        <div className="absolute top-1/4 right-1/4 w-[600px] h-[400px] bg-[#615fff]/5 rounded-full blur-[130px] pointer-events-none" />
+        <div className="absolute top-1/4 right-1/4 w-[600px] h-[400px] bg-[#E61C24]/5 rounded-full blur-[130px] pointer-events-none" />
 
         <div className="container mx-auto space-y-16">
           
@@ -75,7 +53,7 @@ export default function AboutClient() {
               variants={fadeInUp}
               className="flex items-center justify-center gap-1.5 text-base font-semibold text-zinc-500 mb-2 select-none"
             >
-              <Link href="/" className="hover:text-[#615fff] transition-colors">Home</Link>
+              <Link href="/" className="hover:text-[#E61C24] transition-colors">Home</Link>
               <span className="text-zinc-300 font-normal">/</span>
               <span className="text-[#0A163A]">About</span>
             </motion.div>
@@ -83,10 +61,10 @@ export default function AboutClient() {
             {/* Centered Badge Pill */}
             <motion.div 
               variants={fadeInUp}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#615fff]/8 border border-[#615fff]/15 rounded-full select-none shadow-sm shadow-[#615fff]/5"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#E61C24]/8 border border-[#E61C24]/15 rounded-full select-none shadow-sm shadow-[#E61C24]/5"
             >
-              <span className="w-2 h-2 rounded-full bg-[#615fff] animate-pulse" />
-              <span className="text-sm font-bold text-[#615fff] uppercase tracking-wider">About</span>
+              <span className="w-2 h-2 rounded-full bg-[#E61C24] animate-pulse" />
+              <span className="text-sm font-bold text-[#E61C24] uppercase tracking-wider">About</span>
             </motion.div>
 
             {/* Heading */}
@@ -94,7 +72,7 @@ export default function AboutClient() {
               variants={fadeInUp}
               className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#0A163A] tracking-tight leading-[1.2]"
             >
-              About <span className="text-[#615fff]">Tutor Space</span>
+              About <span className="text-[#E61C24]">Tutor Space</span>
             </motion.h1>
 
             {/* Description */}
@@ -135,9 +113,9 @@ export default function AboutClient() {
               <motion.div 
                 variants={statCardVariants}
                 whileHover={{ y: -5, transition: { duration: 0.2, ease: 'easeOut' } }}
-                className="p-5 bg-[#615fff]/4 rounded-lg border border-[#615fff]/15 flex flex-col gap-2 transition-all duration-300 hover:border-[#615fff]/35 shadow-sm hover:shadow-md cursor-pointer"
+                className="p-5 bg-[#E61C24]/4 rounded-lg border border-[#E61C24]/15 flex flex-col gap-2 transition-all duration-300 hover:border-[#E61C24]/35 shadow-sm hover:shadow-md cursor-pointer"
               >
-                <span className="text-[#615fff] text-4xl md:text-5xl font-bold">12K+</span>
+                <span className="text-[#E61C24] text-4xl md:text-5xl font-bold">12K+</span>
                 <span className="text-[#0A163A] text-lg font-bold">Courses</span>
                 <p className="text-[#4F5B7C] text-base font-semibold leading-relaxed">
                   Covering design, business, tech, and more.
@@ -148,9 +126,9 @@ export default function AboutClient() {
               <motion.div 
                 variants={statCardVariants}
                 whileHover={{ y: -5, transition: { duration: 0.2, ease: 'easeOut' } }}
-                className="p-5 bg-[#615fff]/4 rounded-lg border border-[#615fff]/15 flex flex-col gap-2 transition-all duration-300 hover:border-[#615fff]/35 shadow-sm hover:shadow-md cursor-pointer"
+                className="p-5 bg-[#E61C24]/4 rounded-lg border border-[#E61C24]/15 flex flex-col gap-2 transition-all duration-300 hover:border-[#E61C24]/35 shadow-sm hover:shadow-md cursor-pointer"
               >
-                <span className="text-[#615fff] text-4xl md:text-5xl font-bold">85K+</span>
+                <span className="text-[#E61C24] text-4xl md:text-5xl font-bold">85K+</span>
                 <span className="text-[#0A163A] text-lg font-bold">Learners</span>
                 <p className="text-[#4F5B7C] text-base font-semibold leading-relaxed">
                   Growing global community of passionate students.
@@ -161,9 +139,9 @@ export default function AboutClient() {
               <motion.div 
                 variants={statCardVariants}
                 whileHover={{ y: -5, transition: { duration: 0.2, ease: 'easeOut' } }}
-                className="p-5 bg-[#615fff]/4 rounded-lg border border-[#615fff]/15 flex flex-col gap-2 transition-all duration-300 hover:border-[#615fff]/35 shadow-sm hover:shadow-md cursor-pointer"
+                className="p-5 bg-[#E61C24]/4 rounded-lg border border-[#E61C24]/15 flex flex-col gap-2 transition-all duration-300 hover:border-[#E61C24]/35 shadow-sm hover:shadow-md cursor-pointer"
               >
-                <span className="text-[#615fff] text-4xl md:text-5xl font-bold">2K+</span>
+                <span className="text-[#E61C24] text-4xl md:text-5xl font-bold">2K+</span>
                 <span className="text-[#0A163A] text-lg font-bold">Instructors</span>
                 <p className="text-[#4F5B7C] text-base font-semibold leading-relaxed">
                   Learn from top industry professionals.
@@ -174,9 +152,9 @@ export default function AboutClient() {
               <motion.div 
                 variants={statCardVariants}
                 whileHover={{ y: -5, transition: { duration: 0.2, ease: 'easeOut' } }}
-                className="p-5 bg-[#615fff]/4 rounded-lg border border-[#615fff]/15 flex flex-col gap-2 transition-all duration-300 hover:border-[#615fff]/35 shadow-sm hover:shadow-md cursor-pointer"
+                className="p-5 bg-[#E61C24]/4 rounded-lg border border-[#E61C24]/15 flex flex-col gap-2 transition-all duration-300 hover:border-[#E61C24]/35 shadow-sm hover:shadow-md cursor-pointer"
               >
-                <span className="text-[#615fff] text-4xl md:text-5xl font-bold">98%</span>
+                <span className="text-[#E61C24] text-4xl md:text-5xl font-bold">98%</span>
                 <span className="text-[#0A163A] text-lg font-bold">Satisfaction</span>
                 <p className="text-[#4F5B7C] text-base font-semibold leading-relaxed">
                   Learners love the results and experience.
@@ -189,157 +167,131 @@ export default function AboutClient() {
         </div>
       </section>
 
-      {/* ── SECTION 3: STORY, MISSION, VISION TABS (Screenshot 3) ── */}
-      <section className="py-20 md:py-28 px-6 bg-[#F5F8FF] border-t border-zinc-100 relative overflow-hidden">
+      {/* ── SECTION 3: OUR PURPOSE & VALUES (Premium Redesigned Section) ── */}
+      <section className="py-20 md:py-28 px-6 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-t border-b border-slate-100 relative overflow-hidden">
         
-        {/* Subtle background glow */}
-        <div className="absolute top-1/3 left-0 w-[500px] h-[350px] bg-[#615fff]/4 rounded-full blur-[140px] pointer-events-none" />
+        {/* Decorative background gradients */}
+        <div className="absolute top-0 right-0 w-[450px] h-[450px] bg-[#E61C24]/3 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[450px] h-[450px] bg-sky-500/3 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="container mx-auto relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
-            {/* Left side: Heading, interactive tabs and paragraph text */}
+            {/* Left Column: Overlapping Visual Cards Deck */}
             <motion.div 
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              className="lg:col-span-6 space-y-8"
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              className="lg:col-span-6 relative flex items-center justify-center min-h-[400px] md:min-h-[460px]"
             >
-              <motion.h2 
-                variants={fadeInUp}
-                className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#0A163A] tracking-tight leading-[1.2]"
+              {/* Decorative dotted pattern overlay */}
+              <div 
+                className="absolute inset-0 opacity-[0.25] pointer-events-none"
+                style={{ 
+                  backgroundImage: 'radial-gradient(#E61C24 1.2px, transparent 1.2px)', 
+                  backgroundSize: '20px 20px',
+                }}
+              />
+
+              {/* Main Image Frame */}
+              <div className="relative w-4/5 aspect-[4/3] rounded-lg overflow-hidden border border-slate-200 shadow-lg group">
+                <img
+                  src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80"
+                  alt="Team collaboration"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                />
+              </div>
+
+              {/* Overlapping Floating Card 1: Success Rate */}
+              <motion.div 
+                whileHover={{ y: -3 }}
+                className="absolute bottom-4 left-4 sm:left-10 bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-lg p-4 shadow-lg max-w-[200px]"
               >
-                Empowering Learners to Build Skills for the Future
-              </motion.h2>
-
-              {/* Dynamic tabs bar */}
-              <motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-3">
-                
-                {/* Tab: Story */}
-                <button
-                  onClick={() => setActiveTab('story')}
-                  className={`px-5 py-2.5 rounded-lg font-bold text-base transition-all duration-300 cursor-pointer ${
-                    activeTab === 'story'
-                      ? 'bg-[#615fff] text-white shadow-md shadow-[#615fff]/15'
-                      : 'bg-white text-[#4F5B7C] border border-zinc-200/80 hover:border-[#615fff]/30 hover:text-[#0A163A]'
-                  }`}
-                >
-                  Our Story
-                </button>
-
-                {/* Tab: Mission */}
-                <button
-                  onClick={() => setActiveTab('mission')}
-                  className={`px-5 py-2.5 rounded-lg font-bold text-base transition-all duration-300 cursor-pointer ${
-                    activeTab === 'mission'
-                      ? 'bg-[#615fff] text-white shadow-md shadow-[#615fff]/15'
-                      : 'bg-white text-[#4F5B7C] border border-zinc-200/80 hover:border-[#615fff]/30 hover:text-[#0A163A]'
-                  }`}
-                >
-                  Mission
-                </button>
-
-                {/* Tab: Vision */}
-                <button
-                  onClick={() => setActiveTab('vision')}
-                  className={`px-5 py-2.5 rounded-lg font-bold text-base transition-all duration-300 cursor-pointer ${
-                    activeTab === 'vision'
-                      ? 'bg-[#615fff] text-white shadow-md shadow-[#615fff]/15'
-                      : 'bg-white text-[#4F5B7C] border border-zinc-200/80 hover:border-[#615fff]/30 hover:text-[#0A163A]'
-                  }`}
-                >
-                  Vision
-                </button>
-
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-[#E61C24]/10 border border-[#E61C24]/20 flex items-center justify-center text-[#E61C24]">
+                    <FiLayers className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-400 uppercase tracking-wide">Success Rate</p>
+                    <p className="text-lg font-bold text-[#0A163A]">98% Approved</p>
+                  </div>
+                </div>
               </motion.div>
 
-              {/* Dynamic text blocks with smooth transition animation */}
-              <motion.div variants={fadeInUp} className="min-h-[160px]">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeTab}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.28, ease: 'easeOut' }}
-                    className="space-y-4"
-                  >
-                    {tabContent[activeTab].paragraphs.map((p, idx) => (
-                      <p key={idx} className="text-base sm:text-lg font-semibold text-[#4F5B7C] leading-relaxed">
-                        {p}
-                      </p>
-                    ))}
-                  </motion.div>
-                </AnimatePresence>
+              {/* Overlapping Floating Card 2: Interactive Class info */}
+              <motion.div 
+                whileHover={{ y: -3 }}
+                className="absolute top-4 right-4 sm:right-10 bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-lg p-4 shadow-lg max-w-[220px]"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600">
+                    <FiGlobe className="h-5 w-5 animate-spin" style={{ animationDuration: '8s' }} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-400 uppercase tracking-wide">Live Classes</p>
+                    <p className="text-lg font-bold text-[#0A163A]">Interactive Space</p>
+                  </div>
+                </div>
               </motion.div>
-
             </motion.div>
 
-            {/* Right side: Photo Collage layout */}
-            <motion.div 
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              className="lg:col-span-6"
-            >
-              <div className="grid grid-cols-12 gap-4 items-center">
+            {/* Right Column: Title & Structured Value Cards */}
+            <div className="lg:col-span-6 space-y-8">
+              <div className="space-y-4">
+                <span className="text-[#E61C24] font-bold text-base uppercase tracking-wider">Our Core Pillars</span>
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#0A163A] tracking-tight leading-[1.2]">
+                  Empowering Learners to Shape the Future
+                </h2>
+                <p className="text-base sm:text-lg text-slate-500 font-semibold leading-relaxed">
+                  We don&apos;t just teach lessons. We cultivate skills, connect global talent, and build paths to sustainable careers.
+                </p>
+              </div>
+
+              {/* Vertical Stack of Value Cards */}
+              <div className="space-y-4">
                 
-                {/* Top Left flatlay rectangular image */}
-                <motion.div 
-                  variants={fadeInUp}
-                  whileHover={{ scale: 1.01, y: -2, transition: { duration: 0.2 } }}
-                  className="col-span-7 relative aspect-[4/3] bg-zinc-150 rounded-lg overflow-hidden shadow-sm border border-zinc-200/40 cursor-pointer group"
-                >
-                  <img
-                    src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=400&q=80"
-                    alt="Studying books"
-                    className="w-full h-full object-cover pointer-events-none group-hover:scale-103 transition-transform duration-500 ease-out"
-                  />
-                </motion.div>
+                {/* Pillar 1: Our Story */}
+                <div className="bg-white border border-slate-200/80 rounded-lg p-5 flex gap-4 shadow-sm hover:shadow-md transition-shadow group">
+                  <div className="h-12 w-12 rounded-lg bg-[#E61C24]/8 border border-[#E61C24]/15 flex items-center justify-center text-[#E61C24] shrink-0 mt-0.5">
+                    <FiBookOpen className="h-6 w-6" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-bold text-[#0A163A] group-hover:text-[#E61C24] transition-colors">Our Story</h3>
+                    <p className="text-base text-slate-500 font-semibold leading-relaxed">
+                      Tutor Space began with a simple mission: to simplify learning. We started with a handful of passionate educators and have grown into a global ecosystem where students master in-demand skills.
+                    </p>
+                  </div>
+                </div>
 
-                {/* Top Right typing rectangular image */}
-                <motion.div 
-                  variants={fadeInUp}
-                  whileHover={{ scale: 1.01, y: -2, transition: { duration: 0.2 } }}
-                  className="col-span-5 relative aspect-[4/5] bg-zinc-150 rounded-lg overflow-hidden shadow-sm border border-zinc-200/40 cursor-pointer group"
-                >
-                  <img
-                    src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=400&q=80"
-                    alt="Hands on laptop"
-                    className="w-full h-full object-cover pointer-events-none group-hover:scale-103 transition-transform duration-500 ease-out"
-                  />
-                </motion.div>
+                {/* Pillar 2: Our Mission */}
+                <div className="bg-white border border-slate-200/80 rounded-lg p-5 flex gap-4 shadow-sm hover:shadow-md transition-shadow group">
+                  <div className="h-12 w-12 rounded-lg bg-[#E61C24]/8 border border-[#E61C24]/15 flex items-center justify-center text-[#E61C24] shrink-0 mt-0.5">
+                    <FiShield className="h-6 w-6" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-bold text-[#0A163A] group-hover:text-[#E61C24] transition-colors">Our Mission</h3>
+                    <p className="text-base text-slate-500 font-semibold leading-relaxed">
+                      To bridge the gap between classroom theory and real-world implementation. We provide accessible, hands-on training tailored specifically for current industry needs and growth fields.
+                    </p>
+                  </div>
+                </div>
 
-                {/* Bottom Left desk rectangular image */}
-                <motion.div 
-                  variants={fadeInUp}
-                  whileHover={{ scale: 1.01, y: -2, transition: { duration: 0.2 } }}
-                  className="col-span-5 relative aspect-[4/5] bg-zinc-150 rounded-lg overflow-hidden shadow-sm border border-zinc-200/40 cursor-pointer group"
-                >
-                  <img
-                    src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=400&q=80"
-                    alt="Studying desk"
-                    className="w-full h-full object-cover pointer-events-none group-hover:scale-103 transition-transform duration-500 ease-out"
-                  />
-                </motion.div>
-
-                {/* Bottom Right tutor explanation rectangular image */}
-                <motion.div 
-                  variants={fadeInUp}
-                  whileHover={{ scale: 1.01, y: -2, transition: { duration: 0.2 } }}
-                  className="col-span-7 relative aspect-[4/3] bg-zinc-150 rounded-lg overflow-hidden shadow-sm border border-zinc-200/40 cursor-pointer group"
-                >
-                  <img
-                    src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80"
-                    alt="Explaining tutor"
-                    className="w-full h-full object-cover pointer-events-none group-hover:scale-103 transition-transform duration-500 ease-out"
-                  />
-                </motion.div>
+                {/* Pillar 3: Our Vision */}
+                <div className="bg-white border border-slate-200/80 rounded-lg p-5 flex gap-4 shadow-sm hover:shadow-md transition-shadow group">
+                  <div className="h-12 w-12 rounded-lg bg-[#E61C24]/8 border border-[#E61C24]/15 flex items-center justify-center text-[#E61C24] shrink-0 mt-0.5">
+                    <FiGlobe className="h-6 w-6" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-bold text-[#0A163A] group-hover:text-[#E61C24] transition-colors">Our Vision</h3>
+                    <p className="text-base text-slate-500 font-semibold leading-relaxed">
+                      To build the world&apos;s most supportive and engaging learning network, where anyone can acquire high-value skills and transition their careers with absolute confidence.
+                    </p>
+                  </div>
+                </div>
 
               </div>
-            </motion.div>
+            </div>
 
           </div>
         </div>
@@ -349,7 +301,7 @@ export default function AboutClient() {
       <section className="py-20 md:py-28 px-6 bg-white border-t border-zinc-100 relative overflow-hidden">
         
         {/* Subtle background glow */}
-        <div className="absolute top-1/4 right-0 w-[550px] h-[380px] bg-[#615fff]/4 rounded-full blur-[130px] pointer-events-none" />
+        <div className="absolute top-1/4 right-0 w-[550px] h-[380px] bg-[#E61C24]/4 rounded-full blur-[130px] pointer-events-none" />
 
         <div className="container mx-auto relative z-10 space-y-16">
           
@@ -388,9 +340,9 @@ export default function AboutClient() {
             <motion.div 
               variants={statCardVariants}
               whileHover={{ y: -5, transition: { duration: 0.2, ease: 'easeOut' as const } }}
-              className="p-6 bg-gradient-to-br from-[#615fff]/4 to-[#615fff]/8 border border-[#615fff]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#615fff]/30 transition-all duration-300 group cursor-pointer"
+              className="p-6 bg-gradient-to-br from-[#E61C24]/4 to-[#E61C24]/8 border border-[#E61C24]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#E61C24]/30 transition-all duration-300 group cursor-pointer"
             >
-              <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#615fff] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300">
+              <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#E61C24] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300">
                 <FiBookOpen className="h-6 w-6" />
               </div>
               <h3 className="text-xl font-bold text-[#0A163A] mb-2.5">Expert-Led Courses</h3>
@@ -403,9 +355,9 @@ export default function AboutClient() {
             <motion.div 
               variants={statCardVariants}
               whileHover={{ y: -5, transition: { duration: 0.2, ease: 'easeOut' as const } }}
-              className="p-6 bg-gradient-to-br from-[#615fff]/4 to-[#615fff]/8 border border-[#615fff]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#615fff]/30 transition-all duration-300 group cursor-pointer"
+              className="p-6 bg-gradient-to-br from-[#E61C24]/4 to-[#E61C24]/8 border border-[#E61C24]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#E61C24]/30 transition-all duration-300 group cursor-pointer"
             >
-              <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#615fff] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300">
+              <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#E61C24] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300">
                 <FiClock className="h-6 w-6" />
               </div>
               <h3 className="text-xl font-bold text-[#0A163A] mb-2.5">Flexible Learning</h3>
@@ -418,9 +370,9 @@ export default function AboutClient() {
             <motion.div 
               variants={statCardVariants}
               whileHover={{ y: -5, transition: { duration: 0.2, ease: 'easeOut' as const } }}
-              className="p-6 bg-gradient-to-br from-[#615fff]/4 to-[#615fff]/8 border border-[#615fff]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#615fff]/30 transition-all duration-300 group cursor-pointer"
+              className="p-6 bg-gradient-to-br from-[#E61C24]/4 to-[#E61C24]/8 border border-[#E61C24]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#E61C24]/30 transition-all duration-300 group cursor-pointer"
             >
-              <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#615fff] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300">
+              <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#E61C24] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300">
                 <FiLayers className="h-6 w-6" />
               </div>
               <h3 className="text-xl font-bold text-[#0A163A] mb-2.5">Hands-On Projects</h3>
@@ -433,9 +385,9 @@ export default function AboutClient() {
             <motion.div 
               variants={statCardVariants}
               whileHover={{ y: -5, transition: { duration: 0.2, ease: 'easeOut' as const } }}
-              className="p-6 bg-gradient-to-br from-[#615fff]/4 to-[#615fff]/8 border border-[#615fff]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#615fff]/30 transition-all duration-300 group cursor-pointer"
+              className="p-6 bg-gradient-to-br from-[#E61C24]/4 to-[#E61C24]/8 border border-[#E61C24]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#E61C24]/30 transition-all duration-300 group cursor-pointer"
             >
-              <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#615fff] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300">
+              <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#E61C24] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300">
                 <FiShield className="h-6 w-6" />
               </div>
               <h3 className="text-xl font-bold text-[#0A163A] mb-2.5">Verified Certificates</h3>
@@ -448,9 +400,9 @@ export default function AboutClient() {
             <motion.div 
               variants={statCardVariants}
               whileHover={{ y: -5, transition: { duration: 0.2, ease: 'easeOut' as const } }}
-              className="p-6 bg-gradient-to-br from-[#615fff]/4 to-[#615fff]/8 border border-[#615fff]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#615fff]/30 transition-all duration-300 group cursor-pointer"
+              className="p-6 bg-gradient-to-br from-[#E61C24]/4 to-[#E61C24]/8 border border-[#E61C24]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#E61C24]/30 transition-all duration-300 group cursor-pointer"
             >
-              <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#615fff] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300">
+              <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#E61C24] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300">
                 <FiGlobe className="h-6 w-6" />
               </div>
               <h3 className="text-xl font-bold text-[#0A163A] mb-2.5">Global Learning Community</h3>
@@ -463,9 +415,9 @@ export default function AboutClient() {
             <motion.div 
               variants={statCardVariants}
               whileHover={{ y: -5, transition: { duration: 0.2, ease: 'easeOut' as const } }}
-              className="p-6 bg-gradient-to-br from-[#615fff]/4 to-[#615fff]/8 border border-[#615fff]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#615fff]/30 transition-all duration-300 group cursor-pointer"
+              className="p-6 bg-gradient-to-br from-[#E61C24]/4 to-[#E61C24]/8 border border-[#E61C24]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#E61C24]/30 transition-all duration-300 group cursor-pointer"
             >
-              <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#615fff] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300">
+              <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#E61C24] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300">
                 <FiSettings className="h-6 w-6" />
               </div>
               <h3 className="text-xl font-bold text-[#0A163A] mb-2.5">Personalized Progress Tracking</h3>

@@ -146,20 +146,20 @@ export default function InstructorsPageClient({
         <div className="text-center max-w-3xl mx-auto space-y-5">
           {/* Centered Breadcrumbs */}
           <div className="flex items-center justify-center gap-1.5 text-base font-semibold text-zinc-500 mb-2 select-none">
-            <Link href="/" className="hover:text-[#615fff] transition-colors">Home</Link>
+            <Link href="/" className="hover:text-[#E61C24] transition-colors">Home</Link>
             <span className="text-zinc-300 font-normal">/</span>
             <span className="text-[#0A163A]">Mentors</span>
           </div>
 
           {/* Centered Badge Pill */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#615fff]/8 border border-[#615fff]/15 rounded-full select-none shadow-sm shadow-[#615fff]/5">
-            <span className="w-2 h-2 rounded-full bg-[#615fff] animate-pulse" />
-            <span className="text-sm font-bold text-[#615fff] uppercase tracking-wider">Instructor</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#E61C24]/8 border border-[#E61C24]/15 rounded-full select-none shadow-sm shadow-[#E61C24]/5">
+            <span className="w-2 h-2 rounded-full bg-[#E61C24] animate-pulse" />
+            <span className="text-sm font-bold text-[#E61C24] uppercase tracking-wider">Instructor</span>
           </div>
 
           {/* Heading */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#0A163A] tracking-tight leading-[1.2]">
-            Meet Our Expert <span className="text-[#615fff]">Instructors</span>
+            Meet Our Expert <span className="text-[#E61C24]">Instructors</span>
           </h1>
 
           {/* Description */}
@@ -194,10 +194,10 @@ export default function InstructorsPageClient({
  
               {/* Text Info */}
               <div className="py-5 text-center space-y-1 bg-white">
-                <h3 className="text-lg font-bold text-[#0A163A] leading-tight select-text transition-colors group-hover:text-[#615fff]">
+                <h3 className="text-lg font-bold text-[#0A163A] leading-tight select-text transition-colors group-hover:text-[#E61C24]">
                   {instructor.name}
                 </h3>
-                <p className="text-sm font-semibold text-[#615fff] select-text">
+                <p className="text-sm font-semibold text-[#E61C24] select-text">
                   {instructor.role}
                 </p>
               </div>

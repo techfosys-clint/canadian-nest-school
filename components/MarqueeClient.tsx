@@ -30,12 +30,12 @@ export default function MarqueeClient({ items }: MarqueeClientProps) {
   return (
     <div className="w-full relative h-44 flex items-center justify-center my-6 overflow-visible">
       
-      {/* Ribbon 1: Brand Purple Background, White Text (Scrolls Right to Left, Tilts at -5deg) */}
+      {/* Ribbon 1: Primary Red Background, White Text (Scrolls Right to Left, Tilts at -5deg) */}
       <motion.div 
         initial={{ clipPath: 'inset(0 0 0 100%)', rotate: 0 }}
         animate={{ clipPath: 'inset(0 0 0 0%)', rotate: -5 }}
         transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute w-[105vw] left-1/2 -translate-x-1/2 bg-[#615fff] py-5 overflow-hidden select-none border-y border-white/10 shadow-lg shadow-[#615fff]/15 z-10 transform-gpu backface-hidden will-change-transform"
+        className="absolute w-[105vw] left-1/2 -translate-x-1/2 bg-[#E61C24] py-5 overflow-hidden select-none border-y border-white/10 shadow-lg shadow-[#E61C24]/15 z-10 transform-gpu backface-hidden will-change-transform"
         style={{
           WebkitBackfaceVisibility: 'hidden',
           backfaceVisibility: 'hidden',
@@ -90,12 +90,12 @@ export default function MarqueeClient({ items }: MarqueeClientProps) {
         </motion.div>
       </motion.div>
 
-      {/* Ribbon 2: White Background, Brand Purple Text (Scrolls Left to Right, Tilts at +5deg) */}
+      {/* Ribbon 2: White Background, Primary Red Text (Scrolls Left to Right, Tilts at +5deg) */}
       <motion.div 
         initial={{ clipPath: 'inset(0 100% 0 0)', rotate: 0 }}
         animate={{ clipPath: 'inset(0 0 0 0)', rotate: 5 }}
         transition={{ duration: 1.2, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute w-[105vw] left-1/2 -translate-x-1/2 bg-white py-5 overflow-hidden select-none border-y border-[#615fff]/15 shadow-xl shadow-zinc-200/50 z-20 transform-gpu backface-hidden will-change-transform"
+        className="absolute w-[105vw] left-1/2 -translate-x-1/2 bg-white py-5 overflow-hidden select-none border-y border-[#E61C24]/15 shadow-xl shadow-zinc-200/50 z-20 transform-gpu backface-hidden will-change-transform"
         style={{
           WebkitBackfaceVisibility: 'hidden',
           backfaceVisibility: 'hidden',
@@ -116,7 +116,7 @@ export default function MarqueeClient({ items }: MarqueeClientProps) {
         >
           {/* Marquee Group 1 */}
           <div 
-            className="flex gap-20 items-center shrink-0 pr-20 text-base font-bold uppercase tracking-widest text-[#543CDF] subpixel-antialiased"
+            className="flex gap-20 items-center shrink-0 pr-20 text-base font-bold uppercase tracking-widest text-[#E61C24] subpixel-antialiased"
             style={{
               WebkitFontSmoothing: 'subpixel-antialiased',
               WebkitBackfaceVisibility: 'hidden',
@@ -130,7 +130,7 @@ export default function MarqueeClient({ items }: MarqueeClientProps) {
                   src="/svg/sparkle.png" 
                   alt="sparkle" 
                   className="h-5 w-5 object-contain shrink-0" 
-                  style={{ filter: 'invert(40%) sepia(88%) saturate(1900%) hue-rotate(230deg) brightness(95%) contrast(110%)' }} 
+                  style={{ filter: 'invert(16%) sepia(99%) saturate(5436%) hue-rotate(352deg) brightness(95%) contrast(91%)' }} 
                 />
               </React.Fragment>
             ))}
@@ -138,7 +138,7 @@ export default function MarqueeClient({ items }: MarqueeClientProps) {
 
           {/* Marquee Group 2 */}
           <div 
-            className="flex gap-20 items-center shrink-0 pr-20 text-base font-bold uppercase tracking-widest text-[#543CDF] subpixel-antialiased" 
+            className="flex gap-20 items-center shrink-0 pr-20 text-base font-bold uppercase tracking-widest text-[#E61C24] subpixel-antialiased" 
             aria-hidden="true"
             style={{
               WebkitFontSmoothing: 'subpixel-antialiased',
@@ -153,7 +153,7 @@ export default function MarqueeClient({ items }: MarqueeClientProps) {
                   src="/svg/sparkle.png" 
                   alt="sparkle" 
                   className="h-5 w-5 object-contain shrink-0" 
-                  style={{ filter: 'invert(40%) sepia(88%) saturate(1900%) hue-rotate(230deg) brightness(95%) contrast(110%)' }} 
+                  style={{ filter: 'invert(16%) sepia(99%) saturate(5436%) hue-rotate(352deg) brightness(95%) contrast(91%)' }} 
                 />
               </React.Fragment>
             ))}

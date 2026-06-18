@@ -40,7 +40,7 @@ export default function EnrollButton({
     return (
       <button
         onClick={handleEnrollClick}
-        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-[#615fff]/10 hover:bg-[#615fff]/20 text-[#615fff] border border-[#615fff]/30 font-bold text-base transition-all duration-300 cursor-pointer"
+        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-[#E61C24]/10 hover:bg-[#E61C24]/20 text-[#E61C24] border border-[#E61C24]/30 font-bold text-base transition-all duration-300 cursor-pointer"
       >
         <FiCheck className="h-4.5 w-4.5 shrink-0" />
         <span>Go to Course</span>
@@ -53,7 +53,7 @@ export default function EnrollButton({
     <button
       onClick={handleEnrollClick}
       disabled={loading}
-      className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#543cdf] text-white font-bold text-base shadow-lg shadow-[#615fff]/15 hover:shadow-[#615fff]/25 transition-all duration-300 cursor-pointer transform hover:-translate-y-0.5 whitespace-nowrap ${
+      className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#c5141b] text-white font-bold text-base shadow-lg shadow-[#E61C24]/15 hover:shadow-[#E61C24]/25 transition-all duration-300 cursor-pointer transform hover:-translate-y-0.5 whitespace-nowrap ${
         loading ? 'opacity-80 cursor-not-allowed' : ''
       }`}
     >

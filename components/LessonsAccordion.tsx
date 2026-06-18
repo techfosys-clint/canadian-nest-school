@@ -97,7 +97,7 @@ export default function LessonsAccordion({
           return (
             <div 
               key={group.name} 
-              className="bg-white rounded-lg overflow-hidden border border-[#615fff]/25 shadow-[0_4px_16px_rgba(0,0,0,0.01)] hover:shadow-[0_8px_24px_rgba(97,95,255,0.03)] transition-all duration-300 select-text"
+              className="bg-white rounded-lg overflow-hidden border border-zinc-200/80 hover:border-[#E61C24]/30 shadow-[0_4px_16px_rgba(0,0,0,0.01)] hover:shadow-[0_8px_24px_rgba(230,28,36,0.03)] transition-all duration-300 select-text"
             >
               {/* Accordion Header (Module Title) */}
               <button
@@ -133,7 +133,7 @@ export default function LessonsAccordion({
                     transition={{ duration: 0.3, ease: 'easeInOut' }}
                     className="overflow-hidden"
                   >
-                    <div className="border-t border-[#615fff]/20 divide-y divide-[#615fff]/15 bg-white">
+                    <div className="border-t border-[#E61C24]/20 divide-y divide-[#E61C24]/10 bg-white">
                       {group.lessons.map((lesson) => {
                         const dateObj = lesson.liveDate ? new Date(lesson.liveDate) : null
                         const formattedDate = dateObj
@@ -160,7 +160,7 @@ export default function LessonsAccordion({
                                   : lesson.lessonType === 'quiz'
                                   ? 'bg-amber-50 text-amber-500 border border-amber-100'
                                   : lesson.lessonType === 'assignment'
-                                  ? 'bg-[#615fff]/10 text-[#615fff] border border-[#615fff]/20'
+                                  ? 'bg-[#E61C24]/10 text-[#E61C24] border border-[#E61C24]/20'
                                   : 'bg-zinc-50 text-zinc-500 border border-zinc-150'
                               }`}>
                                 {lesson.lessonType === 'live' ? (
@@ -197,7 +197,7 @@ export default function LessonsAccordion({
                                   {lesson.lessonType === 'assignment' && (
                                     <>
                                       <span>•</span>
-                                      <span className="text-[#615fff] font-bold">Assignment</span>
+                                       <span className="text-[#E61C24] font-bold">Assignment</span>
                                     </>
                                   )}
                                 </div>
@@ -255,7 +255,7 @@ export default function LessonsAccordion({
                                   {courseSlug && (
                                     <Link
                                       href={`/courses/${courseSlug}/watch?lesson=${lesson.id}`}
-                                      className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-[#615fff] hover:bg-[#5248e8] text-white border border-transparent rounded-lg text-sm font-bold transition-all cursor-pointer shadow-sm hover:scale-[1.01]"
+                                      className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-[#E61C24] hover:bg-[#c5141b] text-white border border-transparent rounded-lg text-sm font-bold transition-all cursor-pointer shadow-sm hover:scale-[1.01]"
                                     >
                                       <FiVideo className="h-3.5 w-3.5" />
                                       <span>Open Watch Room</span>

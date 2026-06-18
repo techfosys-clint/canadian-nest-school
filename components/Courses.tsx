@@ -202,7 +202,7 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
             animate={headInView ? 'visible' : 'hidden'}
             className="text-3xl sm:text-4xl md:text-5xl font-bold font-sans text-[#000000] tracking-tight leading-[1.2]"
           >
-            Become <span className="text-[#E61C24]">In Demand</span> On the <br className="hidden sm:block" /> Job Market Today!
+            Master English Confidently <br className="hidden sm:block" /> with Our <span className="text-[#E61C24]">Top Programs</span>
           </motion.h2>
         </div>
 

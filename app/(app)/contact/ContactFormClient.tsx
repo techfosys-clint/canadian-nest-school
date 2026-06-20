@@ -104,10 +104,10 @@ export default function ContactFormClient() {
                 </div>
                 <div className="space-y-1">
                   <p className="text-base font-bold text-zinc-800">Phone</p>
-                  <a href="tel:+8801617643566" className="text-base font-semibold text-zinc-550 hover:text-[#E61C24] transition-colors block">
-                    +880 1617-643566
+                  <a href="tel:+8801739534707" className="text-base font-semibold text-zinc-550 hover:text-[#E61C24] transition-colors block">
+                    +880 17 3953 4707
                   </a>
-                  <p className="text-sm font-semibold text-zinc-400">Sun - Fri, 9am - 6pm</p>
+                  <p className="text-base font-semibold text-zinc-400">Sunday - Thursday, 9am - 8pm (GMT+6)</p>
                 </div>
               </div>
 
@@ -118,11 +118,8 @@ export default function ContactFormClient() {
                 </div>
                 <div className="space-y-1">
                   <p className="text-base font-bold text-zinc-800">Email Address</p>
-                  <a href="mailto:info@tutorspace.com" className="text-base font-semibold text-zinc-550 hover:text-sky-500 transition-colors block">
-                    info@tutorspace.com
-                  </a>
-                  <a href="mailto:support@tutorspace.com" className="text-base font-semibold text-zinc-550 hover:text-sky-500 transition-colors block">
-                    support@tutorspace.com
+                  <a href="mailto:info.canadiannestschool@gmail.com" className="text-base font-semibold text-zinc-550 hover:text-sky-500 transition-colors block">
+                    info.canadiannestschool@gmail.com
                   </a>
                 </div>
               </div>
@@ -135,8 +132,7 @@ export default function ContactFormClient() {
                 <div className="space-y-1">
                   <p className="text-base font-bold text-zinc-800">Our Office</p>
                   <p className="text-base font-semibold text-zinc-550 leading-relaxed">
-                    Foxses Studio, 4th Floor, Lakeview Arcade,<br />
-                    Gulshan 2, Dhaka 1212, Bangladesh
+                    Online Global Platform
                   </p>
                 </div>
               </div>
@@ -149,7 +145,7 @@ export default function ContactFormClient() {
                 <div className="space-y-1">
                   <p className="text-base font-bold text-zinc-800">Support Hours</p>
                   <p className="text-base font-semibold text-zinc-550 leading-relaxed">
-                    Our live chat support is open Sunday through Friday, between 9:00 AM and 8:00 PM (GMT+6).
+                    Sunday through Thursday, 9:00 AM to 8:00 PM (GMT+6).
                   </p>
                 </div>
               </div>
@@ -191,7 +187,7 @@ export default function ContactFormClient() {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Shahriar Rahman"
+                  placeholder="e.g. John Doe"
                   className="w-full bg-[#f8fafc] border border-zinc-200 focus:border-[#E61C24] text-zinc-850 rounded-lg p-3 text-base font-semibold outline-none transition-all"
                 />
               </div>
@@ -207,7 +203,7 @@ export default function ContactFormClient() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="e.g. user@tutorspace.com"
+                  placeholder="e.g. user@example.com"
                   className="w-full bg-[#f8fafc] border border-zinc-200 focus:border-[#E61C24] text-zinc-850 rounded-lg p-3 text-base font-semibold outline-none transition-all"
                 />
               </div>
@@ -224,7 +220,7 @@ export default function ContactFormClient() {
                 required
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                placeholder="How can we help you?"
+                placeholder="Please write the subject of your query here"
                 className="w-full bg-[#f8fafc] border border-zinc-200 focus:border-[#E61C24] text-zinc-850 rounded-lg p-3 text-base font-semibold outline-none transition-all"
               />
             </div>
@@ -240,7 +236,7 @@ export default function ContactFormClient() {
                 rows={5}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Tell us what you need support with..."
+                placeholder="Please write your questions or detailed message here so we can help you better..."
                 className="w-full bg-[#f8fafc] border border-zinc-200 focus:border-[#E61C24] text-zinc-850 rounded-lg p-3 text-base font-semibold outline-none transition-all resize-none"
               />
             </div>
@@ -265,23 +261,6 @@ export default function ContactFormClient() {
 
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}
-        className="w-full h-80 sm:h-[450px] rounded-lg overflow-hidden shadow-sm relative z-10 mt-12 bg-zinc-50"
-      >
-        <iframe
-          title="Tutor Space Location Map"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.902442430138!2d90.412586!3d23.784764!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c7a0f70deb73%3A0x30c36497b7ec28c!2sGulshan%202%2C%20Dhaka%201212!5e0!3m2!1sen!2sbd!4v1622000000000!5m2!1sen!2sbd"
-          width="100%"
-          height="100%"
-          style={{ border: 0 }}
-          allowFullScreen={true}
-          loading="lazy"
-        />
-      </motion.div>
     </>
   )
 }

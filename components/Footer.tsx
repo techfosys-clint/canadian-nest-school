@@ -137,14 +137,14 @@ export default function Footer() {
               <div className="space-y-2 text-base">
                 <p>
                   <span className="text-[#E61C24]">Phone:</span>{' '}
-                  <a href="tel:+8801617643566" className="text-zinc-300 hover:text-[#E61C24] transition-colors">
-                    +880 1617-643566
+                  <a href="tel:+8801739534707" className="text-zinc-300 hover:text-[#E61C24] transition-colors">
+                    +880 17 3953 4707
                   </a>
                 </p>
                 <p>
                   <span className="text-[#E61C24]">Email:</span>{' '}
-                  <a href="mailto:info@tutorspace.com" className="text-zinc-300 hover:text-[#E61C24] transition-colors">
-                    info@tutorspace.com
+                  <a href="mailto:info.canadiannestschool@gmail.com" className="text-zinc-300 hover:text-[#E61C24] transition-colors">
+                    info.canadiannestschool@gmail.com
                   </a>
                 </p>
               </div>

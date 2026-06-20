@@ -199,7 +199,7 @@ export default function FAQ({ faqs }: FAQProps) {
             </p>
           </div>
           <a
-            href="mailto:support@tutorspace.com"
+            href="mailto:info.canadiannestschool@gmail.com"
             className="shrink-0 px-5 py-3 bg-[#E61C24] hover:bg-[#c5141b] text-white font-bold text-base rounded-lg shadow-md shadow-[#E61C24]/20 transition-all duration-300"
           >
             Contact Support

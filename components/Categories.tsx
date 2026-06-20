@@ -18,7 +18,7 @@ const CARDS_DATA = [
     icon: <FiBookOpen className="h-6 w-6 text-[#3b82f6]" />,
     iconColor: 'text-[#3b82f6]',
     borderColor: 'border-[#3b82f6]',
-    bgColor: 'bg-[#3b82f6]/5',
+    bgColor: 'bg-[#3b82f6]/8',
     href: '/courses?category=kids',
   },
   {
@@ -27,7 +27,7 @@ const CARDS_DATA = [
     icon: <FiLayers className="h-6 w-6 text-[#10b981]" />,
     iconColor: 'text-[#10b981]',
     borderColor: 'border-[#10b981]',
-    bgColor: 'bg-[#10b981]/5',
+    bgColor: 'bg-[#10b981]/8',
     href: '/courses?category=teens',
   },
   {
@@ -36,7 +36,7 @@ const CARDS_DATA = [
     icon: <FiMessageCircle className="h-6 w-6 text-[#f97316]" />,
     iconColor: 'text-[#f97316]',
     borderColor: 'border-[#f97316]',
-    bgColor: 'bg-[#f97316]/5',
+    bgColor: 'bg-[#f97316]/8',
     href: '/courses?category=adults',
   },
   {
@@ -45,7 +45,7 @@ const CARDS_DATA = [
     icon: <FiAward className="h-6 w-6 text-[#ef4444]" />,
     iconColor: 'text-[#ef4444]',
     borderColor: 'border-[#ef4444]',
-    bgColor: 'bg-[#ef4444]/5',
+    bgColor: 'bg-[#ef4444]/8',
     href: '/courses?category=ielts',
   },
   {
@@ -54,7 +54,7 @@ const CARDS_DATA = [
     icon: <FiUsers className="h-6 w-6 text-[#a855f7]" />,
     iconColor: 'text-[#a855f7]',
     borderColor: 'border-[#a855f7]',
-    bgColor: 'bg-[#a855f7]/5',
+    bgColor: 'bg-[#a855f7]/8',
     href: '/courses?category=teacher-training',
   },
   {
@@ -63,7 +63,7 @@ const CARDS_DATA = [
     icon: <FiShoppingBag className="h-6 w-6 text-[#eab308]" />,
     iconColor: 'text-[#eab308]',
     borderColor: 'border-[#eab308]',
-    bgColor: 'bg-[#eab308]/5',
+    bgColor: 'bg-[#eab308]/8',
     href: '/courses',
   },
   {
@@ -72,7 +72,7 @@ const CARDS_DATA = [
     icon: <FiCompass className="h-6 w-6 text-[#6366f1]" />,
     iconColor: 'text-[#6366f1]',
     borderColor: 'border-[#6366f1]',
-    bgColor: 'bg-[#6366f1]/5',
+    bgColor: 'bg-[#6366f1]/8',
     href: '/courses',
   },
 ]
@@ -175,7 +175,7 @@ export default function Categories({ categories }: CategoriesProps) {
             >
               <Link
                 href={card.href}
-                className={`flex flex-col h-full bg-white rounded-lg border-2 ${card.borderColor} ${card.bgColor} px-4 py-8 text-center shadow-md -translate-y-1 transition-all duration-300 group cursor-pointer hover:shadow-lg hover:-translate-y-1.5`}
+                className={`flex flex-col h-full rounded-lg border-2 ${card.borderColor} ${card.bgColor} px-4 py-8 text-center shadow-md -translate-y-1 transition-all duration-300 group cursor-pointer hover:shadow-lg hover:-translate-y-1.5`}
               >
                 {/* Top Middle Icon Badge overlapping the border */}
                 <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border-2 ${card.borderColor} rounded-lg shadow-xs flex items-center justify-center transition-all duration-500 scale-110 group-hover:scale-115 z-20 w-12 h-12`}>

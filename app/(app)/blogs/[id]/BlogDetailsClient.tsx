@@ -122,7 +122,7 @@ export default function BlogDetailsClient({ blog, recommendedBlogs }: BlogDetail
       {/* ── SECTION 1: HERO HEADER AREA (LIGHT GRAY BG WITH STAGGER ANIMATIONS) ── */}
       <section className="w-full bg-[#f8fafc] border-b border-zinc-200/80 pt-28 pb-16 relative overflow-hidden">
         {/* Dynamic atmospheric ambient glows */}
-        <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-[#615fff]/5 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-[#E61C24]/5 rounded-full blur-[140px] pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-sky-500/5 rounded-full blur-[130px] pointer-events-none" />
 
         <motion.div 
@@ -135,7 +135,7 @@ export default function BlogDetailsClient({ blog, recommendedBlogs }: BlogDetail
           <motion.div variants={fadeInUp} className="mb-10">
             <Link
               href="/blogs"
-              className="inline-flex items-center gap-2 text-base font-bold text-zinc-500 hover:text-[#615fff] transition-colors group"
+              className="inline-flex items-center gap-2 text-base font-bold text-zinc-500 hover:text-[#E61C24] transition-colors group"
             >
               <FiArrowLeft className="h-4.5 w-4.5 group-hover:-translate-x-1 transition-transform" />
               <span>Back to Knowledge Hub</span>
@@ -150,7 +150,7 @@ export default function BlogDetailsClient({ blog, recommendedBlogs }: BlogDetail
                 {blog.tags.map((t, idx) => (
                   <span
                     key={idx}
-                    className="px-3 py-1 bg-[#615fff]/10 text-[#615fff] font-bold text-xs rounded-lg uppercase tracking-wider hover:bg-[#615fff]/20 transition-colors"
+                    className="px-3 py-1 bg-[#E61C24]/10 text-[#E61C24] font-bold text-xs rounded-lg uppercase tracking-wider hover:bg-[#E61C24]/20 transition-colors"
                   >
                     #{t.tag}
                   </span>
@@ -186,7 +186,7 @@ export default function BlogDetailsClient({ blog, recommendedBlogs }: BlogDetail
                     className="h-9 w-9 rounded-full object-cover shrink-0 border border-zinc-200"
                   />
                 ) : (
-                  <div className="h-9 w-9 rounded-full bg-[#615fff]/10 flex items-center justify-center text-[#615fff] font-bold uppercase text-sm shrink-0">
+                  <div className="h-9 w-9 rounded-full bg-[#E61C24]/10 flex items-center justify-center text-[#E61C24] font-bold uppercase text-sm shrink-0">
                     {blog.authorName?.[0] || 'T'}
                   </div>
                 )}
@@ -283,7 +283,7 @@ export default function BlogDetailsClient({ blog, recommendedBlogs }: BlogDetail
                       className="h-12 w-12 rounded-full object-cover border border-zinc-200 shrink-0"
                     />
                   ) : (
-                    <div className="h-12 w-12 rounded-full bg-[#615fff]/10 flex items-center justify-center text-[#615fff] font-bold uppercase shrink-0">
+                    <div className="h-12 w-12 rounded-full bg-[#E61C24]/10 flex items-center justify-center text-[#E61C24] font-bold uppercase shrink-0">
                       {blog.authorName?.[0] || 'T'}
                     </div>
                   )}
@@ -293,11 +293,11 @@ export default function BlogDetailsClient({ blog, recommendedBlogs }: BlogDetail
                   </div>
                 </div>
                 <p className="text-base font-medium text-zinc-550 leading-relaxed">
-                  Tutor Space educator dedicated to delivering top-tier learning resources, code tutorials, and developmental practices to help software engineers thrive.
+                  Tutor Space educator dedicated to delivering top-tier English language learning resources, interactive lessons, and educational strategies to help students and teachers succeed.
                 </p>
                 <Link
                   href="/courses"
-                  className="block text-center w-full py-2.5 bg-[#615fff]/10 hover:bg-[#615fff] text-[#615fff] hover:text-white font-bold text-sm rounded-lg transition-colors cursor-pointer"
+                  className="block text-center w-full py-2.5 bg-[#E61C24]/10 hover:bg-[#E61C24] text-[#E61C24] hover:text-white font-bold text-sm rounded-lg transition-colors cursor-pointer"
                 >
                   Browse My Courses
                 </Link>
@@ -335,7 +335,7 @@ export default function BlogDetailsClient({ blog, recommendedBlogs }: BlogDetail
                           </div>
                         )}
                         <div className="flex-1 min-w-0 space-y-1">
-                          <h4 className="text-base font-bold text-zinc-800 leading-snug line-clamp-2 group-hover:text-[#615fff] transition-colors">
+                          <h4 className="text-base font-bold text-zinc-800 leading-snug line-clamp-2 group-hover:text-[#E61C24] transition-colors">
                             {rec.title}
                           </h4>
                           <div className="flex items-center gap-2 text-xs font-semibold text-zinc-400">
@@ -357,12 +357,12 @@ export default function BlogDetailsClient({ blog, recommendedBlogs }: BlogDetail
       {recommendedBlogs.length > 0 && (
         <section className="w-full bg-[#f8fafc] border-t border-zinc-200/80 py-16 relative overflow-hidden">
           {/* Soft atmospheric ambient glows */}
-          <div className="absolute top-0 right-1/4 w-[300px] h-[300px] bg-[#615fff]/5 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute top-0 right-1/4 w-[300px] h-[300px] bg-[#E61C24]/5 rounded-full blur-[100px] pointer-events-none" />
           
           <div className="container mx-auto px-6 relative z-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
               <div>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#615fff]/10 text-[#615fff] text-xs font-bold uppercase tracking-wider mb-3">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E61C24]/10 text-[#E61C24] text-xs font-bold uppercase tracking-wider mb-3">
                   More Insights
                 </span>
                 <h3 className="text-2xl md:text-3xl font-bold text-zinc-900">
@@ -371,7 +371,7 @@ export default function BlogDetailsClient({ blog, recommendedBlogs }: BlogDetail
               </div>
               <Link
                 href="/blogs"
-                className="inline-flex items-center gap-2 text-base font-bold text-[#615fff] hover:text-[#5248e8] transition-colors group"
+                className="inline-flex items-center gap-2 text-base font-bold text-[#E61C24] hover:text-[#c3131a] transition-colors group"
               >
                 <span>View all articles</span>
                 <FiArrowLeft className="h-4.5 w-4.5 rotate-180 group-hover:translate-x-1 transition-transform" />
@@ -396,7 +396,7 @@ export default function BlogDetailsClient({ blog, recommendedBlogs }: BlogDetail
                   >
                     <Link
                       href={`/blogs/${rec.id}`}
-                      className="bg-white border border-zinc-200 hover:border-[#615fff]/30 rounded-lg hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden group w-full"
+                      className="bg-white border border-zinc-200 hover:border-[#E61C24]/30 rounded-lg hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden group w-full"
                     >
                       {/* Cover Image */}
                       <div className="aspect-[16/10] overflow-hidden bg-zinc-55 border-b border-zinc-200/80 relative">
@@ -423,13 +423,13 @@ export default function BlogDetailsClient({ blog, recommendedBlogs }: BlogDetail
                           <span>{recReadingTime} min read</span>
                         </div>
                         
-                        <h4 className="font-bold text-zinc-900 text-lg leading-snug line-clamp-2 group-hover:text-[#615fff] transition-colors">
+                        <h4 className="font-bold text-zinc-900 text-lg leading-snug line-clamp-2 group-hover:text-[#E61C24] transition-colors">
                           {rec.title}
                         </h4>
                         
-                        <div className="text-zinc-550 text-sm font-semibold mt-auto pt-3 border-t border-zinc-100 flex items-center justify-between">
+                        <div className="text-zinc-555 text-sm font-semibold mt-auto pt-3 border-t border-zinc-100 flex items-center justify-between">
                           <span className="text-zinc-700">{rec.authorName}</span>
-                          <span className="inline-flex items-center gap-1 text-[#615fff] group-hover:translate-x-1 transition-transform">
+                          <span className="inline-flex items-center gap-1 text-[#E61C24] group-hover:translate-x-1 transition-transform">
                             Read <FiArrowLeft className="h-3.5 w-3.5 rotate-180" />
                           </span>
                         </div>

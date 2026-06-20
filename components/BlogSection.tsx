@@ -84,13 +84,13 @@ export default function BlogSection({ blogs }: BlogSectionProps) {
             </div>
             
             {/* Title */}
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#000000] tracking-tight leading-[1.2]">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0A163A] tracking-tight leading-[1.2]">
               The Canadian Nest <span className="text-[#E61C24]">Knowledge Hub</span>
             </h2>
             
             {/* Description */}
-            <p className="text-base font-semibold text-[#4b5563] leading-relaxed">
-              Get expert insights, coding tutorials, career advice, and industry deep dives to fuel your learning journey.
+            <p className="text-base md:text-lg font-semibold text-[#4F5B7C] leading-relaxed">
+              Read our latest articles, parenting tips, and expert advice on how to improve English pronunciation, phonics, and communication skills easily.
             </p>
           </div>
 

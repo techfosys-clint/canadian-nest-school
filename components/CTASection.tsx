@@ -29,9 +29,9 @@ export default function CTASection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-3xl md:text-5xl font-bold text-white tracking-tight leading-[1.15]"
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight leading-[1.15]"
         >
-          Start Your Learning Journey Today
+          Ready to Transform Your English Skills?
         </motion.h2>
         
         <motion.p 
@@ -39,9 +39,9 @@ export default function CTASection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-4 md:mt-6 text-base md:text-lg text-white/85 max-w-2xl font-normal leading-relaxed"
+          className="mt-4 md:mt-6 text-base md:text-lg text-white/90 max-w-2xl font-semibold leading-relaxed"
         >
-          Gain new skills, explore creative fields, and achieve your career goals — all in one platform.
+          Join our growing community of learners globally. Enroll in our upcoming batch today and step into a brighter, more confident future.
         </motion.p>
 
         <motion.div 

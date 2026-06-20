@@ -143,10 +143,9 @@ export default function Categories({ categories }: CategoriesProps) {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
-            className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#000000] tracking-tight leading-[1.2] max-w-4xl mx-auto"
+            className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0A163A] tracking-tight leading-[1.2] max-w-4xl mx-auto"
           >
-            <span className="block mb-1">Explore diverse learning paths</span>
-            <span className="block">within our <span className="text-[#E61C24]">course categories</span></span>
+            Explore Our <span className="text-[#E61C24]">Specialized English Programs</span>
           </motion.h2>
           
           <motion.p
@@ -154,9 +153,9 @@ export default function Categories({ categories }: CategoriesProps) {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
-            className="text-base sm:text-lg font-semibold text-[#4b5563] max-w-2xl mx-auto pt-2 leading-relaxed"
+            className="text-base md:text-lg font-semibold text-[#4F5B7C] max-w-3xl mx-auto pt-2 leading-relaxed"
           >
-            Our carefully curated course categories are designed to help you explore different fields, gain new skills, and advance your knowledge.
+            From foundational Phonics for kids to advanced Spoken English, IELTS preparation, and professional Teacher Training, choose the perfect program tailored to your learning goals.
           </motion.p>
         </div>
 

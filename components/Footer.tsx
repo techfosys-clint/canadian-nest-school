@@ -185,7 +185,7 @@ export default function Footer() {
             href="/privacy-policy"
             className={pathname === '/privacy-policy' ? 'text-[#E61C24] font-bold' : 'hover:text-zinc-300 transition-colors'}
           >
-            Privacy policy
+            Privacy Policy
           </Link>
           <div className="text-center text-zinc-500 text-base">
             &copy; 2026 Canadian Nest School. All Rights Reserved. Design &amp; Developed By{' '}
@@ -194,10 +194,10 @@ export default function Footer() {
             </a>
           </div>
           <Link
-            href="/terms-of-service"
-            className={pathname === '/terms-of-service' ? 'text-[#E61C24] font-bold' : 'hover:text-zinc-300 transition-colors'}
+            href="/refund-policy"
+            className={pathname === '/refund-policy' ? 'text-[#E61C24] font-bold' : 'hover:text-zinc-300 transition-colors'}
           >
-            Terms of Use
+            Refund Policy
           </Link>
         </div>
       </div>

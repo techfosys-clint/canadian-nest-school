@@ -390,15 +390,15 @@ export default function CoursesPageClient({
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="relative bg-[#E61C24] py-12 md:py-16 text-center overflow-hidden shadow-lg select-text w-full z-10 border-none"
+        className="relative bg-zinc-950 py-12 md:py-16 text-center overflow-hidden shadow-lg select-text w-full z-10 border-none"
       >
         {/* Glowing gradient circles behind */}
-        <div className="absolute -top-12 -left-12 w-48 h-48 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-white/5 rounded-full blur-3xl pointer-events-none" />
-
+        <div className="absolute -top-12 -left-12 w-48 h-48 bg-[#E61C24]/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-[#E61C24]/10 rounded-full blur-3xl pointer-events-none" />
+ 
         {/* Premium Dot grid background inside the card */}
         <div
-          className="absolute inset-0 opacity-[0.6] pointer-events-none"
+          className="absolute inset-0 opacity-[0.35] pointer-events-none"
           style={{ 
             backgroundImage: 'radial-gradient(white 1.2px, transparent 1.2px)', 
             backgroundSize: '24px 24px',
@@ -406,14 +406,14 @@ export default function CoursesPageClient({
             WebkitMaskImage: 'radial-gradient(ellipse at center, black, transparent 80%)'
           }}
         />
-
+ 
         <div className="container mx-auto px-6 relative z-10 flex flex-col items-center w-full max-w-5xl">
           {/* Pill Tag */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="inline-flex items-center gap-2 px-3 py-1 bg-white/15 rounded-lg text-base font-bold text-white uppercase tracking-wide mb-4 border-none"
+            className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-lg text-base font-bold text-white uppercase tracking-wide mb-4 border-none"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
             <span>Our Courses</span>
@@ -424,7 +424,7 @@ export default function CoursesPageClient({
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight leading-[1.2] font-display max-w-4xl"
+            className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight leading-[1.2] font-display max-w-4xl"
           >
             Our Popular Courses
           </motion.h1>
@@ -436,7 +436,7 @@ export default function CoursesPageClient({
             transition={{ duration: 0.6, delay: 0.3 }}
             className="mt-4 text-base sm:text-lg text-white/85 max-w-3xl mx-auto leading-relaxed font-semibold"
           >
-            Grow your skills with expert-led lessons designed to help you achieve your goals — anytime, anywhere.
+            Enhance your <span className="text-[#E61C24] font-bold">English fluency</span> and communication skills with our specialized courses designed for <span className="text-[#E61C24] font-bold">kids, adults, and educators</span>.
           </motion.p>
         </div>
       </motion.div>

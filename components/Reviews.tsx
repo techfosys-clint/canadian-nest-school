@@ -178,13 +178,16 @@ export default function Reviews({ reviews }: ReviewsProps) {
 
       <div className="container mx-auto relative z-10">
         {/* Title / Heading Section */}
-        <div className="text-center mb-16">
-          <p className="text-base font-bold text-[#E61C24] mb-3 tracking-wide uppercase">
-            Hear from our students
+        <div className="text-center mb-16 space-y-4">
+          <p className="text-base font-bold text-[#E61C24] tracking-wide uppercase">
+            SUCCESS STORIES
           </p>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold font-sans text-[#000000] tracking-tight leading-[1.2] max-w-2xl mx-auto">
-            Hear directly from <span className="text-[#E61C24]">our learners!</span> Discover their experiences and insights as they navigate their educational.
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-sans text-[#0A163A] tracking-tight leading-[1.2] max-w-3xl mx-auto">
+            Hear From Our <span className="text-[#E61C24]">Happy Parents and Students</span>
           </h2>
+          <p className="text-base md:text-lg font-semibold text-[#4F5B7C] max-w-3xl mx-auto leading-relaxed">
+            Discover how Canadian Nest School has transformed the English reading and speaking skills of the learners across the globe.
+          </p>
         </div>
 
         {/* 3-Column Marquee Grid */}

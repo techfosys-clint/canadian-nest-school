@@ -127,7 +127,7 @@ export default function BlogsPageClient({ initialBlogs }: BlogsPageClientProps) 
       {/* ── SECTION 1: HERO HEADER WITH CENTERED SEARCH BAR & THEME BG ── */}
       <section className="w-full bg-[#f8fafc] border-b border-zinc-200/80 py-16 relative overflow-hidden">
         {/* Soft atmospheric ambient blurs */}
-        <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-[#615fff]/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-[#E61C24]/5 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-[350px] h-[350px] bg-sky-500/5 rounded-full blur-[110px] pointer-events-none" />
 
         <motion.div 
@@ -140,7 +140,7 @@ export default function BlogsPageClient({ initialBlogs }: BlogsPageClientProps) 
           {/* Centered Category Badge */}
           <motion.span 
             variants={fadeInUp}
-            className="inline-flex items-center justify-center gap-2 px-3.5 py-1 rounded-full bg-[#615fff]/10 text-[#615fff] text-base font-bold"
+            className="inline-flex items-center justify-center gap-2 px-3.5 py-1 rounded-full bg-[#E61C24]/10 text-[#E61C24] text-base font-bold"
           >
             <FiBookOpen className="h-4.5 w-4.5" />
             Knowledge Hub
@@ -151,7 +151,7 @@ export default function BlogsPageClient({ initialBlogs }: BlogsPageClientProps) 
             variants={staggerContainer}
             className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 leading-[1.2] text-center max-w-4xl flex flex-wrap justify-center gap-x-2.5 overflow-hidden py-1"
           >
-            {"Insights & Professional".split(" ").map((word, i) => (
+            {"Insights & Educational".split(" ").map((word, i) => (
               <span key={i} className="relative inline-block overflow-hidden pb-1">
                 <motion.span
                   variants={fadeInUp}
@@ -161,12 +161,12 @@ export default function BlogsPageClient({ initialBlogs }: BlogsPageClientProps) 
                 </motion.span>
               </span>
             ))}
-            <span className="relative inline-block overflow-hidden pb-1 text-[#615fff]">
+            <span className="relative inline-block overflow-hidden pb-1 text-[#E61C24]">
               <motion.span
                 variants={fadeInUp}
                 className="inline-block"
               >
-                Deep Dives
+                Resources
               </motion.span>
             </span>
           </motion.h1>
@@ -176,7 +176,7 @@ export default function BlogsPageClient({ initialBlogs }: BlogsPageClientProps) 
             variants={fadeInUp}
             className="text-base font-semibold text-zinc-550 leading-relaxed max-w-2xl text-center mx-auto"
           >
-            Explore advanced tutorials, engineering principles, structural database reviews, and educational growth guides curated by our expert trainers.
+            Explore English language learning guides, teaching methods, classroom activities, and educational updates curated by our expert instructors.
           </motion.p>
 
           {/* Centered Interactive Search Bar */}
@@ -184,7 +184,7 @@ export default function BlogsPageClient({ initialBlogs }: BlogsPageClientProps) 
             variants={searchAnim}
             className="pt-2 max-w-xl w-full mx-auto"
           >
-            <div className="relative bg-white border border-zinc-200 focus-within:border-[#615fff] rounded-lg shadow-md transition-all flex items-center px-4 py-3 gap-3">
+            <div className="relative bg-white border border-zinc-200 focus-within:border-[#E61C24] rounded-lg shadow-md transition-all flex items-center px-4 py-3 gap-3">
               <FiSearch className="text-zinc-400 h-5 w-5 shrink-0" />
               <input
                 type="text"
@@ -254,7 +254,7 @@ export default function BlogsPageClient({ initialBlogs }: BlogsPageClientProps) 
                       {/* Content Block */}
                       <div className="flex flex-col gap-2.5">
                         {/* Headline */}
-                        <h3 className="text-xl font-bold text-[#0A163A] leading-snug line-clamp-2 hover:text-[#615fff] transition-colors duration-200">
+                        <h3 className="text-xl font-bold text-[#0A163A] leading-snug line-clamp-2 hover:text-[#E61C24] transition-colors duration-200">
                           <Link href={`/blogs/${blog.id}`}>{blog.title}</Link>
                         </h3>
 
@@ -272,7 +272,7 @@ export default function BlogsPageClient({ initialBlogs }: BlogsPageClientProps) 
                               className="h-6 w-6 rounded-full object-cover shrink-0 border border-zinc-150"
                             />
                           ) : (
-                            <div className="h-6 w-6 rounded-full bg-[#615fff]/10 flex items-center justify-center text-[#615fff] font-bold text-xs uppercase shrink-0 select-none">
+                            <div className="h-6 w-6 rounded-full bg-[#E61C24]/10 flex items-center justify-center text-[#E61C24] font-bold text-xs uppercase shrink-0 select-none">
                               {blog.authorName[0]}
                             </div>
                           )}

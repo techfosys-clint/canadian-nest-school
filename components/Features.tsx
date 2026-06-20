@@ -12,27 +12,27 @@ export default function Features() {
       iconColor: 'text-[#10B981]',
       iconBg: 'bg-[#10B981]/10',
       iconBorder: 'border-[#10B981]/20',
-      title: 'Interactive Learning Experience',
+      title: 'Methodology',
       description:
-        'Engage with hands-on projects, real-world simulations, and interactive content that makes learning stick and builds practical skills.',
-    },
-    {
-      icon: <FiAward className="h-6 w-6" />,
-      iconColor: 'text-[#84CC16]',
-      iconBg: 'bg-[#84CC16]/10',
-      iconBorder: 'border-[#84CC16]/20',
-      title: 'Expert-Led Instruction',
-      description:
-        'Learn from industry professionals and academic experts who bring real-world experience and cutting-edge knowledge to every lesson.',
+        'Experience a highly effective learning method focusing on accurate pronunciation, phonics, and natural speaking skills without the pressure of traditional memorization.',
     },
     {
       icon: <FiCalendar className="h-6 w-6" />,
       iconColor: 'text-[#3b82f6]',
       iconBg: 'bg-[#3b82f6]/10',
       iconBorder: 'border-[#3b82f6]/20',
-      title: 'Flexible Study Schedule',
+      title: 'Live and Interactive Classes',
       description:
-        'Study when it works for you with 24/7 access to all materials. Pause, rewind, and replay lessons at your own pace.',
+        'Engage directly with highly experienced instructors through fun, interactive, and practical live sessions designed to keep both kids and adults highly engaged.',
+    },
+    {
+      icon: <FiAward className="h-6 w-6" />,
+      iconColor: 'text-[#84CC16]',
+      iconBg: 'bg-[#84CC16]/10',
+      iconBorder: 'border-[#84CC16]/20',
+      title: 'Tailored for Every Learner',
+      description:
+        'Whether it is a child building their English foundation, an adult improving fluency, or a teacher upgrading their skills, our programs guarantee real progress.',
     },
   ]
 
@@ -47,9 +47,9 @@ export default function Features() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
-            className="text-3xl md:text-5xl font-bold font-display text-[#000000] tracking-tight mb-6 leading-tight"
+            className="text-2xl sm:text-3xl md:text-4xl font-bold font-display text-[#0A163A] tracking-tight mb-6 leading-tight"
           >
-            Empower Your <span className="text-[#E61C24]">Learning Journey</span>
+            Experience the <span className="text-[#E61C24]">International Way of Learning</span>
           </motion.h2>
           
           <motion.p
@@ -57,9 +57,9 @@ export default function Features() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
             transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}
-            className="text-base md:text-lg text-[#4b5563] font-medium leading-relaxed"
+            className="text-base md:text-lg text-[#4F5B7C] font-semibold leading-relaxed"
           >
-            Discover interactive courses, expert instructors, and flexible study options designed to help you reach your goals anytime, anywhere.
+            Watch how our expert instructors use practical and interactive methods to make English reading, speaking, and pronunciation effortless for every student.
           </motion.p>
         </div>
 
@@ -86,7 +86,7 @@ export default function Features() {
               ></iframe>
             </div>
           </motion.div>
-
+ 
           {/* Right Column: Cards Stack */}
           <div className="flex flex-col gap-6">
             {featuresList.map((item, idx) => (
@@ -104,13 +104,13 @@ export default function Features() {
                 >
                   {item.icon}
                 </div>
-
+ 
                 {/* Content */}
                 <div className="space-y-2">
                   <h3 className="text-lg md:text-xl font-bold text-[#0A163A] transition-colors duration-200">
                     {item.title}
                   </h3>
-                  <p className="text-base text-[#4b5563] font-normal leading-relaxed">
+                  <p className="text-base text-[#4F5B7C] font-normal leading-relaxed">
                     {item.description}
                   </p>
                 </div>

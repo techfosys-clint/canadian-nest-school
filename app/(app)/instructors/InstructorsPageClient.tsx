@@ -158,13 +158,13 @@ export default function InstructorsPageClient({
           </div>
 
           {/* Heading */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#0A163A] tracking-tight leading-[1.2]">
-            Meet Our Expert <span className="text-[#E61C24]">Instructors</span>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#0A163A] tracking-tight leading-[1.2]">
+            Meet Our Expert <span className="text-[#E61C24]">Educators</span>
           </h1>
 
           {/* Description */}
-          <p className="text-base sm:text-lg font-semibold text-[#4F5B7C] leading-relaxed max-w-2xl mx-auto">
-            Learn from industry professionals who bring real-world experience, creativity, and insights into every lesson.
+          <p className="text-base md:text-lg font-semibold text-[#4F5B7C] leading-relaxed max-w-2xl mx-auto">
+            Learn directly from highly qualified professionals and certified educators dedicated to maintaining Canadian and International teaching standards.
           </p>
         </div>
  

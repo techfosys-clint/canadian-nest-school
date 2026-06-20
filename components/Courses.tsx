@@ -200,9 +200,9 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
             variants={sectionHeadVariants}
             initial="hidden"
             animate={headInView ? 'visible' : 'hidden'}
-            className="text-3xl sm:text-4xl md:text-5xl font-bold font-sans text-[#000000] tracking-tight leading-[1.2]"
+            className="text-2xl sm:text-3xl md:text-4xl font-bold font-sans text-[#0A163A] tracking-tight leading-[1.2]"
           >
-            Master English Confidently <br className="hidden sm:block" /> with Our <span className="text-[#E61C24]">Top Programs</span>
+            Our Most Favourite <span className="text-[#E61C24]">English Programs</span>
           </motion.h2>
         </div>
 

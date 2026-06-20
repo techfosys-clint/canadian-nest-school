@@ -436,7 +436,7 @@ export default function CoursesPageClient({
             transition={{ duration: 0.6, delay: 0.3 }}
             className="mt-4 text-base sm:text-lg text-white/85 max-w-3xl mx-auto leading-relaxed font-semibold"
           >
-            Enhance your <span className="text-[#E61C24] font-bold">English fluency</span> and communication skills with our specialized courses designed for <span className="text-[#E61C24] font-bold">kids, adults, and educators</span>.
+            Enhance your <span className="text-[#E61C24] font-bold">English fluency</span> and communication skills with our specialized courses designed for <span className="text-[#E61C24] font-bold">kids, teens, adults, and educators</span>.
           </motion.p>
         </div>
       </motion.div>

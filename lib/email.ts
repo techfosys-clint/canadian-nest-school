@@ -1,9 +1,34 @@
-export async function sendStaffRegistrationEmail(toEmail: string, name: string, role: string, rawPassword: string) {
-  const apiKey = process.env.RESEND_API_KEY
-  const fromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@email.foxses.com'
+import nodemailer from 'nodemailer'
 
-  if (!apiKey) {
-    console.error('RESEND_API_KEY is not defined in environment variables.')
+let cachedTransporter: ReturnType<typeof nodemailer.createTransport> | null = null
+
+export function getGmailTransporter() {
+  if (cachedTransporter) return cachedTransporter
+
+  const gmailUser = process.env.GMAIL_USER
+  const gmailAppPassword = process.env.GMAIL_APP_PASSWORD
+
+  if (!gmailUser || !gmailAppPassword) {
+    console.error('GMAIL_USER or GMAIL_APP_PASSWORD is not defined in environment variables.')
+    return null
+  }
+
+  cachedTransporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: gmailUser,
+      pass: gmailAppPassword,
+    },
+  })
+
+  return cachedTransporter
+}
+
+export async function sendStaffRegistrationEmail(toEmail: string, name: string, role: string, rawPassword: string) {
+  const transporter = getGmailTransporter()
+  const fromEmail = process.env.GMAIL_USER
+
+  if (!transporter) {
     return false
   }
 
@@ -29,25 +54,12 @@ export async function sendStaffRegistrationEmail(toEmail: string, name: string, 
   `
 
   try {
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: `Tutor Space <${fromEmail}>`,
-        to: toEmail,
-        subject: subject,
-        html: htmlContent,
-      }),
+    await transporter.sendMail({
+      from: `Tutor Space <${fromEmail}>`,
+      to: toEmail,
+      subject: subject,
+      html: htmlContent,
     })
-
-    if (!res.ok) {
-      const errData = await res.json()
-      console.error('Resend API error:', errData)
-      return false
-    }
 
     return true
   } catch (error) {
@@ -65,12 +77,11 @@ export async function sendLiveClassReminderEmail(
   livePlatform: string,
   liveUrl: string
 ) {
-  const apiKey = process.env.RESEND_API_KEY
-  const fromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@email.foxses.com'
+  const transporter = getGmailTransporter()
+  const fromEmail = process.env.GMAIL_USER
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-  if (!apiKey) {
-    console.error('RESEND_API_KEY is not defined in environment variables.')
+  if (!transporter) {
     return false
   }
 
@@ -136,25 +147,12 @@ export async function sendLiveClassReminderEmail(
   `
 
   try {
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: `Tutor Space <${fromEmail}>`,
-        to: toEmail,
-        subject: subject,
-        html: htmlContent,
-      }),
+    await transporter.sendMail({
+      from: `Tutor Space <${fromEmail}>`,
+      to: toEmail,
+      subject: subject,
+      html: htmlContent,
     })
-
-    if (!res.ok) {
-      const errData = await res.json()
-      console.error('Resend Live Reminder Email error:', errData)
-      return false
-    }
 
     return true
   } catch (error) {

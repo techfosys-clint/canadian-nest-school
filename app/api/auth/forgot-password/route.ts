@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Student } from '@/lib/db/models/Student'
 import { User } from '@/lib/db/models/User'
+import { getGmailTransporter } from '@/lib/email'
 import crypto from 'crypto'
 
 export async function POST(request: Request) {
@@ -44,24 +45,20 @@ export async function POST(request: Request) {
     account.resetPasswordExpiration = expiration
     await account.save()
 
-    // 4. Send the actual email using Resend API via fetch
+    // 4. Send the actual email using Gmail SMTP via nodemailer
     const host = request.headers.get('host') || 'localhost:3000'
     const protocol = host.includes('localhost') ? 'http' : 'https'
     const resetUrl = `${protocol}://${host}/reset-password?token=${token}`
 
-    if (process.env.RESEND_API_KEY && process.env.RESEND_FROM_EMAIL) {
+    const transporter = getGmailTransporter()
+
+    if (transporter) {
       try {
-        const mailRes = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-          },
-          body: JSON.stringify({
-            from: `Tutor Space <${process.env.RESEND_FROM_EMAIL}>`,
-            to: emailLower,
-            subject: 'Reset Password Request - Tutor Space',
-            html: `
+        await transporter.sendMail({
+          from: `Tutor Space <${process.env.GMAIL_USER}>`,
+          to: emailLower,
+          subject: 'Reset Password Request - Tutor Space',
+          html: `
               <!DOCTYPE html>
               <html>
               <head>
@@ -97,18 +94,12 @@ export async function POST(request: Request) {
               </body>
               </html>
             `,
-          }),
         })
-
-        if (!mailRes.ok) {
-          const mailError = await mailRes.json()
-          console.error('Resend API Mail Error:', mailError)
-        }
       } catch (mailError) {
-        console.error('Failed to send email via Resend API:', mailError)
+        console.error('Failed to send email via Gmail SMTP:', mailError)
       }
     } else {
-      console.warn('Resend API credentials missing. Skipping real email dispatch.')
+      console.warn('Gmail SMTP credentials missing. Skipping real email dispatch.')
     }
 
     // 5. Return success response

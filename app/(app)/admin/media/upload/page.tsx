@@ -7,7 +7,7 @@ import { User } from '@/lib/db/models/User'
 import MediaUploadClient from './MediaUploadClient'
 
 export const metadata = {
-  title: 'Upload Media - Tutor Space Admin',
+  title: 'Upload Media - Canadian Nest School Admin',
   description: 'Upload images, videos, and files to the media library.',
 }
 

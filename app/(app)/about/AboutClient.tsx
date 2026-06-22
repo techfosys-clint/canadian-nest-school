@@ -72,7 +72,7 @@ export default function AboutClient() {
               variants={fadeInUp}
               className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#0A163A] tracking-tight leading-[1.2]"
             >
-              About <span className="text-[#E61C24]">Tutor Space</span>
+              About <span className="text-[#E61C24]">Canadian Nest School</span>
             </motion.h1>
 
             {/* Description */}
@@ -259,7 +259,7 @@ export default function AboutClient() {
                   <div className="space-y-1">
                     <h3 className="text-lg font-bold text-[#0A163A] group-hover:text-[#E61C24] transition-colors">Our Story</h3>
                     <p className="text-base text-slate-500 font-semibold leading-relaxed">
-                      Tutor Space began with a simple mission: to simplify learning. We started with a handful of passionate educators and have grown into a global ecosystem where students master in-demand skills.
+                      Canadian Nest School began with a simple mission: to simplify learning. We started with a handful of passionate educators and have grown into a global ecosystem where students master in-demand skills.
                     </p>
                   </div>
                 </div>

@@ -15,9 +15,9 @@ export async function generateMetadata({ params }: Props) {
   const { id } = await params
   await connectToDatabase()
   const coupon = await Coupon.findById(id).select('code').lean()
-  if (!coupon) return { title: 'Edit Coupon - Tutor Space' }
+  if (!coupon) return { title: 'Edit Coupon - Canadian Nest School' }
   return {
-    title: `Edit Coupon: ${coupon.code} - Tutor Space Admin`,
+    title: `Edit Coupon: ${coupon.code} - Canadian Nest School Admin`,
   }
 }
 

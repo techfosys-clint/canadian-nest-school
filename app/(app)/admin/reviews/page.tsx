@@ -8,7 +8,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import ReviewsModerationClient from './ReviewsModerationClient'
 
 export const metadata = {
-  title: 'Reviews Moderation - Tutor Space Admin',
+  title: 'Reviews Moderation - Canadian Nest School Admin',
   description: 'Approve or reject student reviews.',
 }
 

@@ -8,7 +8,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import LessonFormClient from '../LessonFormClient'
 
 export const metadata = {
-  title: 'Add Lesson - Tutor Space Admin',
+  title: 'Add Lesson - Canadian Nest School Admin',
   description: 'Add a new syllabus lesson document.',
 }
 

@@ -1,8 +1,8 @@
-# 📚 Tutor Space — আপনার নিজস্ব অনলাইন কোর্স বিক্রয় প্ল্যাটফর্ম
+# 📚 Canadian Nest School — আপনার নিজস্ব অনলাইন কোর্স বিক্রয় প্ল্যাটফর্ম
 
 আপনি একজন শিক্ষক বা কন্টেন্ট ক্রিয়েটর? আপনার দক্ষতা অনলাইনে শেখান এবং অর্থ উপার্জন করতে চান?
 
-**Tutor Space একটি সম্পূর্ণ সমাধান।** এটি একটি ready-made course selling template যা আপনি নিজের domain-এ setup করে আপনার নিজস্ব অনলাইন স্কুল চালু করতে পারবেন। কোনো technical knowledge লাগবে না।
+**Canadian Nest School একটি সম্পূর্ণ সমাধান।** এটি একটি ready-made course selling template যা আপনি নিজের domain-এ setup করে আপনার নিজস্ব অনলাইন স্কুল চালু করতে পারবেন। কোনো technical knowledge লাগবে না।
 
 ---
 
@@ -107,7 +107,7 @@ Dashboard থেকে সবকিছু ট্র্যাক করুন:
 
 ## 💡 **এটা প্রতিযোগিতায় কেন এগিয়ে?**
 
-| বৈশিষ্ট্য | Tutor Space | অন্যদের তুলনায় |
+| বৈশিষ্ট্য | Canadian Nest School | অন্যদের তুলনায় |
 |---|---|---|
 | **নিজের ডোমেইনে** | ✅ সম্পূর্ণ আপনার নিয়ন্ত্রণ | ❌ অন্যদের ডোমেইন ভাড়া, ব্র্যান্ডিং সীমিত |
 | **সব ফিচার এক জায়গায়** | ✅ Video + Quiz + Assignment + Live + Certificate | ⚠️ একটার জন্য অন্য tool লাগে |
@@ -128,7 +128,7 @@ Dashboard থেকে সবকিছু ট্র্যাক করুন:
 ### প্রথম ৫ ধাপ:
 
 #### **ধাপ ১: Setup**
-আমরা আপনার domain-এ Tutor Space install করব। (Technical কাজ আমরা করব)
+আমরা আপনার domain-এ Canadian Nest School install করব। (Technical কাজ আমরা করব)
 
 #### **ধাপ ২: আপনার প্রোফাইল**
 - আপনার নাম, ছবি, বর্ণনা লিখুন
@@ -173,7 +173,7 @@ Dashboard থেকে সবকিছু ট্র্যাক করুন:
 
 ---
 
-## 🎁 **Tutor Space Template-এ যা যা পাচ্ছেন**
+## 🎁 **Canadian Nest School Template-এ যা যা পাচ্ছেন**
 
 ✅ সম্পূর্ণ course platform (video, quiz, assignment, live, certificate)  
 ✅ নিজের domain-এ setup  
@@ -192,7 +192,7 @@ Dashboard থেকে সবকিছু ট্র্যাক করুন:
 
 আপনার নিজস্ব অনলাইন স্কুল চালু করুন। হাজার হাজার শিক্ষার্থীকে শেখান। আপনার দক্ষতা থেকে আয় করুন।
 
-**Tutor Space — সবকিছু আপনার হাতে।** 🚀
+**Canadian Nest School — সবকিছু আপনার হাতে।** 🚀
 
 ---
 

@@ -7,7 +7,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import CouponFormClient from '../CouponFormClient'
 
 export const metadata = {
-  title: 'Create Coupon - Tutor Space Admin',
+  title: 'Create Coupon - Canadian Nest School Admin',
 }
 
 export default async function NewCouponPage() {

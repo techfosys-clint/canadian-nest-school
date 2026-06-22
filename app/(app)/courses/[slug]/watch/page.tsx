@@ -19,9 +19,9 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params
   await connectToDatabase()
   const course = await Course.findOne({ slug, status: 'published' }).lean()
-  if (!course) return { title: 'Course Player - Tutor Space' }
+  if (!course) return { title: 'Course Player - Canadian Nest School' }
   return {
-    title: `Player: ${course.title} - Tutor Space`,
+    title: `Player: ${course.title} - Canadian Nest School`,
     description: `Watch course lectures for ${course.title}`,
   }
 }

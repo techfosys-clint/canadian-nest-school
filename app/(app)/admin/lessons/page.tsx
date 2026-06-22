@@ -8,7 +8,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import LessonsPageClient from './LessonsPageClient'
 
 export const metadata = {
-  title: 'Lessons Syllabus Hub - Tutor Space Admin',
+  title: 'Lessons Syllabus Hub - Canadian Nest School Admin',
   description: 'Manage and organise course lessons and live sessions.',
 }
 

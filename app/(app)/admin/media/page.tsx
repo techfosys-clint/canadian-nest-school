@@ -8,7 +8,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import MediaLibraryClient from './MediaLibraryClient'
 
 export const metadata = {
-  title: 'Media Library - Tutor Space Admin',
+  title: 'Media Library - Canadian Nest School Admin',
   description: 'Browse and manage all uploaded media assets.',
 }
 

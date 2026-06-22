@@ -5,7 +5,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import StaffRegisterFormClient from '../StaffRegisterFormClient'
 
 export const metadata = {
-  title: 'Register Faculty - Tutor Space Admin',
+  title: 'Register Faculty - Canadian Nest School Admin',
   description: 'Create new administrator, staff, or instructor profiles.',
 }
 

@@ -8,7 +8,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import CategoryFormClient from '../../CategoryFormClient'
 
 export const metadata = {
-  title: 'Edit Category - Tutor Space Admin',
+  title: 'Edit Category - Canadian Nest School Admin',
   description: 'Edit a course catalog category.',
 }
 

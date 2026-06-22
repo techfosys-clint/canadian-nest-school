@@ -14,9 +14,9 @@ export async function generateMetadata({ params }: Props) {
   const { id } = await params
   await connectToDatabase()
   const member = await User.findById(id).select('name').lean()
-  if (!member) return { title: 'Edit Faculty - Tutor Space' }
+  if (!member) return { title: 'Edit Faculty - Canadian Nest School' }
   return {
-    title: `Edit: ${member.name} - Tutor Space Admin`,
+    title: `Edit: ${member.name} - Canadian Nest School Admin`,
   }
 }
 

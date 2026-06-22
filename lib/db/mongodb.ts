@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const DATABASE_URL = process.env.DATABASE_URL || 'mongodb://127.0.0.1/tutor-space'
+const DATABASE_URL = process.env.DATABASE_URL || 'mongodb://127.0.0.1/canadian-nest-school'
 
 if (!DATABASE_URL) {
   throw new Error('Please define the DATABASE_URL environment variable inside .env.local')

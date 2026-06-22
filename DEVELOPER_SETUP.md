@@ -1,6 +1,6 @@
-# 👨‍💻 Tutor Space — Developer Setup & Customization Guide
+# 👨‍💻 Canadian Nest School — Developer Setup & Customization Guide
 
-আপনার ক্লায়েন্ট Tutor Space template কিনেছেন এবং নিজের course platform বানাতে চান। এই গাইড আপনাকে (developer) সম্পূর্ণ setup, customization, এবং deployment করতে সাহায্য করবে।
+আপনার ক্লায়েন্ট Canadian Nest School template কিনেছেন এবং নিজের course platform বানাতে চান। এই গাইড আপনাকে (developer) সম্পূর্ণ setup, customization, এবং deployment করতে সাহায্য করবে।
 
 ---
 
@@ -19,8 +19,8 @@
 
 ### Step 1.1: Repository Clone করুন
 ```bash
-git clone <tutor-space-repo-url>
-cd tutor-space
+git clone <canadian-nest-school-repo-url>
+cd canadian-nest-school
 ```
 
 ### Step 1.2: Dependencies Install করুন
@@ -36,14 +36,14 @@ pnpm install
 
 ```env
 # === Database ===
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/tutor-space-db?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/canadian-nest-school-db?retryWrites=true&w=majority
 
 # === JWT & Auth ===
 PAYLOAD_SECRET=your-super-secret-key-here-min-32-characters
 
 # === Video Storage (Cloudflare R2 / S3-Compatible) ===
 S3_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
-S3_BUCKET=tutor-space-videos
+S3_BUCKET=canadian-nest-school-videos
 S3_ACCESS_KEY_ID=your-r2-access-key
 S3_SECRET_ACCESS_KEY=your-r2-secret-key
 
@@ -119,7 +119,7 @@ export const metadata = {
 ### Step 3.1: R2 Account তৈরি করুন
 
 1. https://dash.cloudflare.com এ login করুন
-2. **R2** → **Create bucket** → নাম দিন `tutor-space-videos`
+2. **R2** → **Create bucket** → নাম দিন `canadian-nest-school-videos`
 3. **Settings** → bucket-কে **Private** রাখুন (public access বন্ধ)
 
 ### Step 3.2: API Token তৈরি করুন

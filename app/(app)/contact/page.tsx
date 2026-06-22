@@ -6,8 +6,8 @@ import type { FAQDoc } from '@/components/FAQ'
 import ContactFormClient from './ContactFormClient'
 
 export const metadata = {
-  title: 'Contact Us - Tutor Space',
-  description: 'Have questions or feedback? Contact the Tutor Space support team today and we will get back to you shortly.',
+  title: 'Contact Us - Canadian Nest School',
+  description: 'Have questions or feedback? Contact the Canadian Nest School support team today and we will get back to you shortly.',
 }
 
 export default async function ContactPage() {

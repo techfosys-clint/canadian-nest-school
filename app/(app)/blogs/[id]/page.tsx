@@ -16,15 +16,15 @@ export async function generateMetadata({ params }: Props) {
   
   try {
     const blog = await Blog.findById(id).lean()
-    if (!blog) return { title: 'Article Not Found - Tutor Space' }
+    if (!blog) return { title: 'Article Not Found - Canadian Nest School' }
     
     return {
-      title: `${blog.title} - Tutor Space`,
-      description: blog.seo?.metaDescription || `${blog.title} educational article on Tutor Space.`,
+      title: `${blog.title} - Canadian Nest School`,
+      description: blog.seo?.metaDescription || `${blog.title} educational article on Canadian Nest School.`,
       keywords: blog.seo?.keywords || '',
     }
   } catch (err) {
-    return { title: 'Blog Details - Tutor Space' }
+    return { title: 'Blog Details - Canadian Nest School' }
   }
 }
 
@@ -71,7 +71,7 @@ export default async function BlogDetailsPage({ params }: Props) {
       tag: typeof t === 'string' ? t : (t?.tag || '')
     })),
     coverImageUrl: blogDoc.coverImage?.url || '',
-    authorName: blogDoc.author?.name || 'Tutor Space Expert',
+    authorName: blogDoc.author?.name || 'Canadian Nest School Expert',
     authorRole: blogDoc.author?.role || 'Staff',
     authorProfilePicUrl: blogDoc.author?.profilePic?.url || ''
   }))
@@ -81,7 +81,7 @@ export default async function BlogDetailsPage({ params }: Props) {
       id: b._id.toString(),
       title: b.title || '',
       content: b.content || '',
-      authorName: b.author?.name || 'Tutor Space Expert',
+      authorName: b.author?.name || 'Canadian Nest School Expert',
       coverImageUrl: b.coverImage?.url || '',
       publishedDate: b.publishedDate ? b.publishedDate.toISOString() : b.createdAt ? b.createdAt.toISOString() : '',
     }))

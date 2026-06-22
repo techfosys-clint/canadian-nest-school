@@ -11,7 +11,7 @@ import type { CourseDoc, CategoryDoc } from '@/components/Courses'
 import type { ReviewDoc } from '@/components/Reviews'
 
 export const metadata = {
-  title: 'Our Mentors - Tutor Space',
+  title: 'Our Mentors - Canadian Nest School',
   description: 'Meet our industry\'s leading expert mentors.',
 }
 

@@ -7,7 +7,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import LiveClassesPageClient from './LiveClassesPageClient'
 
 export const metadata = {
-  title: 'Scheduled Live Classes - Tutor Space Admin',
+  title: 'Scheduled Live Classes - Canadian Nest School Admin',
   description: 'Manage and coordinate all active interactive live lectures.',
 }
 

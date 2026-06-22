@@ -381,7 +381,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
       if (!window.location.pathname.includes('/watch')) return
       if (e.key === 'PrintScreen') {
         setIsBlackout(true)
-        navigator.clipboard.writeText('Protected Content - Tutor Space Screen Captures Restricted.').catch(() => {})
+        navigator.clipboard.writeText('Protected Content - Canadian Nest School Screen Captures Restricted.').catch(() => {})
         Swal.fire({
           icon: 'warning',
           title: 'Screenshot Restricted',

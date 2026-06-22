@@ -405,7 +405,7 @@ export default function AdminDashboardPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Executive Dashboard</h1>
           <p className="text-base font-semibold text-slate-500 mt-0.5 capitalize">
-            Manage Tutor Space core e-learning operations as {role}.
+            Manage Canadian Nest School core e-learning operations as {role}.
           </p>
         </div>
         <button

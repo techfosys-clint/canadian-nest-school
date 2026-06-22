@@ -9,7 +9,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import ReviewFormClient from './ReviewFormClient'
 
 export const metadata = {
-  title: 'Add Review - Tutor Space Admin',
+  title: 'Add Review - Canadian Nest School Admin',
   description: 'Add a custom review testimonial from the admin panel.',
 }
 

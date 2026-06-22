@@ -8,7 +8,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import FAQsPageClient from './FAQsPageClient'
 
 export const metadata = {
-  title: 'FAQs Management - Tutor Space Admin',
+  title: 'FAQs Management - Canadian Nest School Admin',
 }
 
 export default async function FAQsPage() {

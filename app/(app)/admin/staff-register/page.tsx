@@ -8,7 +8,7 @@ import { User } from '@/lib/db/models/User'
 import StaffListPageClient from './StaffListPageClient'
 
 export const metadata = {
-  title: 'Staff Registry - Tutor Space Admin',
+  title: 'Staff Registry - Canadian Nest School Admin',
   description: 'Register and manage administrative, teaching, and support accounts.',
 }
 

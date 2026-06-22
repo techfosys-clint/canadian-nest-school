@@ -69,7 +69,7 @@ export async function generateMetadata({ params }: Props) {
   const course = await Course.findOne({ slug, status: 'published' }).lean()
   if (!course) return { title: 'Course Not Found' }
   return {
-    title: `${course.title} - Tutor Space`,
+    title: `${course.title} - Canadian Nest School`,
     description: course.summary,
   }
 }

@@ -4,7 +4,7 @@ import { Blog } from '@/lib/db/models/Blog'
 import BlogsPageClient from './BlogsPageClient'
 
 export const metadata = {
-  title: 'Blog & Articles - Tutor Space',
+  title: 'Blog & Articles - Canadian Nest School',
   description: 'Explore professional guides, tech deep-dives, industry tutorials, and educational updates curated by our senior expert instructors.',
 }
 

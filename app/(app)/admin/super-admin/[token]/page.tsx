@@ -8,8 +8,8 @@ import fs from 'fs/promises'
 import path from 'path'
 
 export const metadata = {
-  title: 'Root Setup Wizard - Tutor Space Console',
-  description: 'Setup the root administrator account for Tutor Space.',
+  title: 'Root Setup Wizard - Canadian Nest School Console',
+  description: 'Setup the root administrator account for Canadian Nest School.',
 }
 
 type PageParams = { token: string }

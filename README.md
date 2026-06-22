@@ -1,6 +1,6 @@
-# 🎓 Tutor Space - Premium Course Selling Platform
+# 🎓 Canadian Nest School - Premium Course Selling Platform
 
-Tutor Space is a high-performance, full-stack course selling and e-learning platform built natively on **Next.js 16 (App Router)** and **Payload CMS 3.x**. 
+Canadian Nest School is a high-performance, full-stack course selling and e-learning platform built natively on **Next.js 16 (App Router)** and **Payload CMS 3.x**. 
 
 It provides completely isolated environments for public-facing client pages and administrative dashboards using Next.js Route Groups. It is designed for ultra-low latency server data fetching, robust role-based access controls, and modular course blueprint creation.
 
@@ -8,7 +8,7 @@ It provides completely isolated environments for public-facing client pages and 
 
 ## 📸 Website Preview
 
-![Tutor Space Preview](./public/webscreenshort.png)
+![Canadian Nest School Preview](./public/webscreenshort.png)
 
 ---
 
@@ -52,9 +52,9 @@ Use the following credentials to test the various role access levels of the plat
 
 You can access the hosted version of the platform and its panels using these URLs:
 
-- **🌐 Public Frontend Website:** [https://tutor-space-three.vercel.app/](https://tutor-space-three.vercel.app/)
-- **🔑 Payload Admin Dashboard:** [https://tutor-space-three.vercel.app/admin](https://tutor-space-three.vercel.app/admin) (Use this link to log in to Admin, Instructor, and Staff dashboards)
-- **🔌 REST API Gateway:** [https://tutor-space-three.vercel.app/api](https://tutor-space-three.vercel.app/api)
+- **🌐 Public Frontend Website:** [https://canadian-nest-school-three.vercel.app/](https://canadian-nest-school-three.vercel.app/)
+- **🔑 Payload Admin Dashboard:** [https://canadian-nest-school-three.vercel.app/admin](https://canadian-nest-school-three.vercel.app/admin) (Use this link to log in to Admin, Instructor, and Staff dashboards)
+- **🔌 REST API Gateway:** [https://canadian-nest-school-three.vercel.app/api](https://canadian-nest-school-three.vercel.app/api)
 
 ---
 
@@ -120,11 +120,11 @@ pnpm dev
 ## 🤖 For AI Coding Assistants
 
 If you are using an AI Coding Assistant (such as Antigravity, Claude, Cursor, Copilot, or similar LLMs) to write code for this project, please direct them to read:
-👉 **[AGENTS.md](file:///d:/Shahriar/personal/tutor-space/AGENTS.md)**
+👉 **[AGENTS.md](file:///d:/Shahriar/personal/canadian-nest-school/AGENTS.md)**
 
 It contains crucial instructions about Next.js 15/16 asynchronous parameter typing and Payload CMS 3.x layout configurations to prevent compiler conflicts or build breaks.
 
 ---
 
 ## 📄 License
-This project is private and owned by Foxses Studio / Tutor Space. All rights reserved.
+This project is private and owned by Foxses Studio / Canadian Nest School. All rights reserved.

@@ -8,7 +8,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import CategoriesPageClient from './CategoriesPageClient'
 
 export const metadata = {
-  title: 'Categories Management - Tutor Space Admin',
+  title: 'Categories Management - Canadian Nest School Admin',
 }
 
 export default async function CategoriesPage() {

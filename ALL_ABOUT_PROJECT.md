@@ -1,6 +1,6 @@
-# 🎓 All About Tutor Space - Master Project Documentation
+# 🎓 All About Canadian Nest School - Master Project Documentation
 
-Welcome to **Tutor Space**, a high-performance, full-stack course selling and e-learning platform engineered using **Next.js 16 (App Router)** and **Payload CMS 3.x**. 
+Welcome to **Canadian Nest School**, a high-performance, full-stack course selling and e-learning platform engineered using **Next.js 16 (App Router)** and **Payload CMS 3.x**. 
 
 This document serves as the absolute **source of truth** and architectural blueprint for the entire project. It details the project's identity, technical stack, structural directories, custom design system, database engine, and step-by-step development guidelines.
 
@@ -8,7 +8,7 @@ This document serves as the absolute **source of truth** and architectural bluep
 
 ## 🎨 Project Identity & Core Branding
 
-**Tutor Space** is designed to look like a premium, state-of-the-art e-learning platform. It breaks away from generic color palettes and standard fonts, implementing a cohesive, modern dark-mode experience that builds user trust and boosts course conversions.
+**Canadian Nest School** is designed to look like a premium, state-of-the-art e-learning platform. It breaks away from generic color palettes and standard fonts, implementing a cohesive, modern dark-mode experience that builds user trust and boosts course conversions.
 
 ### 🎨 Color Palette & Aesthetic Tokens
 The brand styling guidelines are defined locally inside the Tailwind v4 configurations:
@@ -39,12 +39,12 @@ To achieve a premium, readable, and organic reading experience, we have imported
 To keep the client-side styles and Next.js layouts isolated from the Payload Admin Panel, the codebase utilizes **Next.js Route Groups**:
 
 ```text
-tutor-space/
+canadian-nest-school/
 ├── app/
 │   ├── (app)/                    # 🌐 PUBLIC FRONTEND WEBSITE
 │   │   ├── globals.css           # Global CSS variables, Tailwind configurations & fonts
 │   │   ├── layout.tsx            # Main HTML wrapper (loads Nunito & Plus Jakarta Sans)
-│   │   └── page.tsx              # Tutor Space Landing Page (Now extremely modular)
+│   │   └── page.tsx              # Canadian Nest School Landing Page (Now extremely modular)
 │   │
 │   └── (payload)/                # ⚙️ PAYLOAD CMS ADMIN & API GATEWAY
 │       ├── admin/                # Catch-all routes for administrative panel
@@ -112,7 +112,7 @@ npm install -g pnpm
 Create a `.env.local` file at the root of the project:
 ```env
 # MongoDB Database URI (can be local mongodb:// or remote MongoDB Atlas)
-DATABASE_URL=mongodb://127.0.0.1/tutor-space
+DATABASE_URL=mongodb://127.0.0.1/canadian-nest-school
 
 # Unique security key used to sign Payload cookies and authentication tokens
 PAYLOAD_SECRET=ba4c95208f237efb75e1136b8e3a242fce211bf439b1a5d0981b2c45e69e2c7a
@@ -131,7 +131,7 @@ pnpm dev
 ```
 
 ### 5. Access Platforms
-- **🌐 Tutor Space Landing Page:** [http://localhost:3000](http://localhost:3000)
+- **🌐 Canadian Nest School Landing Page:** [http://localhost:3000](http://localhost:3000)
 - **🔑 CMS Admin Dashboard:** [http://localhost:3000/admin](http://localhost:3000/admin) (Sign up your first Admin user instantly)
 - **🔌 REST API Gateway:** [http://localhost:3000/api](http://localhost:3000/api) (Query database collections)
 

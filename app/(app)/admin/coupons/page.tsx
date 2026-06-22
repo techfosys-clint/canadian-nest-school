@@ -8,7 +8,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import CouponsPageClient from './CouponsPageClient'
 
 export const metadata = {
-  title: 'Coupons Management - Tutor Space Admin',
+  title: 'Coupons Management - Canadian Nest School Admin',
 }
 
 export default async function CouponsPage() {

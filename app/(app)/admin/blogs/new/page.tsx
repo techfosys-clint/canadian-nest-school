@@ -7,7 +7,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import BlogFormClient from '../BlogFormClient'
 
 export const metadata = {
-  title: 'Compose Article - Tutor Space Admin',
+  title: 'Compose Article - Canadian Nest School Admin',
 }
 
 export default async function NewBlogPage() {

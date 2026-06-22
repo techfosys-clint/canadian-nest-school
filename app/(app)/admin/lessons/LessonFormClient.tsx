@@ -458,7 +458,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                       <span className="text-base font-bold text-slate-600">Auto-generate Zoom Meeting Link</span>
                     </label>
                     <p className="text-base font-medium text-slate-500">
-                      When enabled, Tutor Space will automatically create a Zoom meeting using your Server-to-Server OAuth credentials.
+                      When enabled, Canadian Nest School will automatically create a Zoom meeting using your Server-to-Server OAuth credentials.
                     </p>
                   </div>
                 )}

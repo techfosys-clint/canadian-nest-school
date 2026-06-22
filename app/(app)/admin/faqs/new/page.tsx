@@ -6,7 +6,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import FAQFormClient from '../FAQFormClient'
 
 export const metadata = {
-  title: 'Create FAQ - Tutor Space Admin',
+  title: 'Create FAQ - Canadian Nest School Admin',
   description: 'Create a new landing page FAQ document.',
 }
 

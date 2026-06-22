@@ -151,7 +151,7 @@ export default function StudyHubPage() {
             LMS Platform
           </span>
           <h1 className="text-3xl md:text-4xl font-bold font-display text-white mb-4 leading-tight">
-            Tutor Space <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8a88ff] to-white font-bold">Study Hub</span> ⚡
+            Canadian Nest School <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8a88ff] to-white font-bold">Study Hub</span> ⚡
           </h1>
           <p className="text-zinc-400 text-base md:text-lg font-semibold leading-relaxed">
             Monitor your daily study streaks, participate in live webinar streams, and manage interactive lessons.

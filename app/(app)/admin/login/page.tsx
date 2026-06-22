@@ -8,8 +8,8 @@ import fs from 'fs/promises'
 import path from 'path'
 
 export const metadata = {
-  title: 'Administrative Sign In - Tutor Space Console',
-  description: 'Access the Tutor Space administrative management console.',
+  title: 'Administrative Sign In - Canadian Nest School Console',
+  description: 'Access the Canadian Nest School administrative management console.',
 }
 
 export default async function AdminLoginPage() {

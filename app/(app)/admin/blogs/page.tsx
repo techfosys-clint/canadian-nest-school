@@ -8,7 +8,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import BlogsPageClient from './BlogsPageClient'
 
 export const metadata = {
-  title: 'Blog Management - Tutor Space Admin',
+  title: 'Blog Management - Canadian Nest School Admin',
 }
 
 export default async function BlogsPage() {

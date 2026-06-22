@@ -1,6 +1,6 @@
-# 🤖 AI Agent & Developer Handbook (Tutor Space)
+# 🤖 AI Agent & Developer Handbook (Canadian Nest School)
 
-This document serves as the **source of truth** and manual for AI coding assistants (like Antigravity, Claude, Cursor, Copilot, etc.) and developers working on the **Tutor Space** codebase. Read this file completely before making any structural, typing, or directory edits.
+This document serves as the **source of truth** and manual for AI coding assistants (like Antigravity, Claude, Cursor, Copilot, etc.) and developers working on the **Canadian Nest School** codebase. Read this file completely before making any structural, typing, or directory edits.
 
 ---
 
@@ -24,7 +24,7 @@ To prevent styling leaks, layout nesting issues (multiple `<html>` and `<body>` 
    - Contains all public website pages, layouts, and public-facing routes.
    - Has its own `layout.tsx` defining standard HTML tags.
    - Tailwind CSS configurations are loaded exclusively here.
-   - Entry point: `app/(app)/page.tsx` (Tutor Space Landing Page).
+   - Entry point: `app/(app)/page.tsx` (Canadian Nest School Landing Page).
 
 2. **⚙️ Payload CMS Admin & API Gateway (`app/(payload)`)**
    - Contains the Admin panel catch-all routes under `/admin` and API routes under `/api`.
@@ -79,7 +79,7 @@ Always reference the Payload configuration using the path alias `@payload-config
 When customizing the Admin panel favicon in `payload.config.ts`, do not use the deprecated `favicon` property. Use the `icons` array instead:
 ```typescript
 meta: {
-  titleSuffix: '- Tutor Space Admin',
+  titleSuffix: '- Canadian Nest School Admin',
   icons: [
     {
       rel: 'icon',

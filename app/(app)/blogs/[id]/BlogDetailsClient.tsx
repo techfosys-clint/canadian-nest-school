@@ -293,7 +293,7 @@ export default function BlogDetailsClient({ blog, recommendedBlogs }: BlogDetail
                   </div>
                 </div>
                 <p className="text-base font-medium text-zinc-550 leading-relaxed">
-                  Tutor Space educator dedicated to delivering top-tier English language learning resources, interactive lessons, and educational strategies to help students and teachers succeed.
+                  Canadian Nest School educator dedicated to delivering top-tier English language learning resources, interactive lessons, and educational strategies to help students and teachers succeed.
                 </p>
                 <Link
                   href="/courses"

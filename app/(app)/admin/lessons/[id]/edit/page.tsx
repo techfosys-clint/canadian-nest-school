@@ -9,7 +9,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import LessonFormClient from '../../LessonFormClient'
 
 export const metadata = {
-  title: 'Edit Lesson - Tutor Space Admin',
+  title: 'Edit Lesson - Canadian Nest School Admin',
   description: 'Edit a syllabus lesson.',
 }
 

@@ -3,8 +3,8 @@ import ForgotPasswordForm from '@/app/(app)/forgot-password/ForgotPasswordForm'
 
 
 export const metadata: Metadata = {
-  title: 'Forgot Password - Tutor Space',
-  description: 'Reset your password for your Tutor Space account to regain access to your dashboard.',
+  title: 'Forgot Password - Canadian Nest School',
+  description: 'Reset your password for your Canadian Nest School account to regain access to your dashboard.',
 }
 
 export default function ForgotPasswordPage() {

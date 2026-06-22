@@ -7,7 +7,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import CertificatesPageClient from './CertificatesPageClient'
 
 export const metadata = {
-  title: 'Certificate Requests - Tutor Space Admin',
+  title: 'Certificate Requests - Canadian Nest School Admin',
   description: 'Manage student certificate requests and uploads.',
 }
 

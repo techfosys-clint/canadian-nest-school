@@ -1,7 +1,7 @@
-# 🔐 Tutor Space — Security & Content Protection
+# 🔐 Canadian Nest School — Security & Content Protection
 
 This document explains every security and content-protection layer built into the
-Tutor Space platform: how it works, which files implement it, and — just as
+Canadian Nest School platform: how it works, which files implement it, and — just as
 importantly — **what it does NOT protect against**. Read the "Honest Limitations"
 section before promising anything to clients.
 
@@ -32,7 +32,7 @@ based on the lesson's **Video Source** field:
 | Protection | What it stops | Where |
 |---|---|---|
 | **Authenticated streaming** | Login + enrollment required before any byte is served. | `lib/streamGuard.ts` |
-| **Server-side byte proxy** | The browser plays from `tutor-space.com/api/stream/<id>/play`. The **real R2 URL is fetched server-side and never reaches the browser / devtools**. | `app/api/stream/[lessonId]/play/route.ts`, `lib/stream.ts` |
+| **Server-side byte proxy** | The browser plays from `canadian-nest-school.com/api/stream/<id>/play`. The **real R2 URL is fetched server-side and never reaches the browser / devtools**. | `app/api/stream/[lessonId]/play/route.ts`, `lib/stream.ts` |
 | **Short-lived authorization** | The player must pass an authorize check (`/api/stream/<id>`) before playback. A copied `/play` URL is useless without the user's auth cookie (returns `401`). | `app/api/stream/[lessonId]/route.ts` |
 | **Domain restriction** | Playback requests are rejected unless the `Origin`/`Referer` matches an allowed host (stops hotlinking / embedding on other sites). | `lib/stream.ts → isAllowedOrigin()` |
 | **Concurrent-device limit** | Each browser gets a persistent device id; a user may stream on at most `STREAM_MAX_DEVICES` devices at once (anti account-sharing). | `lib/db/models/WatchSession.ts`, `lib/streamGuard.ts` |
@@ -77,7 +77,7 @@ S3_SECRET_ACCESS_KEY=...
 
 # Domain restriction — comma-separated list of allowed origins.
 # Empty in local dev = no restriction. Falls back to NEXT_PUBLIC_SITE_URL.
-ALLOWED_STREAM_ORIGINS=https://tutor-space.com,https://www.tutor-space.com
+ALLOWED_STREAM_ORIGINS=https://canadian-nest-school.com,https://www.canadian-nest-school.com
 
 # Max simultaneous streaming devices per user (default 2)
 STREAM_MAX_DEVICES=2

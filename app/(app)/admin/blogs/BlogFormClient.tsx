@@ -175,7 +175,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
             </h1>
           </div>
           <p className="text-base font-semibold text-slate-500 pl-13">
-            Construct SEO-rich blog articles and product announcements for Tutor Space.
+            Construct SEO-rich blog articles and product announcements for Canadian Nest School.
           </p>
         </div>
         

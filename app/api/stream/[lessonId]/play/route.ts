@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
 
 /**
  * Byte proxy. The browser's <video> element points here, so devtools only ever
- * shows `tutor-space.com/api/stream/<id>/play` — the Cloudflare R2 URL is fetched
+ * shows `canadian-nest-school.com/api/stream/<id>/play` — the Cloudflare R2 URL is fetched
  * server-side and never reaches the client. Supports HTTP Range so seeking works.
  *
  * Session registration is intentionally skipped here (the authorize call already

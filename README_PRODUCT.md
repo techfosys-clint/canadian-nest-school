@@ -1,4 +1,4 @@
-# 📚 Tutor Space — White-Label Course Selling Platform Template
+# 📚 Canadian Nest School — White-Label Course Selling Platform Template
 
 **একটি সম্পূর্ণ সমাধান যা দিয়ে আপনি নিজের অনলাইন কোর্স বিক্রয় প্ল্যাটফর্ম বানাতে পারবেন।**
 
@@ -8,7 +8,7 @@
 
 ## 🎯 এটা কী?
 
-Tutor Space একটি **production-ready template** যা দিয়ে আপনি:
+Canadian Nest School একটি **production-ready template** যা দিয়ে আপনি:
 
 ✅ নিজের অনলাইন স্কুল চালু করতে পারবেন  
 ✅ ভিডিও কোর্স, লাইভ ক্লাস, কুইজ, অ্যাসাইনমেন্ট — সবকিছু করতে পারবেন  
@@ -104,7 +104,7 @@ Tutor Space একটি **production-ready template** যা দিয়ে �
 1. **Repository clone করুন**
    ```bash
    git clone <this-repo>
-   cd tutor-space
+   cd canadian-nest-school
    npm install
    ```
 
@@ -187,6 +187,6 @@ Tutor Space একটি **production-ready template** যা দিয়ে �
 
 ---
 
-**Tutor Space — আপনার শিক্ষা ব্যবসার নিখুঁত প্ল্যাটফর্ম।** 🚀
+**Canadian Nest School — আপনার শিক্ষা ব্যবসার নিখুঁত প্ল্যাটফর্ম।** 🚀
 
 শুরু করতে প্রস্তুত? CLIENT_GUIDE.md পড়ুন।

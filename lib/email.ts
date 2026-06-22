@@ -7,12 +7,12 @@ export async function sendStaffRegistrationEmail(toEmail: string, name: string, 
     return false
   }
 
-  const subject = `Welcome to Tutor Space - Your ${role.toUpperCase()} Account is Ready`
+  const subject = `Welcome to Canadian Nest School - Your ${role.toUpperCase()} Account is Ready`
   const htmlContent = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e4e4e7; border-radius: 8px; background-color: #ffffff; color: #1f2937;">
-      <h2 style="color: #615fff; margin-bottom: 20px; font-weight: bold;">Welcome to Tutor Space, ${name}!</h2>
+      <h2 style="color: #615fff; margin-bottom: 20px; font-weight: bold;">Welcome to Canadian Nest School, ${name}!</h2>
       <p style="font-size: 16px; color: #4b5563; line-height: 1.6;">
-        An administrative account has been created for you on the <strong>Tutor Space Admin Panel</strong>.
+        An administrative account has been created for you on the <strong>Canadian Nest School Admin Panel</strong>.
       </p>
       <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #e5e7eb;">
         <p style="margin: 8px 0; font-size: 16px;"><strong>Role:</strong> ${role.charAt(0).toUpperCase() + role.slice(1)}</p>
@@ -20,7 +20,7 @@ export async function sendStaffRegistrationEmail(toEmail: string, name: string, 
         <p style="margin: 8px 0; font-size: 16px;"><strong>Password:</strong> <span style="font-family: monospace; font-weight: bold; background: #e5e7eb; padding: 2px 6px; border-radius: 4px;">${rawPassword}</span></p>
       </div>
       <p style="font-size: 16px; color: #4b5563; line-height: 1.6;">
-        You can log in to your dashboard here: <a href="http://localhost:3000/admin/login" style="color: #615fff; font-weight: bold; text-decoration: none;">Tutor Space Admin Login</a>
+        You can log in to your dashboard here: <a href="http://localhost:3000/admin/login" style="color: #615fff; font-weight: bold; text-decoration: none;">Canadian Nest School Admin Login</a>
       </p>
       <p style="font-size: 14px; color: #9ca3af; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 15px;">
         For security reasons, we highly recommend changing your password after your first login.
@@ -36,7 +36,7 @@ export async function sendStaffRegistrationEmail(toEmail: string, name: string, 
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: `Tutor Space <${fromEmail}>`,
+        from: `Canadian Nest School <${fromEmail}>`,
         to: toEmail,
         subject: subject,
         html: htmlContent,
@@ -129,7 +129,7 @@ export async function sendLiveClassReminderEmail(
         </div>
         
         <p style="font-size: 14px; color: #71717a; text-align: center; margin-top: 40px; border-top: 1px solid #18181b; padding-top: 20px;">
-          Tutor Space Admin Portal • Automated Reminder Notification
+          Canadian Nest School Admin Portal • Automated Reminder Notification
         </p>
       </div>
     </div>
@@ -143,7 +143,7 @@ export async function sendLiveClassReminderEmail(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: `Tutor Space <${fromEmail}>`,
+        from: `Canadian Nest School <${fromEmail}>`,
         to: toEmail,
         subject: subject,
         html: htmlContent,

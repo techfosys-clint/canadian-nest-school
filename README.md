@@ -71,9 +71,9 @@ DATABASE_URL=your_mongodb_connection_string
 PAYLOAD_SECRET=your_payload_secret_key
 ADMIN_REGISTRATION_SECRET=super-secret-admin-token-2026
 
-# Email Provider Configuration (Resend)
-RESEND_API_KEY=your_resend_api_key
-RESEND_FROM_EMAIL=noreply@yourdomain.com
+# Email Provider Configuration (Gmail SMTP)
+GMAIL_USER=your_gmail_address@gmail.com
+GMAIL_APP_PASSWORD=your_gmail_app_password
 
 # Zoom Server-to-Server OAuth Credentials (Optional: Fill out to auto-generate Zoom links)
 ZOOM_ACCOUNT_ID=your_zoom_account_id

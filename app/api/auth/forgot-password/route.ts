@@ -55,9 +55,9 @@ export async function POST(request: Request) {
     if (transporter) {
       try {
         await transporter.sendMail({
-          from: `Tutor Space <${process.env.GMAIL_USER}>`,
+          from: `Canadian Nest School <${process.env.GMAIL_USER}>`,
           to: emailLower,
-          subject: 'Reset Password Request - Tutor Space',
+          subject: 'Reset Password Request - Canadian Nest School',
           html: `
               <!DOCTYPE html>
               <html>
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
                   <div class="logo">T</div>
                   <h2 class="title">Password Recovery</h2>
                   <p class="text">Hello,</p>
-                  <p class="text">We received a request to reset the password for your Tutor Space account. Click the button below to set a new password and recover your access:</p>
+                  <p class="text">We received a request to reset the password for your Canadian Nest School account. Click the button below to set a new password and recover your access:</p>
                   <div class="btn-container">
                     <a href="${resetUrl}" class="btn" style="color: #ffffff !important;">Reset Password</a>
                   </div>
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
                   <p class="text" style="word-break: break-all;"><a href="${resetUrl}" class="link">${resetUrl}</a></p>
                   <div class="footer">
                     <p>If you did not make this request, you can safely ignore this email. The link will automatically expire in 1 hour.</p>
-                    <p>&copy; 2026 Tutor Space Inc. All rights reserved.</p>
+                    <p>&copy; 2026 Canadian Nest School Inc. All rights reserved.</p>
                   </div>
                 </div>
               </body>

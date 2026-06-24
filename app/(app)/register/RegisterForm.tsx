@@ -20,6 +20,97 @@ export default function RegisterForm() {
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [otp, setOtp] = useState('')
+  const [otpSent, setOtpSent] = useState(false)
+  const [otpVerified, setOtpVerified] = useState(false)
+  const [sendingOtp, setSendingOtp] = useState(false)
+  const [verifyingOtp, setVerifyingOtp] = useState(false)
+
+  const handleSendOtp = async () => {
+    if (!phone) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Phone Number Required',
+        text: 'Please enter your phone number first.',
+        confirmButtonColor: '#615fff',
+      })
+      return
+    }
+
+    setSendingOtp(true)
+    try {
+      const res = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone }),
+      })
+      const data = await res.json()
+
+      if (res.ok) {
+        setOtpSent(true)
+        Swal.fire({
+          icon: 'success',
+          title: 'OTP Sent',
+          text: 'Please check your phone for the verification code.',
+          confirmButtonColor: '#615fff',
+        })
+      } else {
+        throw new Error(data.error || 'Failed to send OTP.')
+      }
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed to Send OTP',
+        text: err.message || 'Something went wrong.',
+        confirmButtonColor: '#615fff',
+      })
+    } finally {
+      setSendingOtp(false)
+    }
+  }
+
+  const handleVerifyOtp = async () => {
+    if (!otp) {
+      Swal.fire({
+        icon: 'error',
+        title: 'OTP Required',
+        text: 'Please enter the verification code sent to your phone.',
+        confirmButtonColor: '#615fff',
+      })
+      return
+    }
+
+    setVerifyingOtp(true)
+    try {
+      const res = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, otp }),
+      })
+      const data = await res.json()
+
+      if (res.ok) {
+        setOtpVerified(true)
+        Swal.fire({
+          icon: 'success',
+          title: 'Phone Verified!',
+          text: 'Your phone number has been verified successfully.',
+          confirmButtonColor: '#615fff',
+        })
+      } else {
+        throw new Error(data.error || 'Incorrect OTP.')
+      }
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Verification Failed',
+        text: err.message || 'Something went wrong.',
+        confirmButtonColor: '#615fff',
+      })
+    } finally {
+      setVerifyingOtp(false)
+    }
+  }
 
   const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -49,7 +140,7 @@ export default function RegisterForm() {
 
   const handleNextStep = () => {
     if (step === 1) {
-      if (!name || !email || !password) {
+      if (!name || !phone || !password) {
         Swal.fire({
           icon: 'error',
           title: 'Missing Fields',
@@ -63,6 +154,15 @@ export default function RegisterForm() {
           icon: 'error',
           title: 'Weak Password',
           text: 'Password must be at least 6 characters long.',
+          confirmButtonColor: '#615fff',
+        })
+        return
+      }
+      if (!otpVerified) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Phone Not Verified',
+          text: 'Please verify your phone number with the OTP code first.',
           confirmButtonColor: '#615fff',
         })
         return
@@ -93,13 +193,13 @@ export default function RegisterForm() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          name, 
-          email, 
-          password, 
-          phone: phone || undefined, 
+        body: JSON.stringify({
+          name,
+          email: email || undefined,
+          password,
+          phone,
           profilePic: profilePic || undefined,
-          role: 'student' 
+          role: 'student'
         }),
       })
 
@@ -264,26 +364,65 @@ export default function RegisterForm() {
                     </div>
                   </div>
 
-                  {/* Email Address */}
+                  {/* Phone Number (Primary identifier, OTP-verified) */}
                   <div className="space-y-1.5">
-                    <label htmlFor="email" className="text-base font-bold text-zinc-700">
-                      Email Address
+                    <label htmlFor="phone" className="text-base font-bold text-zinc-700">
+                      Mobile Number
                     </label>
-                    <div className="relative">
-                      <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
-                        <FiMail className="h-5 w-5" />
-                      </span>
-                      <input
-                        id="email"
-                        type="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="you@example.com"
-                        className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
-                      />
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
+                          <FiPhone className="h-5 w-5" />
+                        </span>
+                        <input
+                          id="phone"
+                          type="tel"
+                          required
+                          disabled={otpVerified}
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          placeholder="01XXXXXXXXX"
+                          className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleSendOtp}
+                        disabled={sendingOtp || otpVerified}
+                        className="px-4 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      >
+                        {sendingOtp ? '...' : otpVerified ? <FiCheck className="h-5 w-5" /> : otpSent ? 'Resend' : 'Send OTP'}
+                      </button>
                     </div>
                   </div>
+
+                  {/* OTP Verification */}
+                  {otpSent && !otpVerified && (
+                    <div className="space-y-1.5">
+                      <label htmlFor="otp" className="text-base font-bold text-zinc-700">
+                        Verification Code
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          id="otp"
+                          type="text"
+                          inputMode="numeric"
+                          value={otp}
+                          onChange={(e) => setOtp(e.target.value)}
+                          placeholder="6-digit code"
+                          className="flex-1 px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleVerifyOtp}
+                          disabled={verifyingOtp}
+                          className="px-4 rounded-lg bg-[#615fff] hover:bg-[#615fff]/95 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        >
+                          {verifyingOtp ? '...' : 'Verify'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Password */}
                   <div className="space-y-1.5">
@@ -335,21 +474,21 @@ export default function RegisterForm() {
                   transition={{ duration: 0.3 }}
                   className="space-y-5"
                 >
-                  {/* Phone Number */}
+                  {/* Email Address (Optional) */}
                   <div className="space-y-1.5">
-                    <label htmlFor="phone" className="text-base font-bold text-zinc-700">
-                      Phone Number (Optional)
+                    <label htmlFor="email" className="text-base font-bold text-zinc-700">
+                      Email Address (Optional)
                     </label>
                     <div className="relative">
                       <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
-                        <FiPhone className="h-5 w-5" />
+                        <FiMail className="h-5 w-5" />
                       </span>
                       <input
-                        id="phone"
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="+1 (555) 000-0000"
+                        id="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@example.com"
                         className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
                       />
                     </div>

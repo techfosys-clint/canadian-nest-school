@@ -15,8 +15,6 @@ export default function RegisterForm() {
   const [password, setPassword] = useState('')
   const [phone, setPhone] = useState('')
   const [academicLevel, setAcademicLevel] = useState('College/University')
-  const [profilePic, setProfilePic] = useState<{ base64: string; name: string; mimeType: string } | null>(null)
-  const [profilePicPreview, setProfilePicPreview] = useState<string | null>(null)
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -112,33 +110,7 @@ export default function RegisterForm() {
     }
   }
 
-  const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        Swal.fire({
-          icon: 'error',
-          title: 'File Too Large',
-          text: 'Profile picture must be under 5MB.',
-          confirmButtonColor: '#615fff',
-        })
-        return
-      }
-
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setProfilePic({
-          base64: reader.result as string,
-          name: file.name,
-          mimeType: file.type,
-        })
-        setProfilePicPreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     if (step === 1) {
       if (!name || !phone || !password) {
         Swal.fire({
@@ -158,13 +130,19 @@ export default function RegisterForm() {
         })
         return
       }
+
+      // Phone not yet verified — auto-send the OTP and reveal the verification box
       if (!otpVerified) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Phone Not Verified',
-          text: 'Please verify your phone number with the OTP code first.',
-          confirmButtonColor: '#615fff',
-        })
+        if (!otpSent) {
+          await handleSendOtp()
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Phone Not Verified',
+            text: 'Please enter the verification code sent to your phone.',
+            confirmButtonColor: '#615fff',
+          })
+        }
         return
       }
     }
@@ -198,7 +176,6 @@ export default function RegisterForm() {
           email: email || undefined,
           password,
           phone,
-          profilePic: profilePic || undefined,
           role: 'student'
         }),
       })
@@ -314,7 +291,7 @@ export default function RegisterForm() {
                     {step > s ? <FiCheck className="h-5 w-5" /> : s}
                   </div>
                   <span className="absolute -bottom-6 text-xs font-bold text-zinc-400 whitespace-nowrap hidden sm:block">
-                    {s === 1 ? 'Account' : s === 2 ? 'Profile' : 'Photo'}
+                    {s === 1 ? 'Account' : s === 2 ? 'Profile' : 'Confirm'}
                   </span>
                 </div>
                 {s < 3 && (
@@ -369,34 +346,29 @@ export default function RegisterForm() {
                     <label htmlFor="phone" className="text-base font-bold text-zinc-700">
                       Mobile Number
                     </label>
-                    <div className="flex gap-2">
-                      <div className="relative flex-1">
-                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
-                          <FiPhone className="h-5 w-5" />
+                    <div className="relative">
+                      <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
+                        <FiPhone className="h-5 w-5" />
+                      </span>
+                      <input
+                        id="phone"
+                        type="tel"
+                        required
+                        disabled={otpVerified}
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="01XXXXXXXXX"
+                        className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500"
+                      />
+                      {otpVerified && (
+                        <span className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-green-600">
+                          <FiCheck className="h-5 w-5" />
                         </span>
-                        <input
-                          id="phone"
-                          type="tel"
-                          required
-                          disabled={otpVerified}
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          placeholder="01XXXXXXXXX"
-                          className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleSendOtp}
-                        disabled={sendingOtp || otpVerified}
-                        className="px-4 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                      >
-                        {sendingOtp ? '...' : otpVerified ? <FiCheck className="h-5 w-5" /> : otpSent ? 'Resend' : 'Send OTP'}
-                      </button>
+                      )}
                     </div>
                   </div>
 
-                  {/* OTP Verification */}
+                  {/* OTP Verification — auto-revealed after clicking Continue */}
                   {otpSent && !otpVerified && (
                     <div className="space-y-1.5">
                       <label htmlFor="otp" className="text-base font-bold text-zinc-700">
@@ -421,6 +393,14 @@ export default function RegisterForm() {
                           {verifyingOtp ? '...' : 'Verify'}
                         </button>
                       </div>
+                      <button
+                        type="button"
+                        onClick={handleSendOtp}
+                        disabled={sendingOtp}
+                        className="text-sm font-bold text-[#615fff] hover:underline disabled:opacity-50 cursor-pointer"
+                      >
+                        {sendingOtp ? 'Resending...' : "Didn't get the code? Resend"}
+                      </button>
                     </div>
                   )}
 
@@ -544,7 +524,7 @@ export default function RegisterForm() {
                 </motion.div>
               )}
 
-              {/* STEP 3: Profile Picture Upload & Final Acceptance */}
+              {/* STEP 3: Final Acceptance */}
               {step === 3 && (
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <motion.div
@@ -555,56 +535,6 @@ export default function RegisterForm() {
                     transition={{ duration: 0.3 }}
                     className="space-y-5"
                   >
-                    {/* Profile Picture Upload */}
-                    <div className="space-y-4 flex flex-col items-center justify-center p-6 border-2 border-dashed border-zinc-200 rounded-lg bg-zinc-50/50">
-                      <label className="text-base font-bold text-zinc-700 block text-center self-start">
-                        Profile Picture
-                      </label>
-                      
-                      <div className="relative group">
-                        <div className="h-24 w-24 rounded-full border-4 border-white shadow-md bg-zinc-100 flex items-center justify-center overflow-hidden relative">
-                          {profilePicPreview ? (
-                            <img src={profilePicPreview} alt="Preview" className="h-full w-full object-cover" />
-                          ) : (
-                            <FiUser className="h-12 w-12 text-zinc-400" />
-                          )}
-                        </div>
-                        {profilePicPreview && (
-                          <button
-                            type="button"
-                            onClick={() => { setProfilePic(null); setProfilePicPreview(null); }}
-                            className="absolute -top-1 -right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-md hover:scale-105 transition-all cursor-pointer animate-none"
-                          >
-                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        )}
-                      </div>
-
-                      <div className="text-center">
-                        <label 
-                          htmlFor="avatar-upload" 
-                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#615fff] text-base font-bold text-[#615fff] bg-white hover:bg-[#615fff]/5 transition-all cursor-pointer select-none"
-                        >
-                          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                          </svg>
-                          Choose Image
-                        </label>
-                        <input 
-                          id="avatar-upload" 
-                          type="file" 
-                          accept="image/*"
-                          className="hidden" 
-                          onChange={handleProfilePicChange}
-                        />
-                        <p className="text-sm font-semibold text-zinc-400 mt-2">
-                          Supported formats: JPG, PNG. Max 5MB
-                        </p>
-                      </div>
-                    </div>
-
                     {/* Terms Acceptance */}
                     <div className="flex items-start gap-3 pt-2">
                       <input

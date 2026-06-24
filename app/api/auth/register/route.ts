@@ -3,6 +3,7 @@ import { connectToDatabase } from '@/lib/db/mongodb'
 import { Student } from '@/lib/db/models/Student'
 import { User } from '@/lib/db/models/User'
 import { Media } from '@/lib/db/models/Media'
+import { OtpVerification } from '@/lib/db/models/OtpVerification'
 import { hashPassword, verifyToken } from '@/lib/auth/auth'
 import { rateLimit } from '@/lib/rateLimit'
 import { cookies } from 'next/headers'
@@ -39,11 +40,26 @@ export async function POST(request: Request) {
     }
 
     const { name, email, password, phone, profilePic, role, permissions, designation } = body
+    let targetRole = role || 'student'
 
     // 1. Basic validation
-    if (!name || !email || !password) {
+    if (!name || !password) {
       return NextResponse.json(
-        { success: false, error: 'Name, email, and password are required fields.' },
+        { success: false, error: 'Name and password are required fields.' },
+        { status: 400 }
+      )
+    }
+
+    if (targetRole === 'student' && !phone) {
+      return NextResponse.json(
+        { success: false, error: 'Phone number is required.' },
+        { status: 400 }
+      )
+    }
+
+    if (targetRole !== 'student' && !email) {
+      return NextResponse.json(
+        { success: false, error: 'Email is required.' },
         { status: 400 }
       )
     }
@@ -57,20 +73,41 @@ export async function POST(request: Request) {
 
     await connectToDatabase()
 
-    // 2. Check for duplicate emails across both collections
-    const emailLower = email.toLowerCase()
-    const existingStudent = await Student.findOne({ email: emailLower })
-    const existingUser = await User.findOne({ email: emailLower })
+    // 2. Check for duplicate email/phone across collections
+    const emailLower = email ? email.toLowerCase() : undefined
 
-    if (existingStudent || existingUser) {
-      return NextResponse.json(
-        { success: false, error: 'Email is already registered.' },
-        { status: 400 }
-      )
+    if (emailLower) {
+      const existingStudent = await Student.findOne({ email: emailLower })
+      const existingUser = await User.findOne({ email: emailLower })
+
+      if (existingStudent || existingUser) {
+        return NextResponse.json(
+          { success: false, error: 'Email is already registered.' },
+          { status: 400 }
+        )
+      }
+    }
+
+    if (targetRole === 'student') {
+      const existingPhone = await Student.findOne({ phone })
+      if (existingPhone) {
+        return NextResponse.json(
+          { success: false, error: 'Phone number is already registered.' },
+          { status: 400 }
+        )
+      }
+
+      // 2b. Require a verified OTP for this phone number before registering
+      const otpRecord = await OtpVerification.findOne({ phone })
+      if (!otpRecord || !otpRecord.verified || otpRecord.expiresAt < new Date()) {
+        return NextResponse.json(
+          { success: false, error: 'Phone number is not verified. Please verify the OTP first.' },
+          { status: 400 }
+        )
+      }
     }
 
     // 3. Role Security Verification
-    let targetRole = role || 'student'
     const sensitiveRoles = ['admin', 'staff', 'instructor']
 
     if (sensitiveRoles.includes(targetRole)) {
@@ -147,10 +184,13 @@ export async function POST(request: Request) {
         name,
         email: emailLower,
         password: hashedPassword,
-        phone: phone || undefined,
+        phone,
         profilePic: profilePicId || undefined,
         status: 'active',
       })
+
+      // OTP is single-use — remove it now that registration is complete
+      await OtpVerification.deleteOne({ phone })
     } else {
       newUser = await User.create({
         name,

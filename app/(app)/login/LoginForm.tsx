@@ -142,10 +142,10 @@ export default function LoginForm() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             
-            {/* Email input */}
+            {/* Email / Phone input */}
             <div className="space-y-2">
               <label htmlFor="email" className="text-base font-bold text-zinc-700">
-                Email Address
+                Email Address or Mobile Number
               </label>
               <div className="relative">
                 <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
@@ -153,11 +153,11 @@ export default function LoginForm() {
                 </span>
                 <input
                   id="email"
-                  type="email"
+                  type="text"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@mediaportal.com"
+                  placeholder="you@example.com or 01XXXXXXXXX"
                   className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
                 />
               </div>

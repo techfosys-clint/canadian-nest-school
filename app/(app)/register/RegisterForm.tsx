@@ -133,6 +133,17 @@ export default function RegisterForm() {
         return
       }
     }
+    if (step === 2) {
+      if (!email) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Email Required',
+          text: 'Please enter your email address to continue.',
+          confirmButtonColor: '#615fff',
+        })
+        return
+      }
+    }
     setStep(prev => prev + 1)
   }
 
@@ -181,7 +192,7 @@ export default function RegisterForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name,
-          email: email || undefined,
+          email,
           password,
           phone,
           role: 'student'
@@ -382,38 +393,38 @@ export default function RegisterForm() {
                   </div>
 
                   {/* OTP Verification */}
-                  {otpSent && !otpVerified && (
-                    <div className="space-y-1.5">
-                      <label htmlFor="otp" className="text-base font-bold text-zinc-700">
-                        Verification Code
-                      </label>
-                      <div className="flex gap-2">
-                        <input
-                          id="otp"
-                          type="text"
-                          inputMode="numeric"
-                          value={otp}
-                          onChange={(e) => setOtp(e.target.value)}
-                          placeholder="6-digit code"
-                          className="flex-1 px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
-                        />
-                        <button
-                          type="button"
-                          onClick={handleVerifyOtp}
-                          disabled={verifyingOtp}
-                          className="px-4 rounded-lg bg-[#615fff] hover:bg-[#615fff]/95 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                        >
-                          {verifyingOtp ? '...' : 'Verify'}
-                        </button>
-                      </div>
+                  <div className="space-y-1.5">
+                    <label htmlFor="otp" className="text-base font-bold text-zinc-700">
+                      Verification Code
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        id="otp"
+                        type="text"
+                        inputMode="numeric"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        placeholder="6-digit code"
+                        className="flex-1 px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500"
+                        disabled={otpVerified}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleVerifyOtp}
+                        disabled={verifyingOtp || otpVerified || !otp}
+                        className="px-4 rounded-lg bg-[#615fff] hover:bg-[#615fff]/95 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      >
+                        {verifyingOtp ? '...' : otpVerified ? <FiCheck className="h-5 w-5" /> : 'Verify'}
+                      </button>
                     </div>
-                  )}
+                  </div>
 
                   {/* Next Button */}
                   <button
                     type="button"
                     onClick={handleNextStep}
-                    className="w-full flex items-center justify-center gap-2 py-3.5 mt-4 rounded-lg bg-[#615fff] hover:bg-[#615fff]/95 text-white font-bold text-base shadow-lg shadow-[#615fff]/15 hover:shadow-[#615fff]/25 transition-all duration-300 cursor-pointer"
+                    disabled={!name || !phone || !otpVerified}
+                    className="w-full flex items-center justify-center gap-2 py-3.5 mt-4 rounded-lg bg-[#615fff] hover:bg-[#615fff]/95 text-white font-bold text-base shadow-lg shadow-[#615fff]/15 hover:shadow-[#615fff]/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   >
                     Continue
                     <FiArrowRight className="h-5 w-5" />
@@ -431,10 +442,10 @@ export default function RegisterForm() {
                   transition={{ duration: 0.3 }}
                   className="space-y-5"
                 >
-                  {/* Email Address (Optional) */}
+                  {/* Email Address */}
                   <div className="space-y-1.5">
                     <label htmlFor="email" className="text-base font-bold text-zinc-700">
-                      Email Address (Optional)
+                      Email Address
                     </label>
                     <div className="relative">
                       <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
@@ -443,6 +454,7 @@ export default function RegisterForm() {
                       <input
                         id="email"
                         type="email"
+                        required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="you@example.com"
@@ -594,7 +606,7 @@ export default function RegisterForm() {
                       </button>
                       <button
                         type="submit"
-                        disabled={loading}
+                        disabled={loading || !password || !confirmPassword || !termsAccepted}
                         className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#615fff] hover:bg-[#615fff]/95 text-white font-bold text-base shadow-lg shadow-[#615fff]/15 hover:shadow-[#615fff]/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                       >
                         {loading ? (

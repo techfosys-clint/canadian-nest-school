@@ -41,9 +41,17 @@ export async function POST(request: Request) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { success: false, error: 'Email and password are required.' },
+        { success: false, error: 'Email or Mobile Number and password are required.' },
         { status: 400 }
       )
+    }
+
+    const identifier = email.toLowerCase().trim()
+    const query = {
+      $or: [
+        { email: identifier },
+        { phone: identifier }
+      ]
     }
 
     await connectToDatabase()
@@ -53,7 +61,7 @@ export async function POST(request: Request) {
     let role = 'student'
 
     // 1. Try to find student first
-    const student = await Student.findOne({ email: email.toLowerCase() }).populate('profilePic')
+    const student = await Student.findOne(query).populate('profilePic')
     if (student) {
       const isMatch = await comparePasswords(password, student.password || '')
       if (isMatch) {
@@ -65,7 +73,7 @@ export async function POST(request: Request) {
 
     // 2. If not found or password mismatch, try staff/admin
     if (!verifiedDoc) {
-      const user = await User.findOne({ email: email.toLowerCase() }).populate('profilePic')
+      const user = await User.findOne(query).populate('profilePic')
       if (user) {
         const isMatch = await comparePasswords(password, user.password || '')
         if (isMatch) {

@@ -350,17 +350,17 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
 
                   <div className="space-y-4 pt-2">
                     <div className="space-y-1.5">
-                      <label className="text-base font-bold text-zinc-700">Email Address</label>
+                      <label className="text-base font-bold text-zinc-700">Email Address or Mobile Number</label>
                       <div className="relative">
                         <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
                           <FiMail className="h-5 w-5" />
                         </span>
                         <input
-                          type="email"
+                          type="text"
                           required
                           value={loginEmail}
                           onChange={(e) => setLoginEmail(e.target.value)}
-                          placeholder="you@example.com"
+                          placeholder="you@example.com or 01XXXXXXXXX"
                           className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
                         />
                       </div>

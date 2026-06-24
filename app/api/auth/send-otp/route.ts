@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Student } from '@/lib/db/models/Student'
 import { OtpVerification } from '@/lib/db/models/OtpVerification'
-import { generateOtp, hashOtp, buildOtpMessage, sendSms } from '@/lib/sms'
+import { generateOtp, hashOtp, buildOtpMessage, sendSms, resendSms } from '@/lib/sms'
 import { rateLimit } from '@/lib/rateLimit'
 
 export async function POST(request: Request) {
@@ -34,6 +34,8 @@ export async function POST(request: Request) {
       )
     }
 
+    const isResend = await OtpVerification.exists({ phone })
+
     const otp = generateOtp()
     const otpHash = hashOtp(otp)
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000)
@@ -44,7 +46,9 @@ export async function POST(request: Request) {
       { upsert: true }
     )
 
-    const sent = await sendSms(phone, buildOtpMessage(otp))
+    const sent = isResend
+      ? await resendSms(phone, buildOtpMessage(otp))
+      : await sendSms(phone, buildOtpMessage(otp))
     if (!sent) {
       return NextResponse.json(
         { success: false, error: 'Failed to send OTP. Please try again.' },

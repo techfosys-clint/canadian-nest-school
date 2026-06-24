@@ -13,10 +13,12 @@ export default function RegisterForm() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [phone, setPhone] = useState('')
   const [academicLevel, setAcademicLevel] = useState('College/University')
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [otp, setOtp] = useState('')
   const [otpSent, setOtpSent] = useState(false)
@@ -110,39 +112,24 @@ export default function RegisterForm() {
     }
   }
 
-  const handleNextStep = async () => {
+  const handleNextStep = () => {
     if (step === 1) {
-      if (!name || !phone || !password) {
+      if (!name || !phone) {
         Swal.fire({
           icon: 'error',
           title: 'Missing Fields',
-          text: 'Please fill in all account fields.',
+          text: 'Please enter your name and mobile number.',
           confirmButtonColor: '#615fff',
         })
         return
       }
-      if (password.length < 6) {
+      if (!otpVerified) {
         Swal.fire({
           icon: 'error',
-          title: 'Weak Password',
-          text: 'Password must be at least 6 characters long.',
+          title: 'Phone Not Verified',
+          text: 'Please verify your mobile number with the OTP code first.',
           confirmButtonColor: '#615fff',
         })
-        return
-      }
-
-      // Phone not yet verified — auto-send the OTP and reveal the verification box
-      if (!otpVerified) {
-        if (!otpSent) {
-          await handleSendOtp()
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Phone Not Verified',
-            text: 'Please enter the verification code sent to your phone.',
-            confirmButtonColor: '#615fff',
-          })
-        }
         return
       }
     }
@@ -155,6 +142,27 @@ export default function RegisterForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!password || password.length < 6) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Weak Password',
+        text: 'Password must be at least 6 characters long.',
+        confirmButtonColor: '#615fff',
+      })
+      return
+    }
+
+    if (password !== confirmPassword) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Passwords Do Not Match',
+        text: 'Please make sure both password fields match.',
+        confirmButtonColor: '#615fff',
+      })
+      return
+    }
+
     if (!termsAccepted) {
       Swal.fire({
         icon: 'warning',
@@ -346,29 +354,34 @@ export default function RegisterForm() {
                     <label htmlFor="phone" className="text-base font-bold text-zinc-700">
                       Mobile Number
                     </label>
-                    <div className="relative">
-                      <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
-                        <FiPhone className="h-5 w-5" />
-                      </span>
-                      <input
-                        id="phone"
-                        type="tel"
-                        required
-                        disabled={otpVerified}
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="01XXXXXXXXX"
-                        className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500"
-                      />
-                      {otpVerified && (
-                        <span className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-green-600">
-                          <FiCheck className="h-5 w-5" />
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
+                          <FiPhone className="h-5 w-5" />
                         </span>
-                      )}
+                        <input
+                          id="phone"
+                          type="tel"
+                          required
+                          disabled={otpVerified}
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          placeholder="01XXXXXXXXX"
+                          className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleSendOtp}
+                        disabled={sendingOtp || otpVerified}
+                        className="px-4 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      >
+                        {sendingOtp ? '...' : otpVerified ? <FiCheck className="h-5 w-5" /> : otpSent ? 'Resend' : 'Send OTP'}
+                      </button>
                     </div>
                   </div>
 
-                  {/* OTP Verification — auto-revealed after clicking Continue */}
+                  {/* OTP Verification */}
                   {otpSent && !otpVerified && (
                     <div className="space-y-1.5">
                       <label htmlFor="otp" className="text-base font-bold text-zinc-700">
@@ -393,44 +406,8 @@ export default function RegisterForm() {
                           {verifyingOtp ? '...' : 'Verify'}
                         </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={handleSendOtp}
-                        disabled={sendingOtp}
-                        className="text-sm font-bold text-[#615fff] hover:underline disabled:opacity-50 cursor-pointer"
-                      >
-                        {sendingOtp ? 'Resending...' : "Didn't get the code? Resend"}
-                      </button>
                     </div>
                   )}
-
-                  {/* Password */}
-                  <div className="space-y-1.5">
-                    <label htmlFor="password" className="text-base font-bold text-zinc-700">
-                      Password (Min. 6 chars)
-                    </label>
-                    <div className="relative">
-                      <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
-                        <FiLock className="h-5 w-5" />
-                      </span>
-                      <input
-                        id="password"
-                        type={showPassword ? 'text' : 'password'}
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••"
-                        className="w-full pl-11 pr-11 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-zinc-400 hover:text-zinc-600 transition-colors"
-                      >
-                        {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
-                      </button>
-                    </div>
-                  </div>
 
                   {/* Next Button */}
                   <button
@@ -535,6 +512,62 @@ export default function RegisterForm() {
                     transition={{ duration: 0.3 }}
                     className="space-y-5"
                   >
+                    {/* Password */}
+                    <div className="space-y-1.5">
+                      <label htmlFor="password" className="text-base font-bold text-zinc-700">
+                        Password (Min. 6 chars)
+                      </label>
+                      <div className="relative">
+                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
+                          <FiLock className="h-5 w-5" />
+                        </span>
+                        <input
+                          id="password"
+                          type={showPassword ? 'text' : 'password'}
+                          required
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="••••••••"
+                          className="w-full pl-11 pr-11 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-zinc-400 hover:text-zinc-600 transition-colors"
+                        >
+                          {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Confirm Password */}
+                    <div className="space-y-1.5">
+                      <label htmlFor="confirmPassword" className="text-base font-bold text-zinc-700">
+                        Confirm Password
+                      </label>
+                      <div className="relative">
+                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
+                          <FiLock className="h-5 w-5" />
+                        </span>
+                        <input
+                          id="confirmPassword"
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          required
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="••••••••"
+                          className="w-full pl-11 pr-11 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-zinc-400 hover:text-zinc-600 transition-colors"
+                        >
+                          {showConfirmPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
+                        </button>
+                      </div>
+                    </div>
+
                     {/* Terms Acceptance */}
                     <div className="flex items-start gap-3 pt-2">
                       <input

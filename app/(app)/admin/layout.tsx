@@ -265,30 +265,30 @@ export default function AdminLayout({
 
         if (res.ok && data.authenticated) {
           if (data.user.role === 'student') {
-            router.push('/dashboard')
+            window.location.href = '/dashboard'
             return
           }
 
           if (isPublicAdminRoute) {
-            router.push('/admin')
+            window.location.href = '/admin'
             return
           }
 
           if (!['admin', 'staff', 'instructor'].includes(data.user.role)) {
-            router.push('/admin/login')
+            window.location.href = '/admin/login'
             return
           }
 
           setUser(data.user)
         } else {
           if (!isPublicAdminRoute) {
-            router.push('/admin/login')
+            window.location.href = '/admin/login'
           }
         }
       } catch (err) {
         console.error('Admin layout session check error:', err)
         if (!isPublicAdminRoute) {
-          router.push('/admin/login')
+          window.location.href = '/admin/login'
         }
       } finally {
         setLoading(false)

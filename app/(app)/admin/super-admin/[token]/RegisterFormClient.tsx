@@ -56,10 +56,18 @@ export default function RegisterFormClient() {
         throw new Error(data.error || 'Setup failed. Please try again.')
       }
 
+      // Auto-login with the freshly created credentials so the admin lands
+      // straight on the dashboard instead of having to sign in manually.
+      const loginRes = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+
       await Swal.fire({
         icon: 'success',
         title: 'Initial Setup Complete',
-        text: 'Root administrator account configured successfully! You can now log in.',
+        text: 'Root administrator account configured successfully!',
         background: '#ffffff',
         color: '#1a1a1a',
         confirmButtonColor: '#615fff',
@@ -69,7 +77,11 @@ export default function RegisterFormClient() {
         },
       })
 
-      router.push('/admin/login')
+      if (loginRes.ok) {
+        window.location.href = '/admin'
+      } else {
+        router.push('/admin/login')
+      }
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred.')
     } finally {

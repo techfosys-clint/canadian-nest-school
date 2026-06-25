@@ -11,6 +11,8 @@ export const metadata = {
   title: 'Coupons Management - Canadian Nest School Admin',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function CouponsPage() {
   await connectToDatabase()
 

@@ -11,6 +11,8 @@ export const metadata = {
   title: 'Categories Management - Canadian Nest School Admin',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function CategoriesPage() {
   await connectToDatabase()
 

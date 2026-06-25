@@ -12,6 +12,8 @@ export const metadata = {
   description: 'Approve or reject student reviews.',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function ReviewsPage() {
   await connectToDatabase()
 

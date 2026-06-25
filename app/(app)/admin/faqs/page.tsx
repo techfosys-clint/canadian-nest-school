@@ -11,6 +11,8 @@ export const metadata = {
   title: 'FAQs Management - Canadian Nest School Admin',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function FAQsPage() {
   await connectToDatabase()
 

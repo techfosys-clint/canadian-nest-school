@@ -12,6 +12,8 @@ export const metadata = {
   description: 'Register and manage administrative, teaching, and support accounts.',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function StaffRegisterPage() {
   const cookieStore = await cookies()
   const payloadToken = cookieStore.get('payload-token')?.value

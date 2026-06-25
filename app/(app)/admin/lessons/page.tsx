@@ -12,6 +12,8 @@ export const metadata = {
   description: 'Manage and organise course lessons and live sessions.',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function LessonsPage() {
   await connectToDatabase()
 

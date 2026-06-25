@@ -10,6 +10,8 @@ export const metadata = {
   title: 'Compose Article - Canadian Nest School Admin',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewBlogPage() {
   await connectToDatabase()
 

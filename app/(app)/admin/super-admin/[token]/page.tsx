@@ -16,6 +16,8 @@ type Props = {
   params: Promise<PageParams>
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function SuperAdminRegisterPage({ params }: Props) {
   // Turbopack Next.js 16 requirements: await params!
   const resolvedParams = await params

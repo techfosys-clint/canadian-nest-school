@@ -11,6 +11,8 @@ export const metadata = {
   description: 'Manage student certificate requests and uploads.',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function CertificatesPage() {
   await connectToDatabase()
 

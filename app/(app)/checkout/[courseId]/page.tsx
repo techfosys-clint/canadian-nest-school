@@ -11,6 +11,8 @@ type Props = {
   params: Promise<{ courseId: string }>
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function CheckoutPage({ params }: Props) {
   const { courseId } = await params
   await connectToDatabase()

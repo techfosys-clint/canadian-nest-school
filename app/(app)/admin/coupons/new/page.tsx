@@ -10,6 +10,8 @@ export const metadata = {
   title: 'Create Coupon - Canadian Nest School Admin',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewCouponPage() {
   await connectToDatabase()
 

@@ -8,6 +8,8 @@ import Link from 'next/link'
 import { FiPlus, FiBookOpen } from 'react-icons/fi'
 import CoursesGridClient from './CoursesGridClient'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminCoursesPage() {
   await connectToDatabase()
 

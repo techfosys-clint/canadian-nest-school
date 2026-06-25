@@ -12,6 +12,8 @@ export const metadata = {
   description: 'Add a new syllabus lesson document.',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewLessonPage() {
   await connectToDatabase()
 

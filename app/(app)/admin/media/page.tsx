@@ -12,6 +12,8 @@ export const metadata = {
   description: 'Browse and manage all uploaded media assets.',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function MediaPage() {
   await connectToDatabase()
 

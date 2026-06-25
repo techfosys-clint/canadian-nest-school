@@ -11,6 +11,8 @@ export const metadata = {
   description: 'Access the Canadian Nest School administrative management console.',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminLoginPage() {
   await connectToDatabase()
 

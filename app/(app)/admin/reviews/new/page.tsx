@@ -13,6 +13,8 @@ export const metadata = {
   description: 'Add a custom review testimonial from the admin panel.',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewReviewPage() {
   await connectToDatabase()
 

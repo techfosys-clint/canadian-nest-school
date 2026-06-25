@@ -8,6 +8,8 @@ export const metadata = {
   description: 'Explore professional guides, tech deep-dives, industry tutorials, and educational updates curated by our senior expert instructors.',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function BlogsPage() {
   await connectToDatabase()
 

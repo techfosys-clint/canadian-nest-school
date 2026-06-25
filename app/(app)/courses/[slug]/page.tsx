@@ -76,6 +76,8 @@ export async function generateMetadata({ params }: Props) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+export const dynamic = 'force-dynamic'
+
 export default async function CourseDetailPage({ params }: Props) {
   const { slug } = await params
   await connectToDatabase()

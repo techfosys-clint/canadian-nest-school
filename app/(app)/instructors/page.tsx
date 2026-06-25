@@ -15,6 +15,8 @@ export const metadata = {
   description: 'Meet our industry\'s leading expert mentors.',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function InstructorsPage() {
   await connectToDatabase()
 

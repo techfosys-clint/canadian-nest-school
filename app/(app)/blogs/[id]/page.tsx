@@ -30,6 +30,8 @@ export async function generateMetadata({ params }: Props) {
 
 // ─── Page Component ────────────────────────────────────────────────────────────
 
+export const dynamic = 'force-dynamic'
+
 export default async function BlogDetailsPage({ params }: Props) {
   const { id } = await params
   await connectToDatabase()

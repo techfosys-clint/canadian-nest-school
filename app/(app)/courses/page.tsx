@@ -12,6 +12,8 @@ export const metadata = {
   description: 'Browse all premium courses on Canadian Nest. Filter by category, level, and price.',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function CoursesPage() {
   await connectToDatabase()
 

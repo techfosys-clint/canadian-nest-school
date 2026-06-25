@@ -18,6 +18,8 @@ import type { CourseDoc, CategoryDoc } from '@/components/Courses'
 import type { ReviewDoc } from '@/components/Reviews'
 import type { BlogDoc } from '@/components/BlogSection'
 
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
   await connectToDatabase()
 

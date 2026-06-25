@@ -10,6 +10,8 @@ export const metadata = {
   description: 'Have questions or feedback? Contact the Canadian Nest School support team today and we will get back to you shortly.',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function ContactPage() {
   await connectToDatabase()
 

@@ -45,13 +45,17 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url)
-    
-    // Parse Payload-style query filter where[student][equals]
+
+    // Parse Payload-style query filter where[student][equals] — only
+    // admin/staff/instructor may override the target student; a regular
+    // student is always scoped to their own reviews regardless of this param.
     let targetStudentId = userId
-    for (const [key, value] of searchParams.entries()) {
-      if (key.includes('student') && key.includes('equals')) {
-        targetStudentId = value
-        break
+    if (isAdminOrStaff) {
+      for (const [key, value] of searchParams.entries()) {
+        if (key.includes('student') && key.includes('equals')) {
+          targetStudentId = value
+          break
+        }
       }
     }
 

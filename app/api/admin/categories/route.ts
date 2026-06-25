@@ -1,20 +1,7 @@
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Category } from '@/lib/db/models/Category'
-import { User } from '@/lib/db/models/User'
-import { verifyToken } from '@/lib/auth/auth'
-import { cookies } from 'next/headers'
-
-async function authCheck(allowedRoles = ['admin', 'staff']) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get('payload-token')?.value
-  if (!token) return null
-  const decoded = verifyToken(token)
-  if (!decoded?.id) return null
-  const user = await User.findById(decoded.id).lean()
-  if (!user || !allowedRoles.includes(user.role)) return null
-  return user
-}
+import { getAuthorizedUser } from '@/lib/auth/auth'
 
 export async function GET() {
   try {
@@ -29,7 +16,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     await connectToDatabase()
-    const user = await authCheck(['admin', 'staff'])
+    const user = await getAuthorizedUser(['admin', 'staff'], 'categories')
     if (!user) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
 
     const body = await request.json()
@@ -92,7 +79,7 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   try {
     await connectToDatabase()
-    const user = await authCheck(['admin', 'staff'])
+    const user = await getAuthorizedUser(['admin', 'staff'], 'categories')
     if (!user) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
 
     const { id, name, slug } = await request.json()
@@ -113,7 +100,7 @@ export async function PUT(request: Request) {
 export async function DELETE(request: Request) {
   try {
     await connectToDatabase()
-    const user = await authCheck(['admin'])
+    const user = await getAuthorizedUser(['admin'])
     if (!user) return NextResponse.json({ error: 'Unauthorized. Admin only.' }, { status: 401 })
 
     const { id } = await request.json()

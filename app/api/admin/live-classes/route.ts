@@ -2,29 +2,15 @@ import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Lesson } from '@/lib/db/models/Lesson'
 import { Course } from '@/lib/db/models/Course'
-import { User } from '@/lib/db/models/User'
-import { verifyToken } from '@/lib/auth/auth'
-import { cookies } from 'next/headers'
+import { getAuthorizedUser } from '@/lib/auth/auth'
 
 export async function GET() {
   try {
     await connectToDatabase()
 
-    const cookieStore = await cookies()
-    const payloadToken = cookieStore.get('payload-token')?.value
-
-    if (!payloadToken) {
-      return NextResponse.json({ error: 'Unauthorized: Session missing.' }, { status: 401 })
-    }
-
-    const decoded = verifyToken(payloadToken)
-    if (!decoded || !decoded.id) {
-      return NextResponse.json({ error: 'Unauthorized: Session invalid.' }, { status: 401 })
-    }
-
-    const user = await User.findById(decoded.id).lean()
+    const user = await getAuthorizedUser(['admin', 'staff', 'instructor'], 'live-classes')
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized: User not found.' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
     }
 
     let lessonsQuery: any = { lessonType: 'live' }

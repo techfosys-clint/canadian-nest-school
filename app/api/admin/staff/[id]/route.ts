@@ -3,6 +3,7 @@ import { connectToDatabase } from '@/lib/db/mongodb'
 import { User } from '@/lib/db/models/User'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
+import { rateLimit } from '@/lib/rateLimit'
 
 export async function DELETE(
   request: Request,
@@ -70,6 +71,14 @@ export async function PUT(
     const currentUser = await User.findById(decoded.id).lean()
     if (!currentUser || currentUser.role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden: Admins only.' }, { status: 403 })
+    }
+
+    const { allowed, resetIn } = rateLimit(`staff_update_${currentUser._id}`, 20, 600)
+    if (!allowed) {
+      return NextResponse.json(
+        { error: `Too many requests. Please try again in ${resetIn} seconds.` },
+        { status: 429 }
+      )
     }
 
     // 2. Parse request body

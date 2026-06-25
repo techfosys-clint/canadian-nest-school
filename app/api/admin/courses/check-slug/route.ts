@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Course } from '@/lib/db/models/Course'
+import mongoose from 'mongoose'
 
 export async function GET(request: Request) {
   try {
@@ -11,6 +12,10 @@ export async function GET(request: Request) {
 
     if (!slug) {
       return NextResponse.json({ available: false, error: 'Slug parameter is required.' }, { status: 400 })
+    }
+
+    if (excludeId && !mongoose.isValidObjectId(excludeId)) {
+      return NextResponse.json({ available: false, error: 'Invalid excludeId parameter.' }, { status: 400 })
     }
 
     const query: any = { slug }

@@ -4,17 +4,20 @@ import { Student } from '@/lib/db/models/Student'
 import { OtpVerification } from '@/lib/db/models/OtpVerification'
 import { generateOtp, hashOtp, buildOtpMessage, sendSms, resendSms } from '@/lib/sms'
 import { rateLimit } from '@/lib/rateLimit'
+import { normalizePhone } from '@/lib/phone'
 
 export async function POST(request: Request) {
   try {
-    const { phone } = await request.json()
+    const { phone: rawPhone } = await request.json()
 
-    if (!phone || typeof phone !== 'string') {
+    if (!rawPhone || typeof rawPhone !== 'string') {
       return NextResponse.json(
         { success: false, error: 'A valid phone number is required.' },
         { status: 400 }
       )
     }
+
+    const phone = normalizePhone(rawPhone)
 
     const { allowed, resetIn } = rateLimit(`otp_${phone}`, 3, 600)
     if (!allowed) {

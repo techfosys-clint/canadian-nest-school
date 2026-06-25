@@ -103,13 +103,16 @@ export async function POST(request: Request) {
     }
 
     // 5. Return success response
-    // In development mode, we also return the token to make it easy to test without email setup
-    const isDev = process.env.NODE_ENV !== 'production'
-    
+    // Only ever include the raw token when explicitly opted in via env flag —
+    // never infer this from NODE_ENV, since a misconfigured staging/preview
+    // deploy without NODE_ENV=production would otherwise leak reset tokens
+    // (full account takeover without needing to read the email).
+    const debugTokensEnabled = process.env.ENABLE_DEBUG_TOKEN === 'true'
+
     return NextResponse.json({
       success: true,
       message: 'If the email exists, a password reset link has been generated.',
-      ...(isDev ? { debugToken: token } : {}),
+      ...(debugTokensEnabled ? { debugToken: token } : {}),
     })
 
   } catch (error: any) {

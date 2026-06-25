@@ -5,7 +5,7 @@ import { Lesson } from '@/lib/db/models/Lesson'
 import { Review } from '@/lib/db/models/Review'
 import { Enrollment } from '@/lib/db/models/Enrollment'
 import { User } from '@/lib/db/models/User'
-import { verifyToken } from '@/lib/auth/auth'
+import { verifyToken, getAuthorizedUser } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 
@@ -13,10 +13,6 @@ import { revalidatePath } from 'next/cache'
 const getSubmissionModel = async () => {
   const { Submission } = await import('@/lib/db/models/Submission')
   return Submission
-}
-const getWatchSessionModel = async () => {
-  const { WatchSession } = await import('@/lib/db/models/WatchSession')
-  return WatchSession
 }
 
 /**
@@ -30,6 +26,15 @@ export async function GET(
 ) {
   try {
     await connectToDatabase()
+
+    const user = await getAuthorizedUser(['admin', 'staff', 'instructor'], 'courses')
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized', code: 'AUTH_REQUIRED', message: 'You must be signed in to view this course.' },
+        { status: 401 }
+      )
+    }
+
     const { id } = await params
 
     const course = await Course.findById(id)
@@ -152,13 +157,10 @@ export async function DELETE(
       await Submission.deleteMany({ lesson: { $in: lessonIds } })
     }
 
-    // Step 3: Delete all watch sessions for students in this course
-    const WatchSession = await getWatchSessionModel()
-    if (lessonIds.length > 0) {
-      await WatchSession.deleteMany({
-        // TODO: This would need a join; for now, rely on TTL index to clean up
-      })
-    }
+    // Note: WatchSession records are per-user device sessions (not scoped to
+    // a course/lesson), used only for device-limit anti-sharing checks. They
+    // self-expire via a TTL index, so there's nothing course-specific to
+    // cascade-delete here.
 
     // Step 4: Delete lessons
     await Lesson.deleteMany({ course: id })
@@ -194,7 +196,7 @@ export async function DELETE(
           course: 1,
         },
       },
-      message: 'Course and all related data (lessons, submissions, enrollments, reviews, watch sessions) successfully deleted.',
+      message: 'Course and all related data (lessons, submissions, enrollments, reviews) successfully deleted.',
     })
   } catch (error: any) {
     console.error('DELETE /api/admin/courses/[id] error:', error)

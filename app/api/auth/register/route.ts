@@ -5,7 +5,9 @@ import { User } from '@/lib/db/models/User'
 import { Media } from '@/lib/db/models/Media'
 import { OtpVerification } from '@/lib/db/models/OtpVerification'
 import { hashPassword, verifyToken } from '@/lib/auth/auth'
+import crypto from 'crypto'
 import { rateLimit } from '@/lib/rateLimit'
+import { normalizePhone } from '@/lib/phone'
 import { cookies } from 'next/headers'
 import fs from 'fs/promises'
 import path from 'path'
@@ -39,8 +41,9 @@ export async function POST(request: Request) {
       )
     }
 
-    const { name, email, password, phone, profilePic, role, permissions, designation } = body
+    const { name, email, password, phone: rawPhone, profilePic, role, permissions, designation } = body
     let targetRole = role || 'student'
+    const phone = rawPhone ? normalizePhone(rawPhone) : undefined
 
     // 1. Basic validation
     if (!name || !password) {
@@ -116,7 +119,13 @@ export async function POST(request: Request) {
       // If no admin exists in the system yet, allow creating the first admin
       if (adminCount > 0) {
         const adminSecretHeader = request.headers.get('x-admin-secret')
-        const isSecretValid = adminSecretHeader && adminSecretHeader === process.env.ADMIN_REGISTRATION_SECRET
+        const expectedSecret = process.env.ADMIN_REGISTRATION_SECRET
+        const isSecretValid = Boolean(
+          adminSecretHeader &&
+          expectedSecret &&
+          adminSecretHeader.length === expectedSecret.length &&
+          crypto.timingSafeEqual(Buffer.from(adminSecretHeader), Buffer.from(expectedSecret))
+        )
 
         if (!isSecretValid) {
           // Fallback: check if currently logged-in user is an Admin

@@ -242,25 +242,46 @@ export async function POST(request: Request) {
       }
 
       appliedCoupon = coupon
+
+      // Atomically claim a usage slot so concurrent requests can't both pass
+      // the maxUses check and over-redeem the coupon (TOCTOU race fix).
+      const claimedCoupon = await Coupon.findOneAndUpdate(
+        {
+          _id: coupon._id,
+          $or: [
+            { maxUses: { $exists: false } },
+            { maxUses: null },
+            { $expr: { $lt: ['$usedCount', '$maxUses'] } },
+          ],
+        },
+        { $inc: { usedCount: 1 } }
+      )
+
+      if (!claimedCoupon) {
+        return NextResponse.json({ success: false, error: 'This coupon has reached its usage limit.' }, { status: 400 })
+      }
     }
 
     // Create enrollment
-    const newEnrollment = await Enrollment.create({
-      student: userId,
-      course: courseId,
-      paymentStatus: 'completed',
-      pricePaid,
-      paymentReference: 'ENROLL-' + Math.random().toString(36).substring(2, 11).toUpperCase(),
-      billingName,
-      billingPhone,
-      billingAddress,
-      couponCode: appliedCoupon ? appliedCoupon.code : undefined,
-    })
-
-    // If coupon is used, increment its count
-    if (appliedCoupon) {
-      appliedCoupon.usedCount += 1
-      await appliedCoupon.save()
+    let newEnrollment
+    try {
+      newEnrollment = await Enrollment.create({
+        student: userId,
+        course: courseId,
+        paymentStatus: 'completed',
+        pricePaid,
+        paymentReference: 'ENROLL-' + Math.random().toString(36).substring(2, 11).toUpperCase(),
+        billingName,
+        billingPhone,
+        billingAddress,
+        couponCode: appliedCoupon ? appliedCoupon.code : undefined,
+      })
+    } catch (enrollError) {
+      // Roll back the coupon usage claim if enrollment creation failed
+      if (appliedCoupon) {
+        await Coupon.updateOne({ _id: appliedCoupon._id }, { $inc: { usedCount: -1 } })
+      }
+      throw enrollError
     }
 
     return NextResponse.json({

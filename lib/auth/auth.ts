@@ -1,5 +1,7 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import { cookies } from 'next/headers'
+import { User } from '@/lib/db/models/User'
 
 const PAYLOAD_SECRET = process.env.PAYLOAD_SECRET as string
 if (!PAYLOAD_SECRET) {
@@ -25,4 +27,40 @@ export function verifyToken(token: string): any {
   } catch (error) {
     return null
   }
+}
+
+/**
+ * Resolves the authenticated staff/admin/instructor user from the
+ * "payload-token" cookie and enforces role + (for staff) permission checks.
+ * Returns null if unauthenticated, wrong role, or missing permission.
+ *
+ * Admins always pass the permission check. Staff must have the named
+ * permission in their `permissions[]` array — this is the single source of
+ * truth for backend authorization, mirroring the nav visibility rules in
+ * app/(app)/admin/layout.tsx so the permission model is actually enforced
+ * server-side, not just hidden in the UI.
+ */
+export async function getAuthorizedUser(
+  allowedRoles: string[] = ['admin', 'staff'],
+  permission?: string
+) {
+  const cookieStore = await cookies()
+  const token = cookieStore.get('payload-token')?.value
+  if (!token) return null
+
+  const decoded = verifyToken(token)
+  if (!decoded?.id) return null
+
+  const user = await User.findById(decoded.id).lean()
+  if (!user || !allowedRoles.includes(user.role)) return null
+
+  // Permission-array gating only applies to the 'staff' role — admins always
+  // have full access, and instructors are scoped by ownership checks instead
+  // of the permissions[] array (matching the frontend nav fallback logic).
+  if (permission && user.role === 'staff') {
+    const permissions: string[] = (user as any).permissions || []
+    if (!permissions.includes(permission)) return null
+  }
+
+  return user
 }

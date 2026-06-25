@@ -2,17 +2,21 @@ import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { OtpVerification } from '@/lib/db/models/OtpVerification'
 import { hashOtp } from '@/lib/sms'
+import { normalizePhone } from '@/lib/phone'
+import crypto from 'crypto'
 
 export async function POST(request: Request) {
   try {
-    const { phone, otp } = await request.json()
+    const { phone: rawPhone, otp } = await request.json()
 
-    if (!phone || !otp) {
+    if (!rawPhone || typeof rawPhone !== 'string' || !otp || typeof otp !== 'string') {
       return NextResponse.json(
         { success: false, error: 'Phone number and OTP are required.' },
         { status: 400 }
       )
     }
+
+    const phone = normalizePhone(rawPhone)
 
     await connectToDatabase()
 
@@ -32,7 +36,13 @@ export async function POST(request: Request) {
       )
     }
 
-    if (record.otpHash !== hashOtp(otp)) {
+    const providedHash = Buffer.from(hashOtp(otp))
+    const storedHash = Buffer.from(record.otpHash)
+    const isMatch =
+      providedHash.length === storedHash.length &&
+      crypto.timingSafeEqual(providedHash, storedHash)
+
+    if (!isMatch) {
       record.attempts += 1
       await record.save()
       return NextResponse.json(

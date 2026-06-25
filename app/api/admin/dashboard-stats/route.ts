@@ -16,11 +16,6 @@ export async function GET() {
   try {
     await connectToDatabase()
 
-    // Trigger upcoming live class email reminders in background
-    checkAndSendLiveClassReminders().catch((err) => {
-      console.error('Error in background live class reminders:', err)
-    })
-
     const cookieStore = await cookies()
     const payloadToken = cookieStore.get('payload-token')?.value
 
@@ -34,9 +29,16 @@ export async function GET() {
     }
 
     const user = await User.findById(decoded.id).lean()
-    if (!user) {
+    if (!user || !['admin', 'staff', 'instructor'].includes(user.role)) {
       return NextResponse.json({ error: 'Unauthorized: User not found.' }, { status: 401 })
     }
+
+    // Trigger upcoming live class email reminders in background — only after
+    // confirming the caller is an authenticated staff/admin/instructor, so
+    // this side effect can't be triggered by an unauthenticated request.
+    checkAndSendLiveClassReminders().catch((err) => {
+      console.error('Error in background live class reminders:', err)
+    })
 
     const role = user.role
 

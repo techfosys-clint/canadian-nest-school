@@ -4,6 +4,7 @@ import { User } from '@/lib/db/models/User'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
 import { uploadToStorage } from '@/lib/storage'
+import { rateLimit } from '@/lib/rateLimit'
 
 const MAX_VIDEO_SIZE = 500 * 1024 * 1024 // 500MB
 const ALLOWED_TYPES = ['video/mp4', 'video/webm', 'video/quicktime', 'application/x-mkvideo']
@@ -51,6 +52,14 @@ export async function POST(request: Request) {
           message: 'Only admins and instructors can upload videos.',
         },
         { status: 403 }
+      )
+    }
+
+    const { allowed, resetIn } = rateLimit(`video_upload_${user._id}`, 10, 600)
+    if (!allowed) {
+      return NextResponse.json(
+        { success: false, error: `Too many uploads. Please try again in ${resetIn} seconds.`, code: 'RATE_LIMIT_EXCEEDED' },
+        { status: 429 }
       )
     }
 

@@ -25,7 +25,7 @@ function formatBytes(bytes: number) {
 }
 
 function FileTypeIcon({ mime }: { mime: string }) {
-  if (mime.startsWith('image/')) return <FiImage className="h-5 w-5 text-[#615fff]" />
+  if (mime.startsWith('image/')) return <FiImage className="h-5 w-5 text-[#E61C24]" />
   if (mime.startsWith('video/')) return <FiFilm className="h-5 w-5 text-emerald-400" />
   if (mime === 'application/pdf') return <FiFileText className="h-5 w-5 text-rose-400" />
   return <FiFile className="h-5 w-5 text-slate-500" />
@@ -151,10 +151,10 @@ export default function MediaUploadClient() {
     >
       {/* Drag overlay */}
       {dragOver && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/92 border-4 border-dashed border-[#615fff] pointer-events-none">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/92 border-4 border-dashed border-[#E61C24] pointer-events-none">
           <div className="flex flex-col items-center gap-5 text-center">
-            <div className="h-28 w-28 rounded-full bg-[#615fff]/20 flex items-center justify-center animate-pulse">
-              <FiUploadCloud className="h-14 w-14 text-[#615fff]" />
+            <div className="h-28 w-28 rounded-full bg-[#E61C24]/20 flex items-center justify-center animate-pulse">
+              <FiUploadCloud className="h-14 w-14 text-[#E61C24]" />
             </div>
             <p className="text-3xl font-bold text-slate-800">Drop files here</p>
             <p className="text-base font-semibold text-slate-500">Images, videos, and PDFs supported</p>
@@ -183,8 +183,8 @@ export default function MediaUploadClient() {
         <label
           className={`flex flex-col items-center justify-center gap-5 w-full min-h-60 rounded-lg border-2 border-dashed transition-all cursor-pointer ${
             dragOver
-              ? 'border-[#615fff] bg-[#615fff]/8'
-              : 'border-slate-300 bg-white hover:border-[#615fff]/50 hover:bg-white'
+              ? 'border-[#E61C24] bg-[#E61C24]/8'
+              : 'border-slate-300 bg-white hover:border-[#E61C24]/50 hover:bg-white'
           }`}
         >
           <input
@@ -196,12 +196,12 @@ export default function MediaUploadClient() {
             className="hidden"
             disabled={uploading}
           />
-          <div className="h-20 w-20 rounded-full bg-[#615fff]/15 flex items-center justify-center">
-            <FiUploadCloud className="h-10 w-10 text-[#615fff]" />
+          <div className="h-20 w-20 rounded-full bg-[#E61C24]/15 flex items-center justify-center">
+            <FiUploadCloud className="h-10 w-10 text-[#E61C24]" />
           </div>
           <div className="text-center space-y-2">
             <p className="text-base font-bold text-slate-800">
-              Drag &amp; drop files here, or <span className="text-[#615fff] underline underline-offset-2">click to browse</span>
+              Drag &amp; drop files here, or <span className="text-[#E61C24] underline underline-offset-2">click to browse</span>
             </p>
             <p className="text-base font-semibold text-slate-400">
               Images (JPG, PNG, WEBP, GIF, SVG), Videos (MP4, MOV), PDF — bulk supported
@@ -247,7 +247,7 @@ export default function MediaUploadClient() {
                   className={`flex items-center gap-4 px-5 py-4 transition-colors ${
                     entry.status === 'done' ? 'bg-emerald-500/5' :
                     entry.status === 'error' ? 'bg-rose-500/5' :
-                    entry.status === 'uploading' ? 'bg-[#615fff]/5' : ''
+                    entry.status === 'uploading' ? 'bg-[#E61C24]/5' : ''
                   }`}
                 >
                   {/* Thumbnail or icon */}
@@ -276,8 +276,8 @@ export default function MediaUploadClient() {
                       <span className="text-sm font-bold text-slate-400">Queued</span>
                     )}
                     {entry.status === 'uploading' && (
-                      <div className="flex items-center gap-2 text-[#615fff]">
-                        <div className="h-4 w-4 border-2 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+                      <div className="flex items-center gap-2 text-[#E61C24]">
+                        <div className="h-4 w-4 border-2 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
                         <span className="text-sm font-bold">Uploading...</span>
                       </div>
                     )}
@@ -330,7 +330,7 @@ export default function MediaUploadClient() {
               <button
                 onClick={handleUpload}
                 disabled={uploading}
-                className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] disabled:opacity-60 disabled:pointer-events-none text-slate-800 font-bold text-base shadow-md shadow-[#615fff]/25 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] disabled:opacity-60 disabled:pointer-events-none text-slate-800 font-bold text-base shadow-md shadow-[#E61C24]/25 transition-all cursor-pointer"
               >
                 {uploading ? (
                   <>

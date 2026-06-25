@@ -117,7 +117,7 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 placeholder="e.g. How do I access my course after purchase?"
-                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
               />
             </div>
 
@@ -130,7 +130,7 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
                 placeholder="Provide a clear, helpful answer..."
-                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors resize-none"
+                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors resize-none"
               />
             </div>
 
@@ -142,7 +142,7 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
                 min={0}
                 value={order}
                 onChange={(e) => setOrder(Number(e.target.value))}
-                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
               />
             </div>
 
@@ -157,7 +157,7 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
             <label className="flex items-center gap-3 cursor-pointer select-none">
               <div
                 className={`relative w-12 h-6 rounded-full transition-colors ${
-                  isActive ? 'bg-[#615fff]' : 'bg-slate-200'
+                  isActive ? 'bg-[#E61C24]' : 'bg-slate-200'
                 }`}
                 onClick={() => setIsActive(!isActive)}
               >
@@ -175,7 +175,7 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
             <button
               type="submit"
               disabled={saving}
-              className={`w-full py-3.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base shadow-lg shadow-[#615fff]/20 hover:shadow-[#615fff]/30 transition-all duration-300 cursor-pointer flex items-center justify-center ${
+              className={`w-full py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-lg shadow-[#E61C24]/20 hover:shadow-[#E61C24]/30 transition-all duration-300 cursor-pointer flex items-center justify-center ${
                 saving ? 'opacity-50 pointer-events-none' : ''
               }`}
             >

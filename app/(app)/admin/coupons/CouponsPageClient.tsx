@@ -115,7 +115,7 @@ export default function CouponsPageClient({
         <button
           type="button"
           onClick={() => router.push('/admin/coupons/new')}
-          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base shadow-lg shadow-[#615fff]/15 hover:scale-[1.01] transition-all cursor-pointer shrink-0"
+          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-lg shadow-[#E61C24]/15 hover:scale-[1.01] transition-all cursor-pointer shrink-0"
         >
           <FiPlus className="h-5 w-5" /> 
           <span>Generate New Coupon</span>
@@ -152,8 +152,8 @@ export default function CouponsPageClient({
                     {/* Code name */}
                     <td className="px-6 py-4 select-all">
                       <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-lg bg-[#615fff]/10 border border-[#615fff]/20 flex items-center justify-center shrink-0">
-                          <FiTag className="h-4 w-4 text-[#615fff]" />
+                        <div className="h-9 w-9 rounded-lg bg-[#E61C24]/10 border border-[#E61C24]/20 flex items-center justify-center shrink-0">
+                          <FiTag className="h-4 w-4 text-[#E61C24]" />
                         </div>
                         <span className="font-bold text-slate-800 text-base tracking-wide font-mono bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
                           {coupon.code}
@@ -211,7 +211,7 @@ export default function CouponsPageClient({
                       <div className="flex items-center justify-end gap-2.5">
                         <button
                           onClick={() => router.push(`/admin/coupons/${coupon.id}/edit`)}
-                          className="p-2 rounded-lg bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/20 text-[#615fff] hover:text-white transition-all cursor-pointer hover:shadow-lg hover:shadow-[#615fff]/10"
+                          className="p-2 rounded-lg bg-[#E61C24]/10 hover:bg-[#E61C24] border border-[#E61C24]/20 text-[#E61C24] hover:text-white transition-all cursor-pointer hover:shadow-lg hover:shadow-[#E61C24]/10"
                           title="Edit Coupon Settings"
                         >
                           <FiEdit className="h-4 w-4" />

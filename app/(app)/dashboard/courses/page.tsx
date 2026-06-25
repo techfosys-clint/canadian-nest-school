@@ -106,7 +106,7 @@ export default function MyCoursesPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+          <div className="h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
           <p className="text-base font-bold text-zinc-650">Loading courses...</p>
         </div>
       </div>
@@ -120,15 +120,15 @@ export default function MyCoursesPage() {
 
       {/* Dynamic Premium Header/Banner */}
       <div className="w-full bg-[#0A163A] rounded-lg p-8 md:p-12 relative overflow-hidden mb-10 border border-zinc-800/20">
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#615fff]/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#543cdf]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#E61C24]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#CC181F]/15 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative z-10 max-w-2xl">
-          <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-[#615fff]/20 border border-[#615fff]/30 text-base font-bold text-[#615fff] uppercase tracking-wider mb-6">
+          <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-[#E61C24]/20 border border-[#E61C24]/30 text-base font-bold text-[#E61C24] uppercase tracking-wider mb-6">
             My Portfolio
           </span>
           <h1 className="text-3xl md:text-4xl font-bold font-display text-white mb-4 leading-tight">
-            My Enrolled <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8a88ff] to-white font-bold">Courses</span> 🎓
+            My Enrolled <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF4D55] to-white font-bold">Courses</span> 🎓
           </h1>
           <p className="text-zinc-400 text-base md:text-lg font-semibold leading-relaxed">
             Access your full e-learning catalog, dynamic watch streams, syllabus completion progress, and certificates.
@@ -139,14 +139,14 @@ export default function MyCoursesPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-zinc-800 tracking-tight font-display">Active Subscriptions</h2>
-          <span className="text-base font-bold text-[#615fff] bg-[#615fff]/10 px-3.5 py-1.5 rounded-lg">
+          <span className="text-base font-bold text-[#E61C24] bg-[#E61C24]/10 px-3.5 py-1.5 rounded-lg">
             Total {enrollments.length}
           </span>
         </div>
 
         {enrollments.length === 0 ? (
           <div className="bg-white rounded-lg p-12 text-center flex flex-col items-center justify-center border border-zinc-200">
-            <div className="h-16 w-16 rounded-full bg-[#615fff]/5 flex items-center justify-center text-[#615fff] mb-6">
+            <div className="h-16 w-16 rounded-full bg-[#E61C24]/5 flex items-center justify-center text-[#E61C24] mb-6">
               <FiBook className="h-8 w-8" />
             </div>
             <h3 className="text-xl font-bold text-zinc-800 mb-2">No active courses</h3>
@@ -155,7 +155,7 @@ export default function MyCoursesPage() {
             </p>
             <Link
               href="/"
-              className="px-6 py-3.5 rounded-lg bg-[#615fff] hover:bg-[#615fff]/95 text-white font-bold text-base transition-all duration-300"
+              className="px-6 py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#E61C24]/95 text-white font-bold text-base transition-all duration-300"
             >
               Browse Premium Courses
             </Link>
@@ -173,7 +173,7 @@ export default function MyCoursesPage() {
               const progress = courseProgress[course.id] ?? 0
 
               return (
-                <div key={enrollment.id} className="group bg-white border border-zinc-200/80 rounded-lg overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:shadow-zinc-200/50 hover:border-[#615fff]/30 transition-all duration-300 flex flex-col justify-between">
+                <div key={enrollment.id} className="group bg-white border border-zinc-200/80 rounded-lg overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:shadow-zinc-200/50 hover:border-[#E61C24]/30 transition-all duration-300 flex flex-col justify-between">
                   <div>
                     {/* Thumbnail with hover zoom */}
                     <div className="h-48 w-full bg-zinc-100 overflow-hidden relative">
@@ -186,7 +186,7 @@ export default function MyCoursesPage() {
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 pointer-events-none" />
-                      <span className="absolute top-3 left-3 bg-[#615fff]/10 backdrop-blur-md text-[#615fff] border border-[#615fff]/20 px-3 py-1 rounded-lg text-sm font-bold uppercase tracking-wider">
+                      <span className="absolute top-3 left-3 bg-[#E61C24]/10 backdrop-blur-md text-[#E61C24] border border-[#E61C24]/20 px-3 py-1 rounded-lg text-sm font-bold uppercase tracking-wider">
                         {course.category && typeof course.category === 'object' ? course.category.name : 'LMS'}
                       </span>
                       {course.level && (
@@ -200,7 +200,7 @@ export default function MyCoursesPage() {
                     <div className="p-6 space-y-3.5">
                       <h3 
                         onClick={() => handleResumeLearning(course.id, course.slug)}
-                        className="text-lg font-bold text-zinc-800 line-clamp-2 leading-snug hover:text-[#615fff] transition-colors cursor-pointer"
+                        className="text-lg font-bold text-zinc-800 line-clamp-2 leading-snug hover:text-[#E61C24] transition-colors cursor-pointer"
                       >
                         {course.title}
                       </h3>
@@ -210,7 +210,7 @@ export default function MyCoursesPage() {
                       
                       {/* Instructor detail row */}
                       <div className="flex items-center gap-2.5 pt-2 border-t border-zinc-100">
-                        <div className="h-7 w-7 rounded-full bg-[#615fff]/10 flex items-center justify-center font-bold text-xs text-[#615fff] uppercase shrink-0">
+                        <div className="h-7 w-7 rounded-full bg-[#E61C24]/10 flex items-center justify-center font-bold text-xs text-[#E61C24] uppercase shrink-0">
                           {course.instructor && typeof course.instructor === 'object' ? course.instructor.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2) : 'EX'}
                         </div>
                         <div className="min-w-0">
@@ -228,11 +228,11 @@ export default function MyCoursesPage() {
                     <div className="space-y-2 border-t border-zinc-100 pt-4">
                       <div className="flex justify-between text-base font-semibold text-zinc-500">
                         <span className="flex items-center gap-1.5"><FiBookOpen className="text-zinc-400 h-4 w-4 shrink-0" /> Syllabus Progress</span>
-                        <span className="font-bold text-[#615fff]">{progress}%</span>
+                        <span className="font-bold text-[#E61C24]">{progress}%</span>
                       </div>
                       <div className="w-full bg-zinc-100 h-2 rounded-lg overflow-hidden">
                         <div 
-                          className="bg-gradient-to-r from-[#615fff] to-[#8a88ff] h-full rounded-lg transition-all duration-500" 
+                          className="bg-gradient-to-r from-[#E61C24] to-[#FF4D55] h-full rounded-lg transition-all duration-500" 
                           style={{ width: `${progress}%` }}
                         />
                       </div>
@@ -240,7 +240,7 @@ export default function MyCoursesPage() {
 
                     <button 
                       onClick={() => handleResumeLearning(course.id, course.slug)}
-                      className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base transition-all duration-200 cursor-pointer border-none active:scale-[0.99]"
+                      className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all duration-200 cursor-pointer border-none active:scale-[0.99]"
                     >
                       <span>Resume Learning</span>
                       <FiArrowRight className="h-5 w-5 group-hover:translate-x-0.5 transition-transform" />

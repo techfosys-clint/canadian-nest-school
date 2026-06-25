@@ -70,7 +70,7 @@ export default function VideoUploadWidget({ onUploadSuccess }: VideoUploadWidget
                <code style="background: #f3f4f6; padding: 8px 12px; border-radius: 4px; display: block; word-break: break-all;">
                ${data.data.objectKey}
                </code>`,
-        confirmButtonColor: '#615fff',
+        confirmButtonColor: '#E61C24',
         background: '#121829',
         color: '#ffffff',
       })
@@ -119,7 +119,7 @@ export default function VideoUploadWidget({ onUploadSuccess }: VideoUploadWidget
 
   return (
     <div className="space-y-4">
-      <div className="border-2 border-dashed border-zinc-700 rounded-lg p-6 text-center hover:border-[#615fff] transition-colors cursor-pointer"
+      <div className="border-2 border-dashed border-zinc-700 rounded-lg p-6 text-center hover:border-[#E61C24] transition-colors cursor-pointer"
         onClick={() => fileInputRef.current?.click()}
       >
         <input
@@ -145,7 +145,7 @@ export default function VideoUploadWidget({ onUploadSuccess }: VideoUploadWidget
           <div className="space-y-3">
             <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#615fff] transition-all duration-300"
+                className="h-full bg-[#E61C24] transition-all duration-300"
                 style={{ width: `${uploadProgress}%` }}
               />
             </div>

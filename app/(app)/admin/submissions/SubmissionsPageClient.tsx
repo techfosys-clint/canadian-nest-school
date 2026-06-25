@@ -178,7 +178,7 @@ export default function SubmissionsPageClient() {
             <p className="text-base font-bold text-slate-500">Total Submissions</p>
             <p className="text-2xl font-bold text-slate-800 mt-1">{totalCount}</p>
           </div>
-          <div className="h-12 w-12 rounded-lg bg-[#615fff]/10 border border-[#615fff]/20 flex items-center justify-center text-[#615fff]">
+          <div className="h-12 w-12 rounded-lg bg-[#E61C24]/10 border border-[#E61C24]/20 flex items-center justify-center text-[#E61C24]">
             <FiFileText className="h-6 w-6" />
           </div>
         </div>
@@ -216,7 +216,7 @@ export default function SubmissionsPageClient() {
             placeholder="Search by student name or lesson title..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-base font-semibold outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-base font-semibold outline-none transition-colors"
           />
         </div>
 
@@ -229,7 +229,7 @@ export default function SubmissionsPageClient() {
                 onClick={() => setStatusFilter(s)}
                 className={`px-4 py-1.5 rounded-lg text-base font-bold transition-all cursor-pointer capitalize ${
                   statusFilter === s
-                    ? 'bg-[#615fff] text-white shadow-sm'
+                    ? 'bg-[#E61C24] text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
@@ -244,7 +244,7 @@ export default function SubmissionsPageClient() {
       <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
         {loading ? (
           <div className="p-12 flex flex-col items-center justify-center gap-4">
-            <div className="h-10 w-10 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+            <div className="h-10 w-10 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
             <p className="text-base font-semibold text-slate-500">Loading submissions registry...</p>
           </div>
         ) : filtered.length === 0 ? (
@@ -289,7 +289,7 @@ export default function SubmissionsPageClient() {
                           href={sub.googleDriveLink}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/20 text-[#615fff] hover:text-white rounded-lg text-base font-bold transition-all cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#E61C24]/10 hover:bg-[#E61C24] border border-[#E61C24]/20 text-[#E61C24] hover:text-white rounded-lg text-base font-bold transition-all cursor-pointer"
                         >
                           <FiEye className="h-4.5 w-4.5" /> View Drive Link
                         </a>
@@ -326,7 +326,7 @@ export default function SubmissionsPageClient() {
                     <td className="px-6 py-4 text-center">
                       <button
                         onClick={() => handleOpenGradeModal(sub)}
-                        className="px-4 py-2 bg-[#615fff] hover:bg-[#5248e8] text-white rounded-lg text-base font-bold shadow-sm shadow-[#615fff]/20 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer border-none"
+                        className="px-4 py-2 bg-[#E61C24] hover:bg-[#CC181F] text-white rounded-lg text-base font-bold shadow-sm shadow-[#E61C24]/20 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer border-none"
                       >
                         {sub.status === 'graded' ? 'Update Grade' : 'Grade Assignment'}
                       </button>
@@ -349,7 +349,7 @@ export default function SubmissionsPageClient() {
             <div className="flex items-center justify-between border-b border-slate-200 p-5 bg-slate-50 select-none">
               <div>
                 <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                  <FiAward className="text-[#615fff]" /> Grade Student Submission
+                  <FiAward className="text-[#E61C24]" /> Grade Student Submission
                 </h3>
                 <p className="text-base font-semibold text-slate-500 mt-0.5">
                   Review and award marks for assignment tasks
@@ -374,7 +374,7 @@ export default function SubmissionsPageClient() {
                 </div>
                 <div className="flex justify-between text-base">
                   <span className="font-bold text-slate-500">Task:</span>
-                  <span className="font-bold text-[#615fff]">{activeSubmission.lesson?.title}</span>
+                  <span className="font-bold text-[#E61C24]">{activeSubmission.lesson?.title}</span>
                 </div>
                 {activeSubmission.googleDriveLink && (
                   <div className="flex justify-between text-base border-t border-slate-200 pt-2.5 items-center">
@@ -383,7 +383,7 @@ export default function SubmissionsPageClient() {
                       href={activeSubmission.googleDriveLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/20 text-[#615fff] hover:text-white rounded-lg text-base font-bold transition-all cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#E61C24]/10 hover:bg-[#E61C24] border border-[#E61C24]/20 text-[#E61C24] hover:text-white rounded-lg text-base font-bold transition-all cursor-pointer"
                     >
                       <FiEye className="h-4 w-4" /> Open Attachment
                     </a>
@@ -405,7 +405,7 @@ export default function SubmissionsPageClient() {
                   value={marksInput}
                   onChange={(e) => setMarksInput(Number(e.target.value))}
                   placeholder="e.g. 85"
-                  className="bg-slate-50 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                  className="bg-slate-50 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                 />
               </div>
 
@@ -419,7 +419,7 @@ export default function SubmissionsPageClient() {
                   value={editDriveLink}
                   onChange={(e) => setEditDriveLink(e.target.value)}
                   placeholder="https://drive.google.com/file/d/..."
-                  className="bg-slate-50 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
+                  className="bg-slate-50 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
                 />
               </div>
 
@@ -431,7 +431,7 @@ export default function SubmissionsPageClient() {
                   value={feedbackInput}
                   onChange={(e) => setFeedbackInput(e.target.value)}
                   placeholder="Provide guidance, point out mistakes, or share encouragement..."
-                  className="bg-slate-50 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors resize-none"
+                  className="bg-slate-50 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors resize-none"
                 />
               </div>
 
@@ -447,7 +447,7 @@ export default function SubmissionsPageClient() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex items-center gap-1.5 px-6 py-2.5 bg-[#615fff] hover:bg-[#5248e8] text-white rounded-lg text-base font-bold shadow-md shadow-[#615fff]/20 transition-all cursor-pointer border-none disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-6 py-2.5 bg-[#E61C24] hover:bg-[#CC181F] text-white rounded-lg text-base font-bold shadow-md shadow-[#E61C24]/20 transition-all cursor-pointer border-none disabled:opacity-50"
                 >
                   {saving ? (
                     <>

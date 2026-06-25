@@ -214,7 +214,7 @@ export default function AttendanceAdminPage() {
     return (
       <div className="min-h-[70vh] flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+          <div className="h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
           <p className="text-base font-bold text-slate-600">Loading Attendance Workspace...</p>
         </div>
       </div>
@@ -226,7 +226,7 @@ export default function AttendanceAdminPage() {
       
       {/* Page Title Header */}
       <div className="mb-8 select-none">
-        <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-[#615fff]/15 border border-[#615fff]/30 text-base font-bold text-[#615fff] uppercase tracking-wider mb-3">
+        <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-[#E61C24]/15 border border-[#E61C24]/30 text-base font-bold text-[#E61C24] uppercase tracking-wider mb-3">
           Academic Registry
         </span>
         <h1 className="text-3xl font-bold font-display text-slate-800 leading-tight">
@@ -243,7 +243,7 @@ export default function AttendanceAdminPage() {
           onClick={() => setActiveTab('sheet')}
           className={`pb-3.5 px-5 font-bold text-base border-b-2 transition-colors cursor-pointer ${
             activeTab === 'sheet' 
-              ? 'border-[#615fff] text-slate-800' 
+              ? 'border-[#E61C24] text-slate-800' 
               : 'border-transparent text-slate-400 hover:text-slate-600'
           }`}
         >
@@ -253,7 +253,7 @@ export default function AttendanceAdminPage() {
           onClick={() => setActiveTab('history')}
           className={`pb-3.5 px-5 font-bold text-base border-b-2 transition-colors cursor-pointer ${
             activeTab === 'history' 
-              ? 'border-[#615fff] text-slate-800' 
+              ? 'border-[#E61C24] text-slate-800' 
               : 'border-transparent text-slate-400 hover:text-slate-600'
           }`}
         >
@@ -268,7 +268,7 @@ export default function AttendanceAdminPage() {
           
           <div className="bg-white border border-slate-200 rounded-lg p-5 space-y-4">
             <h3 className="text-base font-bold text-slate-600 flex items-center gap-2 select-none">
-              <FiList className="text-[#615fff]" />
+              <FiList className="text-[#E61C24]" />
               <span>Select Active Batch</span>
             </h3>
             
@@ -280,7 +280,7 @@ export default function AttendanceAdminPage() {
               <select
                 value={selectedBatchId}
                 onChange={(e) => setSelectedBatchId(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/60 rounded-lg px-4 py-3 text-base font-semibold text-slate-800 outline-none cursor-pointer"
+                className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/60 rounded-lg px-4 py-3 text-base font-semibold text-slate-800 outline-none cursor-pointer"
               >
                 {batches.map(b => (
                   <option key={b._id} value={b._id}>{b.name} ({b.course?.title.substring(0, 15)}...)</option>
@@ -292,7 +292,7 @@ export default function AttendanceAdminPage() {
           {selectedBatch && (
             <div className="bg-white border border-slate-200 rounded-lg p-5 space-y-5 select-none">
               <h3 className="text-base font-bold text-slate-600 flex items-center gap-2">
-                <FiInfo className="text-[#615fff]" />
+                <FiInfo className="text-[#E61C24]" />
                 <span>Daily Sheet Metrics</span>
               </h3>
               
@@ -319,7 +319,7 @@ export default function AttendanceAdminPage() {
                 <p className="text-base font-semibold text-slate-400">Intake Course:</p>
                 <p className="text-base font-bold text-slate-800 truncate">{selectedBatch.course?.title}</p>
                 <p className="text-base font-semibold text-slate-400 mt-2.5">Total Enrolled:</p>
-                <p className="text-base font-bold text-[#615fff]">{totalStudents} registered students</p>
+                <p className="text-base font-bold text-[#E61C24]">{totalStudents} registered students</p>
               </div>
             </div>
           )}
@@ -337,18 +337,18 @@ export default function AttendanceAdminPage() {
                 {/* Daily Setup Toolbar */}
                 <div className="p-5 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 select-none">
                   <div className="flex items-center gap-2">
-                    <FiCalendar className="text-[#615fff] h-5 w-5 shrink-0" />
+                    <FiCalendar className="text-[#E61C24] h-5 w-5 shrink-0" />
                     <span className="text-base font-bold text-slate-800">Class Registry Date</span>
                     <input
                       type="date"
                       required
                       value={date}
                       onChange={(e) => setDate(e.target.value)}
-                      className="bg-slate-50 border border-slate-200 focus:border-[#615fff]/60 rounded-lg px-3 py-2 text-base font-semibold text-slate-800 outline-none cursor-pointer"
+                      className="bg-slate-50 border border-slate-200 focus:border-[#E61C24]/60 rounded-lg px-3 py-2 text-base font-semibold text-slate-800 outline-none cursor-pointer"
                     />
                   </div>
                   
-                  <span className="text-base font-bold text-[#615fff] bg-[#615fff]/10 px-3.5 py-1.5 rounded-lg">
+                  <span className="text-base font-bold text-[#E61C24] bg-[#E61C24]/10 px-3.5 py-1.5 rounded-lg">
                     {totalStudents} Student Seats
                   </span>
                 </div>
@@ -426,7 +426,7 @@ export default function AttendanceAdminPage() {
                         value={remarks}
                         onChange={(e) => setRemarks(e.target.value)}
                         placeholder="e.g. Completed module 3 review session / Q&A class"
-                        className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/60 rounded-lg px-4 py-3 text-base font-semibold text-slate-800 outline-none placeholder-zinc-600"
+                        className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/60 rounded-lg px-4 py-3 text-base font-semibold text-slate-800 outline-none placeholder-zinc-600"
                       />
                     </div>
 
@@ -434,7 +434,7 @@ export default function AttendanceAdminPage() {
                       <button
                         type="submit"
                         disabled={saving}
-                        className="px-8 py-3.5 bg-[#615fff] hover:bg-[#5248e8] disabled:bg-[#615fff]/50 text-slate-800 font-bold text-base rounded-lg transition-all duration-300 flex items-center gap-2 cursor-pointer border-none"
+                        className="px-8 py-3.5 bg-[#E61C24] hover:bg-[#CC181F] disabled:bg-[#E61C24]/50 text-slate-800 font-bold text-base rounded-lg transition-all duration-300 flex items-center gap-2 cursor-pointer border-none"
                       >
                         {saving ? (
                           <>
@@ -463,7 +463,7 @@ export default function AttendanceAdminPage() {
             <div className="space-y-4">
               {fetchingLogs ? (
                 <div className="p-12 text-center bg-white border border-slate-200 rounded-lg">
-                  <div className="h-8 w-8 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                  <div className="h-8 w-8 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
                   <p className="text-base font-bold text-slate-400">Fetching historical logs...</p>
                 </div>
               ) : attendanceLogs.length === 0 ? (
@@ -486,7 +486,7 @@ export default function AttendanceAdminPage() {
                       <div key={log._id} className="bg-white border border-slate-200 rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-5 shadow-sm">
                         <div className="space-y-1">
                           <h4 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <FiCalendar className="text-[#615fff] h-5 w-5" />
+                            <FiCalendar className="text-[#E61C24] h-5 w-5" />
                             {lDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
                           </h4>
                           {log.remarks && (

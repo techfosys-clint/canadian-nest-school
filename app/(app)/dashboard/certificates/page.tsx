@@ -48,7 +48,7 @@ export default function MyCertificatesPage() {
         text: err.message || 'Error occurred while loading certificates.',
         background: '#ffffff',
         color: '#1e293b',
-        confirmButtonColor: '#615fff',
+        confirmButtonColor: '#E61C24',
       })
     } finally {
       setLoading(false)
@@ -80,7 +80,7 @@ export default function MyCertificatesPage() {
       {/* Heading Section */}
       <div className="border-b border-slate-200 pb-4">
         <h1 className="text-2xl font-bold text-zinc-900 flex items-center gap-2 select-none">
-          <FiAward className="text-[#615fff] h-7 w-7" /> My Verified Certificates
+          <FiAward className="text-[#E61C24] h-7 w-7" /> My Verified Certificates
         </h1>
         <p className="text-base font-semibold text-zinc-500 mt-1 select-none">
           View auto-generated course completion requests and download approved PDF credentials
@@ -96,7 +96,7 @@ export default function MyCertificatesPage() {
             placeholder="Search certificates by course title..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-zinc-800 rounded-lg pl-10 pr-4 py-2.5 text-base font-semibold outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-zinc-800 rounded-lg pl-10 pr-4 py-2.5 text-base font-semibold outline-none transition-colors"
           />
         </div>
 
@@ -109,7 +109,7 @@ export default function MyCertificatesPage() {
       <div className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-12 flex flex-col items-center justify-center gap-4">
-            <div className="h-10 w-10 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+            <div className="h-10 w-10 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
             <p className="text-base font-semibold text-zinc-500 select-none">Loading credentials registry...</p>
           </div>
         ) : filtered.length === 0 ? (
@@ -122,7 +122,7 @@ export default function MyCertificatesPage() {
             <div className="pt-2">
               <Link
                 href="/dashboard/courses"
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#615fff] hover:bg-[#5248e8] text-white rounded-lg text-base font-bold transition-all shadow-md shadow-[#615fff]/15"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#E61C24] hover:bg-[#CC181F] text-white rounded-lg text-base font-bold transition-all shadow-md shadow-[#E61C24]/15"
               >
                 Go to My Courses <FiExternalLink className="h-4 w-4" />
               </Link>
@@ -147,7 +147,7 @@ export default function MyCertificatesPage() {
                     <td className="px-6 py-4 max-w-xs">
                       <Link
                         href={`/courses/${cert.courseSlug}`}
-                        className="text-base font-bold text-[#0A163A] hover:text-[#615fff] transition-colors leading-tight inline-block"
+                        className="text-base font-bold text-[#0A163A] hover:text-[#E61C24] transition-colors leading-tight inline-block"
                       >
                         {cert.courseTitle}
                       </Link>
@@ -159,7 +159,7 @@ export default function MyCertificatesPage() {
                         <span className="text-base font-bold text-zinc-800">{cert.progress}% Complete</span>
                         <div className="w-24 bg-slate-100 h-1.5 rounded-lg overflow-hidden mt-1.5 border border-slate-200/40">
                           <div
-                            className="bg-[#615fff] h-full rounded-lg"
+                            className="bg-[#E61C24] h-full rounded-lg"
                             style={{ width: `${cert.progress}%` }}
                           />
                         </div>

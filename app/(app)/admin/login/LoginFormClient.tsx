@@ -84,7 +84,7 @@ export default function LoginFormClient() {
             placeholder="admin@tutorspace.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
           />
         </div>
       </div>
@@ -100,7 +100,7 @@ export default function LoginFormClient() {
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/70 text-slate-800 rounded-lg pl-11 pr-11 py-3 text-base font-semibold outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/70 text-slate-800 rounded-lg pl-11 pr-11 py-3 text-base font-semibold outline-none transition-colors"
           />
           <button
             type="button"
@@ -117,7 +117,7 @@ export default function LoginFormClient() {
         <span /> {/* Spacer */}
         <Link
           href="/forgot-password"
-          className="text-[#615fff] hover:underline transition-colors cursor-pointer"
+          className="text-[#E61C24] hover:underline transition-colors cursor-pointer"
         >
           Forgot Password?
         </Link>
@@ -127,7 +127,7 @@ export default function LoginFormClient() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base transition-colors duration-200 cursor-pointer disabled:opacity-50"
+        className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-colors duration-200 cursor-pointer disabled:opacity-50"
       >
         <FiLogIn className="h-5 w-5" />
         {loading ? 'Authenticating...' : 'Sign In to Console'}

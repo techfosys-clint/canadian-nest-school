@@ -114,7 +114,7 @@ export default function StudyHubPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+          <div className="h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
           <p className="text-base font-bold text-zinc-650">Loading Study Hub...</p>
         </div>
       </div>
@@ -143,15 +143,15 @@ export default function StudyHubPage() {
 
       {/* Dynamic Premium Header/Banner */}
       <div className="w-full bg-[#0A163A] rounded-lg p-8 md:p-12 relative overflow-hidden mb-10 border border-zinc-800/20">
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#615fff]/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#543cdf]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#E61C24]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#CC181F]/15 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative z-10 max-w-2xl">
-          <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-[#615fff]/20 border border-[#615fff]/30 text-base font-bold text-[#615fff] uppercase tracking-wider mb-6">
+          <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-[#E61C24]/20 border border-[#E61C24]/30 text-base font-bold text-[#E61C24] uppercase tracking-wider mb-6">
             LMS Platform
           </span>
           <h1 className="text-3xl md:text-4xl font-bold font-display text-white mb-4 leading-tight">
-            Canadian Nest School <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8a88ff] to-white font-bold">Study Hub</span> ⚡
+            Canadian Nest School <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF4D55] to-white font-bold">Study Hub</span> ⚡
           </h1>
           <p className="text-zinc-400 text-base md:text-lg font-semibold leading-relaxed">
             Monitor your daily study streaks, participate in live webinar streams, and manage interactive lessons.
@@ -198,12 +198,12 @@ export default function StudyHubPage() {
         <div className="lg:col-span-7">
           <a
             href="/dashboard/live-classes"
-            className="block bg-white p-6 border border-zinc-200/80 rounded-lg space-y-5 shadow-sm hover:border-[#615fff]/40 hover:shadow-md transition-all duration-300 group"
+            className="block bg-white p-6 border border-zinc-200/80 rounded-lg space-y-5 shadow-sm hover:border-[#E61C24]/40 hover:shadow-md transition-all duration-300 group"
           >
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-bold text-zinc-800 flex items-center gap-2 group-hover:text-[#615fff] transition-colors">
-                  <FiRadio className="text-[#615fff]" /> Live Webinar Broadcasts
+                <h3 className="text-xl font-bold text-zinc-800 flex items-center gap-2 group-hover:text-[#E61C24] transition-colors">
+                  <FiRadio className="text-[#E61C24]" /> Live Webinar Broadcasts
                 </h3>
                 <p className="text-base font-semibold text-zinc-450 mt-1 leading-relaxed">
                   Join active webinar classrooms to ask live questions, share comments, and review assignments.
@@ -217,8 +217,8 @@ export default function StudyHubPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-[#615fff]/5 border border-[#615fff]/15 rounded-lg p-4 text-center">
-                <p className="text-3xl font-bold text-[#615fff]">{webinars.filter(w => w.liveDate && new Date(w.liveDate).getTime() > Date.now()).length}</p>
+              <div className="bg-[#E61C24]/5 border border-[#E61C24]/15 rounded-lg p-4 text-center">
+                <p className="text-3xl font-bold text-[#E61C24]">{webinars.filter(w => w.liveDate && new Date(w.liveDate).getTime() > Date.now()).length}</p>
                 <p className="text-sm font-bold text-zinc-500 mt-1">Upcoming Classes</p>
               </div>
               <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-4 text-center">
@@ -228,7 +228,7 @@ export default function StudyHubPage() {
             </div>
 
             <div className="flex items-center justify-end">
-              <span className="inline-flex items-center gap-2 text-base font-bold text-[#615fff] group-hover:gap-3 transition-all">
+              <span className="inline-flex items-center gap-2 text-base font-bold text-[#E61C24] group-hover:gap-3 transition-all">
                 View All Live Classes <FiExternalLink className="h-4 w-4" />
               </span>
             </div>
@@ -242,7 +242,7 @@ export default function StudyHubPage() {
         <div className="bg-white p-6 border border-zinc-200/80 rounded-lg space-y-6">
           <div>
             <h3 className="text-xl font-bold text-zinc-800 flex items-center gap-2">
-              <span className="text-[#615fff]">📚</span> Study Materials & eBooks Hub
+              <span className="text-[#E61C24]">📚</span> Study Materials & eBooks Hub
             </h3>
             <p className="text-base font-semibold text-zinc-450 mt-1 leading-relaxed">
               Access exclusive ebooks, guides, cheat sheets, and reference materials provided by your course mentors.
@@ -277,7 +277,7 @@ export default function StudyHubPage() {
                 }
 
                 return (
-                  <div key={idx} className="bg-zinc-50/50 hover:bg-white border border-zinc-150/80 hover:border-[#615fff]/35 rounded-lg transition-all duration-300 flex flex-col group overflow-hidden">
+                  <div key={idx} className="bg-zinc-50/50 hover:bg-white border border-zinc-150/80 hover:border-[#E61C24]/35 rounded-lg transition-all duration-300 flex flex-col group overflow-hidden">
                     
                     {/* Cover image / placeholder */}
                     <div className="relative w-full aspect-[4/3] bg-zinc-100 overflow-hidden shrink-0">
@@ -308,7 +308,7 @@ export default function StudyHubPage() {
                     {/* Card body */}
                     <div className="p-4 flex flex-col flex-1 gap-3">
                       <div>
-                        <h4 className="text-base font-bold text-zinc-850 line-clamp-2 leading-snug group-hover:text-[#615fff] transition-colors">
+                        <h4 className="text-base font-bold text-zinc-850 line-clamp-2 leading-snug group-hover:text-[#E61C24] transition-colors">
                           {material.title}
                         </h4>
                         <p className="text-sm font-semibold text-zinc-450 mt-1.5 line-clamp-1">
@@ -321,7 +321,7 @@ export default function StudyHubPage() {
                           href={material.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-white hover:bg-[#615fff] text-zinc-700 hover:text-white border border-zinc-250 hover:border-[#615fff] font-bold text-base transition-all duration-200 shadow-sm cursor-pointer"
+                          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-white hover:bg-[#E61C24] text-zinc-700 hover:text-white border border-zinc-250 hover:border-[#E61C24] font-bold text-base transition-all duration-200 shadow-sm cursor-pointer"
                         >
                           <span>Access Material</span>
                           <FiDownload className="h-4.5 w-4.5 shrink-0" />

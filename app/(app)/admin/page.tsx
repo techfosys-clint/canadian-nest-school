@@ -277,7 +277,7 @@ export default function AdminDashboardPage() {
     return (
       <div className="min-h-[70vh] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+          <div className="h-10 w-10 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
           <p className="text-base font-bold text-slate-400">Loading Dashboard Data...</p>
         </div>
       </div>
@@ -293,7 +293,7 @@ export default function AdminDashboardPage() {
           <p className="text-base font-semibold text-slate-500 leading-relaxed">{error}</p>
           <button 
             onClick={fetchStats} 
-            className="w-full py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base cursor-pointer transition-all duration-200"
+            className="w-full py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base cursor-pointer transition-all duration-200"
           >
             Retry Loading
           </button>
@@ -349,7 +349,7 @@ export default function AdminDashboardPage() {
             <h2 className="text-lg font-bold text-slate-800">Income Trend</h2>
             <p className="text-base font-semibold text-slate-500 mt-0.5">Last 7 days revenue mapping</p>
           </div>
-          <span className="text-base font-bold text-[#615fff] bg-[#615fff]/10 px-2.5 py-1 rounded-lg border border-[#615fff]/20">
+          <span className="text-base font-bold text-[#E61C24] bg-[#E61C24]/10 px-2.5 py-1 rounded-lg border border-[#E61C24]/20">
             Auto Aggregated
           </span>
         </div>
@@ -359,8 +359,8 @@ export default function AdminDashboardPage() {
           <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto select-none overflow-visible">
             <defs>
               <linearGradient id="chart-glow-gradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#615fff" stopOpacity="0.25"/>
-                <stop offset="100%" stopColor="#615fff" stopOpacity="0.0"/>
+                <stop offset="0%" stopColor="#E61C24" stopOpacity="0.25"/>
+                <stop offset="100%" stopColor="#E61C24" stopOpacity="0.0"/>
               </linearGradient>
             </defs>
 
@@ -373,12 +373,12 @@ export default function AdminDashboardPage() {
             <path d={fillPathD} fill="url(#chart-glow-gradient)" />
 
             {/* Smooth Bezier Stroke Line */}
-            <path d={pathD} fill="none" stroke="#615fff" strokeWidth="3" strokeLinecap="round" />
+            <path d={pathD} fill="none" stroke="#E61C24" strokeWidth="3" strokeLinecap="round" />
 
             {/* Interactive Neon Data Dots */}
             {points.map((p, i) => (
               <g key={i}>
-                <circle cx={p.x} cy={p.y} r="5" fill="#615fff" stroke="#ffffff" strokeWidth="2" className="cursor-pointer" />
+                <circle cx={p.x} cy={p.y} r="5" fill="#E61C24" stroke="#ffffff" strokeWidth="2" className="cursor-pointer" />
                 {/* Value tooltip label */}
                 {p.val > 0 && (
                   <text x={p.x} y={p.y - 10} fill="#1e293b" fontSize="10" fontWeight="bold" textAnchor="middle">
@@ -444,7 +444,7 @@ export default function AdminDashboardPage() {
             <div className="bg-white rounded-lg border border-slate-200 p-6 shadow-sm space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-base font-semibold text-slate-500">Purchases</p>
-                <div className="h-10 w-10 rounded-lg bg-[#615fff]/10 border border-[#615fff]/20 flex items-center justify-center text-[#615fff]">
+                <div className="h-10 w-10 rounded-lg bg-[#E61C24]/10 border border-[#E61C24]/20 flex items-center justify-center text-[#E61C24]">
                   <FiBookOpen className="h-5 w-5" />
                 </div>
               </div>
@@ -512,10 +512,10 @@ export default function AdminDashboardPage() {
               <div className="grid grid-cols-1 gap-3">
                 <Link
                   href="/admin/courses/new"
-                  className="flex items-center justify-between p-3.5 rounded-lg border border-slate-200 hover:border-[#615fff]/50 bg-slate-50 hover:bg-[#615fff]/5 text-slate-600 hover:text-slate-900 transition-all duration-200 group text-base font-semibold"
+                  className="flex items-center justify-between p-3.5 rounded-lg border border-slate-200 hover:border-[#E61C24]/50 bg-slate-50 hover:bg-[#E61C24]/5 text-slate-600 hover:text-slate-900 transition-all duration-200 group text-base font-semibold"
                 >
                   <span className="flex items-center gap-3">
-                    <FiBookOpen className="h-5 w-5 text-[#615fff]" />
+                    <FiBookOpen className="h-5 w-5 text-[#E61C24]" />
                     Add New Course
                   </span>
                   <FiChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
@@ -523,7 +523,7 @@ export default function AdminDashboardPage() {
 
                 <Link
                   href="/admin/courses"
-                  className="flex items-center justify-between p-3.5 rounded-lg border border-slate-200 hover:border-[#615fff]/50 bg-slate-50 hover:bg-[#615fff]/5 text-slate-600 hover:text-slate-900 transition-all duration-200 group text-base font-semibold"
+                  className="flex items-center justify-between p-3.5 rounded-lg border border-slate-200 hover:border-[#E61C24]/50 bg-slate-50 hover:bg-[#E61C24]/5 text-slate-600 hover:text-slate-900 transition-all duration-200 group text-base font-semibold"
                 >
                   <span className="flex items-center gap-3">
                     <FiBook className="h-5 w-5 text-indigo-500" />
@@ -534,7 +534,7 @@ export default function AdminDashboardPage() {
 
                 <Link
                   href="/admin/reviews"
-                  className="flex items-center justify-between p-3.5 rounded-lg border border-slate-200 hover:border-[#615fff]/50 bg-slate-50 hover:bg-[#615fff]/5 text-slate-600 hover:text-slate-900 transition-all duration-200 group text-base font-semibold"
+                  className="flex items-center justify-between p-3.5 rounded-lg border border-slate-200 hover:border-[#E61C24]/50 bg-slate-50 hover:bg-[#E61C24]/5 text-slate-600 hover:text-slate-900 transition-all duration-200 group text-base font-semibold"
                 >
                   <span className="flex items-center gap-3">
                     <FiStar className="h-5 w-5 text-amber-500" />
@@ -570,7 +570,7 @@ export default function AdminDashboardPage() {
                       placeholder="Search student or course..."
                       value={enrollmentSearchQuery}
                       onChange={(e) => setEnrollmentSearchQuery(e.target.value)}
-                      className="w-full sm:w-64 pl-9 pr-8 py-1.5 bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-[#615fff] rounded-lg text-slate-800 text-base font-semibold focus:outline-none placeholder-slate-400 transition-colors"
+                      className="w-full sm:w-64 pl-9 pr-8 py-1.5 bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-[#E61C24] rounded-lg text-slate-800 text-base font-semibold focus:outline-none placeholder-slate-400 transition-colors"
                     />
                     <FiSearch className="absolute left-3 text-slate-400 h-4.5 w-4.5" />
                     {enrollmentSearchQuery && (
@@ -656,7 +656,7 @@ export default function AdminDashboardPage() {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="font-bold text-slate-800 text-base">{r.studentName}</p>
-                          <p className="text-base font-bold text-[#615fff] uppercase tracking-wider mt-0.5">
+                          <p className="text-base font-bold text-[#E61C24] uppercase tracking-wider mt-0.5">
                             {r.courseTitle}
                           </p>
                         </div>
@@ -743,7 +743,7 @@ export default function AdminDashboardPage() {
           {/* Stats grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <div className="bg-white border border-slate-200 p-6 rounded-lg shadow-sm flex items-center gap-4">
-              <div className="h-10 w-10 rounded-lg bg-[#615fff]/10 border border-[#615fff]/20 flex items-center justify-center text-[#615fff] shrink-0">
+              <div className="h-10 w-10 rounded-lg bg-[#E61C24]/10 border border-[#E61C24]/20 flex items-center justify-center text-[#E61C24] shrink-0">
                 <FiBookOpen className="h-5 w-5" />
               </div>
               <div>
@@ -819,7 +819,7 @@ export default function AdminDashboardPage() {
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 text-base text-[#615fff] font-bold">
+                          <td className="px-6 py-4 text-base text-[#E61C24] font-bold">
                             {formatCurrency(c.price)}
                           </td>
                           <td className="px-4 py-4 text-center">
@@ -834,7 +834,7 @@ export default function AdminDashboardPage() {
                           <td className="px-6 py-4 text-right">
                             <Link
                               href={`/admin/lessons?courseId=${c.id}`}
-                              className="inline-flex items-center gap-1.5 py-2 px-4 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base transition-colors"
+                              className="inline-flex items-center gap-1.5 py-2 px-4 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-colors"
                             >
                               <FiList className="h-4.5 w-4.5" />
                               <span>Manage Syllabus</span>
@@ -853,12 +853,12 @@ export default function AdminDashboardPage() {
               <div className="border-b border-slate-200 pb-4 flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-[#615fff] animate-pulse" />
+                    <span className="h-2 w-2 rounded-full bg-[#E61C24] animate-pulse" />
                     Live Schedule
                   </h2>
                   <p className="text-base font-semibold text-slate-500 mt-0.5">Upcoming interactive classes</p>
                 </div>
-                <span className="px-2 py-0.5 bg-[#615fff]/10 border border-[#615fff]/20 text-[#615fff] text-xs font-bold rounded-md select-none shrink-0">
+                <span className="px-2 py-0.5 bg-[#E61C24]/10 border border-[#E61C24]/20 text-[#E61C24] text-xs font-bold rounded-md select-none shrink-0">
                   {(data.liveLessons || []).length} Total
                 </span>
               </div>
@@ -905,7 +905,7 @@ export default function AdminDashboardPage() {
                               href={lesson.liveUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="py-1 px-2.5 rounded bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-xs transition-colors shrink-0"
+                              className="py-1 px-2.5 rounded bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-xs transition-colors shrink-0"
                             >
                               Join
                             </a>

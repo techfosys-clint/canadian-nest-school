@@ -61,7 +61,7 @@ export default async function AdminCoursesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 tracking-tight flex items-center gap-2.5">
-            <FiBookOpen className="text-[#615fff] h-6 w-6" />
+            <FiBookOpen className="text-[#E61C24] h-6 w-6" />
             Courses Management
           </h1>
           <p className="text-sm font-semibold text-slate-500 mt-1">
@@ -70,7 +70,7 @@ export default async function AdminCoursesPage() {
         </div>
         <Link
           href="/admin/courses/new"
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base shadow-md shadow-[#615fff]/15 hover:shadow-[#615fff]/25 transition-all duration-300 cursor-pointer"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-md shadow-[#E61C24]/15 hover:shadow-[#E61C24]/25 transition-all duration-300 cursor-pointer"
         >
           <FiPlus className="h-5 w-5" />
           Create Course

@@ -183,7 +183,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
           type="button"
           onClick={handleSave} 
           disabled={saving}
-          className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base shadow-lg shadow-[#615fff]/15 cursor-pointer disabled:opacity-50 shrink-0 transition-all"
+          className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-lg shadow-[#E61C24]/15 cursor-pointer disabled:opacity-50 shrink-0 transition-all"
         >
           <FiSave className="h-5 w-5" />
           <span>{saving ? 'Saving...' : initialBlog ? 'Save Changes' : 'Publish Article'}</span>
@@ -203,7 +203,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
                 value={title} 
                 onChange={e => setTitle(e.target.value)}
                 placeholder="Write a captivating, keyword-rich title..."
-                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/60 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none transition-colors" 
+                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/60 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none transition-colors" 
               />
             </div>
             
@@ -249,7 +249,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
                   <button 
                     type="button" 
                     onClick={() => setShowMediaPicker(true)}
-                    className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-[#615fff]/15 hover:bg-[#615fff]/25 border border-[#615fff]/20 text-[#9693ff] font-bold text-sm cursor-pointer transition-colors"
+                    className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-[#E61C24]/15 hover:bg-[#E61C24]/25 border border-[#E61C24]/20 text-[#9693ff] font-bold text-sm cursor-pointer transition-colors"
                   >
                     <FiImage className="h-4.5 w-4.5" />
                     <span>Library</span>
@@ -258,7 +258,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
               </div>
             ) : (
               <div className="space-y-3">
-                <label className={`flex flex-col items-center justify-center aspect-[16/9] w-full bg-slate-100 border-2 border-dashed border-slate-200 hover:border-[#615fff]/50 rounded-lg cursor-pointer transition-colors p-4 text-center ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                <label className={`flex flex-col items-center justify-center aspect-[16/9] w-full bg-slate-100 border-2 border-dashed border-slate-200 hover:border-[#E61C24]/50 rounded-lg cursor-pointer transition-colors p-4 text-center ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
                   <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                   <FiUploadCloud className="h-8 w-8 text-slate-400 mb-2 animate-bounce" />
                   <span className="text-base font-semibold text-slate-500">{uploading ? 'Uploading Cover...' : 'Upload cover photo'}</span>
@@ -268,7 +268,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
                 <button 
                   type="button" 
                   onClick={() => setShowMediaPicker(true)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-[#615fff]/10 hover:bg-[#615fff]/20 border border-[#615fff]/20 text-[#9693ff] font-bold text-base transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-[#E61C24]/10 hover:bg-[#E61C24]/20 border border-[#E61C24]/20 text-[#9693ff] font-bold text-base transition-colors cursor-pointer"
                 >
                   <FiImage className="h-4.5 w-4.5" />
                   <span>Choose from Media</span>
@@ -288,7 +288,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
                 value={tagsInput} 
                 onChange={e => setTagsInput(e.target.value)}
                 placeholder="e.g. Next.js, Design Patterns, Careers"
-                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/60 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none transition-colors" 
+                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/60 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none transition-colors" 
               />
               <p className="text-xs font-semibold text-slate-400 leading-normal">
                 Separate multiple article tags using comma characters. Tag labels are parsed automatically.
@@ -299,7 +299,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
           {/* SEO Metadata Card (Moved to the Right Sidebar) */}
           <div className="bg-white border border-slate-200/60 rounded-lg p-6 space-y-5">
             <div className="flex items-center gap-2 pb-2 border-b border-slate-200/50">
-              <FiInfo className="text-[#615fff] h-5 w-5" />
+              <FiInfo className="text-[#E61C24] h-5 w-5" />
               <h3 className="text-base font-bold text-slate-800 uppercase tracking-wider">Search Engine Optimization (SEO)</h3>
             </div>
             
@@ -310,7 +310,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
                 value={metaTitle} 
                 onChange={e => setMetaTitle(e.target.value)}
                 placeholder="Alternative SEO title..."
-                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/60 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none transition-colors" 
+                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/60 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none transition-colors" 
               />
             </div>
 
@@ -321,7 +321,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
                 value={metaDescription} 
                 onChange={e => setMetaDescription(e.target.value)}
                 placeholder="Write a summary under 160 characters..."
-                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/60 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none resize-none transition-colors" 
+                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/60 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none resize-none transition-colors" 
               />
             </div>
 
@@ -332,7 +332,7 @@ export default function BlogFormClient({ initialBlog }: BlogFormClientProps) {
                 value={keywords} 
                 onChange={e => setKeywords(e.target.value)}
                 placeholder="e.g. coaching, tutor tips"
-                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/60 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none transition-colors" 
+                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/60 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none transition-colors" 
               />
             </div>
           </div>

@@ -174,7 +174,7 @@ export default function ManageEnrollmentsPage() {
     return (
       <div className="min-h-[70vh] flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+          <div className="h-10 w-10 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
           <p className="text-base font-bold text-slate-500">Loading Enrollment console...</p>
         </div>
       </div>
@@ -190,7 +190,7 @@ export default function ManageEnrollmentsPage() {
           <p className="text-base font-semibold text-slate-500 leading-relaxed">{error}</p>
           <button 
             onClick={fetchEnrollments} 
-            className="w-full py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base cursor-pointer transition-all duration-200"
+            className="w-full py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base cursor-pointer transition-all duration-200"
           >
             Retry Loading
           </button>
@@ -236,7 +236,7 @@ export default function ManageEnrollmentsPage() {
         <div className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <p className="text-base font-semibold text-slate-500">Total Enrollments</p>
-            <div className="h-10 w-10 rounded-lg bg-[#615fff]/10 border border-[#615fff]/20 flex items-center justify-center text-[#615fff]">
+            <div className="h-10 w-10 rounded-lg bg-[#E61C24]/10 border border-[#E61C24]/20 flex items-center justify-center text-[#E61C24]">
               <FiUsers className="h-5 w-5" />
             </div>
           </div>
@@ -294,7 +294,7 @@ export default function ManageEnrollmentsPage() {
               placeholder="Search student name, email, or course title..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-[#615fff] rounded-lg text-slate-800 text-base font-semibold focus:outline-none placeholder-zinc-550 transition-colors"
+              className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-[#E61C24] rounded-lg text-slate-800 text-base font-semibold focus:outline-none placeholder-zinc-550 transition-colors"
             />
             <FiSearch className="absolute left-3 text-slate-400 h-4.5 w-4.5" />
             {searchQuery && (
@@ -313,7 +313,7 @@ export default function ManageEnrollmentsPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 text-base font-semibold focus:outline-none focus:border-[#615fff] cursor-pointer"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 text-base font-semibold focus:outline-none focus:border-[#E61C24] cursor-pointer"
             >
               <option value="all">All Payment Statuses</option>
               <option value="completed">Active (Completed)</option>
@@ -327,7 +327,7 @@ export default function ManageEnrollmentsPage() {
             <select
               value={courseFilter}
               onChange={(e) => setCourseFilter(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 text-base font-semibold focus:outline-none focus:border-[#615fff] cursor-pointer"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 text-base font-semibold focus:outline-none focus:border-[#E61C24] cursor-pointer"
             >
               <option value="all">All Courses Assigned</option>
               {uniqueCourses.map(course => (
@@ -366,7 +366,7 @@ export default function ManageEnrollmentsPage() {
                   setStatusFilter('all')
                   setCourseFilter('all')
                 }}
-                className="py-2 px-4 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base cursor-pointer transition-colors"
+                className="py-2 px-4 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base cursor-pointer transition-colors"
               >
                 Reset Filters
               </button>
@@ -392,7 +392,7 @@ export default function ManageEnrollmentsPage() {
                     {/* Student Info */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-[#615fff]/8 border border-[#615fff]/15 flex items-center justify-center font-bold text-base text-[#615fff] uppercase shrink-0">
+                        <div className="h-10 w-10 rounded-lg bg-[#E61C24]/8 border border-[#E61C24]/15 flex items-center justify-center font-bold text-base text-[#E61C24] uppercase shrink-0">
                           {e.studentName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
                         </div>
                         <div>

@@ -118,8 +118,8 @@ export default function StaffRegisterFormClient() {
       {/* Header and Back Button - Borderless */}
       <div className="flex items-center justify-between pb-4 border-b border-slate-200/60">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-lg bg-[#615fff]/15 flex items-center justify-center">
-            <FiUserPlus className="text-[#615fff] h-5.5 w-5.5" />
+          <div className="h-10 w-10 rounded-lg bg-[#E61C24]/15 flex items-center justify-center">
+            <FiUserPlus className="text-[#E61C24] h-5.5 w-5.5" />
           </div>
           <div>
             <h2 className="text-xl font-bold text-slate-800 leading-none">Add Faculty Member</h2>
@@ -157,7 +157,7 @@ export default function StaffRegisterFormClient() {
                   placeholder="e.g. Jane Doe"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-slate-100 border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
+                  className="w-full bg-slate-100 border-none focus:ring-2 focus:ring-[#E61C24]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
                 />
               </div>
             </div>
@@ -173,7 +173,7 @@ export default function StaffRegisterFormClient() {
                   placeholder="e.g. jane@tutorspace.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-slate-100 border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
+                  className="w-full bg-slate-100 border-none focus:ring-2 focus:ring-[#E61C24]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
                 />
               </div>
             </div>
@@ -191,7 +191,7 @@ export default function StaffRegisterFormClient() {
                   placeholder="e.g. +88017XXXXXXXX"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-slate-100 border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
+                  className="w-full bg-slate-100 border-none focus:ring-2 focus:ring-[#E61C24]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
                 />
               </div>
             </div>
@@ -207,7 +207,7 @@ export default function StaffRegisterFormClient() {
                   placeholder="Minimum 6 characters"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-slate-100 border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
+                  className="w-full bg-slate-100 border-none focus:ring-2 focus:ring-[#E61C24]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
                 />
               </div>
             </div>
@@ -223,7 +223,7 @@ export default function StaffRegisterFormClient() {
                 placeholder="e.g. Software Engineer, UI/UX Designer, Project Manager"
                 value={designation}
                 onChange={(e) => setDesignation(e.target.value)}
-                className="w-full bg-slate-100 border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
+                className="w-full bg-slate-100 border-none focus:ring-2 focus:ring-[#E61C24]/40 text-slate-800 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all shadow-sm"
               />
             </div>
             <p className="text-xs text-slate-400 font-semibold mt-1">This designation will display on public views (like the Mentors page).</p>
@@ -250,7 +250,7 @@ export default function StaffRegisterFormClient() {
                 <button
                   type="button"
                   onClick={() => setShowMediaPicker(true)}
-                  className="flex items-center gap-1.5 px-4.5 py-2 rounded-lg bg-[#615fff]/15 hover:bg-[#615fff]/25 text-[#9693ff] font-bold text-sm cursor-pointer transition-colors"
+                  className="flex items-center gap-1.5 px-4.5 py-2 rounded-lg bg-[#E61C24]/15 hover:bg-[#E61C24]/25 text-[#9693ff] font-bold text-sm cursor-pointer transition-colors"
                 >
                   <FiImage className="h-4.5 w-4.5" />
                   <span>Media Library</span>
@@ -278,7 +278,7 @@ export default function StaffRegisterFormClient() {
                 onClick={() => handleRoleChange('staff')}
                 className={`flex items-start gap-3 p-4 rounded-lg border-none cursor-pointer transition-all duration-200 select-none ${
                   role === 'staff'
-                    ? 'bg-[#615fff]/10 text-slate-800 shadow-md'
+                    ? 'bg-[#E61C24]/10 text-slate-800 shadow-md'
                     : 'bg-slate-100 text-slate-500 hover:text-slate-800'
                 }`}
               >
@@ -301,7 +301,7 @@ export default function StaffRegisterFormClient() {
                 onClick={() => handleRoleChange('instructor')}
                 className={`flex items-start gap-3 p-4 rounded-lg border-none cursor-pointer transition-all duration-200 select-none ${
                   role === 'instructor'
-                    ? 'bg-[#615fff]/10 text-slate-800 shadow-md'
+                    ? 'bg-[#E61C24]/10 text-slate-800 shadow-md'
                     : 'bg-slate-100 text-slate-500 hover:text-slate-800'
                 }`}
               >
@@ -324,7 +324,7 @@ export default function StaffRegisterFormClient() {
                 onClick={() => handleRoleChange('admin')}
                 className={`flex items-start gap-3 p-4 rounded-lg border-none cursor-pointer transition-all duration-200 select-none ${
                   role === 'admin'
-                    ? 'bg-[#615fff]/10 text-slate-800 shadow-md'
+                    ? 'bg-[#E61C24]/10 text-slate-800 shadow-md'
                     : 'bg-slate-100 text-slate-500 hover:text-slate-800'
                 }`}
               >
@@ -367,7 +367,7 @@ export default function StaffRegisterFormClient() {
                       key={perm.key}
                       className={`flex items-center gap-3 p-3.5 rounded-lg border-none cursor-pointer select-none transition-all duration-200 ${
                         isChecked
-                          ? 'bg-[#615fff]/10 text-slate-800'
+                          ? 'bg-[#E61C24]/10 text-slate-800'
                           : 'bg-slate-100 text-slate-500 hover:text-slate-800'
                       }`}
                     >
@@ -381,7 +381,7 @@ export default function StaffRegisterFormClient() {
                             setPermissions([...permissions, perm.key])
                           }
                         }}
-                        className="h-4.5 w-4.5 rounded border-none text-[#615fff] focus:ring-0 cursor-pointer"
+                        className="h-4.5 w-4.5 rounded border-none text-[#E61C24] focus:ring-0 cursor-pointer"
                       />
                       <span className="text-sm font-bold">{perm.label}</span>
                     </label>
@@ -397,7 +397,7 @@ export default function StaffRegisterFormClient() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base transition-all duration-200 cursor-pointer disabled:opacity-50 border-none shadow-md"
+            className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all duration-200 cursor-pointer disabled:opacity-50 border-none shadow-md"
           >
             <FiUserPlus className="h-5 w-5" />
             <span>{loading ? 'Registering Faculty...' : 'Register Faculty Account'}</span>

@@ -69,7 +69,7 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
       text: `Are you sure you want to change this course status to "${nextStatus}"?`,
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#615fff',
+      confirmButtonColor: '#E61C24',
       cancelButtonColor: '#6b7280',
       confirmButtonText: `Yes, ${nextStatus === 'published' ? 'Publish' : 'Draft'} it`,
       background: '#ffffff',
@@ -239,8 +239,8 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
             <p className="text-sm font-bold text-slate-500 uppercase tracking-wider select-none">Total Courses</p>
             <p className="text-3xl font-bold text-slate-800 tracking-tight">{totalCourses}</p>
           </div>
-          <div className="h-12 w-12 rounded-lg bg-[#615fff]/10 border border-[#615fff]/20 flex items-center justify-center select-none">
-            <FiBookOpen className="h-6 w-6 text-[#615fff]" />
+          <div className="h-12 w-12 rounded-lg bg-[#E61C24]/10 border border-[#E61C24]/20 flex items-center justify-center select-none">
+            <FiBookOpen className="h-6 w-6 text-[#E61C24]" />
           </div>
         </div>
 
@@ -271,7 +271,7 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
       <div className="flex flex-col md:flex-row md:items-center gap-4 bg-white border border-slate-200 p-4 rounded-lg shadow-sm">
         
         {/* Search Input */}
-        <div className="flex-1 flex items-center gap-2.5 px-3.5 py-2.5 bg-slate-50 border border-slate-200 focus-within:ring-2 focus-within:ring-[#615fff]/40 rounded-lg transition-all">
+        <div className="flex-1 flex items-center gap-2.5 px-3.5 py-2.5 bg-slate-50 border border-slate-200 focus-within:ring-2 focus-within:ring-[#E61C24]/40 rounded-lg transition-all">
           <FiSearch className="h-4.5 w-4.5 text-slate-400" />
           <input
             type="text"
@@ -290,7 +290,7 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
               onClick={() => setStatusFilter(tab)}
               className={`px-4 py-1.5 rounded-md text-base font-bold capitalize transition-all duration-200 cursor-pointer ${
                 statusFilter === tab
-                  ? 'bg-[#615fff] text-white'
+                  ? 'bg-[#E61C24] text-white'
                   : 'text-slate-500 hover:text-slate-800'
               }`}
             >
@@ -345,7 +345,7 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
                     </td>
 
                     {/* Price */}
-                    <td className="px-6 py-4 font-bold text-[#615fff]">
+                    <td className="px-6 py-4 font-bold text-[#E61C24]">
                       {formatCurrency(c.price)}
                     </td>
 
@@ -390,7 +390,7 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
                         <Link
                           href={`/admin/courses/${c.id}/edit`}
                           title="Edit Course Parameters"
-                          className="p-2 rounded bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/20 text-[#615fff] hover:text-white transition-all duration-200"
+                          className="p-2 rounded bg-[#E61C24]/10 hover:bg-[#E61C24] border border-[#E61C24]/20 text-[#E61C24] hover:text-white transition-all duration-200"
                         >
                           <FiEdit className="h-4.5 w-4.5" />
                         </Link>

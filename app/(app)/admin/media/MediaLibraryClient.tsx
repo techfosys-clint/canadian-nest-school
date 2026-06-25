@@ -74,8 +74,8 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
   function SortIcon({ col }: { col: SortKey }) {
     if (sortKey !== col) return <span className="ml-1 text-slate-400">↕</span>
     return sortDir === 'asc'
-      ? <FiChevronUp className="ml-1 inline h-4 w-4 text-[#615fff]" />
-      : <FiChevronDown className="ml-1 inline h-4 w-4 text-[#615fff]" />
+      ? <FiChevronUp className="ml-1 inline h-4 w-4 text-[#E61C24]" />
+      : <FiChevronDown className="ml-1 inline h-4 w-4 text-[#E61C24]" />
   }
 
   // Copy URL
@@ -127,7 +127,7 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
 
         <Link
           href="/admin/media/upload"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base shadow-md shadow-[#615fff]/25 transition-all"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-md shadow-[#E61C24]/25 transition-all"
         >
           <FiUploadCloud className="h-5 w-5" />
           Upload File / Photo
@@ -135,7 +135,7 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
       </div>
 
       {/* Search */}
-      <div className="flex items-center gap-2.5 bg-white border border-slate-200 px-4 py-3 rounded-lg focus-within:border-[#615fff]/50 transition-colors max-w-md shadow-sm">
+      <div className="flex items-center gap-2.5 bg-white border border-slate-200 px-4 py-3 rounded-lg focus-within:border-[#E61C24]/50 transition-colors max-w-md shadow-sm">
         <FiSearch className="h-5 w-5 text-slate-400 shrink-0" />
         <input
           type="text"
@@ -160,7 +160,7 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
               {search ? 'No assets match your search.' : 'No media yet — upload your first file'}
             </p>
             {!search && (
-              <Link href="/admin/media/upload" className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base transition-all">
+              <Link href="/admin/media/upload" className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all">
                 <FiUploadCloud className="h-5 w-5" /> Upload File / Photo
               </Link>
             )}
@@ -198,7 +198,7 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
                     <tr
                       key={item.id}
                       onClick={() => setPreviewItem(prev => prev?.id === item.id ? null : item)}
-                      className={`border-b border-slate-100 cursor-pointer transition-colors hover:bg-slate-50 ${previewItem?.id === item.id ? 'bg-[#615fff]/5 border-l-2 border-l-[#615fff]' : ''} ${idx === sorted.length - 1 ? 'border-b-0' : ''}`}
+                      className={`border-b border-slate-100 cursor-pointer transition-colors hover:bg-slate-50 ${previewItem?.id === item.id ? 'bg-[#E61C24]/5 border-l-2 border-l-[#E61C24]' : ''} ${idx === sorted.length - 1 ? 'border-b-0' : ''}`}
                     >
                       {/* Thumbnail */}
                       <td className="px-4 py-3 align-middle">
@@ -253,7 +253,7 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
                           <button
                             onClick={e => handleCopyUrl(item, e)}
                             title="Copy URL"
-                            className="p-2 rounded-lg bg-slate-100 hover:bg-[#615fff]/20 border border-slate-200 hover:border-[#615fff]/40 text-slate-500 hover:text-[#615fff] transition-all cursor-pointer"
+                            className="p-2 rounded-lg bg-slate-100 hover:bg-[#E61C24]/20 border border-slate-200 hover:border-[#E61C24]/40 text-slate-500 hover:text-[#E61C24] transition-all cursor-pointer"
                           >
                             {isCopied ? <FiCheck className="h-4 w-4 text-emerald-500" /> : <FiCopy className="h-4 w-4" />}
                           </button>
@@ -285,7 +285,7 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
 
           {/* Expandable preview row */}
           {previewItem && (
-            <div className="border-t border-[#615fff]/20 bg-slate-50 p-6">
+            <div className="border-t border-[#E61C24]/20 bg-slate-50 p-6">
               <div className="flex flex-col sm:flex-row gap-6">
                 {/* Image preview */}
                 <div className="h-48 w-48 shrink-0 rounded-lg bg-white border border-slate-200 overflow-hidden flex items-center justify-center shadow-sm">
@@ -332,7 +332,7 @@ export default function MediaLibraryClient({ initialMedia }: { initialMedia: Med
                     />
                     <button
                       onClick={e => handleCopyUrl(previewItem, e)}
-                      className="px-4 py-2 rounded-lg bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/30 hover:border-[#615fff] text-[#615fff] hover:text-white font-bold text-base transition-all cursor-pointer flex items-center gap-2 shrink-0"
+                      className="px-4 py-2 rounded-lg bg-[#E61C24]/10 hover:bg-[#E61C24] border border-[#E61C24]/30 hover:border-[#E61C24] text-[#E61C24] hover:text-white font-bold text-base transition-all cursor-pointer flex items-center gap-2 shrink-0"
                     >
                       {copiedId === previewItem.id ? <FiCheck className="h-4 w-4 text-emerald-400" /> : <FiCopy className="h-4 w-4" />}
                       {copiedId === previewItem.id ? 'Copied!' : 'Copy URL'}

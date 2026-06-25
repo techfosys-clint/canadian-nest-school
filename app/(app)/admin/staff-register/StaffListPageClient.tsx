@@ -124,7 +124,7 @@ export default function StaffListPageClient({ initialStaff }: StaffListPageClien
             placeholder="Search by name, email, or phone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-[#615fff]/40 focus:border-[#615fff]/50 text-slate-800 rounded-lg pl-11 pr-4 py-2.5 text-base font-semibold outline-none transition-all"
+            className="w-full bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-[#E61C24]/40 focus:border-[#E61C24]/50 text-slate-800 rounded-lg pl-11 pr-4 py-2.5 text-base font-semibold outline-none transition-all"
           />
         </div>
 
@@ -139,7 +139,7 @@ export default function StaffListPageClient({ initialStaff }: StaffListPageClien
                   onClick={() => setRoleFilter(r)}
                   className={`px-3.5 py-1.5 rounded text-sm font-bold capitalize select-none cursor-pointer transition-all border-none ${
                     roleFilter === r
-                      ? 'bg-[#615fff] text-white shadow-sm'
+                      ? 'bg-[#E61C24] text-white shadow-sm'
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
@@ -151,7 +151,7 @@ export default function StaffListPageClient({ initialStaff }: StaffListPageClien
 
           <button
             onClick={() => router.push('/admin/staff-register/new')}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base rounded-lg transition-all cursor-pointer select-none border-none shadow-lg shadow-[#615fff]/15"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base rounded-lg transition-all cursor-pointer select-none border-none shadow-lg shadow-[#E61C24]/15"
           >
             <FiUserPlus className="h-5 w-5" />
             <span>Register Faculty</span>
@@ -188,14 +188,14 @@ export default function StaffListPageClient({ initialStaff }: StaffListPageClien
                         {member.profilePic?.url ? (
                           <img src={member.profilePic.url} alt={member.name} className="h-10 w-10 rounded-full object-cover shrink-0 shadow-sm" />
                         ) : (
-                          <div className="h-10 w-10 rounded-full bg-[#615fff]/10 border border-[#615fff]/20 flex items-center justify-center font-bold text-base text-[#615fff] uppercase shrink-0 select-none">
+                          <div className="h-10 w-10 rounded-full bg-[#E61C24]/10 border border-[#E61C24]/20 flex items-center justify-center font-bold text-base text-[#E61C24] uppercase shrink-0 select-none">
                             {member.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
                           </div>
                         )}
                         <div>
                           <p className="text-slate-800 font-bold text-base leading-tight">{member.name}</p>
                           {member.designation && (
-                            <p className="text-[#615fff] text-xs font-bold mt-1 tracking-wide">{member.designation}</p>
+                            <p className="text-[#E61C24] text-xs font-bold mt-1 tracking-wide">{member.designation}</p>
                           )}
                           <p className="text-slate-400 text-[10px] font-semibold mt-1">ID: {member.id}</p>
                         </div>
@@ -269,7 +269,7 @@ export default function StaffListPageClient({ initialStaff }: StaffListPageClien
                         <>
                           <button
                             onClick={() => router.push(`/admin/staff-register/${member.id}/edit`)}
-                            className="p-2 text-slate-400 hover:text-[#615fff] hover:bg-[#615fff]/10 rounded-lg transition-all cursor-pointer border-none inline-flex items-center"
+                            className="p-2 text-slate-400 hover:text-[#E61C24] hover:bg-[#E61C24]/10 rounded-lg transition-all cursor-pointer border-none inline-flex items-center"
                             title="Edit Profile"
                           >
                             <FiEdit2 className="h-4 w-4" />

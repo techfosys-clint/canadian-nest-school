@@ -555,7 +555,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
         <p className="text-base font-semibold text-zinc-500 mb-6 leading-relaxed">
           The instructor is currently constructing the curriculum for this course. Please check back shortly!
         </p>
-        <Link href="/dashboard" className="inline-flex items-center gap-2 py-2.5 px-4.5 rounded-lg bg-[#615fff] text-white font-bold text-base shadow-md whitespace-nowrap">
+        <Link href="/dashboard" className="inline-flex items-center gap-2 py-2.5 px-4.5 rounded-lg bg-[#E61C24] text-white font-bold text-base shadow-md whitespace-nowrap">
           <FiArrowLeft className="h-4.5 w-4.5" />
           <span>Back to Study Hub</span>
         </Link>
@@ -606,7 +606,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
       {isBlackout && (
         <div className="absolute inset-0 bg-black z-50 flex flex-col items-center justify-center text-center p-6 select-none animate-fade-in">
           <div className="bg-zinc-950/90 border border-zinc-800/80 rounded-lg p-6 max-w-sm shadow-2xl backdrop-blur-md">
-            <FiLock className="h-10 w-10 text-[#615fff] mx-auto mb-3 animate-pulse" />
+            <FiLock className="h-10 w-10 text-[#E61C24] mx-auto mb-3 animate-pulse" />
             <h3 className="text-lg font-bold text-white mb-2">Screen Shield Active</h3>
             <p className="text-sm font-semibold text-zinc-400 leading-relaxed">
               Screen capturing premium course video is restricted. Return your mouse/focus to this tab to resume playing.
@@ -639,7 +639,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
               href={currentLesson.videoUrl} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="mt-4 inline-flex items-center gap-2 py-2 px-4 rounded-lg bg-[#615fff] hover:bg-[#543cdf] text-white font-bold text-base whitespace-nowrap transition-colors"
+              className="mt-4 inline-flex items-center gap-2 py-2 px-4 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base whitespace-nowrap transition-colors"
             >
               <span>Watch on External Host</span>
               <FiExternalLink className="h-4.5 w-4.5" />
@@ -650,8 +650,8 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
         // Premium Live Session Dashboard Card inside Video Box
         <div className="w-full h-full bg-gradient-to-br from-[#0F1B40] via-[#08102B] to-[#0A163A] text-white p-8 sm:p-12 flex flex-col justify-between select-none relative overflow-hidden">
           {/* Decorative glowing grid background */}
-          <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#615fff 1.5px, transparent 1.5px)', backgroundSize: '20px 20px' }} />
-          <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#615fff]/20 rounded-full blur-2xl" />
+          <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#E61C24 1.5px, transparent 1.5px)', backgroundSize: '20px 20px' }} />
+          <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#E61C24]/20 rounded-full blur-2xl" />
           
           {/* Top platform bar */}
           <div className="flex justify-between items-center relative z-10">
@@ -689,7 +689,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                 href={currentLesson.liveUrl || currentLesson.videoUrl} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="py-2.5 px-4.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base whitespace-nowrap transition-all transform hover:-translate-y-0.5 shadow-lg shadow-[#615fff]/15 cursor-pointer inline-flex items-center gap-2"
+                className="py-2.5 px-4.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base whitespace-nowrap transition-all transform hover:-translate-y-0.5 shadow-lg shadow-[#E61C24]/15 cursor-pointer inline-flex items-center gap-2"
               >
                 <FiRadio className="h-5 w-5 animate-pulse" />
                 <span>Join Live Broadcast</span>
@@ -711,12 +711,12 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
           return (
             <div className="w-full h-full bg-[#080d1a] text-white p-6 sm:p-8 flex flex-col justify-between select-none relative overflow-y-auto overflow-x-hidden">
               {/* Decorative glows */}
-              <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#615fff 1.5px, transparent 1.5px)', backgroundSize: '20px 20px' }} />
-              <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#615fff]/10 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#E61C24 1.5px, transparent 1.5px)', backgroundSize: '20px 20px' }} />
+              <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#E61C24]/10 rounded-full blur-2xl pointer-events-none" />
 
               {/* Title and score or question counter */}
               <div className="flex justify-between items-center border-b border-white/5 pb-4 shrink-0 font-sans">
-                <span className="px-3.5 py-1 bg-[#615fff]/20 border border-[#615fff]/30 text-[#8a88ff] text-base font-bold rounded-lg flex items-center gap-2 uppercase tracking-wide animate-fadeIn">
+                <span className="px-3.5 py-1 bg-[#E61C24]/20 border border-[#E61C24]/30 text-[#FF4D55] text-base font-bold rounded-lg flex items-center gap-2 uppercase tracking-wide animate-fadeIn">
                   <FiAward className="h-4 w-4" />
                   Interactive Quiz
                 </span>
@@ -766,7 +766,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                   {/* Question Answers Review Section */}
                   <div className="space-y-4 text-left">
                     <h4 className="text-lg font-bold text-white flex items-center gap-2 border-b border-zinc-800 pb-2">
-                      <FiBookOpen className="h-5 w-5 text-[#8a88ff]" />
+                      <FiBookOpen className="h-5 w-5 text-[#FF4D55]" />
                       Question & Answer Review
                     </h4>
 
@@ -851,7 +851,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                             router.replace(`/courses/${course.slug}/watch?lesson=${nextL.id}`)
                           }
                         }}
-                        className="px-6 py-2.5 bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base rounded-lg cursor-pointer transition-all shadow-md shadow-[#615fff]/15 border-none"
+                        className="px-6 py-2.5 bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base rounded-lg cursor-pointer transition-all shadow-md shadow-[#E61C24]/15 border-none"
                       >
                         Next Lesson
                       </button>
@@ -870,7 +870,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                   <div className="space-y-3 shrink-0 font-sans">
                     <div className="w-full bg-slate-950 h-2 rounded-lg overflow-hidden">
                       <div 
-                        className="bg-[#615fff] h-full rounded-lg transition-all duration-300"
+                        className="bg-[#E61C24] h-full rounded-lg transition-all duration-300"
                         style={{ width: `${((currentQuestionIndex + 1) / currentLesson.quizQuestions.length) * 100}%` }}
                       />
                     </div>
@@ -890,13 +890,13 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                           onClick={() => setSelectedAnswers({ ...selectedAnswers, [currentQuestionIndex]: idx })}
                           className={`w-full p-4 rounded-lg border text-left font-bold text-base transition-all cursor-pointer ${
                             isSelected
-                              ? 'bg-[#615fff]/15 border-[#615fff] text-white shadow-lg shadow-[#615fff]/10'
+                              ? 'bg-[#E61C24]/15 border-[#E61C24] text-white shadow-lg shadow-[#E61C24]/10'
                               : 'bg-slate-950/45 border-zinc-800 text-zinc-350 hover:border-zinc-700 hover:text-white'
                           }`}
                         >
                           <div className="flex items-center gap-3">
                             <div className={`h-5 w-5 rounded-full border flex items-center justify-center shrink-0 ${
-                              isSelected ? 'border-[#615fff] bg-[#615fff]' : 'border-zinc-700 bg-transparent'
+                              isSelected ? 'border-[#E61C24] bg-[#E61C24]' : 'border-zinc-700 bg-transparent'
                             }`}>
                               {isSelected && <FiCheck className="h-3 w-3 text-white" />}
                             </div>
@@ -927,7 +927,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                         <button
                           type="button"
                           onClick={() => setCurrentQuestionIndex(currentQuestionIndex + 1)}
-                          className="px-5 py-2.5 bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base rounded-lg cursor-pointer transition-all shadow-md shadow-[#615fff]/15 border-none"
+                          className="px-5 py-2.5 bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base rounded-lg cursor-pointer transition-all shadow-md shadow-[#E61C24]/15 border-none"
                         >
                           Next Question
                         </button>
@@ -978,7 +978,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                               text: `You have successfully completed this quiz lesson! Correct answers: ${correctCount} of ${questions.length}.`,
                               background: '#1a1a1a',
                               color: '#ffffff',
-                              confirmButtonColor: '#615fff'
+                              confirmButtonColor: '#E61C24'
                             })
                           }}
                           className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-base rounded-lg cursor-pointer transition-all shadow-md shadow-emerald-600/15 border-none"
@@ -1028,7 +1028,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                    {/* Question Answers Review Section */}
                    <div className="space-y-4 text-left">
                      <h4 className="text-lg font-bold text-white flex items-center gap-2 border-b border-zinc-800 pb-2">
-                       <FiBookOpen className="h-5 w-5 text-[#8a88ff]" />
+                       <FiBookOpen className="h-5 w-5 text-[#FF4D55]" />
                        Question & Answer Review
                      </h4>
 
@@ -1113,7 +1113,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                              router.replace(`/courses/${course.slug}/watch?lesson=${nextL.id}`)
                            }
                          }}
-                         className="px-6 py-2.5 bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base rounded-lg cursor-pointer transition-all shadow-md shadow-[#615fff]/15 border-none"
+                         className="px-6 py-2.5 bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base rounded-lg cursor-pointer transition-all shadow-md shadow-[#E61C24]/15 border-none"
                        >
                          Next Lesson
                        </button>
@@ -1165,7 +1165,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                 text: 'Your assignment Google Drive link has been logged successfully for instructor grading.',
                 background: '#1a1a1a',
                 color: '#ffffff',
-                confirmButtonColor: '#615fff'
+                confirmButtonColor: '#E61C24'
               })
 
               // Mark lesson completed in client lists
@@ -1191,12 +1191,12 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
           return (
             <div className="w-full h-full bg-[#080d1a] text-white p-6 sm:p-8 flex flex-col justify-between select-none relative overflow-y-auto overflow-x-hidden font-sans">
               {/* Decorative glows */}
-              <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#615fff 1.5px, transparent 1.5px)', backgroundSize: '20px 20px' }} />
-              <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#615fff]/10 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#E61C24 1.5px, transparent 1.5px)', backgroundSize: '20px 20px' }} />
+              <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#E61C24]/10 rounded-full blur-2xl pointer-events-none" />
 
               {/* Header */}
               <div className="flex justify-between items-center border-b border-white/5 pb-4 shrink-0">
-                <span className="px-3.5 py-1 bg-[#615fff]/20 border border-[#615fff]/30 text-[#8a88ff] text-sm font-bold rounded-lg flex items-center gap-2 uppercase tracking-wide">
+                <span className="px-3.5 py-1 bg-[#E61C24]/20 border border-[#E61C24]/30 text-[#FF4D55] text-sm font-bold rounded-lg flex items-center gap-2 uppercase tracking-wide">
                   <FiFileText className="h-4 w-4" />
                   Assignment Portal
                 </span>
@@ -1249,7 +1249,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                         href={submission.googleDriveLink} 
                         target="_blank" 
                         rel="noopener noreferrer" 
-                        className="text-[#8a88ff] font-bold hover:underline truncate inline-block max-w-[280px]"
+                        className="text-[#FF4D55] font-bold hover:underline truncate inline-block max-w-[280px]"
                       >
                         {submission.googleDriveLink}
                       </a>
@@ -1268,14 +1268,14 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                         value={driveLinkInput}
                         onChange={(e) => setDriveLinkInput(e.target.value)}
                         placeholder="https://drive.google.com/file/d/..."
-                        className="bg-slate-950 border border-zinc-800 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
+                        className="bg-slate-950 border border-zinc-800 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-white rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
                       />
                     </div>
                     
                     <button
                       type="submit"
                       disabled={submittingDrive}
-                      className="w-full py-3.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base shadow-lg shadow-[#615fff]/15 hover:shadow-[#615fff]/25 transition-all cursor-pointer border-none flex items-center justify-center gap-2"
+                      className="w-full py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-lg shadow-[#E61C24]/15 hover:shadow-[#E61C24]/25 transition-all cursor-pointer border-none flex items-center justify-center gap-2"
                     >
                       {submittingDrive ? (
                         <>
@@ -1345,7 +1345,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
           className={`inline-flex items-center gap-2 px-4.5 py-2 rounded-lg border font-bold text-base whitespace-nowrap transition-all cursor-pointer shadow-sm hover:scale-[1.01] ${
             completedLessonIds.includes(currentLesson.id)
               ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100/70'
-              : 'bg-[#615fff] border-transparent text-white hover:bg-[#5248e8]'
+              : 'bg-[#E61C24] border-transparent text-white hover:bg-[#CC181F]'
           }`}
         >
           <FiCheck className="h-5 w-5" />
@@ -1369,7 +1369,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
 
       {/* Verified Instructor footer within widget */}
       <div className="border-t border-slate-100 pt-5 flex items-center gap-3">
-        <div className="h-10 w-10 rounded-lg bg-[#615fff]/8 border border-[#615fff]/15 flex items-center justify-center font-bold text-base text-[#615fff] uppercase shrink-0">
+        <div className="h-10 w-10 rounded-lg bg-[#E61C24]/8 border border-[#E61C24]/15 flex items-center justify-center font-bold text-base text-[#E61C24] uppercase shrink-0">
           {course.instructor?.name ? course.instructor.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2) : 'EX'}
         </div>
         <div>
@@ -1391,7 +1391,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
       {progressPercentage === 100 && (
         <div className="mx-4 mt-4 p-4 bg-slate-50 border border-zinc-200 rounded-lg flex flex-col gap-3 shadow-sm select-none animate-fadeIn">
           <div className="flex items-center gap-2">
-            <FiAward className="h-6 w-6 text-[#615fff]" />
+            <FiAward className="h-6 w-6 text-[#E61C24]" />
             <h3 className="text-base font-bold text-zinc-900 leading-tight">Course Completed! 🎓</h3>
           </div>
           
@@ -1401,7 +1401,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                 Congratulations on completing the course! Creating your completion certificate request...
               </p>
               <div className="w-full h-1.5 bg-slate-200 rounded-lg overflow-hidden">
-                <div className="h-full bg-[#615fff] rounded-lg animate-pulse" style={{ width: '60%' }} />
+                <div className="h-full bg-[#E61C24] rounded-lg animate-pulse" style={{ width: '60%' }} />
               </div>
             </div>
           ) : certRequest.status === 'pending' ? (
@@ -1453,7 +1453,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
           const lectureCount = group.lessons.length
 
           return (
-            <div key={group.name} className="border border-[#615fff]/25 rounded-lg bg-white overflow-hidden shadow-sm">
+            <div key={group.name} className="border border-[#E61C24]/25 rounded-lg bg-white overflow-hidden shadow-sm">
               {/* Module Header (Clickable toggle) */}
               <button
                 type="button"
@@ -1463,7 +1463,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                     [group.name]: !prev[group.name],
                   }))
                 }}
-                className="w-full px-4 py-3 flex items-center justify-between text-left bg-[#fcfbfe] border-b border-[#615fff]/20 hover:bg-zinc-50/40 transition-colors select-none cursor-pointer"
+                className="w-full px-4 py-3 flex items-center justify-between text-left bg-[#fcfbfe] border-b border-[#E61C24]/20 hover:bg-zinc-50/40 transition-colors select-none cursor-pointer"
               >
                 <div className="min-w-0 pr-2">
                   <h4 className="font-bold text-zinc-850 text-sm leading-tight truncate">
@@ -1480,7 +1480,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
 
               {/* Module Lessons list */}
               {isModuleExpanded && (
-                <div className="divide-y divide-[#615fff]/15">
+                <div className="divide-y divide-[#E61C24]/15">
                   {group.lessons.map((lesson) => {
                     const isActive = lesson.id === currentLesson.id
                     const isCompleted = completedLessonIds.includes(lesson.id)
@@ -1494,7 +1494,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                         }}
                         className={`w-full flex items-start gap-3 p-3 text-left transition-all duration-150 cursor-pointer ${
                           isActive 
-                            ? 'bg-[#615fff]/8 text-zinc-900 font-bold' 
+                            ? 'bg-[#E61C24]/8 text-zinc-900 font-bold' 
                             : 'hover:bg-slate-50 text-zinc-750 hover:text-zinc-900'
                         }`}
                       >
@@ -1507,9 +1507,9 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                           ) : lesson.lessonType === 'quiz' ? (
                             <FiHelpCircle className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-amber-500' : 'text-amber-455'}`} />
                           ) : lesson.lessonType === 'assignment' ? (
-                            <FiFileText className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-[#615fff]' : 'text-zinc-455'}`} />
+                            <FiFileText className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-[#E61C24]' : 'text-zinc-455'}`} />
                           ) : (
-                            <FiVideo className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-[#615fff]' : 'text-zinc-400'}`} />
+                            <FiVideo className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-[#E61C24]' : 'text-zinc-400'}`} />
                           )}
                         </div>
 
@@ -1527,7 +1527,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                                 : lesson.lessonType === 'quiz'
                                 ? 'text-amber-500'
                                 : lesson.lessonType === 'assignment'
-                                ? 'text-[#615fff]'
+                                ? 'text-[#E61C24]'
                                 : ''
                             }>
                               {lesson.lessonType === 'live' 
@@ -1572,7 +1572,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
               <FiArrowLeft className="h-5 w-5" />
             </Link>
             <div className="min-w-0">
-              <span className="text-xs font-bold text-[#615fff] uppercase tracking-wider bg-[#615fff]/8 border border-[#615fff]/12 px-2.5 py-0.5 rounded-lg">
+              <span className="text-xs font-bold text-[#E61C24] uppercase tracking-wider bg-[#E61C24]/8 border border-[#E61C24]/12 px-2.5 py-0.5 rounded-lg">
                 {course.category?.name || 'Course Player'}
               </span>
               <h1 className="text-lg font-bold text-zinc-900 truncate mt-1 leading-tight max-w-lg">
@@ -1591,7 +1591,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                 onClick={() => setIsTheaterMode(prev => !prev)}
                 className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border font-bold text-base whitespace-nowrap transition-all cursor-pointer shadow-sm ${
                   isTheaterMode 
-                    ? 'bg-[#615fff] text-white border-transparent' 
+                    ? 'bg-[#E61C24] text-white border-transparent' 
                     : 'bg-white border-slate-200 text-zinc-650 hover:bg-slate-50'
                 }`}
                 title="Toggle Theater Mode (T)"
@@ -1620,7 +1620,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
               </div>
               <div className="w-20 sm:w-28 bg-zinc-200 h-2 rounded-lg overflow-hidden shrink-0">
                 <div 
-                  className="bg-[#615fff] h-full rounded-lg transition-all duration-500" 
+                  className="bg-[#E61C24] h-full rounded-lg transition-all duration-500" 
                   style={{ width: `${progressPercentage}%` }}
                 />
               </div>

@@ -13,7 +13,7 @@ export default function ShareButton() {
   return (
     <button
       onClick={handleCopy}
-      className="px-4.5 py-2 border border-zinc-200 hover:border-[#615fff] text-[#615fff] hover:bg-[#615fff] hover:text-white font-bold text-sm rounded-lg transition-all duration-200 cursor-pointer bg-white"
+      className="px-4.5 py-2 border border-zinc-200 hover:border-[#E61C24] text-[#E61C24] hover:bg-[#E61C24] hover:text-white font-bold text-sm rounded-lg transition-all duration-200 cursor-pointer bg-white"
     >
       Copy Link
     </button>

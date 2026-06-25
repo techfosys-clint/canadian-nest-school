@@ -87,7 +87,7 @@ export default function DashboardLayout({
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-50">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+          <div className="h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
           <p className="text-base font-bold text-zinc-600">Loading Student Portal...</p>
         </div>
       </div>
@@ -148,7 +148,7 @@ export default function DashboardLayout({
                 href={link.href}
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-base font-semibold transition-all duration-200 group ${
                   isActive 
-                    ? 'bg-[#615fff] text-white' 
+                    ? 'bg-[#E61C24] text-white' 
                     : 'hover:bg-[#152347] hover:text-white'
                 }`}
               >
@@ -162,7 +162,7 @@ export default function DashboardLayout({
         {/* Sidebar Student Info Footer */}
         <div className="p-4 border-t border-[#152347] bg-[#070d20]">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full border border-[#615fff]/30 bg-[#152347] flex items-center justify-center text-xs font-bold text-white overflow-hidden shrink-0">
+            <div className="h-10 w-10 rounded-full border border-[#E61C24]/30 bg-[#152347] flex items-center justify-center text-xs font-bold text-white overflow-hidden shrink-0">
               {user.profilePic ? (
                 <img src={user.profilePic} alt={user.name} className="h-full w-full object-cover" />
               ) : (
@@ -171,7 +171,7 @@ export default function DashboardLayout({
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-base font-bold text-white truncate leading-tight">{user.name}</p>
-              <p className="text-sm font-semibold text-[#615fff] truncate mt-0.5">
+              <p className="text-sm font-semibold text-[#E61C24] truncate mt-0.5">
                 Student Account
               </p>
             </div>
@@ -228,7 +228,7 @@ export default function DashboardLayout({
                   onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-base font-semibold transition-all duration-200 group ${
                     isActive 
-                      ? 'bg-[#615fff] text-white' 
+                      ? 'bg-[#E61C24] text-white' 
                       : 'hover:bg-[#152347] hover:text-white'
                   }`}
                 >
@@ -242,7 +242,7 @@ export default function DashboardLayout({
 
         <div className="p-4 border-t border-[#152347] bg-[#070d20]">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full border border-[#615fff]/30 bg-[#152347] flex items-center justify-center text-xs font-bold text-white overflow-hidden shrink-0">
+            <div className="h-10 w-10 rounded-full border border-[#E61C24]/30 bg-[#152347] flex items-center justify-center text-xs font-bold text-white overflow-hidden shrink-0">
               {user.profilePic ? (
                 <img src={user.profilePic} alt={user.name} className="h-full w-full object-cover" />
               ) : (
@@ -251,7 +251,7 @@ export default function DashboardLayout({
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-base font-bold text-white truncate leading-none">{user.name}</p>
-              <p className="text-sm font-semibold text-[#615fff] truncate mt-1">
+              <p className="text-sm font-semibold text-[#E61C24] truncate mt-1">
                 Student
               </p>
             </div>
@@ -290,7 +290,7 @@ export default function DashboardLayout({
           </div>
 
           {/* Desktop Mock Search (adds premium touch) */}
-          <div className="hidden lg:flex items-center gap-2.5 w-80 px-3.5 py-2 rounded-lg bg-zinc-50 border border-zinc-200/80 focus-within:border-[#615fff]/60 transition-colors">
+          <div className="hidden lg:flex items-center gap-2.5 w-80 px-3.5 py-2 rounded-lg bg-zinc-50 border border-zinc-200/80 focus-within:border-[#E61C24]/60 transition-colors">
             <FiSearch className="h-4.5 w-4.5 text-zinc-400" />
             <input 
               type="text" 
@@ -318,7 +318,7 @@ export default function DashboardLayout({
                   icon: 'info',
                   title: 'Notifications',
                   text: 'You have no new notifications.',
-                  confirmButtonColor: '#615fff',
+                  confirmButtonColor: '#E61C24',
                 })
               }}
               className="relative p-2 rounded-lg border border-zinc-200 hover:border-zinc-350 text-zinc-500 hover:text-zinc-900 bg-white transition-colors cursor-pointer"
@@ -330,7 +330,7 @@ export default function DashboardLayout({
 
             {/* User Profile Summary */}
             <div className="flex items-center gap-3 border-l border-zinc-200 pl-4.5">
-              <div className="h-10 w-10 rounded-full border border-[#615fff]/20 bg-zinc-100 flex items-center justify-center overflow-hidden shrink-0">
+              <div className="h-10 w-10 rounded-full border border-[#E61C24]/20 bg-zinc-100 flex items-center justify-center overflow-hidden shrink-0">
                 {user.profilePic ? (
                   <img src={user.profilePic} alt={user.name} className="h-full w-full object-cover" />
                 ) : (

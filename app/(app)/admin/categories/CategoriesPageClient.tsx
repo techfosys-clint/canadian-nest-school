@@ -71,7 +71,7 @@ export default function CategoriesPageClient({
         </div>
         <Link
           href="/admin/categories/new"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base shadow-md shadow-[#615fff]/20 transition-all cursor-pointer"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-md shadow-[#E61C24]/20 transition-all cursor-pointer"
         >
           <FiPlus className="h-5 w-5" /> New Category
         </Link>
@@ -101,8 +101,8 @@ export default function CategoriesPageClient({
                   <tr key={cat.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-lg bg-[#615fff]/10 border border-[#615fff]/20 flex items-center justify-center shrink-0">
-                          <FiBookmark className="h-4 w-4 text-[#615fff]" />
+                        <div className="h-9 w-9 rounded-lg bg-[#E61C24]/10 border border-[#E61C24]/20 flex items-center justify-center shrink-0">
+                          <FiBookmark className="h-4 w-4 text-[#E61C24]" />
                         </div>
                         <span className="font-bold text-slate-800 text-base">{cat.name}</span>
                       </div>
@@ -116,7 +116,7 @@ export default function CategoriesPageClient({
                       <div className="flex items-center justify-end gap-2.5">
                         <Link
                           href={`/admin/categories/${cat.id}/edit`}
-                          className="p-2 rounded-lg bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/20 hover:border-[#615fff] text-[#615fff] hover:text-white transition-all cursor-pointer"
+                          className="p-2 rounded-lg bg-[#E61C24]/10 hover:bg-[#E61C24] border border-[#E61C24]/20 hover:border-[#E61C24] text-[#E61C24] hover:text-white transition-all cursor-pointer"
                         >
                           <FiEdit className="h-4 w-4" />
                         </Link>

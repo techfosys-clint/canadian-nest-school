@@ -274,7 +274,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                 value={title}
                 onChange={handleTitleChange}
                 placeholder="e.g. Introduction to Next.js routing structures"
-                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
               />
             </div>
 
@@ -310,7 +310,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                   value={slug}
                   onChange={(e) => setSlug(slugify(e.target.value))}
                   placeholder="intro-to-routing"
-                  className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
+                  className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -321,7 +321,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                   min={1}
                   value={order}
                   onChange={(e) => setOrder(Number(e.target.value))}
-                  className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                  className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                 />
               </div>
             </div>
@@ -344,7 +344,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                     }}
                     className={`flex items-center gap-2 px-5 py-3 rounded-lg font-bold text-base border transition-all cursor-pointer ${
                       lessonType === type
-                        ? 'bg-[#615fff] border-[#615fff] text-white shadow-md shadow-[#615fff]/20'
+                        ? 'bg-[#E61C24] border-[#E61C24] text-white shadow-md shadow-[#E61C24]/20'
                         : 'bg-slate-100 border-slate-200 text-slate-500 hover:text-slate-800 hover:border-slate-300'
                     }`}
                   >
@@ -406,11 +406,11 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                     value={videoUrl}
                     onChange={handleVideoUrlChange}
                     placeholder="https://www.youtube.com/embed/...  or  videos/lesson-1.mp4"
-                    className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
+                    className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
                   />
                   <p className="text-base font-medium text-slate-400 leading-relaxed">
                     Paste a <span className="text-slate-600 font-semibold">YouTube / Vimeo URL</span> to embed it,
-                    or an <span className="text-slate-600 font-semibold">R2 object key</span> (e.g. <span className="font-mono text-[#8a88ff]">videos/lesson-1.mp4</span>).
+                    or an <span className="text-slate-600 font-semibold">R2 object key</span> (e.g. <span className="font-mono text-[#FF4D55]">videos/lesson-1.mp4</span>).
                   </p>
                 </div>
               </div>
@@ -436,7 +436,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                       type="datetime-local"
                       value={liveDate}
                       onChange={(e) => setLiveDate(e.target.value)}
-                      className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                      className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                     />
                   </div>
                 </div>
@@ -445,7 +445,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                     <label className="flex items-center gap-3 cursor-pointer select-none">
                       <div
                         className={`relative w-12 h-6 rounded-full transition-colors ${
-                          autoGenerateZoom ? 'bg-[#615fff]' : 'bg-zinc-700'
+                          autoGenerateZoom ? 'bg-[#E61C24]' : 'bg-zinc-700'
                         }`}
                         onClick={() => setAutoGenerateZoom(!autoGenerateZoom)}
                       >
@@ -473,16 +473,16 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                     disabled={autoGenerateZoom}
                     onChange={(e) => setLiveUrl(e.target.value)}
                     placeholder={autoGenerateZoom ? 'Will be automatically generated upon save' : 'https://zoom.us/j/...'}
-                    className={`bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono ${
+                    className={`bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono ${
                       autoGenerateZoom ? 'opacity-50 cursor-not-allowed select-none' : ''
                     }`}
                   />
                 </div>
               </div>
             ) : lessonType === 'assignment' ? (
-              <div className="space-y-4 border border-[#615fff]/25 rounded-lg p-6 bg-gradient-to-b from-slate-50 to-white shadow-2xl shadow-[#615fff]/5 animate-fadeIn">
+              <div className="space-y-4 border border-[#E61C24]/25 rounded-lg p-6 bg-gradient-to-b from-slate-50 to-white shadow-2xl shadow-[#E61C24]/5 animate-fadeIn">
                 <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
-                  <FiFileText className="text-[#615fff] h-6 w-6" /> Assignment Configuration
+                  <FiFileText className="text-[#E61C24] h-6 w-6" /> Assignment Configuration
                 </h3>
                 
                 <div className="flex flex-col gap-2">
@@ -492,7 +492,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                     min={1}
                     value={totalMarks}
                     onChange={(e) => setTotalMarks(Number(e.target.value))}
-                    className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors animate-fadeIn"
+                    className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors animate-fadeIn"
                   />
                 </div>
                 <p className="text-base font-semibold text-slate-500">
@@ -500,11 +500,11 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                 </p>
               </div>
             ) : (
-              <div className="space-y-6 border border-[#615fff]/25 rounded-lg p-6 bg-gradient-to-b from-slate-50 to-white shadow-2xl shadow-[#615fff]/5 animate-fadeIn">
+              <div className="space-y-6 border border-[#E61C24]/25 rounded-lg p-6 bg-gradient-to-b from-slate-50 to-white shadow-2xl shadow-[#E61C24]/5 animate-fadeIn">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200/60 pb-4">
                   <div>
                     <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                      <FiHelpCircle className="text-[#615fff] h-6 w-6" /> Quiz Questions Builder
+                      <FiHelpCircle className="text-[#E61C24] h-6 w-6" /> Quiz Questions Builder
                     </h3>
                     <p className="text-base font-medium text-slate-500 mt-1">
                       Configure dynamic evaluation queries with dynamic option selection
@@ -525,7 +525,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                     <button
                       type="button"
                       onClick={() => setQuizQuestions([...quizQuestions, { questionText: '', options: ['', '', '', ''], correctAnswerIndex: 0 }])}
-                      className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#615fff] to-[#5248e8] hover:from-[#5248e8] hover:to-[#4338ca] text-slate-800 rounded-lg text-base font-bold shadow-lg shadow-[#615fff]/20 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer border-none"
+                      className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#E61C24] to-[#CC181F] hover:from-[#CC181F] hover:to-[#4338ca] text-slate-800 rounded-lg text-base font-bold shadow-lg shadow-[#E61C24]/20 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer border-none"
                     >
                       <FiPlus className="h-5 w-5" /> Add Question
                     </button>
@@ -536,12 +536,12 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                   {quizQuestions.map((q, qIdx) => (
                     <div 
                       key={qIdx} 
-                      className="bg-slate-50 backdrop-blur border border-slate-200/80 hover:border-[#615fff]/30 p-6 rounded-lg space-y-6 transition-all duration-300 relative"
+                      className="bg-slate-50 backdrop-blur border border-slate-200/80 hover:border-[#E61C24]/30 p-6 rounded-lg space-y-6 transition-all duration-300 relative"
                     >
                       {/* Card Header */}
                       <div className="flex items-center justify-between pb-4 border-b border-slate-100/50">
                         <div className="flex items-center gap-3">
-                          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-[#615fff] to-[#5248e8] text-slate-800 font-bold text-base shadow-md shadow-[#615fff]/20 select-none">
+                          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-[#E61C24] to-[#CC181F] text-slate-800 font-bold text-base shadow-md shadow-[#E61C24]/20 select-none">
                             {String(qIdx + 1).padStart(2, '0')}
                           </span>
                           <div>
@@ -576,7 +576,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                             setQuizQuestions(newQuestions)
                           }}
                           placeholder="e.g. What does CSS stand for in web development?"
-                          className="bg-white border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none w-full transition-colors"
+                          className="bg-white border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none w-full transition-colors"
                         />
                       </div>
 
@@ -594,7 +594,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                               newQuestions[qIdx].options.push('')
                               setQuizQuestions(newQuestions)
                             }}
-                            className="flex items-center gap-1.5 px-4 py-2 bg-[#615fff]/10 hover:bg-[#615fff]/20 border border-[#615fff]/20 hover:border-[#615fff]/40 text-[#8a88ff] hover:text-slate-800 rounded-lg text-base font-bold transition-all cursor-pointer"
+                            className="flex items-center gap-1.5 px-4 py-2 bg-[#E61C24]/10 hover:bg-[#E61C24]/20 border border-[#E61C24]/20 hover:border-[#E61C24]/40 text-[#FF4D55] hover:text-slate-800 rounded-lg text-base font-bold transition-all cursor-pointer"
                           >
                             <FiPlus className="h-5 w-5" /> Add Choice
                           </button>
@@ -700,7 +700,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                 min={1}
                 value={duration}
                 onChange={(e) => setDuration(Number(e.target.value))}
-                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
               />
             </div>
 
@@ -715,7 +715,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
             <label className="flex items-center gap-3 cursor-pointer select-none">
               <div
                 className={`relative w-12 h-6 rounded-full transition-colors ${
-                  isPreviewable ? 'bg-[#615fff]' : 'bg-zinc-700'
+                  isPreviewable ? 'bg-[#E61C24]' : 'bg-zinc-700'
                 }`}
                 onClick={() => setIsPreviewable(!isPreviewable)}
               >
@@ -733,7 +733,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
             <button
               type="submit"
               disabled={saving}
-              className={`w-full py-3.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base shadow-lg shadow-[#615fff]/20 hover:shadow-[#615fff]/30 transition-all duration-300 cursor-pointer flex items-center justify-center ${
+              className={`w-full py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-lg shadow-[#E61C24]/20 hover:shadow-[#E61C24]/30 transition-all duration-300 cursor-pointer flex items-center justify-center ${
                 saving ? 'opacity-50 pointer-events-none' : ''
               }`}
             >

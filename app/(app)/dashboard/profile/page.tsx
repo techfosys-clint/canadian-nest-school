@@ -67,7 +67,7 @@ export default function StudentProfile() {
         icon: 'error',
         title: 'File Too Large',
         text: 'Profile image size must be under 2MB.',
-        confirmButtonColor: '#615fff',
+        confirmButtonColor: '#E61C24',
       })
       return
     }
@@ -92,7 +92,7 @@ export default function StudentProfile() {
         icon: 'error',
         title: 'Validation Error',
         text: 'Please enter your full name.',
-        confirmButtonColor: '#615fff',
+        confirmButtonColor: '#E61C24',
       })
       return
     }
@@ -104,7 +104,7 @@ export default function StudentProfile() {
           icon: 'error',
           title: 'Validation Error',
           text: 'Please enter your current password to set a new password.',
-          confirmButtonColor: '#615fff',
+          confirmButtonColor: '#E61C24',
         })
         return
       }
@@ -113,7 +113,7 @@ export default function StudentProfile() {
           icon: 'error',
           title: 'Validation Error',
           text: 'New password must be at least 6 characters long.',
-          confirmButtonColor: '#615fff',
+          confirmButtonColor: '#E61C24',
         })
         return
       }
@@ -122,7 +122,7 @@ export default function StudentProfile() {
           icon: 'error',
           title: 'Validation Error',
           text: 'New password and confirmation do not match.',
-          confirmButtonColor: '#615fff',
+          confirmButtonColor: '#E61C24',
         })
         return
       }
@@ -170,7 +170,7 @@ export default function StudentProfile() {
         icon: 'error',
         title: 'Update Failed',
         text: err.message || 'An error occurred while saving changes.',
-        confirmButtonColor: '#615fff',
+        confirmButtonColor: '#E61C24',
       })
     } finally {
       setSaving(false)
@@ -181,7 +181,7 @@ export default function StudentProfile() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-50/50">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+          <div className="h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
           <p className="text-base font-bold text-zinc-600">Loading profile data...</p>
         </div>
       </div>
@@ -204,7 +204,7 @@ export default function StudentProfile() {
       
       {/* Page Title & Heading */}
       <div className="mb-8 select-none">
-        <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-[#615fff]/15 border border-[#615fff]/30 text-base font-bold text-[#615fff] uppercase tracking-wider mb-3">
+        <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-[#E61C24]/15 border border-[#E61C24]/30 text-base font-bold text-[#E61C24] uppercase tracking-wider mb-3">
           Account Settings
         </span>
         <h1 className="text-3xl font-bold font-display text-zinc-900 leading-tight">
@@ -224,18 +224,18 @@ export default function StudentProfile() {
           <div className="relative group mb-6 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
             
             {/* Profile Avatar circle with hover effect */}
-            <div className="h-32 w-32 rounded-full border-2 border-[#615fff]/20 bg-zinc-100 flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-105 group-hover:border-[#615fff]">
+            <div className="h-32 w-32 rounded-full border-2 border-[#E61C24]/20 bg-zinc-100 flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-105 group-hover:border-[#E61C24]">
               {imagePreview ? (
                 <img src={imagePreview} alt={name} className="h-full w-full object-cover" />
               ) : (
-                <span className="text-2xl font-bold text-[#615fff]">
+                <span className="text-2xl font-bold text-[#E61C24]">
                   {getInitials(name)}
                 </span>
               )}
             </div>
 
             {/* Glowing camera hover badge overlay */}
-            <div className="absolute bottom-1 right-1 h-9 w-9 bg-[#615fff] hover:bg-[#615fff]/90 text-white rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+            <div className="absolute bottom-1 right-1 h-9 w-9 bg-[#E61C24] hover:bg-[#E61C24]/90 text-white rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
               <FiCamera className="h-4.5 w-4.5" />
             </div>
 
@@ -250,7 +250,7 @@ export default function StudentProfile() {
           />
 
           <h3 className="text-lg font-bold text-zinc-800">{name || 'Student Account'}</h3>
-          <p className="text-base font-semibold text-[#615fff] mt-1 uppercase tracking-wider">
+          <p className="text-base font-semibold text-[#E61C24] mt-1 uppercase tracking-wider">
             {['admin', 'staff', 'instructor'].includes(user.role) ? 'student' : user.role}
           </p>
           <p className="text-sm font-semibold text-zinc-400 mt-4 leading-relaxed max-w-xs">
@@ -271,7 +271,7 @@ export default function StudentProfile() {
         <div className="lg:col-span-2 bg-white rounded-lg border border-zinc-200/80 p-6 md:p-8">
           
           <h2 className="text-xl font-bold text-zinc-800 mb-6 pb-3 border-b border-zinc-100 flex items-center gap-2.5 select-none">
-            <FiUser className="text-[#615fff] h-5 w-5" />
+            <FiUser className="text-[#E61C24] h-5 w-5" />
             <span>Personal Information</span>
           </h2>
 
@@ -282,7 +282,7 @@ export default function StudentProfile() {
               <label htmlFor="name" className="text-base font-bold text-zinc-700 block">
                 Full Name <span className="text-red-500">*</span>
               </label>
-              <div className="relative flex items-center rounded-lg bg-zinc-50 border border-zinc-200 focus-within:border-[#615fff]/60 transition-colors">
+              <div className="relative flex items-center rounded-lg bg-zinc-50 border border-zinc-200 focus-within:border-[#E61C24]/60 transition-colors">
                 <FiUser className="absolute left-3.5 h-4.5 w-4.5 text-zinc-400" />
                 <input
                   id="name"
@@ -322,7 +322,7 @@ export default function StudentProfile() {
               <label htmlFor="phone" className="text-base font-bold text-zinc-700 block">
                 Phone Number
               </label>
-              <div className="relative flex items-center rounded-lg bg-zinc-50 border border-zinc-200 focus-within:border-[#615fff]/60 transition-colors">
+              <div className="relative flex items-center rounded-lg bg-zinc-50 border border-zinc-200 focus-within:border-[#E61C24]/60 transition-colors">
                 <FiPhone className="absolute left-3.5 h-4.5 w-4.5 text-zinc-400" />
                 <input
                   id="phone"
@@ -337,7 +337,7 @@ export default function StudentProfile() {
 
             {/* Change Password Section */}
             <h2 className="text-xl font-bold text-zinc-800 pt-6 mt-6 border-t border-zinc-100 pb-3 flex items-center gap-2.5 select-none">
-              <FiLock className="text-[#615fff] h-5 w-5" />
+              <FiLock className="text-[#E61C24] h-5 w-5" />
               <span>Change Password</span>
             </h2>
             <p className="text-sm font-semibold text-zinc-400 -mt-2 mb-4 select-none">
@@ -350,7 +350,7 @@ export default function StudentProfile() {
                 <label htmlFor="currentPassword" className="text-base font-bold text-zinc-700 block">
                   Current Password
                 </label>
-                <div className="relative flex items-center rounded-lg bg-zinc-50 border border-zinc-200 focus-within:border-[#615fff]/60 transition-colors">
+                <div className="relative flex items-center rounded-lg bg-zinc-50 border border-zinc-200 focus-within:border-[#E61C24]/60 transition-colors">
                   <FiLock className="absolute left-3.5 h-4.5 w-4.5 text-zinc-400" />
                   <input
                     id="currentPassword"
@@ -368,7 +368,7 @@ export default function StudentProfile() {
                 <label htmlFor="newPassword" className="text-base font-bold text-zinc-700 block">
                   New Password
                 </label>
-                <div className="relative flex items-center rounded-lg bg-zinc-50 border border-zinc-200 focus-within:border-[#615fff]/60 transition-colors">
+                <div className="relative flex items-center rounded-lg bg-zinc-50 border border-zinc-200 focus-within:border-[#E61C24]/60 transition-colors">
                   <FiLock className="absolute left-3.5 h-4.5 w-4.5 text-zinc-400" />
                   <input
                     id="newPassword"
@@ -386,7 +386,7 @@ export default function StudentProfile() {
                 <label htmlFor="confirmNewPassword" className="text-base font-bold text-zinc-700 block">
                   Confirm New Password
                 </label>
-                <div className="relative flex items-center rounded-lg bg-zinc-50 border border-zinc-200 focus-within:border-[#615fff]/60 transition-colors">
+                <div className="relative flex items-center rounded-lg bg-zinc-50 border border-zinc-200 focus-within:border-[#E61C24]/60 transition-colors">
                   <FiLock className="absolute left-3.5 h-4.5 w-4.5 text-zinc-400" />
                   <input
                     id="confirmNewPassword"
@@ -405,7 +405,7 @@ export default function StudentProfile() {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-8 py-3.5 bg-[#615fff] hover:bg-[#615fff]/95 disabled:bg-[#615fff]/50 text-white font-bold text-base rounded-lg transition-all duration-300 flex items-center gap-2 cursor-pointer"
+                className="px-8 py-3.5 bg-[#E61C24] hover:bg-[#E61C24]/95 disabled:bg-[#E61C24]/50 text-white font-bold text-base rounded-lg transition-all duration-300 flex items-center gap-2 cursor-pointer"
               >
                 {saving ? (
                   <>

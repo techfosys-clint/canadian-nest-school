@@ -191,7 +191,7 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
                 <button
                   type="button"
                   onClick={addCategoryRow}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#615fff]/15 hover:bg-[#615fff]/25 text-[#615fff] border border-[#615fff]/20 rounded-lg text-base font-bold transition-colors cursor-pointer animate-fadeIn"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#E61C24]/15 hover:bg-[#E61C24]/25 text-[#E61C24] border border-[#E61C24]/20 rounded-lg text-base font-bold transition-colors cursor-pointer animate-fadeIn"
                 >
                   <FiPlus className="h-4.5 w-4.5" /> Add Category Row
                 </button>
@@ -209,7 +209,7 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
                     value={name}
                     onChange={handleNameChange}
                     placeholder="e.g. Web Development"
-                    className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                    className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                   />
                 </div>
 
@@ -221,7 +221,7 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
                     value={slug}
                     onChange={(e) => setSlug(slugify(e.target.value))}
                     placeholder="e.g. web-development"
-                    className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
+                    className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
                   />
                 </div>
               </div>
@@ -231,7 +231,7 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
                 {categoryRows.map((row, idx) => (
                   <div key={idx} className="p-4 bg-slate-100 rounded-lg space-y-4 relative animate-fadeIn">
                     <div className="flex items-center justify-between border-b border-slate-100/50 pb-2">
-                      <span className="text-sm font-bold text-[#615fff]">Category #{idx + 1}</span>
+                      <span className="text-sm font-bold text-[#E61C24]">Category #{idx + 1}</span>
                       {categoryRows.length > 1 && (
                         <button
                           type="button"
@@ -252,7 +252,7 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
                           value={row.name}
                           onChange={(e) => handleRowNameChange(idx, e.target.value)}
                           placeholder="e.g. Graphic Design"
-                          className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                          className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                         />
                       </div>
                       <div className="flex flex-col gap-1.5">
@@ -263,7 +263,7 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
                           value={row.slug}
                           onChange={(e) => handleRowSlugChange(idx, e.target.value)}
                           placeholder="graphic-design"
-                          className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
+                          className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
                         />
                       </div>
                     </div>
@@ -281,7 +281,7 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
             <button
               type="submit"
               disabled={saving}
-              className={`w-full py-3.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base shadow-lg shadow-[#615fff]/20 hover:shadow-[#615fff]/30 transition-all duration-300 cursor-pointer flex items-center justify-center ${
+              className={`w-full py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-lg shadow-[#E61C24]/20 hover:shadow-[#E61C24]/30 transition-all duration-300 cursor-pointer flex items-center justify-center ${
                 saving ? 'opacity-50 pointer-events-none' : ''
               }`}
             >

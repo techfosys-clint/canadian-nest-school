@@ -86,7 +86,7 @@ export default function FAQsPageClient({ initialFaqs }: { initialFaqs: FAQItem[]
         </div>
         <Link
           href="/admin/faqs/new"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base shadow-md shadow-[#615fff]/20 transition-all cursor-pointer"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-md shadow-[#E61C24]/20 transition-all cursor-pointer"
         >
           <FiPlus className="h-5 w-5" /> New FAQ
         </Link>
@@ -111,7 +111,7 @@ export default function FAQsPageClient({ initialFaqs }: { initialFaqs: FAQItem[]
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <span className="h-7 w-7 rounded-lg bg-[#615fff]/10 border border-[#615fff]/20 flex items-center justify-center font-bold text-[#615fff] text-sm shrink-0 mt-0.5">
+                    <span className="h-7 w-7 rounded-lg bg-[#E61C24]/10 border border-[#E61C24]/20 flex items-center justify-center font-bold text-[#E61C24] text-sm shrink-0 mt-0.5">
                       {f.order}
                     </span>
                     <div className="min-w-0">
@@ -139,7 +139,7 @@ export default function FAQsPageClient({ initialFaqs }: { initialFaqs: FAQItem[]
                     </button>
                     <Link
                       href={`/admin/faqs/${f.id}/edit`}
-                      className="p-2 rounded-lg bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/20 hover:border-[#615fff] text-[#615fff] hover:text-white transition-all cursor-pointer"
+                      className="p-2 rounded-lg bg-[#E61C24]/10 hover:bg-[#E61C24] border border-[#E61C24]/20 hover:border-[#E61C24] text-[#E61C24] hover:text-white transition-all cursor-pointer"
                     >
                       <FiEdit className="h-4 w-4" />
                     </Link>

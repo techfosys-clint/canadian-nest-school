@@ -531,7 +531,7 @@ export default function CourseFormClient({
                 value={title}
                 onChange={handleTitleChange}
                 placeholder="e.g. Master Next.js 16 and Mongoose Database Engineering"
-                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
               />
             </div>
 
@@ -546,7 +546,7 @@ export default function CourseFormClient({
                   value={slug}
                   onChange={(e) => setSlug(slugify(e.target.value))}
                   placeholder="master-nextjs-16"
-                  className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
+                  className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
                 />
               </div>
               <div className="flex items-center gap-1.5 mt-1 text-sm font-semibold">
@@ -575,7 +575,7 @@ export default function CourseFormClient({
                 value={summary}
                 onChange={(e) => setSummary(e.target.value)}
                 placeholder="Give a quick, captivating 1-2 sentence sell for this syllabus catalog."
-                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors resize-none"
+                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors resize-none"
               />
             </div>
 
@@ -598,7 +598,7 @@ export default function CourseFormClient({
               <button
                 type="button"
                 onClick={handleAddOutcome}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#615fff]/15 hover:bg-[#615fff]/25 text-[#615fff] border border-[#615fff]/20 rounded-lg text-base font-bold transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#E61C24]/15 hover:bg-[#E61C24]/25 text-[#E61C24] border border-[#E61C24]/20 rounded-lg text-base font-bold transition-colors cursor-pointer"
               >
                 <FiPlus className="h-4.5 w-4.5" /> Add Outcome
               </button>
@@ -618,7 +618,7 @@ export default function CourseFormClient({
                       value={item.outcome}
                       onChange={(e) => handleOutcomeChange(idx, e.target.value)}
                       placeholder={`e.g. Master React 19 hooks and async Server Actions`}
-                      className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
+                      className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
                     />
                     <button
                       type="button"
@@ -640,7 +640,7 @@ export default function CourseFormClient({
               <button
                 type="button"
                 onClick={handleAddRequirement}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#615fff]/15 hover:bg-[#615fff]/25 text-[#615fff] border border-[#615fff]/20 rounded-lg text-base font-bold transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#E61C24]/15 hover:bg-[#E61C24]/25 text-[#E61C24] border border-[#E61C24]/20 rounded-lg text-base font-bold transition-colors cursor-pointer"
               >
                 <FiPlus className="h-4.5 w-4.5" /> Add Requirement
               </button>
@@ -660,7 +660,7 @@ export default function CourseFormClient({
                       value={item.requirement}
                       onChange={(e) => handleRequirementChange(idx, e.target.value)}
                       placeholder={`e.g. Fundamental knowledge of JavaScript (ES6)`}
-                      className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
+                      className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
                     />
                     <button
                       type="button"
@@ -685,7 +685,7 @@ export default function CourseFormClient({
               <button
                 type="button"
                 onClick={handleAddStudyMaterial}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#615fff]/15 hover:bg-[#615fff]/25 text-[#615fff] border border-[#615fff]/20 rounded-lg text-base font-bold transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#E61C24]/15 hover:bg-[#E61C24]/25 text-[#E61C24] border border-[#E61C24]/20 rounded-lg text-base font-bold transition-colors cursor-pointer"
               >
                 <FiPlus className="h-5 w-5" /> Add Material
               </button>
@@ -702,7 +702,7 @@ export default function CourseFormClient({
                 {studyMaterials.map((item, idx) => (
                   <div key={idx} className="bg-slate-100 p-5 rounded-lg border border-slate-200/80 space-y-4 relative group">
                     <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-                      <span className="text-base font-bold text-[#615fff]">Material #{idx + 1}</span>
+                      <span className="text-base font-bold text-[#E61C24]">Material #{idx + 1}</span>
                       <button
                         type="button"
                         onClick={() => handleRemoveStudyMaterial(idx)}
@@ -723,7 +723,7 @@ export default function CourseFormClient({
                           value={item.title}
                           onChange={(e) => handleStudyMaterialChange(idx, 'title', e.target.value)}
                           placeholder="e.g. JavaScript Cheat Sheet"
-                          className="bg-white border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                          className="bg-white border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                         />
                       </div>
 
@@ -750,7 +750,7 @@ export default function CourseFormClient({
                         {/* Preview */}
                         <div className="h-20 w-32 rounded-lg border border-slate-200 bg-slate-50 overflow-hidden flex items-center justify-center shrink-0">
                           {uploadingCoverStates[idx] ? (
-                            <div className="h-5 w-5 border-2 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+                            <div className="h-5 w-5 border-2 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
                           ) : item.coverImage ? (
                             <img src={item.coverImage} alt="Cover" className="w-full h-full object-cover" />
                           ) : (
@@ -763,7 +763,7 @@ export default function CourseFormClient({
 
                         {/* Upload / Remove buttons */}
                         <div className="flex flex-col gap-2">
-                          <label className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#615fff]/10 hover:bg-[#615fff]/20 border border-[#615fff]/20 text-[#615fff] font-bold text-sm cursor-pointer transition-all ${uploadingCoverStates[idx] ? 'opacity-50 pointer-events-none' : ''}`}>
+                          <label className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#E61C24]/10 hover:bg-[#E61C24]/20 border border-[#E61C24]/20 text-[#E61C24] font-bold text-sm cursor-pointer transition-all ${uploadingCoverStates[idx] ? 'opacity-50 pointer-events-none' : ''}`}>
                             <input
                               type="file"
                               accept="image/*"
@@ -801,7 +801,7 @@ export default function CourseFormClient({
                           value={item.url}
                           onChange={(e) => handleStudyMaterialChange(idx, 'url', e.target.value)}
                           placeholder="https://example.com/material or upload below"
-                          className="bg-white border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
+                          className="bg-white border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
                         />
                         <div className="relative shrink-0">
                           <input
@@ -821,8 +821,8 @@ export default function CourseFormClient({
                         </div>
                       </div>
                       {uploadingStates[idx] && (
-                        <p className="text-sm font-semibold text-[#8a88ff] animate-pulse flex items-center gap-2">
-                          <span className="h-4 w-4 border-2 border-[#615fff] border-t-transparent rounded-full animate-spin inline-block" />
+                        <p className="text-sm font-semibold text-[#FF4D55] animate-pulse flex items-center gap-2">
+                          <span className="h-4 w-4 border-2 border-[#E61C24] border-t-transparent rounded-full animate-spin inline-block" />
                           Uploading secure document to server...
                         </p>
                       )}
@@ -842,7 +842,7 @@ export default function CourseFormClient({
                 value={newModuleName}
                 onChange={(e) => setNewModuleName(e.target.value)}
                 placeholder="e.g. Module 1: Introduction to React"
-                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
+                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault()
@@ -853,7 +853,7 @@ export default function CourseFormClient({
               <button
                 type="button"
                 onClick={handleAddModule}
-                className="px-5 py-3 bg-[#615fff] hover:bg-[#5248e8] text-white rounded-lg text-base font-bold transition-all shadow-md shadow-[#615fff]/20 cursor-pointer border-none"
+                className="px-5 py-3 bg-[#E61C24] hover:bg-[#CC181F] text-white rounded-lg text-base font-bold transition-all shadow-md shadow-[#E61C24]/20 cursor-pointer border-none"
               >
                 Add Module
               </button>
@@ -892,7 +892,7 @@ export default function CourseFormClient({
                 <h2 className="text-xl font-bold text-slate-800 tracking-tight">Course Curriculum</h2>
                 <Link
                   href={`/admin/lessons/new?courseId=${initialData._id}`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#615fff]/15 hover:bg-[#615fff]/25 text-[#615fff] border border-[#615fff]/20 rounded-lg text-base font-bold transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#E61C24]/15 hover:bg-[#E61C24]/25 text-[#E61C24] border border-[#E61C24]/20 rounded-lg text-base font-bold transition-colors"
                 >
                   <FiPlus className="h-4 w-4" /> Add Lesson
                 </Link>
@@ -900,7 +900,7 @@ export default function CourseFormClient({
 
               {lessonsLoading ? (
                 <div className="flex items-center justify-center py-8">
-                  <div className="h-6 w-6 border-2 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+                  <div className="h-6 w-6 border-2 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : lessons.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10 gap-3 text-center">
@@ -908,7 +908,7 @@ export default function CourseFormClient({
                   <p className="text-base font-semibold text-slate-400">No lessons yet. Add your first lesson to build the curriculum.</p>
                   <Link
                     href={`/admin/lessons/new?courseId=${initialData._id}`}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#615fff] hover:bg-[#5248e8] text-white rounded-lg font-bold text-base transition-all"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#E61C24] hover:bg-[#CC181F] text-white rounded-lg font-bold text-base transition-all"
                   >
                     <FiPlus className="h-4 w-4" /> Add First Lesson
                   </Link>
@@ -993,7 +993,7 @@ export default function CourseFormClient({
                     <FiUploadCloud className="h-4 w-4" /> Upload New
                   </button>
                   <button type="button" onClick={() => setShowMediaPicker(true)}
-                    className="flex items-center justify-center gap-2 py-2 rounded-lg bg-[#615fff]/15 hover:bg-[#615fff]/25 border border-[#615fff]/20 text-[#615fff] font-bold text-sm cursor-pointer transition-all">
+                    className="flex items-center justify-center gap-2 py-2 rounded-lg bg-[#E61C24]/15 hover:bg-[#E61C24]/25 border border-[#E61C24]/20 text-[#E61C24] font-bold text-sm cursor-pointer transition-all">
                     <FiImage className="h-4 w-4" /> From Library
                   </button>
                 </div>
@@ -1001,8 +1001,8 @@ export default function CourseFormClient({
             ) : (
               <div className="space-y-3">
                 {uploadingImage ? (
-                  <div className="flex flex-col items-center justify-center border-2 border-dashed border-[#615fff]/40 rounded-lg p-8 gap-3 bg-[#615fff]/5">
-                    <div className="h-8 w-8 border-2 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+                  <div className="flex flex-col items-center justify-center border-2 border-dashed border-[#E61C24]/40 rounded-lg p-8 gap-3 bg-[#E61C24]/5">
+                    <div className="h-8 w-8 border-2 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
                     <p className="text-base font-semibold text-slate-500">Processing with Sharp...</p>
                   </div>
                 ) : (
@@ -1011,9 +1011,9 @@ export default function CourseFormClient({
                       type="button"
                       onClick={() => thumbnailFileRef.current?.click()}
                       disabled={uploadingImage}
-                      className="w-full flex flex-col items-center justify-center border-2 border-dashed border-slate-200 hover:border-[#615fff]/60 rounded-lg p-6 text-center cursor-pointer transition-colors group disabled:opacity-50"
+                      className="w-full flex flex-col items-center justify-center border-2 border-dashed border-slate-200 hover:border-[#E61C24]/60 rounded-lg p-6 text-center cursor-pointer transition-colors group disabled:opacity-50"
                     >
-                      <FiUploadCloud className="h-9 w-9 text-slate-400 group-hover:text-[#615fff] transition-colors mb-2" />
+                      <FiUploadCloud className="h-9 w-9 text-slate-400 group-hover:text-[#E61C24] transition-colors mb-2" />
                       <p className="text-base font-bold text-slate-800">Upload New File</p>
                       <p className="text-sm font-semibold text-slate-400">PNG, JPEG, WEBP — auto-resized</p>
                     </button>
@@ -1025,7 +1025,7 @@ export default function CourseFormClient({
                     <button
                       type="button"
                       onClick={() => setShowMediaPicker(true)}
-                      className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#615fff]/10 hover:bg-[#615fff]/20 border border-[#615fff]/20 hover:border-[#615fff]/40 text-[#615fff] font-bold text-base transition-all cursor-pointer"
+                      className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24]/10 hover:bg-[#E61C24]/20 border border-[#E61C24]/20 hover:border-[#E61C24]/40 text-[#E61C24] font-bold text-base transition-all cursor-pointer"
                     >
                       <FiImage className="h-5 w-5" /> Pick from Media Library
                     </button>
@@ -1068,7 +1068,7 @@ export default function CourseFormClient({
                 value={price}
                 onChange={(e) => setPrice(Number(e.target.value))}
                 placeholder="4500"
-                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
               />
             </div>
 
@@ -1113,7 +1113,7 @@ export default function CourseFormClient({
               <label className="text-base font-bold text-slate-600">Lead Mentor (Instructor) *</label>
               {user.role === 'instructor' ? (
                 <div className="bg-slate-100 border border-slate-200 text-slate-500 rounded-lg p-3 text-base font-semibold select-none flex items-center gap-2">
-                  <FiInfo className="text-[#615fff]" />
+                  <FiInfo className="text-[#E61C24]" />
                   <span>
                     {instructors.find((ins) => ins.id === user.id)?.name || 'You (Assigned Mentor)'}
                   </span>
@@ -1158,7 +1158,7 @@ export default function CourseFormClient({
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
                 placeholder="e.g. 14 Hours of video lectures"
-                className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
               />
             </div>
           </div>
@@ -1183,7 +1183,7 @@ export default function CourseFormClient({
                     value={metaTitle}
                     onChange={(e) => setMetaTitle(e.target.value)}
                     placeholder="Search snippet header title"
-                    className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                    className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                   />
                 </div>
 
@@ -1194,7 +1194,7 @@ export default function CourseFormClient({
                     value={metaDescription}
                     onChange={(e) => setMetaDescription(e.target.value)}
                     placeholder="Search snippet summary block (160 characters max recommendation)"
-                    className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors resize-none"
+                    className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors resize-none"
                   />
                 </div>
 
@@ -1205,7 +1205,7 @@ export default function CourseFormClient({
                     value={keywords}
                     onChange={(e) => setKeywords(e.target.value)}
                     placeholder="e.g. Next.js, Mongoose, MongoDB, Course"
-                    className="bg-slate-100 border border-slate-200 focus:border-[#615fff]/80 focus:ring-1 focus:ring-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                    className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                   />
                 </div>
               </div>
@@ -1217,7 +1217,7 @@ export default function CourseFormClient({
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full py-3.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base shadow-lg shadow-[#615fff]/20 hover:shadow-[#615fff]/30 transition-all duration-300 cursor-pointer flex items-center justify-center ${
+              className={`w-full py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-lg shadow-[#E61C24]/20 hover:shadow-[#E61C24]/30 transition-all duration-300 cursor-pointer flex items-center justify-center ${
                 isSubmitting ? 'opacity-50 pointer-events-none' : ''
               }`}
             >

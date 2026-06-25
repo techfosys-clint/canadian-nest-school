@@ -77,7 +77,7 @@ export default function SecureVideoPlayer({ lessonId, title }: SecureVideoPlayer
         <button
           type="button"
           onClick={authorizeAndLoad}
-          className="mt-4 py-2 px-4 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base transition-colors cursor-pointer"
+          className="mt-4 py-2 px-4 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-colors cursor-pointer"
         >
           Try Again
         </button>
@@ -89,7 +89,7 @@ export default function SecureVideoPlayer({ lessonId, title }: SecureVideoPlayer
     <div className="w-full h-full relative bg-black">
       {loading && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 text-white z-10">
-          <FiLock className="h-8 w-8 text-[#615fff] mb-3 animate-pulse" />
+          <FiLock className="h-8 w-8 text-[#E61C24] mb-3 animate-pulse" />
           <div className="h-6 w-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           <p className="text-base font-semibold text-zinc-400 mt-3">Securing stream…</p>
         </div>

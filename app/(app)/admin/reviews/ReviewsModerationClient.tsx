@@ -122,7 +122,7 @@ export default function ReviewsModerationClient({ initialReviews }: { initialRev
             </div>
           )}
           <Link href="/admin/reviews/new"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base shadow-md shadow-[#615fff]/20 transition-all cursor-pointer">
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-md shadow-[#E61C24]/20 transition-all cursor-pointer">
             <FiPlus className="h-5 w-5" /> Add New Review
           </Link>
         </div>
@@ -130,7 +130,7 @@ export default function ReviewsModerationClient({ initialReviews }: { initialRev
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 bg-white border border-slate-200 p-4 rounded-lg shadow-sm">
-        <div className="flex-1 flex items-center gap-2.5 px-3 py-2 bg-slate-100 border border-slate-200 focus-within:border-[#615fff]/60 rounded-lg transition-colors">
+        <div className="flex-1 flex items-center gap-2.5 px-3 py-2 bg-slate-100 border border-slate-200 focus-within:border-[#E61C24]/60 rounded-lg transition-colors">
           <FiSearch className="h-5 w-5 text-slate-400 shrink-0" />
           <input type="text" value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Search by student, course or comment..."
@@ -140,7 +140,7 @@ export default function ReviewsModerationClient({ initialReviews }: { initialRev
           {(['all', 'pending', 'approved', 'rejected'] as const).map(tab => (
             <button key={tab} onClick={() => setFilterStatus(tab)}
               className={`px-4 py-1.5 rounded-md text-base font-bold capitalize transition-all cursor-pointer ${
-                filterStatus === tab ? 'bg-[#615fff] text-white' : 'text-slate-500 hover:text-slate-800'}`}>
+                filterStatus === tab ? 'bg-[#E61C24] text-white' : 'text-slate-500 hover:text-slate-800'}`}>
               {tab}
             </button>
           ))}
@@ -184,7 +184,7 @@ export default function ReviewsModerationClient({ initialReviews }: { initialRev
                       {/* Student / Reviewer */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-[#615fff]/15 border border-[#615fff]/20 flex items-center justify-center font-bold text-[#615fff] text-base shrink-0 select-none">
+                          <div className="h-10 w-10 rounded-full bg-[#E61C24]/15 border border-[#E61C24]/20 flex items-center justify-center font-bold text-[#E61C24] text-base shrink-0 select-none">
                             {initials}
                           </div>
                           <div>

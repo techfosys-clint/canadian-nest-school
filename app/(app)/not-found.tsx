@@ -20,9 +20,9 @@ export default function NotFound() {
       `}</style>
 
       {/* Elegant background grid pattern and brand spotlights */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#615fff 0.5px, transparent 0.5px)', backgroundSize: '24px 24px' }} />
+      <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#E61C24 0.5px, transparent 0.5px)', backgroundSize: '24px 24px' }} />
       
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#615fff]/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#E61C24]/10 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#ff5b5b]/5 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Floating vector shapes from landing page */}
@@ -44,11 +44,11 @@ export default function NotFound() {
           className="relative mb-6"
         >
           {/* Glassmorphic backdrop */}
-          <div className="absolute inset-0 bg-white/40 backdrop-blur-md rounded-lg border border-zinc-200/50 shadow-xl shadow-[#615fff]/5 -rotate-2" />
+          <div className="absolute inset-0 bg-white/40 backdrop-blur-md rounded-lg border border-zinc-200/50 shadow-xl shadow-[#E61C24]/5 -rotate-2" />
           
           <h1 className="relative text-7xl sm:text-8xl md:text-9xl font-bold font-display text-zinc-900 tracking-tight px-8 py-4 select-none leading-none">
             4
-            <span className="text-[#615fff] relative inline-block">
+            <span className="text-[#E61C24] relative inline-block">
               0
               <motion.span
                 initial={{ rotate: 0 }}
@@ -92,7 +92,7 @@ export default function NotFound() {
         >
           <Link
             href="/"
-            className="w-full sm:w-auto px-6 py-3.5 bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base rounded-lg shadow-lg shadow-[#615fff]/20 hover:shadow-xl hover:shadow-[#615fff]/30 transition-all duration-300 flex items-center justify-center gap-2 group cursor-pointer"
+            className="w-full sm:w-auto px-6 py-3.5 bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base rounded-lg shadow-lg shadow-[#E61C24]/20 hover:shadow-xl hover:shadow-[#E61C24]/30 transition-all duration-300 flex items-center justify-center gap-2 group cursor-pointer"
           >
             <FiHome className="h-5 w-5" />
             <span>Back to Home Page</span>

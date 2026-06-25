@@ -65,7 +65,7 @@ export default function ReviewsPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+          <div className="h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
           <p className="text-base font-bold text-zinc-650">Loading reviews...</p>
         </div>
       </div>
@@ -79,15 +79,15 @@ export default function ReviewsPage() {
 
       {/* Premium Banner - Box Shadow Removed */}
       <div className="w-full bg-[#0A163A] rounded-lg p-8 md:p-12 relative overflow-hidden mb-10 border border-zinc-800/20">
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#615fff]/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#543cdf]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#E61C24]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#CC181F]/15 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative z-10 max-w-2xl">
-          <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-[#615fff]/20 border border-[#615fff]/30 text-base font-bold text-[#615fff] uppercase tracking-wider mb-6">
+          <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-[#E61C24]/20 border border-[#E61C24]/30 text-base font-bold text-[#E61C24] uppercase tracking-wider mb-6">
             Reviews Panel
           </span>
           <h1 className="text-3xl md:text-4xl font-bold font-display text-white mb-4 leading-tight">
-            Learner <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8a88ff] to-white font-bold">Reviews Hub</span> 🌟
+            Learner <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF4D55] to-white font-bold">Reviews Hub</span> 🌟
           </h1>
           <p className="text-zinc-400 text-base md:text-lg font-semibold leading-relaxed">
             Your dynamic course feedback helps shape curriculum quality. Track your logged evaluations and add new course testimonials!
@@ -106,7 +106,7 @@ export default function ReviewsPage() {
 
           <Link
             href="/dashboard/reviews/new"
-            className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base transition-colors shrink-0"
+            className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-colors shrink-0"
           >
             <FiPlus className="h-5 w-5" />
             <span>Write a Review</span>
@@ -117,12 +117,12 @@ export default function ReviewsPage() {
         <div className="bg-white rounded-lg border border-zinc-200/85 overflow-hidden">
           <div className="px-6 py-5 bg-zinc-50/50 flex items-center justify-between border-b border-zinc-200/80">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-[#615fff]/10 flex items-center justify-center border border-[#615fff]/15">
-                <FiClock className="h-5 w-5 text-[#615fff]" />
+              <div className="h-10 w-10 rounded-lg bg-[#E61C24]/10 flex items-center justify-center border border-[#E61C24]/15">
+                <FiClock className="h-5 w-5 text-[#E61C24]" />
               </div>
               <h3 className="text-xl font-bold text-zinc-800">Submitted Logs</h3>
             </div>
-            <span className="text-base font-bold text-[#615fff] bg-[#615fff]/10 px-3.5 py-1 rounded-lg">
+            <span className="text-base font-bold text-[#E61C24] bg-[#E61C24]/10 px-3.5 py-1 rounded-lg">
               Total {myReviews.length}
             </span>
           </div>

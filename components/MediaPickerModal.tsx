@@ -179,8 +179,8 @@ export default function MediaPickerModal({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-lg bg-[#615fff]/15 border border-[#615fff]/20 flex items-center justify-center">
-              <FiImage className="h-4.5 w-4.5 text-[#615fff]" />
+            <div className="h-9 w-9 rounded-lg bg-[#E61C24]/15 border border-[#E61C24]/20 flex items-center justify-center">
+              <FiImage className="h-4.5 w-4.5 text-[#E61C24]" />
             </div>
             <div>
               <h2 className="font-bold text-white text-xl leading-tight">{title}</h2>
@@ -196,13 +196,13 @@ export default function MediaPickerModal({
         <div className="flex gap-1 px-6 pt-4 shrink-0">
           <button
             onClick={() => setTab('library')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-base font-bold transition-all cursor-pointer ${tab === 'library' ? 'bg-[#615fff] text-white' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'}`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-base font-bold transition-all cursor-pointer ${tab === 'library' ? 'bg-[#E61C24] text-white' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'}`}
           >
             <FiGrid className="h-4 w-4" /> Library
           </button>
           <button
             onClick={() => setTab('upload')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-base font-bold transition-all cursor-pointer ${tab === 'upload' ? 'bg-[#615fff] text-white' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'}`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-base font-bold transition-all cursor-pointer ${tab === 'upload' ? 'bg-[#E61C24] text-white' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'}`}
           >
             <FiUpload className="h-4 w-4" /> Upload New
             {uploads.length > 0 && (
@@ -219,7 +219,7 @@ export default function MediaPickerModal({
           {tab === 'library' && (
             <>
               {/* Search */}
-              <div className="flex items-center gap-2 bg-[#121829] border border-zinc-800 rounded-lg px-4 py-2.5 mb-4 focus-within:border-[#615fff]/50 transition-colors shrink-0">
+              <div className="flex items-center gap-2 bg-[#121829] border border-zinc-800 rounded-lg px-4 py-2.5 mb-4 focus-within:border-[#E61C24]/50 transition-colors shrink-0">
                 <FiSearch className="h-4.5 w-4.5 text-zinc-500 shrink-0" />
                 <input
                   type="text"
@@ -239,7 +239,7 @@ export default function MediaPickerModal({
               <div className="flex-1 overflow-y-auto min-h-0 pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#27272a transparent' }}>
                 {loading ? (
                   <div className="flex items-center justify-center h-48">
-                    <div className="h-8 w-8 border-2 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+                    <div className="h-8 w-8 border-2 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
                   </div>
                 ) : filtered.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-48 gap-3 text-center">
@@ -248,7 +248,7 @@ export default function MediaPickerModal({
                       {search ? 'No assets match your search.' : 'No media in library yet. Upload files first.'}
                     </p>
                     {!search && (
-                      <button onClick={() => setTab('upload')} className="px-4 py-2 bg-[#615fff]/15 hover:bg-[#615fff]/25 border border-[#615fff]/20 text-[#615fff] rounded-lg font-bold text-base transition-all cursor-pointer">
+                      <button onClick={() => setTab('upload')} className="px-4 py-2 bg-[#E61C24]/15 hover:bg-[#E61C24]/25 border border-[#E61C24]/20 text-[#E61C24] rounded-lg font-bold text-base transition-all cursor-pointer">
                         Go to Upload
                       </button>
                     )}
@@ -265,7 +265,7 @@ export default function MediaPickerModal({
                           onClick={() => { onSelect(item); onClose() }}
                           onMouseEnter={() => setHovered(item.id)}
                           onMouseLeave={() => setHovered(null)}
-                          className={`group relative rounded-lg overflow-hidden border transition-all duration-150 text-left cursor-pointer ${isHov ? 'border-[#615fff] shadow-lg shadow-[#615fff]/20 scale-[1.02]' : 'border-zinc-800 hover:border-zinc-600'}`}
+                          className={`group relative rounded-lg overflow-hidden border transition-all duration-150 text-left cursor-pointer ${isHov ? 'border-[#E61C24] shadow-lg shadow-[#E61C24]/20 scale-[1.02]' : 'border-zinc-800 hover:border-zinc-600'}`}
                         >
                           <div className="aspect-square bg-[#0e1322] flex items-center justify-center overflow-hidden">
                             {isImg ? (
@@ -283,8 +283,8 @@ export default function MediaPickerModal({
                               </div>
                             )}
                             {/* Hover overlay */}
-                            <div className={`absolute inset-0 bg-[#615fff]/20 flex items-center justify-center transition-opacity duration-150 ${isHov ? 'opacity-100' : 'opacity-0'}`}>
-                              <div className="h-8 w-8 rounded-full bg-[#615fff] flex items-center justify-center shadow-lg">
+                            <div className={`absolute inset-0 bg-[#E61C24]/20 flex items-center justify-center transition-opacity duration-150 ${isHov ? 'opacity-100' : 'opacity-0'}`}>
+                              <div className="h-8 w-8 rounded-full bg-[#E61C24] flex items-center justify-center shadow-lg">
                                 <FiCheck className="h-4 w-4 text-white" />
                               </div>
                             </div>
@@ -310,10 +310,10 @@ export default function MediaPickerModal({
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
-                className={`relative border-2 border-dashed rounded-lg p-10 text-center transition-all duration-200 flex flex-col items-center justify-center gap-4 shrink-0 ${dragOver ? 'border-[#615fff] bg-[#615fff]/8' : 'border-zinc-800 hover:border-zinc-700 bg-[#121829]'}`}
+                className={`relative border-2 border-dashed rounded-lg p-10 text-center transition-all duration-200 flex flex-col items-center justify-center gap-4 shrink-0 ${dragOver ? 'border-[#E61C24] bg-[#E61C24]/8' : 'border-zinc-800 hover:border-zinc-700 bg-[#121829]'}`}
               >
-                <div className={`h-16 w-16 rounded-full flex items-center justify-center transition-all ${dragOver ? 'bg-[#615fff]/20 scale-110' : 'bg-zinc-800/50'}`}>
-                  <FiUploadCloud className={`h-8 w-8 transition-all ${dragOver ? 'text-[#615fff]' : 'text-zinc-500'}`} />
+                <div className={`h-16 w-16 rounded-full flex items-center justify-center transition-all ${dragOver ? 'bg-[#E61C24]/20 scale-110' : 'bg-zinc-800/50'}`}>
+                  <FiUploadCloud className={`h-8 w-8 transition-all ${dragOver ? 'text-[#E61C24]' : 'text-zinc-500'}`} />
                 </div>
                 <div>
                   <p className="text-base font-bold text-white">
@@ -323,7 +323,7 @@ export default function MediaPickerModal({
                     or click below to browse — supports bulk selection
                   </p>
                 </div>
-                <label className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-bold text-base transition-all cursor-pointer ${uploading ? 'opacity-50 pointer-events-none bg-zinc-800 text-zinc-500' : 'bg-[#615fff] hover:bg-[#5248e8] text-white shadow-md shadow-[#615fff]/20'}`}>
+                <label className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-bold text-base transition-all cursor-pointer ${uploading ? 'opacity-50 pointer-events-none bg-zinc-800 text-zinc-500' : 'bg-[#E61C24] hover:bg-[#CC181F] text-white shadow-md shadow-[#E61C24]/20'}`}>
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -349,7 +349,7 @@ export default function MediaPickerModal({
                     <div key={i} className={`flex items-center gap-3 px-4 py-3 rounded-lg border transition-all ${u.status === 'done' ? 'bg-emerald-500/8 border-emerald-500/20' : u.status === 'error' ? 'bg-rose-500/8 border-rose-500/20' : 'bg-[#121829] border-zinc-800'}`}>
                       <div className="shrink-0">
                         {u.status === 'uploading' && (
-                          <div className="h-5 w-5 border-2 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+                          <div className="h-5 w-5 border-2 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
                         )}
                         {u.status === 'done' && (
                           <div className="h-5 w-5 rounded-full bg-emerald-500 flex items-center justify-center">
@@ -375,7 +375,7 @@ export default function MediaPickerModal({
                             const item = mediaItems.find(m => m.url === u.url)
                             if (item) { onSelect(item); onClose() }
                           }}
-                          className="shrink-0 px-3 py-1.5 bg-[#615fff]/15 hover:bg-[#615fff] border border-[#615fff]/20 hover:border-[#615fff] text-[#615fff] hover:text-white rounded-lg text-sm font-bold transition-all cursor-pointer"
+                          className="shrink-0 px-3 py-1.5 bg-[#E61C24]/15 hover:bg-[#E61C24] border border-[#E61C24]/20 hover:border-[#E61C24] text-[#E61C24] hover:text-white rounded-lg text-sm font-bold transition-all cursor-pointer"
                         >
                           Use this
                         </button>

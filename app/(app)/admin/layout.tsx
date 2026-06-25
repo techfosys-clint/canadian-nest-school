@@ -140,13 +140,13 @@ function NavGroup({
         onClick={() => setOpen((v) => !v)}
         className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-bold transition-all duration-200 cursor-pointer group ${
           isGroupActive
-            ? 'text-[#615fff] bg-[#615fff]/8'
+            ? 'text-[#E61C24] bg-[#E61C24]/8'
             : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
         }`}
       >
         <div className="flex items-center gap-2">
           <GroupIcon
-            className={`h-4 w-4 ${isGroupActive ? 'text-[#615fff]' : 'text-slate-400 group-hover:text-slate-600'}`}
+            className={`h-4 w-4 ${isGroupActive ? 'text-[#E61C24]' : 'text-slate-400 group-hover:text-slate-600'}`}
           />
           <span className="uppercase tracking-wider">{group.groupLabel}</span>
         </div>
@@ -174,7 +174,7 @@ function NavGroup({
                 onClick={onLinkClick}
                 className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-base font-semibold transition-all duration-150 group/link ${
                   isActive
-                    ? 'bg-[#615fff] text-white shadow-sm shadow-[#615fff]/20'
+                    ? 'bg-[#E61C24] text-white shadow-sm shadow-[#E61C24]/20'
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`}
               >
@@ -216,7 +216,7 @@ function SidebarNav({
         onClick={onLinkClick}
         className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-base font-semibold transition-all duration-200 group ${
           isOverviewActive
-            ? 'bg-[#615fff] text-white shadow-md shadow-[#615fff]/20'
+            ? 'bg-[#E61C24] text-white shadow-md shadow-[#E61C24]/20'
             : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
         }`}
       >
@@ -323,7 +323,7 @@ export default function AdminLayout({
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+          <div className="h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
           <p className="text-base font-bold text-slate-500">Verifying Admin Access...</p>
         </div>
       </div>
@@ -349,7 +349,7 @@ export default function AdminLayout({
   const SidebarFooter = () => (
     <div className="p-4 border-t border-slate-200 bg-slate-50 shrink-0">
       <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-full border border-[#615fff]/35 bg-slate-100 flex items-center justify-center text-base font-bold text-slate-700 overflow-hidden shrink-0">
+        <div className="h-10 w-10 rounded-full border border-[#E61C24]/35 bg-slate-100 flex items-center justify-center text-base font-bold text-slate-700 overflow-hidden shrink-0">
           {user.profilePic ? (
             <img src={user.profilePic} alt={user.name} className="h-full w-full object-cover" />
           ) : (
@@ -358,7 +358,7 @@ export default function AdminLayout({
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-base font-bold text-slate-800 truncate leading-tight">{user.name}</p>
-          <p className="text-base font-semibold text-[#615fff] truncate mt-0.5 capitalize">{user.role}</p>
+          <p className="text-base font-semibold text-[#E61C24] truncate mt-0.5 capitalize">{user.role}</p>
         </div>
       </div>
       <button
@@ -489,7 +489,7 @@ export default function AdminLayout({
 
             {/* Admin Badge */}
             <div className="flex items-center gap-3 border-l border-slate-200 pl-4">
-              <div className="h-9 w-9 rounded-full border border-[#615fff]/30 bg-slate-100 flex items-center justify-center overflow-hidden shrink-0">
+              <div className="h-9 w-9 rounded-full border border-[#E61C24]/30 bg-slate-100 flex items-center justify-center overflow-hidden shrink-0">
                 {user.profilePic ? (
                   <img src={user.profilePic} alt={user.name} className="h-full w-full object-cover" />
                 ) : (
@@ -498,7 +498,7 @@ export default function AdminLayout({
               </div>
               <div className="hidden md:block">
                 <p className="text-base font-bold text-slate-800 leading-none">{user.name}</p>
-                <p className="text-base font-semibold text-[#615fff] mt-1 capitalize">{user.role} Account</p>
+                <p className="text-base font-semibold text-[#E61C24] mt-1 capitalize">{user.role} Account</p>
               </div>
             </div>
 

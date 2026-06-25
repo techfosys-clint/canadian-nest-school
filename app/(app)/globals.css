@@ -3,7 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #121212;
-  --brand: #615fff;
+  --brand: #E61C24;
 }
 
 @theme inline {
@@ -74,7 +74,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #615fff;
+  background-color: #E61C24;
 }
 
 /* Scrollbars inside dark theme panels (Admin console, sidebar, widgets) */
@@ -97,7 +97,7 @@ nav ::-webkit-scrollbar-thumb {
 .bg-\[\#070b16\] ::-webkit-scrollbar-thumb:hover,
 aside ::-webkit-scrollbar-thumb:hover,
 nav ::-webkit-scrollbar-thumb:hover {
-  background-color: #615fff;
+  background-color: #E61C24;
 }
 
 /* Firefox standard scrollbar styles */

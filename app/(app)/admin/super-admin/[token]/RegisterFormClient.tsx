@@ -70,10 +70,10 @@ export default function RegisterFormClient() {
         text: 'Root administrator account configured successfully!',
         background: '#ffffff',
         color: '#1a1a1a',
-        confirmButtonColor: '#615fff',
+        confirmButtonColor: '#E61C24',
         customClass: {
           popup: 'rounded-lg',
-          confirmButton: 'rounded-lg text-base font-bold px-6 py-2.5 bg-[#615fff]',
+          confirmButton: 'rounded-lg text-base font-bold px-6 py-2.5 bg-[#E61C24]',
         },
       })
 
@@ -108,7 +108,7 @@ export default function RegisterFormClient() {
             placeholder="e.g. John Doe"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
           />
         </div>
       </div>
@@ -124,7 +124,7 @@ export default function RegisterFormClient() {
             placeholder="e.g. admin@tutorspace.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
           />
         </div>
       </div>
@@ -139,7 +139,7 @@ export default function RegisterFormClient() {
             placeholder="e.g. +88017XXXXXXXX"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
           />
         </div>
       </div>
@@ -155,7 +155,7 @@ export default function RegisterFormClient() {
             placeholder="Minimum 6 characters"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
           />
         </div>
       </div>
@@ -171,7 +171,7 @@ export default function RegisterFormClient() {
             placeholder="Retype password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
           />
         </div>
       </div>
@@ -180,7 +180,7 @@ export default function RegisterFormClient() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base transition-colors duration-200 cursor-pointer disabled:opacity-50"
+        className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-colors duration-200 cursor-pointer disabled:opacity-50"
       >
         <FiCheckCircle className="h-5 w-5" />
         {loading ? 'Configuring Console...' : 'Initialize System'}

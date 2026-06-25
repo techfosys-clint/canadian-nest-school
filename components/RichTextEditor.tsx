@@ -45,7 +45,7 @@ function ToolBtn({
       title={title}
       className={`flex items-center justify-center w-8 h-8 rounded transition-all cursor-pointer select-none text-sm
         ${active
-          ? 'bg-[#615fff] text-white'
+          ? 'bg-[#E61C24] text-white'
           : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
         }
         ${disabled ? 'opacity-30 cursor-not-allowed pointer-events-none' : ''}
@@ -147,7 +147,7 @@ export default function RichTextEditor({
         </label>
       )}
 
-      <div className="border border-zinc-800 rounded-lg overflow-hidden bg-[#070b16] focus-within:border-[#615fff]/60 transition-colors">
+      <div className="border border-zinc-800 rounded-lg overflow-hidden bg-[#070b16] focus-within:border-[#E61C24]/60 transition-colors">
 
         {/* ── Toolbar ── */}
         <div className="bg-[#0e1422] border-b border-zinc-800 px-3 py-2 flex flex-wrap items-center gap-1">
@@ -232,9 +232,9 @@ export default function RichTextEditor({
                   onChange={e => setLinkUrl(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && applyLink()}
                   placeholder="https://example.com"
-                  className="flex-1 bg-zinc-900 border border-zinc-700 rounded px-3 py-1.5 text-base text-white outline-none focus:border-[#615fff]/60 placeholder-zinc-600"
+                  className="flex-1 bg-zinc-900 border border-zinc-700 rounded px-3 py-1.5 text-base text-white outline-none focus:border-[#E61C24]/60 placeholder-zinc-600"
                 />
-                <button type="button" onClick={applyLink} className="px-3 py-1.5 bg-[#615fff] text-white rounded text-sm font-bold hover:bg-[#4f4fdd] transition-colors cursor-pointer">Apply</button>
+                <button type="button" onClick={applyLink} className="px-3 py-1.5 bg-[#E61C24] text-white rounded text-sm font-bold hover:bg-[#4f4fdd] transition-colors cursor-pointer">Apply</button>
               </div>
             )}
           </div>
@@ -256,9 +256,9 @@ export default function RichTextEditor({
                   onChange={e => setImageUrl(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && applyImage()}
                   placeholder="https://example.com/image.png"
-                  className="flex-1 bg-zinc-900 border border-zinc-700 rounded px-3 py-1.5 text-base text-white outline-none focus:border-[#615fff]/60 placeholder-zinc-600"
+                  className="flex-1 bg-zinc-900 border border-zinc-700 rounded px-3 py-1.5 text-base text-white outline-none focus:border-[#E61C24]/60 placeholder-zinc-600"
                 />
-                <button type="button" onClick={applyImage} className="px-3 py-1.5 bg-[#615fff] text-white rounded text-sm font-bold hover:bg-[#4f4fdd] transition-colors cursor-pointer">Insert</button>
+                <button type="button" onClick={applyImage} className="px-3 py-1.5 bg-[#E61C24] text-white rounded text-sm font-bold hover:bg-[#4f4fdd] transition-colors cursor-pointer">Insert</button>
               </div>
             )}
           </div>
@@ -280,9 +280,9 @@ export default function RichTextEditor({
                   onChange={e => setYoutubeUrl(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && applyYoutube()}
                   placeholder="https://www.youtube.com/watch?v=..."
-                  className="flex-1 bg-zinc-900 border border-zinc-700 rounded px-3 py-1.5 text-base text-white outline-none focus:border-[#615fff]/60 placeholder-zinc-600"
+                  className="flex-1 bg-zinc-900 border border-zinc-700 rounded px-3 py-1.5 text-base text-white outline-none focus:border-[#E61C24]/60 placeholder-zinc-600"
                 />
-                <button type="button" onClick={applyYoutube} className="px-3 py-1.5 bg-[#615fff] text-white rounded text-sm font-bold hover:bg-[#4f4fdd] transition-colors cursor-pointer">Embed</button>
+                <button type="button" onClick={applyYoutube} className="px-3 py-1.5 bg-[#E61C24] text-white rounded text-sm font-bold hover:bg-[#4f4fdd] transition-colors cursor-pointer">Embed</button>
               </div>
             )}
           </div>
@@ -363,7 +363,7 @@ export default function RichTextEditor({
         }
         .tiptap-editor pre code { background: none; color: #7dd3fc; padding: 0; }
         .tiptap-editor blockquote {
-          border-left: 3px solid #615fff80; padding-left: 1rem;
+          border-left: 3px solid #E61C2480; padding-left: 1rem;
           margin: 0.75rem 0; color: #a1a1aa; font-style: italic;
         }
         .tiptap-editor ul { list-style: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
@@ -396,7 +396,7 @@ export default function RichTextEditor({
           color: #cbd5e1; vertical-align: top;
         }
         .tiptap-editor tr:nth-child(even) td { background: #0a0f1e; }
-        .tiptap-editor .selectedCell { background: #615fff22 !important; }
+        .tiptap-editor .selectedCell { background: #E61C2422 !important; }
       `}</style>
     </div>
   )

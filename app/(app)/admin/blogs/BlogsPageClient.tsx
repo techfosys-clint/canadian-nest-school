@@ -154,7 +154,7 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
         
         <button 
           onClick={() => router.push('/admin/blogs/new')}
-          className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base shadow-lg shadow-[#615fff]/15 hover:scale-[1.01] transition-all cursor-pointer shrink-0"
+          className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-lg shadow-[#E61C24]/15 hover:scale-[1.01] transition-all cursor-pointer shrink-0"
         >
           <FiPlus className="h-5 w-5" />
           <span>Write New Article</span>
@@ -166,7 +166,7 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
         
         {/* Total Articles card */}
         <div className="bg-white border border-slate-200 rounded-lg p-6 flex items-center gap-5 shadow-sm">
-          <div className="h-12 w-12 rounded-lg bg-[#615fff]/10 border border-[#615fff]/20 flex items-center justify-center text-[#615fff]">
+          <div className="h-12 w-12 rounded-lg bg-[#E61C24]/10 border border-[#E61C24]/20 flex items-center justify-center text-[#E61C24]">
             <FiFileText className="h-6 w-6" />
           </div>
           <div>
@@ -211,7 +211,7 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             placeholder="Search article titles or contents..."
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 focus:border-[#615fff]/60 text-slate-800 rounded-lg text-base font-semibold outline-none transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 focus:border-[#E61C24]/60 text-slate-800 rounded-lg text-base font-semibold outline-none transition-colors"
           />
           <FiSearch className="absolute left-3.5 top-3.5 text-slate-400 h-4 w-4" />
         </div>
@@ -222,7 +222,7 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
             onClick={() => setSelectedTag(null)}
             className={`px-3.5 py-1.5 rounded-lg border font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer select-none ${
               selectedTag === null 
-                ? 'bg-[#615fff] text-white border-transparent' 
+                ? 'bg-[#E61C24] text-white border-transparent' 
                 : 'bg-slate-100 border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-200'
             }`}
           >
@@ -235,7 +235,7 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
               onClick={() => setSelectedTag(tag)}
               className={`px-3.5 py-1.5 rounded-lg border font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer select-none ${
                 selectedTag === tag 
-                  ? 'bg-[#615fff] text-white border-transparent' 
+                  ? 'bg-[#E61C24] text-white border-transparent' 
                   : 'bg-slate-100 border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-200'
               }`}
             >
@@ -296,7 +296,7 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
                             )}
                           </div>
                           <div className="min-w-0">
-                            <h3 className="font-bold text-slate-800 text-base truncate group-hover:text-[#615fff] transition-colors" title={blog.title}>
+                            <h3 className="font-bold text-slate-800 text-base truncate group-hover:text-[#E61C24] transition-colors" title={blog.title}>
                               {blog.title}
                             </h3>
                             <p className="text-base font-normal text-slate-500 truncate mt-0.5" title={plainTextPreview}>
@@ -309,7 +309,7 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
                       {/* Author Column */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-full bg-[#615fff]/10 border border-[#615fff]/20 flex items-center justify-center font-bold text-base text-[#615fff] uppercase">
+                          <div className="h-8 w-8 rounded-full bg-[#E61C24]/10 border border-[#E61C24]/20 flex items-center justify-center font-bold text-base text-[#E61C24] uppercase">
                             {blog.authorName[0]}
                           </div>
                           <span className="text-base font-bold text-slate-600">{blog.authorName}</span>
@@ -347,8 +347,8 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
                                 }}
                                 className={`px-2.5 py-0.5 border rounded-lg font-bold text-xs transition-colors cursor-pointer select-none ${
                                   selectedTag === t.tag
-                                    ? 'bg-[#615fff] text-white border-transparent'
-                                    : 'bg-[#615fff]/10 border-[#615fff]/20 text-[#615fff] hover:bg-[#615fff]/20'
+                                    ? 'bg-[#E61C24] text-white border-transparent'
+                                    : 'bg-[#E61C24]/10 border-[#E61C24]/20 text-[#E61C24] hover:bg-[#E61C24]/20'
                                 }`}
                               >
                                 #{t.tag}
@@ -365,7 +365,7 @@ export default function BlogsPageClient({ initialBlogs }: { initialBlogs: BlogIt
                         <div className="flex items-center justify-end gap-2.5">
                           <button 
                             onClick={() => router.push(`/admin/blogs/${blog.id}/edit`)} 
-                            className="h-9 px-3.5 inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/20 text-base font-bold text-[#615fff] hover:text-white transition-all cursor-pointer hover:shadow-lg hover:shadow-[#615fff]/10"
+                            className="h-9 px-3.5 inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#E61C24]/10 hover:bg-[#E61C24] border border-[#E61C24]/20 text-base font-bold text-[#E61C24] hover:text-white transition-all cursor-pointer hover:shadow-lg hover:shadow-[#E61C24]/10"
                             title="Edit Article"
                           >
                             <FiEdit className="h-4 w-4" />

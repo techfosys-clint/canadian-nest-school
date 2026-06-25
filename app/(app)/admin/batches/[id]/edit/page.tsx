@@ -131,7 +131,7 @@ export default function EditBatchPage({ params }: Props) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+          <div className="h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
           <p className="text-base font-bold text-slate-500">Loading batch details...</p>
         </div>
       </div>
@@ -150,14 +150,14 @@ export default function EditBatchPage({ params }: Props) {
           <FiArrowLeft className="h-5 w-5" />
           <span>Back to Batches</span>
         </button>
-        <span className="text-base font-bold text-[#615fff] bg-[#615fff]/10 px-4 py-1.5 rounded-lg uppercase tracking-wider">
+        <span className="text-base font-bold text-[#E61C24] bg-[#E61C24]/10 px-4 py-1.5 rounded-lg uppercase tracking-wider">
           Edit Mode
         </span>
       </div>
 
       <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
         <div className="px-6 py-5 bg-slate-50 border-b border-slate-200 flex items-center gap-2.5 select-none">
-          <FiUsers className="text-[#615fff] h-6 w-6" />
+          <FiUsers className="text-[#E61C24] h-6 w-6" />
           <h1 className="text-xl font-bold text-slate-800">Update Intake Batch</h1>
         </div>
 
@@ -185,7 +185,7 @@ export default function EditBatchPage({ params }: Props) {
               value={batchName}
               onChange={(e) => setBatchName(e.target.value)}
               placeholder="e.g. Batch 1 / Jan Intake 2026"
-              className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/60 rounded-lg px-4 py-3.5 text-base font-semibold text-slate-800 outline-none"
+              className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/60 rounded-lg px-4 py-3.5 text-base font-semibold text-slate-800 outline-none"
             />
           </div>
 
@@ -207,7 +207,7 @@ export default function EditBatchPage({ params }: Props) {
               <select
                 value={selectedInstructor}
                 onChange={(e) => setSelectedInstructor(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/60 rounded-lg px-4 py-3.5 text-base font-semibold text-slate-800 outline-none cursor-pointer"
+                className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/60 rounded-lg px-4 py-3.5 text-base font-semibold text-slate-800 outline-none cursor-pointer"
               >
                 {instructors.map(inst => (
                   <option key={inst._id} value={inst._id}>{inst.name} ({inst.role})</option>
@@ -225,7 +225,7 @@ export default function EditBatchPage({ params }: Props) {
                 required
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/60 rounded-lg px-4 py-3.5 text-base font-semibold text-slate-800 outline-none cursor-pointer"
+                className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/60 rounded-lg px-4 py-3.5 text-base font-semibold text-slate-800 outline-none cursor-pointer"
               />
             </div>
             <div className="space-y-1.5">
@@ -235,7 +235,7 @@ export default function EditBatchPage({ params }: Props) {
                 required
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/60 rounded-lg px-4 py-3.5 text-base font-semibold text-slate-800 outline-none cursor-pointer"
+                className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/60 rounded-lg px-4 py-3.5 text-base font-semibold text-slate-800 outline-none cursor-pointer"
               />
             </div>
           </div>
@@ -249,7 +249,7 @@ export default function EditBatchPage({ params }: Props) {
                   key={st}
                   className={`flex-1 flex items-center justify-center py-3 rounded-lg text-base font-bold uppercase tracking-wide cursor-pointer transition-all ${
                     status === st 
-                      ? 'bg-[#615fff] text-white shadow shadow-[#615fff]/20' 
+                      ? 'bg-[#E61C24] text-white shadow shadow-[#E61C24]/20' 
                       : 'text-slate-400 hover:text-slate-600'
                   }`}
                 >
@@ -271,7 +271,7 @@ export default function EditBatchPage({ params }: Props) {
           <div className="pt-4 border-t border-slate-200 flex items-center justify-end select-none">
             <button
               type="submit"
-              className="w-full px-6 py-4 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base transition-colors inline-flex items-center justify-center gap-2 cursor-pointer border-none shadow-md shadow-[#615fff]/15"
+              className="w-full px-6 py-4 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-colors inline-flex items-center justify-center gap-2 cursor-pointer border-none shadow-md shadow-[#E61C24]/15"
             >
               <FiSave className="h-5 w-5" />
               <span>Update Intake Batch</span>

@@ -182,7 +182,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
                 required
                 value={courseId}
                 onChange={(e) => setCourseId(e.target.value)}
-                className="bg-slate-50 border border-slate-200 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none w-full transition-all focus:ring-2 focus:ring-[#615fff]/40 cursor-pointer shadow-sm"
+                className="bg-slate-50 border border-slate-200 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none w-full transition-all focus:ring-2 focus:ring-[#E61C24]/40 cursor-pointer shadow-sm"
               >
                 <option value="">-- Select Target Course --</option>
                 {courses.map((c) => (
@@ -202,7 +202,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
                     type="checkbox"
                     checked={isCustomStudent}
                     onChange={(e) => setIsCustomStudent(e.target.checked)}
-                    className="rounded border-none bg-slate-100 text-[#615fff] focus:ring-0 h-4.5 w-4.5"
+                    className="rounded border-none bg-slate-100 text-[#E61C24] focus:ring-0 h-4.5 w-4.5"
                   />
                   <span className="text-base font-semibold text-slate-500">Add Custom Student on the fly</span>
                 </label>
@@ -221,7 +221,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
                         value={customStudentName}
                         onChange={(e) => setCustomStudentName(e.target.value)}
                         placeholder="e.g. John Doe"
-                        className="bg-white border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-all"
+                        className="bg-white border-none focus:ring-2 focus:ring-[#E61C24]/40 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-all"
                       />
                     </div>
                     <div className="flex flex-col gap-2">
@@ -232,7 +232,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
                         value={customStudentEmail}
                         onChange={(e) => setCustomStudentEmail(e.target.value)}
                         placeholder="e.g. john@example.com"
-                        className="bg-white border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-all"
+                        className="bg-white border-none focus:ring-2 focus:ring-[#E61C24]/40 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-all"
                       />
                     </div>
                   </div>
@@ -261,7 +261,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
                         <button
                           type="button"
                           onClick={() => setShowMediaPicker(true)}
-                          className="flex items-center gap-1.5 px-4.5 py-2 rounded-lg bg-[#615fff]/15 hover:bg-[#615fff]/25 text-[#9693ff] font-bold text-sm cursor-pointer transition-colors"
+                          className="flex items-center gap-1.5 px-4.5 py-2 rounded-lg bg-[#E61C24]/15 hover:bg-[#E61C24]/25 text-[#9693ff] font-bold text-sm cursor-pointer transition-colors"
                         >
                           <FiImage className="h-4.5 w-4.5" />
                           <span>Media Library</span>
@@ -287,7 +287,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
                   required
                   value={selectedStudentId}
                   onChange={(e) => setSelectedStudentId(e.target.value)}
-                  className="bg-slate-50 border border-slate-200 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none w-full transition-all focus:ring-2 focus:ring-[#615fff]/40 cursor-pointer shadow-sm"
+                  className="bg-slate-50 border border-slate-200 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none w-full transition-all focus:ring-2 focus:ring-[#E61C24]/40 cursor-pointer shadow-sm"
                 >
                   <option value="">-- Choose Existing Student Profile --</option>
                   {students.map((s) => (
@@ -337,7 +337,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Write student testimonial / experience feedback..."
-                className="bg-slate-100 border-none focus:ring-2 focus:ring-[#615fff]/40 text-slate-800 rounded-lg p-4 text-base font-semibold outline-none w-full transition-all resize-none shadow-sm"
+                className="bg-slate-100 border-none focus:ring-2 focus:ring-[#E61C24]/40 text-slate-800 rounded-lg p-4 text-base font-semibold outline-none w-full transition-all resize-none shadow-sm"
               />
             </div>
 
@@ -356,7 +356,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as any)}
-                className="bg-slate-50 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-all focus:ring-2 focus:ring-[#615fff]/40 cursor-pointer shadow-sm"
+                className="bg-slate-50 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-all focus:ring-2 focus:ring-[#E61C24]/40 cursor-pointer shadow-sm"
               >
                 <option value="approved">Approved & Live (Instant Publish)</option>
                 <option value="pending">Pending Admin Review</option>
@@ -369,7 +369,7 @@ export default function ReviewFormClient({ courses, students }: ReviewFormClient
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full py-3.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base shadow-lg shadow-[#615fff]/20 hover:shadow-[#615fff]/30 transition-all duration-300 cursor-pointer flex items-center justify-center border-none ${
+              className={`w-full py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-lg shadow-[#E61C24]/20 hover:shadow-[#E61C24]/30 transition-all duration-300 cursor-pointer flex items-center justify-center border-none ${
                 isSubmitting ? 'opacity-50 pointer-events-none' : ''
               }`}
             >

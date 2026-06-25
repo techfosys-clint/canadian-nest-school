@@ -25,6 +25,17 @@ export default function RegisterForm() {
   const [otpVerified, setOtpVerified] = useState(false)
   const [sendingOtp, setSendingOtp] = useState(false)
   const [verifyingOtp, setVerifyingOtp] = useState(false)
+  const [resendTimer, setResendTimer] = useState(0)
+
+  React.useEffect(() => {
+    let interval: any
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1)
+      }, 1000)
+    }
+    return () => clearInterval(interval)
+  }, [resendTimer])
 
   const handleSendOtp = async () => {
     if (!phone) {
@@ -32,27 +43,29 @@ export default function RegisterForm() {
         icon: 'error',
         title: 'Phone Number Required',
         text: 'Please enter your phone number first.',
-        confirmButtonColor: '#615fff',
+        confirmButtonColor: '#E61C24',
       })
       return
     }
 
     setSendingOtp(true)
     try {
+      const formattedPhone = '+880' + phone
       const res = await fetch('/api/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone }),
+        body: JSON.stringify({ phone: formattedPhone }),
       })
       const data = await res.json()
 
       if (res.ok) {
         setOtpSent(true)
+        setResendTimer(60)
         Swal.fire({
           icon: 'success',
           title: 'OTP Sent',
           text: 'Please check your phone for the verification code.',
-          confirmButtonColor: '#615fff',
+          confirmButtonColor: '#E61C24',
         })
       } else {
         throw new Error(data.error || 'Failed to send OTP.')
@@ -62,7 +75,7 @@ export default function RegisterForm() {
         icon: 'error',
         title: 'Failed to Send OTP',
         text: err.message || 'Something went wrong.',
-        confirmButtonColor: '#615fff',
+        confirmButtonColor: '#E61C24',
       })
     } finally {
       setSendingOtp(false)
@@ -75,17 +88,18 @@ export default function RegisterForm() {
         icon: 'error',
         title: 'OTP Required',
         text: 'Please enter the verification code sent to your phone.',
-        confirmButtonColor: '#615fff',
+        confirmButtonColor: '#E61C24',
       })
       return
     }
 
     setVerifyingOtp(true)
     try {
+      const formattedPhone = '+880' + phone
       const res = await fetch('/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, otp }),
+        body: JSON.stringify({ phone: formattedPhone, otp }),
       })
       const data = await res.json()
 
@@ -95,7 +109,7 @@ export default function RegisterForm() {
           icon: 'success',
           title: 'Phone Verified!',
           text: 'Your phone number has been verified successfully.',
-          confirmButtonColor: '#615fff',
+          confirmButtonColor: '#E61C24',
         })
       } else {
         throw new Error(data.error || 'Incorrect OTP.')
@@ -105,7 +119,7 @@ export default function RegisterForm() {
         icon: 'error',
         title: 'Verification Failed',
         text: err.message || 'Something went wrong.',
-        confirmButtonColor: '#615fff',
+        confirmButtonColor: '#E61C24',
       })
     } finally {
       setVerifyingOtp(false)
@@ -119,7 +133,7 @@ export default function RegisterForm() {
           icon: 'error',
           title: 'Missing Fields',
           text: 'Please enter your name and mobile number.',
-          confirmButtonColor: '#615fff',
+          confirmButtonColor: '#E61C24',
         })
         return
       }
@@ -128,7 +142,7 @@ export default function RegisterForm() {
           icon: 'error',
           title: 'Phone Not Verified',
           text: 'Please verify your mobile number with the OTP code first.',
-          confirmButtonColor: '#615fff',
+          confirmButtonColor: '#E61C24',
         })
         return
       }
@@ -139,7 +153,7 @@ export default function RegisterForm() {
           icon: 'error',
           title: 'Email Required',
           text: 'Please enter your email address to continue.',
-          confirmButtonColor: '#615fff',
+          confirmButtonColor: '#E61C24',
         })
         return
       }
@@ -159,7 +173,7 @@ export default function RegisterForm() {
         icon: 'error',
         title: 'Weak Password',
         text: 'Password must be at least 6 characters long.',
-        confirmButtonColor: '#615fff',
+        confirmButtonColor: '#E61C24',
       })
       return
     }
@@ -169,7 +183,7 @@ export default function RegisterForm() {
         icon: 'error',
         title: 'Passwords Do Not Match',
         text: 'Please make sure both password fields match.',
-        confirmButtonColor: '#615fff',
+        confirmButtonColor: '#E61C24',
       })
       return
     }
@@ -179,7 +193,7 @@ export default function RegisterForm() {
         icon: 'warning',
         title: 'Terms & Conditions',
         text: 'Please accept the Terms and Conditions to complete your registration.',
-        confirmButtonColor: '#615fff',
+        confirmButtonColor: '#E61C24',
       })
       return
     }
@@ -194,7 +208,7 @@ export default function RegisterForm() {
           name,
           email,
           password,
-          phone,
+          phone: '+880' + phone,
           role: 'student'
         }),
       })
@@ -221,7 +235,7 @@ export default function RegisterForm() {
         icon: 'error',
         title: 'Sign Up Failed',
         text: err.message || 'Something went wrong.',
-        confirmButtonColor: '#615fff',
+        confirmButtonColor: '#E61C24',
       })
     } finally {
       setLoading(false)
@@ -234,8 +248,8 @@ export default function RegisterForm() {
       {/* Left Side: Premium Navy Branding Column (Hidden on Mobile) */}
       <div className="hidden lg:flex w-1/2 bg-[#0A163A] text-white flex-col justify-between p-16 relative overflow-hidden select-none">
         {/* Soft glowing purple blur gradient blobs */}
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#615fff]/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#543cdf]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#E61C24]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#CC181F]/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Top: Logo */}
         <Link href="/" className="flex items-center group bg-white px-3 py-1.5 rounded-lg shadow-sm z-10 self-start">
@@ -248,12 +262,12 @@ export default function RegisterForm() {
 
         {/* Middle: Brand Messages */}
         <div className="flex flex-col gap-6 z-10 my-auto">
-          <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-white/5 border border-white/10 text-base font-bold text-[#615fff] uppercase tracking-wider self-start">
+          <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-white/5 border border-white/10 text-base font-bold text-[#E61C24] uppercase tracking-wider self-start">
             Student Platform
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold font-display tracking-tight leading-tight text-white">
             Unlock your <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#615fff] to-[#807eff]">Learning Potential</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E61C24] to-[#FF4D55]">Learning Potential</span>
           </h1>
           <p className="text-zinc-400 text-lg max-w-md font-medium leading-relaxed">
             Access world-class interactive courses, learn from top global instructors, and track your progress all in one single, powerful space.
@@ -287,7 +301,7 @@ export default function RegisterForm() {
 
           {/* Form Header */}
           <div className="flex flex-col items-start mb-8">
-            <span className="text-base font-bold text-[#615fff] uppercase tracking-wider mb-2">
+            <span className="text-base font-bold text-[#E61C24] uppercase tracking-wider mb-2">
               Get Started
             </span>
             <h2 className="text-3xl font-bold text-zinc-900 tracking-tight font-display">
@@ -303,7 +317,7 @@ export default function RegisterForm() {
                   <div 
                     className={`h-9 w-9 rounded-full flex items-center justify-center font-bold text-base border-2 transition-all duration-300 ${
                       step >= s 
-                        ? 'bg-[#615fff] border-[#615fff] text-white' 
+                        ? 'bg-[#E61C24] border-[#E61C24] text-white' 
                         : 'border-zinc-200 text-zinc-400 bg-white'
                     }`}
                   >
@@ -316,7 +330,7 @@ export default function RegisterForm() {
                 {s < 3 && (
                   <div className="flex-1 h-0.5 mx-3 bg-zinc-200 relative overflow-hidden">
                     <div 
-                      className="absolute inset-y-0 left-0 bg-[#615fff] transition-all duration-500"
+                      className="absolute inset-y-0 left-0 bg-[#E61C24] transition-all duration-500"
                       style={{ width: step > s ? '100%' : '0%' }}
                     />
                   </div>
@@ -355,7 +369,7 @@ export default function RegisterForm() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="John Doe"
-                        className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
+                        className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
                       />
                     </div>
                   </div>
@@ -369,6 +383,7 @@ export default function RegisterForm() {
                       <div className="relative flex-1">
                         <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
                           <FiPhone className="h-5 w-5" />
+                          <span className="ml-2 text-zinc-800 font-bold border-r border-zinc-200 pr-2">+880</span>
                         </span>
                         <input
                           id="phone"
@@ -376,18 +391,23 @@ export default function RegisterForm() {
                           required
                           disabled={otpVerified}
                           value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          placeholder="01XXXXXXXXX"
-                          className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500"
+                          onChange={(e) => {
+                            let val = e.target.value.replace(/[^0-9]/g, '')
+                            if (val.startsWith('880')) val = val.substring(3)
+                            if (val.startsWith('0')) val = val.substring(1)
+                            setPhone(val)
+                          }}
+                          placeholder="1XXXXXXXXX"
+                          className="w-full pl-[95px] pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500"
                         />
                       </div>
                       <button
                         type="button"
                         onClick={handleSendOtp}
-                        disabled={sendingOtp || otpVerified}
-                        className="px-4 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        disabled={sendingOtp || otpVerified || resendTimer > 0}
+                        className="min-w-[120px] flex items-center justify-center px-4 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                       >
-                        {sendingOtp ? '...' : otpVerified ? <FiCheck className="h-5 w-5" /> : otpSent ? 'Resend' : 'Send OTP'}
+                        {sendingOtp ? <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : otpVerified ? <FiCheck className="h-5 w-5" /> : resendTimer > 0 ? `Wait ${resendTimer}s` : otpSent ? 'Resend' : 'Send OTP'}
                       </button>
                     </div>
                   </div>
@@ -405,16 +425,16 @@ export default function RegisterForm() {
                         value={otp}
                         onChange={(e) => setOtp(e.target.value)}
                         placeholder="6-digit code"
-                        className="flex-1 px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500"
+                        className="flex-1 px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500"
                         disabled={otpVerified}
                       />
                       <button
                         type="button"
                         onClick={handleVerifyOtp}
                         disabled={verifyingOtp || otpVerified || !otp}
-                        className="px-4 rounded-lg bg-[#615fff] hover:bg-[#615fff]/95 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        className="min-w-[120px] flex items-center justify-center px-4 rounded-lg bg-[#E61C24] hover:bg-[#E61C24]/95 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                       >
-                        {verifyingOtp ? '...' : otpVerified ? <FiCheck className="h-5 w-5" /> : 'Verify'}
+                        {verifyingOtp ? <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : otpVerified ? <FiCheck className="h-5 w-5" /> : 'Verify'}
                       </button>
                     </div>
                   </div>
@@ -424,7 +444,7 @@ export default function RegisterForm() {
                     type="button"
                     onClick={handleNextStep}
                     disabled={!name || !phone || !otpVerified}
-                    className="w-full flex items-center justify-center gap-2 py-3.5 mt-4 rounded-lg bg-[#615fff] hover:bg-[#615fff]/95 text-white font-bold text-base shadow-lg shadow-[#615fff]/15 hover:shadow-[#615fff]/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    className="w-full flex items-center justify-center gap-2 py-3.5 mt-4 rounded-lg bg-[#E61C24] hover:bg-[#E61C24]/95 text-white font-bold text-base shadow-lg shadow-[#E61C24]/15 hover:shadow-[#E61C24]/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   >
                     Continue
                     <FiArrowRight className="h-5 w-5" />
@@ -458,7 +478,7 @@ export default function RegisterForm() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="you@example.com"
-                        className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
+                        className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
                       />
                     </div>
                   </div>
@@ -476,7 +496,7 @@ export default function RegisterForm() {
                         id="academic"
                         value={academicLevel}
                         onChange={(e) => setAcademicLevel(e.target.value)}
-                        className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-semibold text-zinc-700 bg-white cursor-pointer appearance-none"
+                        className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-700 bg-white cursor-pointer appearance-none"
                       >
                         <option value="High School">High School</option>
                         <option value="College/University">College / University</option>
@@ -504,7 +524,7 @@ export default function RegisterForm() {
                     <button
                       type="button"
                       onClick={handleNextStep}
-                      className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#615fff] hover:bg-[#615fff]/95 text-white font-bold text-base shadow-lg shadow-[#615fff]/15 hover:shadow-[#615fff]/25 transition-all cursor-pointer"
+                      className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#E61C24]/95 text-white font-bold text-base shadow-lg shadow-[#E61C24]/15 hover:shadow-[#E61C24]/25 transition-all cursor-pointer"
                     >
                       Continue
                       <FiArrowRight className="h-5 w-5" />
@@ -540,7 +560,7 @@ export default function RegisterForm() {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="••••••••"
-                          className="w-full pl-11 pr-11 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
+                          className="w-full pl-11 pr-11 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
                         />
                         <button
                           type="button"
@@ -568,7 +588,7 @@ export default function RegisterForm() {
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           placeholder="••••••••"
-                          className="w-full pl-11 pr-11 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
+                          className="w-full pl-11 pr-11 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
                         />
                         <button
                           type="button"
@@ -588,10 +608,10 @@ export default function RegisterForm() {
                         required
                         checked={termsAccepted}
                         onChange={(e) => setTermsAccepted(e.target.checked)}
-                        className="mt-1 h-5 w-5 rounded border-zinc-300 text-[#615fff] focus:ring-[#615fff] cursor-pointer"
+                        className="mt-1 h-5 w-5 rounded border-zinc-300 text-[#E61C24] focus:ring-[#E61C24] cursor-pointer"
                       />
                       <label htmlFor="terms" className="text-base font-semibold text-zinc-500 cursor-pointer select-none">
-                        I agree to the <span className="text-[#615fff] hover:underline font-bold">Terms of Service</span> and <span className="text-[#615fff] hover:underline font-bold">Privacy Policy</span>.
+                        I agree to the <span className="text-[#E61C24] hover:underline font-bold">Terms of Service</span> and <span className="text-[#E61C24] hover:underline font-bold">Privacy Policy</span>.
                       </label>
                     </div>
 
@@ -607,7 +627,7 @@ export default function RegisterForm() {
                       <button
                         type="submit"
                         disabled={loading || !password || !confirmPassword || !termsAccepted}
-                        className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#615fff] hover:bg-[#615fff]/95 text-white font-bold text-base shadow-lg shadow-[#615fff]/15 hover:shadow-[#615fff]/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#E61C24]/95 text-white font-bold text-base shadow-lg shadow-[#E61C24]/15 hover:shadow-[#E61C24]/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                       >
                         {loading ? (
                           <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -628,7 +648,7 @@ export default function RegisterForm() {
             Already have an account?{' '}
             <Link 
               href="/login" 
-              className="text-[#615fff] hover:text-[#543cdf] font-bold transition-colors"
+              className="text-[#E61C24] hover:text-[#CC181F] font-bold transition-colors"
             >
               Sign In
             </Link>

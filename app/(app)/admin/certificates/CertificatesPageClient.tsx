@@ -324,7 +324,7 @@ export default function CertificatesPageClient() {
           </button>
           <div>
             <h1 className="text-3xl font-bold font-display text-slate-800 flex items-center gap-2">
-              <FiAward className="text-[#615fff]" /> Review Student Certificate
+              <FiAward className="text-[#E61C24]" /> Review Student Certificate
             </h1>
             <p className="text-base font-semibold text-slate-500 mt-1">
               Verify student syllabus progression and manage verified PDF/Image completions credentials
@@ -346,7 +346,7 @@ export default function CertificatesPageClient() {
 
               {loadingGrades ? (
                 <div className="py-8 flex flex-col items-center justify-center gap-3">
-                  <div className="h-8 w-8 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+                  <div className="h-8 w-8 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
                   <p className="text-base font-semibold text-slate-500 animate-pulse">Loading student grades...</p>
                 </div>
               ) : studentSubmissions.length === 0 ? (
@@ -383,7 +383,7 @@ export default function CertificatesPageClient() {
                           <p className="text-xl font-bold text-slate-800">
                             {totalQuizCorrect} / {totalQuizQuestions} Qs
                           </p>
-                          <p className="text-base font-semibold text-[#615fff] mt-0.5">
+                          <p className="text-base font-semibold text-[#E61C24] mt-0.5">
                             {Math.round((totalQuizCorrect / totalQuizQuestions) * 100)}% Score
                           </p>
                         </div>
@@ -409,7 +409,7 @@ export default function CertificatesPageClient() {
                             <div className="flex items-center gap-2 mt-1">
                               <span className={`inline-flex px-2 py-0.5 rounded text-base font-bold uppercase select-none ${
                                 sub.type === 'assignment' 
-                                  ? 'bg-[#615fff]/10 text-[#615fff] border border-[#615fff]/20'
+                                  ? 'bg-[#E61C24]/10 text-[#E61C24] border border-[#E61C24]/20'
                                   : 'bg-indigo-50 text-indigo-600 border border-indigo-200'
                               }`}>
                                 {sub.type}
@@ -444,7 +444,7 @@ export default function CertificatesPageClient() {
             {/* Student Context Card */}
             <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4 shadow-sm">
               <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3 select-none font-display">
-                <FiInfo className="text-[#615fff] h-5 w-5" /> Student Account Details
+                <FiInfo className="text-[#E61C24] h-5 w-5" /> Student Account Details
               </h3>
               
               <div className="space-y-3 font-sans select-text">
@@ -464,7 +464,7 @@ export default function CertificatesPageClient() {
                 )}
                 <div className="pt-3 border-t border-slate-100">
                   <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Course Syllabus Program</p>
-                  <p className="text-base font-bold text-[#615fff] mt-1">{activeRequest.course?.title || 'Unknown Syllabus'}</p>
+                  <p className="text-base font-bold text-[#E61C24] mt-1">{activeRequest.course?.title || 'Unknown Syllabus'}</p>
                 </div>
               </div>
             </div>
@@ -479,7 +479,7 @@ export default function CertificatesPageClient() {
                 <div className="flex justify-between items-center">
                   <span className="text-base font-semibold text-slate-500">Total Completion</span>
                   <span className={`text-xl font-bold ${
-                    activeRequest.progress === 100 ? 'text-emerald-600' : 'text-[#615fff]'
+                    activeRequest.progress === 100 ? 'text-emerald-600' : 'text-[#E61C24]'
                   }`}>
                     {activeRequest.progress}%
                   </span>
@@ -489,7 +489,7 @@ export default function CertificatesPageClient() {
                 <div className="w-full bg-slate-100 h-3 rounded-lg overflow-hidden border border-slate-200">
                   <div 
                     className={`h-full rounded-lg transition-all duration-300 ${
-                      activeRequest.progress === 100 ? 'bg-emerald-500' : 'bg-[#615fff]'
+                      activeRequest.progress === 100 ? 'bg-emerald-500' : 'bg-[#E61C24]'
                     }`}
                     style={{ width: `${activeRequest.progress}%` }}
                   />
@@ -510,7 +510,7 @@ export default function CertificatesPageClient() {
           {/* Right Panel: Grading/Update Form */}
           <div className="lg:col-span-2 bg-white border border-slate-200 rounded-lg p-6 space-y-6 shadow-sm">
             <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3 select-none font-display">
-              <FiEdit3 className="text-[#615fff] h-5 w-5" /> Manage Request Actions
+              <FiEdit3 className="text-[#E61C24] h-5 w-5" /> Manage Request Actions
             </h3>
             
             <form onSubmit={handleSave} className="space-y-6">
@@ -521,7 +521,7 @@ export default function CertificatesPageClient() {
                 <select
                   value={status}
                   onChange={(e: any) => setStatus(e.target.value)}
-                  className="bg-slate-50 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full cursor-pointer focus:border-[#615fff]/80 transition-colors"
+                  className="bg-slate-50 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full cursor-pointer focus:border-[#E61C24]/80 transition-colors"
                 >
                   <option value="pending">Pending Review</option>
                   <option value="approved">Approve & Release Certificate</option>
@@ -535,7 +535,7 @@ export default function CertificatesPageClient() {
                 
                 {uploadingPdf ? (
                   <div className="border border-slate-200 bg-slate-50 p-10 rounded-lg text-center flex flex-col items-center justify-center gap-3 select-none">
-                    <div className="h-8 w-8 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+                    <div className="h-8 w-8 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
                     <p className="text-base font-semibold text-slate-500">Uploading file to media library...</p>
                   </div>
                 ) : certificateUrl ? (
@@ -548,7 +548,7 @@ export default function CertificatesPageClient() {
                           href={certificateUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm font-semibold text-[#615fff] hover:underline flex items-center gap-1.5 mt-0.5 truncate inline-block max-w-[320px]"
+                          className="text-sm font-semibold text-[#E61C24] hover:underline flex items-center gap-1.5 mt-0.5 truncate inline-block max-w-[320px]"
                         >
                           Open Uploaded File <FiExternalLink className="h-3 w-3" />
                         </a>
@@ -566,10 +566,10 @@ export default function CertificatesPageClient() {
                 ) : (
                   <div 
                     onClick={() => fileInputRef.current?.click()}
-                    className="border-2 border-dashed border-slate-300 hover:border-[#615fff]/60 bg-slate-50 p-12 rounded-lg text-center cursor-pointer transition-colors select-none group"
+                    className="border-2 border-dashed border-slate-300 hover:border-[#E61C24]/60 bg-slate-50 p-12 rounded-lg text-center cursor-pointer transition-colors select-none group"
                   >
-                    <FiUploadCloud className="h-10 w-10 text-slate-400 group-hover:text-[#615fff] mx-auto mb-3 transition-colors" />
-                    <p className="text-base font-bold text-slate-700 group-hover:text-[#615fff] transition-colors">Upload Certificate Document</p>
+                    <FiUploadCloud className="h-10 w-10 text-slate-400 group-hover:text-[#E61C24] mx-auto mb-3 transition-colors" />
+                    <p className="text-base font-bold text-slate-700 group-hover:text-[#E61C24] transition-colors">Upload Certificate Document</p>
                     <p className="text-sm font-semibold text-slate-400 mt-1">Supports PDF, PNG, JPG, or JPEG formats</p>
                   </div>
                 )}
@@ -592,7 +592,7 @@ export default function CertificatesPageClient() {
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
                   placeholder="Provide guidance details or feedback notes for the student..."
-                  className="bg-slate-50 border border-slate-200 focus:border-[#615fff]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full resize-none focus:ring-1 focus:ring-[#615fff]/80 transition-all font-sans"
+                  className="bg-slate-50 border border-slate-200 focus:border-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full resize-none focus:ring-1 focus:ring-[#E61C24]/80 transition-all font-sans"
                 />
               </div>
 
@@ -608,7 +608,7 @@ export default function CertificatesPageClient() {
                 <button
                   type="submit"
                   disabled={saving || uploadingPdf}
-                  className="px-5 py-3 bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base rounded-lg flex-1 cursor-pointer transition-all shadow-md shadow-[#615fff]/15 border-none disabled:opacity-50"
+                  className="px-5 py-3 bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base rounded-lg flex-1 cursor-pointer transition-all shadow-md shadow-[#E61C24]/15 border-none disabled:opacity-50"
                 >
                   {saving ? 'Saving...' : 'Save Updates'}
                 </button>
@@ -630,7 +630,7 @@ export default function CertificatesPageClient() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
           <h1 className="text-3xl font-bold font-display text-slate-800 flex items-center gap-2">
-            <FiAward className="text-[#615fff]" /> Student Certificate Requests
+            <FiAward className="text-[#E61C24]" /> Student Certificate Requests
           </h1>
           <p className="text-base font-semibold text-slate-500 mt-1">
             Review student lecture progress and upload completed PDF certificates
@@ -648,7 +648,7 @@ export default function CertificatesPageClient() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search by student name, email, or course..."
-            className="bg-slate-50 border border-slate-200 focus:border-[#615fff]/80 text-slate-800 rounded-lg pl-10 pr-4 py-3 text-base font-semibold outline-none w-full transition-colors"
+            className="bg-slate-50 border border-slate-200 focus:border-[#E61C24]/80 text-slate-800 rounded-lg pl-10 pr-4 py-3 text-base font-semibold outline-none w-full transition-colors"
           />
         </div>
 
@@ -672,7 +672,7 @@ export default function CertificatesPageClient() {
       <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
         {loading ? (
           <div className="p-16 text-center">
-            <div className="h-10 w-10 border-2 border-[#615fff] border-t-transparent rounded-full animate-spin mx-auto" />
+            <div className="h-10 w-10 border-2 border-[#E61C24] border-t-transparent rounded-full animate-spin mx-auto" />
             <p className="text-base font-semibold text-slate-400 mt-4">Loading certificate requests...</p>
           </div>
         ) : filteredRequests.length === 0 ? (
@@ -726,14 +726,14 @@ export default function CertificatesPageClient() {
                           <span className={`inline-flex h-9 w-14 rounded-lg items-center justify-center font-bold text-sm border ${
                             req.progress === 100 
                               ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
-                              : 'bg-[#615fff]/10 border-[#615fff]/20 text-[#615fff]'
+                              : 'bg-[#E61C24]/10 border-[#E61C24]/20 text-[#E61C24]'
                           }`}>
                             {req.progress}%
                           </span>
                           <div className="w-16 bg-slate-100 h-1.5 rounded-full overflow-hidden">
                             <div 
                               className={`h-full rounded-full transition-all duration-300 ${
-                                req.progress === 100 ? 'bg-emerald-500' : 'bg-[#615fff]'
+                                req.progress === 100 ? 'bg-emerald-500' : 'bg-[#E61C24]'
                               }`}
                               style={{ width: `${req.progress}%` }}
                             />
@@ -764,7 +764,7 @@ export default function CertificatesPageClient() {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleOpenManageModal(req)}
-                            className="p-2.5 rounded-lg bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/20 text-[#615fff] hover:text-white transition-all inline-flex items-center cursor-pointer shadow-sm"
+                            className="p-2.5 rounded-lg bg-[#E61C24]/10 hover:bg-[#E61C24] border border-[#E61C24]/20 text-[#E61C24] hover:text-white transition-all inline-flex items-center cursor-pointer shadow-sm"
                             title="Review & Upload Certificate"
                           >
                             <FiEdit3 className="h-4.5 w-4.5" />

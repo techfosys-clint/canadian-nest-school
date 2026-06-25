@@ -22,7 +22,7 @@ export default function LoginForm() {
         icon: 'error',
         title: 'Missing Fields',
         text: 'Please enter both your email and password.',
-        confirmButtonColor: '#615fff',
+        confirmButtonColor: '#E61C24',
       })
       return
     }
@@ -65,7 +65,7 @@ export default function LoginForm() {
         icon: 'error',
         title: 'Sign In Failed',
         text: err.message || 'Something went wrong.',
-        confirmButtonColor: '#615fff',
+        confirmButtonColor: '#E61C24',
       })
     } finally {
       setLoading(false)
@@ -78,8 +78,8 @@ export default function LoginForm() {
       {/* Left Side: Premium Navy Branding Column (Hidden on Mobile) */}
       <div className="hidden lg:flex w-1/2 bg-[#0A163A] text-white flex-col justify-between p-16 relative overflow-hidden select-none">
         {/* Soft glowing purple blur gradient blobs */}
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#615fff]/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#543cdf]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#E61C24]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#CC181F]/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Top: Logo */}
         <Link href="/" className="flex items-center group bg-white px-3 py-1.5 rounded-lg shadow-sm z-10 self-start">
@@ -92,12 +92,12 @@ export default function LoginForm() {
 
         {/* Middle: Brand Messages */}
         <div className="flex flex-col gap-6 z-10 my-auto">
-          <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-white/5 border border-white/10 text-base font-bold text-[#615fff] uppercase tracking-wider self-start">
+          <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-white/5 border border-white/10 text-base font-bold text-[#E61C24] uppercase tracking-wider self-start">
             Student Portal
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold font-display tracking-tight leading-tight text-white">
             Manage your <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#615fff] to-[#807eff]">Learning Journey</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E61C24] to-[#FF4D55]">Learning Journey</span>
           </h1>
           <p className="text-zinc-400 text-lg max-w-md font-medium leading-relaxed">
             Experience the next generation of online learning. Secure, intuitive, and designed specifically for modern students.
@@ -131,7 +131,7 @@ export default function LoginForm() {
 
           {/* Form Header */}
           <div className="flex flex-col items-start mb-8">
-            <span className="text-base font-bold text-[#615fff] uppercase tracking-wider mb-2">
+            <span className="text-base font-bold text-[#E61C24] uppercase tracking-wider mb-2">
               Welcome Back
             </span>
             <h2 className="text-3xl font-bold text-zinc-900 tracking-tight font-display">
@@ -158,7 +158,7 @@ export default function LoginForm() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com or 01XXXXXXXXX"
-                  className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
+                  className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
                 />
               </div>
             </div>
@@ -179,7 +179,7 @@ export default function LoginForm() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-11 pr-11 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
+                  className="w-full pl-11 pr-11 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white"
                 />
                 <button
                   type="button"
@@ -198,13 +198,13 @@ export default function LoginForm() {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-5 w-5 rounded border-zinc-300 text-[#615fff] focus:ring-[#615fff] cursor-pointer"
+                  className="h-5 w-5 rounded border-zinc-300 text-[#E61C24] focus:ring-[#E61C24] cursor-pointer"
                 />
                 Remember me
               </label>
               <Link 
                 href="/forgot-password" 
-                className="text-[#615fff] hover:text-[#543cdf] transition-colors font-bold"
+                className="text-[#E61C24] hover:text-[#CC181F] transition-colors font-bold"
               >
                 Forgot password?
               </Link>
@@ -216,7 +216,7 @@ export default function LoginForm() {
               whileTap={{ scale: 0.99 }}
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#615fff] hover:bg-[#615fff]/95 text-white font-bold text-base shadow-lg shadow-[#615fff]/15 hover:shadow-[#615fff]/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#E61C24]/95 text-white font-bold text-base shadow-lg shadow-[#E61C24]/15 hover:shadow-[#E61C24]/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {loading ? (
                 <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -234,7 +234,7 @@ export default function LoginForm() {
             Don&apos;t have an account?{' '}
             <Link 
               href="/register" 
-              className="text-[#615fff] hover:text-[#543cdf] font-bold transition-colors"
+              className="text-[#E61C24] hover:text-[#CC181F] font-bold transition-colors"
             >
               Sign Up
             </Link>

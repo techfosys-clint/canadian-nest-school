@@ -133,7 +133,7 @@ export default function LessonsPageClient({ courses }: { courses: CourseOption[]
         {selectedCourseId && (
           <Link
             href={`/admin/lessons/new?courseId=${selectedCourseId}`}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base shadow-md shadow-[#615fff]/20 transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-md shadow-[#E61C24]/20 transition-all cursor-pointer"
           >
             <FiPlus className="h-5 w-5" /> Add New Lesson
           </Link>
@@ -164,7 +164,7 @@ export default function LessonsPageClient({ courses }: { courses: CourseOption[]
         <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
           {loading ? (
             <div className="p-16 text-center">
-              <div className="h-10 w-10 border-2 border-[#615fff] border-t-transparent rounded-full animate-spin mx-auto" />
+              <div className="h-10 w-10 border-2 border-[#E61C24] border-t-transparent rounded-full animate-spin mx-auto" />
               <p className="text-base font-semibold text-slate-400 mt-4">Loading syllabus...</p>
             </div>
           ) : lessons.length === 0 ? (
@@ -214,7 +214,7 @@ export default function LessonsPageClient({ courses }: { courses: CourseOption[]
                           <tr key={lesson.id} className="hover:bg-slate-50 transition-colors">
                             {/* Order */}
                             <td className="px-6 py-4 text-center">
-                              <span className="inline-flex h-9 w-9 rounded-lg bg-[#615fff]/15 border border-[#615fff]/20 items-center justify-center font-bold text-[#615fff]">
+                              <span className="inline-flex h-9 w-9 rounded-lg bg-[#E61C24]/15 border border-[#E61C24]/20 items-center justify-center font-bold text-[#E61C24]">
                                 {lesson.order}
                               </span>
                             </td>
@@ -280,7 +280,7 @@ export default function LessonsPageClient({ courses }: { courses: CourseOption[]
                               <div className="flex items-center justify-end gap-2.5">
                                 <Link
                                   href={`/admin/lessons/${lesson.id}/edit`}
-                                  className="p-2 rounded-lg bg-[#615fff]/10 hover:bg-[#615fff] border border-[#615fff]/20 text-[#615fff] hover:text-white transition-all duration-200 hover:scale-105 inline-flex items-center shadow-sm cursor-pointer"
+                                  className="p-2 rounded-lg bg-[#E61C24]/10 hover:bg-[#E61C24] border border-[#E61C24]/20 text-[#E61C24] hover:text-white transition-all duration-200 hover:scale-105 inline-flex items-center shadow-sm cursor-pointer"
                                 >
                                   <FiEdit className="h-4.5 w-4.5" />
                                 </Link>

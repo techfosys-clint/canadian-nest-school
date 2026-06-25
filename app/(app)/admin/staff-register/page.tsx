@@ -51,7 +51,7 @@ export default async function StaffRegisterPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 tracking-tight flex items-center gap-2.5">
-            <FiUserPlus className="text-[#615fff] h-6 w-6" />
+            <FiUserPlus className="text-[#E61C24] h-6 w-6" />
             Staff & Faculty Registry
           </h1>
           <p className="text-base font-semibold text-slate-500 mt-1">

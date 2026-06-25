@@ -26,12 +26,12 @@ function ResetPasswordFormContent() {
         icon: 'error',
         title: 'Invalid Reset Link',
         text: 'The password reset token is missing. Please request a new link.',
-        confirmButtonColor: '#615fff',
+        confirmButtonColor: '#E61C24',
         background: '#1a1a1a',
         color: '#ffffff',
         customClass: {
           popup: 'rounded-lg',
-          confirmButton: 'rounded-lg text-base font-bold px-6 py-2.5 bg-[#615fff]',
+          confirmButton: 'rounded-lg text-base font-bold px-6 py-2.5 bg-[#E61C24]',
         },
       })
       return
@@ -95,14 +95,14 @@ function ResetPasswordFormContent() {
             className="h-11 w-auto object-contain"
           />
         </Link>
-        <span className="px-2.5 py-0.5 text-base font-bold text-[#615fff] bg-[#615fff]/10 rounded-lg border border-[#615fff]/20 uppercase">
+        <span className="px-2.5 py-0.5 text-base font-bold text-[#E61C24] bg-[#E61C24]/10 rounded-lg border border-[#E61C24]/20 uppercase">
           Reset
         </span>
       </div>
 
       {/* Form Header */}
       <div className="space-y-2">
-        <p className="text-[#615fff] text-base font-bold uppercase tracking-wider">
+        <p className="text-[#E61C24] text-base font-bold uppercase tracking-wider">
           Security Update
         </p>
         <h2 className="text-3xl font-bold tracking-tight text-zinc-900 font-display">
@@ -135,7 +135,7 @@ function ResetPasswordFormContent() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full pl-11 pr-11 py-3.5 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-4 focus:ring-[#615fff]/10 outline-none text-base font-semibold text-zinc-900 bg-white transition-all placeholder-zinc-400"
+              className="w-full pl-11 pr-11 py-3.5 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-4 focus:ring-[#E61C24]/10 outline-none text-base font-semibold text-zinc-900 bg-white transition-all placeholder-zinc-400"
             />
             <button
               type="button"
@@ -161,7 +161,7 @@ function ResetPasswordFormContent() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full pl-11 pr-11 py-3.5 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-4 focus:ring-[#615fff]/10 outline-none text-base font-semibold text-zinc-900 bg-white transition-all placeholder-zinc-400"
+              className="w-full pl-11 pr-11 py-3.5 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-4 focus:ring-[#E61C24]/10 outline-none text-base font-semibold text-zinc-900 bg-white transition-all placeholder-zinc-400"
             />
           </div>
         </div>
@@ -170,7 +170,7 @@ function ResetPasswordFormContent() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base shadow-lg shadow-[#615fff]/15 transition-all duration-200 cursor-pointer disabled:opacity-50"
+          className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-lg shadow-[#E61C24]/15 transition-all duration-200 cursor-pointer disabled:opacity-50"
         >
           {loading ? (
             <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -205,7 +205,7 @@ export default function ResetPasswordForm() {
       <aside className="hidden md:flex md:w-1/2 flex-col justify-between bg-[#070b19] p-12 text-white relative select-none">
         
         {/* Subtle Glowing Blur Blob */}
-        <div className="absolute top-1/4 left-10 w-80 h-80 bg-[#615fff]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/4 left-10 w-80 h-80 bg-[#E61C24]/15 rounded-full blur-3xl pointer-events-none" />
 
         {/* Top Brand Logo */}
         <div className="relative z-10">
@@ -220,12 +220,12 @@ export default function ResetPasswordForm() {
 
         {/* Middle Hero Slogan */}
         <div className="relative z-10 my-auto py-12 space-y-6">
-          <span className="px-3.5 py-1 text-base font-bold text-[#615fff] bg-[#615fff]/10 rounded-lg border border-[#615fff]/20 uppercase tracking-wider w-fit block">
+          <span className="px-3.5 py-1 text-base font-bold text-[#E61C24] bg-[#E61C24]/10 rounded-lg border border-[#E61C24]/20 uppercase tracking-wider w-fit block">
             Reset Password
           </span>
           <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight font-display">
             Manage your <br />
-            <span className="text-[#615fff]">Learning Journey</span>
+            <span className="text-[#E61C24]">Learning Journey</span>
           </h1>
           <p className="text-zinc-400 font-semibold text-lg leading-relaxed max-w-md">
             Experience the next generation of online learning. Secure, intuitive, and designed specifically for modern students.
@@ -246,7 +246,7 @@ export default function ResetPasswordForm() {
         <div className="w-full max-w-md">
           <Suspense fallback={
             <div className="flex flex-col items-center justify-center gap-4">
-              <div className="h-10 w-10 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+              <div className="h-10 w-10 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
               <p className="text-base font-bold text-zinc-400">Loading Recovery Wizard...</p>
             </div>
           }>

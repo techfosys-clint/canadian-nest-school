@@ -54,7 +54,7 @@ function StarPicker({
         )
       })}
       {value > 0 && (
-        <span className="ml-3 text-base font-bold text-[#615fff] bg-[#615fff]/10 px-3 py-1 rounded-lg">
+        <span className="ml-3 text-base font-bold text-[#E61C24] bg-[#E61C24]/10 px-3 py-1 rounded-lg">
           {['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'][value]}
         </span>
       )}
@@ -172,7 +172,7 @@ export default function NewReviewPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+          <div className="h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
           <p className="text-base font-bold text-zinc-650">Loading compose form...</p>
         </div>
       </div>
@@ -217,7 +217,7 @@ export default function NewReviewPage() {
 
         {enrollments.length === 0 ? (
           <div className="p-10 text-center flex flex-col items-center justify-center gap-5">
-            <div className="h-16 w-16 rounded-full bg-[#615fff]/5 flex items-center justify-center text-[#615fff]">
+            <div className="h-16 w-16 rounded-full bg-[#E61C24]/5 flex items-center justify-center text-[#E61C24]">
               <FiStar className="h-8 w-8" />
             </div>
             <div className="max-w-md space-y-1.5">
@@ -237,7 +237,7 @@ export default function NewReviewPage() {
                 <select
                   value={selectedCourseId}
                   onChange={(e) => setSelectedCourseId(e.target.value)}
-                  className="w-full px-4 py-3.5 rounded-lg bg-zinc-50 text-base font-semibold text-zinc-800 border border-zinc-200 focus:border-[#615fff]/50 focus:bg-white outline-none transition-all cursor-pointer appearance-none"
+                  className="w-full px-4 py-3.5 rounded-lg bg-zinc-50 text-base font-semibold text-zinc-800 border border-zinc-200 focus:border-[#E61C24]/50 focus:bg-white outline-none transition-all cursor-pointer appearance-none"
                   required
                 >
                   <option value="">— Choose an active course to review —</option>
@@ -275,7 +275,7 @@ export default function NewReviewPage() {
                 maxLength={500}
                 rows={6}
                 placeholder="Share details about curriculum quality, video player experience, support resources, and what could be built better..."
-                className="w-full px-4 py-3.5 rounded-lg bg-zinc-50 text-base font-semibold text-zinc-800 border border-zinc-200 focus:border-[#615fff]/50 focus:bg-white transition-all resize-none leading-relaxed outline-none"
+                className="w-full px-4 py-3.5 rounded-lg bg-zinc-50 text-base font-semibold text-zinc-800 border border-zinc-200 focus:border-[#E61C24]/50 focus:bg-white transition-all resize-none leading-relaxed outline-none"
                 required
               />
             </div>
@@ -293,7 +293,7 @@ export default function NewReviewPage() {
               <button
                 type="submit"
                 disabled={submitting || !selectedCourseId || rating === 0 || !comment.trim()}
-                className="px-6 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base transition-colors cursor-pointer flex items-center gap-2 disabled:opacity-50 border-none"
+                className="px-6 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-colors cursor-pointer flex items-center gap-2 disabled:opacity-50 border-none"
               >
                 {submitting ? (
                   <>

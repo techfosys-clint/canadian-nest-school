@@ -275,7 +275,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-50">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+          <div className="h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
           <p className="text-base font-bold text-zinc-600">Loading Checkout Workspace...</p>
         </div>
       </div>
@@ -308,7 +308,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                   onClick={() => setAuthTab('login')}
                   className={`flex-1 pb-4 text-base font-bold transition-all border-b-2 text-center select-none ${
                     authTab === 'login'
-                      ? 'border-[#615fff] text-[#615fff]'
+                      ? 'border-[#E61C24] text-[#E61C24]'
                       : 'border-transparent text-zinc-400 hover:text-zinc-600'
                   }`}
                 >
@@ -318,7 +318,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                   onClick={() => setAuthTab('register')}
                   className={`flex-1 pb-4 text-base font-bold transition-all border-b-2 text-center select-none ${
                     authTab === 'register'
-                      ? 'border-[#615fff] text-[#615fff]'
+                      ? 'border-[#E61C24] text-[#E61C24]'
                       : 'border-transparent text-zinc-400 hover:text-zinc-600'
                   }`}
                 >
@@ -361,7 +361,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                           value={loginEmail}
                           onChange={(e) => setLoginEmail(e.target.value)}
                           placeholder="you@example.com or 01XXXXXXXXX"
-                          className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
+                          className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
                         />
                       </div>
                     </div>
@@ -378,7 +378,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                           value={loginPassword}
                           onChange={(e) => setLoginPassword(e.target.value)}
                           placeholder="••••••••"
-                          className="w-full pl-11 pr-11 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
+                          className="w-full pl-11 pr-11 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
                         />
                         <button
                           type="button"
@@ -393,7 +393,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                     <button
                       type="submit"
                       disabled={authLoading}
-                      className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#615fff] hover:bg-[#543cdf] text-white font-bold text-base transition-all select-none cursor-pointer mt-4"
+                      className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all select-none cursor-pointer mt-4"
                     >
                       {authLoading ? (
                         <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -441,7 +441,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                           value={regName}
                           onChange={(e) => setRegName(e.target.value)}
                           placeholder="John Doe"
-                          className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
+                          className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
                         />
                       </div>
                     </div>
@@ -458,7 +458,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                           value={regEmail}
                           onChange={(e) => setRegEmail(e.target.value)}
                           placeholder="you@example.com"
-                          className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
+                          className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
                         />
                       </div>
                     </div>
@@ -475,7 +475,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                           value={regPassword}
                           onChange={(e) => setRegPassword(e.target.value)}
                           placeholder="••••••••"
-                          className="w-full pl-11 pr-11 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
+                          className="w-full pl-11 pr-11 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
                         />
                         <button
                           type="button"
@@ -498,7 +498,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                           value={regPhone}
                           onChange={(e) => setRegPhone(e.target.value)}
                           placeholder="+1 (555) 000-0000"
-                          className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
+                          className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
                         />
                       </div>
                     </div>
@@ -506,7 +506,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                     <button
                       type="submit"
                       disabled={authLoading}
-                      className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#615fff] hover:bg-[#543cdf] text-white font-bold text-base transition-all select-none cursor-pointer mt-4"
+                      className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all select-none cursor-pointer mt-4"
                     >
                       {authLoading ? (
                         <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -529,7 +529,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
               <div className="bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-6">
                 <div>
                   <h3 className="text-xl font-bold text-zinc-800 flex items-center gap-2">
-                    <FiMapPin className="text-[#615fff]" />
+                    <FiMapPin className="text-[#E61C24]" />
                     Billing Information
                   </h3>
                   <p className="text-sm font-semibold text-zinc-450 mt-1">
@@ -562,7 +562,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                       value={billingName}
                       onChange={(e) => setBillingName(e.target.value)}
                       placeholder="Enter full name"
-                      className="w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-semibold text-zinc-800"
+                      className="w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800"
                     />
                   </div>
 
@@ -586,7 +586,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                       value={billingPhone}
                       onChange={(e) => setBillingPhone(e.target.value)}
                       placeholder="e.g. +1 555-0199"
-                      className="w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-semibold text-zinc-800"
+                      className="w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800"
                     />
                   </div>
 
@@ -599,14 +599,14 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                       value={billingAddress}
                       onChange={(e) => setBillingAddress(e.target.value)}
                       placeholder="Street address, City, State, ZIP code, Country"
-                      className="w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#615fff] focus:ring-3 focus:ring-[#615fff]/10 outline-none text-base transition-all font-semibold text-zinc-800"
+                      className="w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={purchaseLoading}
-                    className="w-full flex items-center justify-center gap-2 py-4 rounded-lg bg-[#615fff] hover:bg-[#543cdf] text-white font-bold text-base transition-all select-none cursor-pointer mt-6"
+                    className="w-full flex items-center justify-center gap-2 py-4 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all select-none cursor-pointer mt-6"
                   >
                     {purchaseLoading ? (
                       <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -645,7 +645,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
               {/* Category, Title, Instructor */}
               <div className="space-y-2">
                 {course.categoryName && (
-                  <span className="inline-block px-3 py-1 bg-[#615fff]/10 rounded-lg font-bold text-xs text-[#615fff] uppercase tracking-wide">
+                  <span className="inline-block px-3 py-1 bg-[#E61C24]/10 rounded-lg font-bold text-xs text-[#E61C24] uppercase tracking-wide">
                     {course.categoryName}
                   </span>
                 )}
@@ -678,7 +678,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
 
                 <div className="border-t border-zinc-100 pt-3.5 flex justify-between items-center">
                   <span className="text-base font-bold text-zinc-800">Total Investment</span>
-                  <span className="text-3xl font-bold text-[#615fff]">
+                  <span className="text-3xl font-bold text-[#E61C24]">
                     ৳{finalPrice.toLocaleString('en-BD')}
                   </span>
                 </div>
@@ -690,7 +690,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
           {user && (
             <div className="bg-white border border-zinc-200 rounded-lg p-6 space-y-4">
               <label className="text-base font-bold text-zinc-800 flex items-center gap-2">
-                <FiTag className="text-[#615fff]" />
+                <FiTag className="text-[#E61C24]" />
                 Apply Coupon / Promo Code
               </label>
               
@@ -700,7 +700,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                   placeholder="e.g. SAVE20"
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                  className="flex-1 px-3.5 py-2.5 rounded-lg border border-zinc-200 focus:border-[#615fff] outline-none text-base transition-all font-mono font-bold text-zinc-800"
+                  className="flex-1 px-3.5 py-2.5 rounded-lg border border-zinc-200 focus:border-[#E61C24] outline-none text-base transition-all font-mono font-bold text-zinc-800"
                 />
                 <button
                   type="button"

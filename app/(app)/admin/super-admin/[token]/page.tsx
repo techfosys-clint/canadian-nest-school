@@ -43,7 +43,7 @@ export default async function SuperAdminRegisterPage({ params }: Props) {
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-6 py-12 text-slate-700 font-sans">
       <div className="w-full max-w-lg bg-white border border-slate-200 p-8 rounded-lg shadow-xl shadow-black/40 space-y-6">
         <div className="text-center space-y-2">
-          <div className="inline-flex h-12 w-12 rounded-lg bg-[#615fff]/15 items-center justify-center text-[#615fff] font-bold text-lg border border-[#615fff]/30">
+          <div className="inline-flex h-12 w-12 rounded-lg bg-[#E61C24]/15 items-center justify-center text-[#E61C24] font-bold text-lg border border-[#E61C24]/30">
             T
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-800">First-Time Setup Wizard</h1>

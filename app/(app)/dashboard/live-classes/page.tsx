@@ -61,7 +61,7 @@ export default function LiveClassesPage() {
       icon: 'success',
       title: 'Seat Reserved!',
       text: `You have successfully registered for: ${webinarTitle}. Join links are active below!`,
-      confirmButtonColor: '#615fff',
+      confirmButtonColor: '#E61C24',
       background: '#121829',
       color: '#ffffff',
     })
@@ -71,7 +71,7 @@ export default function LiveClassesPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+          <div className="h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
           <p className="text-base font-bold text-zinc-600">Loading Live Classes...</p>
         </div>
       </div>
@@ -94,15 +94,15 @@ export default function LiveClassesPage() {
 
       {/* Hero Banner */}
       <div className="w-full bg-[#0A163A] rounded-lg p-8 md:p-12 relative overflow-hidden border border-zinc-800/20">
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#615fff]/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#543cdf]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#E61C24]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#CC181F]/15 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
           <div className="max-w-xl">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-[#615fff]/20 border border-[#615fff]/30 text-base font-bold text-[#615fff] uppercase tracking-wider mb-4">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-[#E61C24]/20 border border-[#E61C24]/30 text-base font-bold text-[#E61C24] uppercase tracking-wider mb-4">
               <FiRadio className="h-4 w-4 animate-pulse" /> Live Sessions
             </span>
             <h1 className="text-3xl md:text-4xl font-bold font-display text-white mb-3 leading-tight">
-              Live Class <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8a88ff] to-white font-bold">Broadcasts</span>
+              Live Class <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF4D55] to-white font-bold">Broadcasts</span>
             </h1>
             <p className="text-zinc-400 text-base font-semibold leading-relaxed">
               Join real-time webinar classrooms to ask live questions, interact with instructors, and submit assignments.
@@ -131,7 +131,7 @@ export default function LiveClassesPage() {
             onClick={() => setFilter(tab)}
             className={`px-5 py-2 rounded text-base font-bold capitalize transition-all cursor-pointer border-none ${
               filter === tab
-                ? 'bg-[#615fff] text-white shadow-sm'
+                ? 'bg-[#E61C24] text-white shadow-sm'
                 : 'text-zinc-500 hover:text-zinc-800'
             }`}
           >
@@ -181,11 +181,11 @@ export default function LiveClassesPage() {
               <div
                 key={webinar.id}
                 className={`bg-white border rounded-lg overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md flex flex-col ${
-                  isUpcoming ? 'border-[#615fff]/30 hover:border-[#615fff]/60' : 'border-zinc-200'
+                  isUpcoming ? 'border-[#E61C24]/30 hover:border-[#E61C24]/60' : 'border-zinc-200'
                 }`}
               >
                 {/* Card Top Accent */}
-                <div className={`h-1.5 w-full ${isUpcoming ? 'bg-gradient-to-r from-[#615fff] to-[#8a88ff]' : 'bg-zinc-200'}`} />
+                <div className={`h-1.5 w-full ${isUpcoming ? 'bg-gradient-to-r from-[#E61C24] to-[#FF4D55]' : 'bg-zinc-200'}`} />
 
                 <div className="p-5 flex flex-col flex-1 gap-4">
                   {/* Status & Platform badges */}
@@ -214,12 +214,12 @@ export default function LiveClassesPage() {
                   {/* Date & Duration */}
                   <div className="space-y-1.5 border-t border-zinc-100 pt-3">
                     <div className="flex items-center gap-2 text-sm font-semibold text-zinc-500">
-                      <FiCalendar className="h-4 w-4 text-[#615fff] shrink-0" />
+                      <FiCalendar className="h-4 w-4 text-[#E61C24] shrink-0" />
                       <span>{formattedDate}</span>
                     </div>
                     {webinar.duration > 0 && (
                       <div className="flex items-center gap-2 text-sm font-semibold text-zinc-500">
-                        <FiClock className="h-4 w-4 text-[#615fff] shrink-0" />
+                        <FiClock className="h-4 w-4 text-[#E61C24] shrink-0" />
                         <span>{webinar.duration} minutes</span>
                       </div>
                     )}
@@ -230,7 +230,7 @@ export default function LiveClassesPage() {
                     {isUpcoming && (
                       <button
                         onClick={() => handleRegisterSeat(webinar.title)}
-                        className="flex-1 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white text-base font-bold transition-all cursor-pointer border-none shadow-md shadow-[#615fff]/20 flex items-center justify-center gap-1.5"
+                        className="flex-1 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white text-base font-bold transition-all cursor-pointer border-none shadow-md shadow-[#E61C24]/20 flex items-center justify-center gap-1.5"
                       >
                         <FiRadio className="h-4 w-4" /> RSVP Seat
                       </button>

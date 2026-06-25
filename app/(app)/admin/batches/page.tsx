@@ -213,7 +213,7 @@ export default function BatchesAdminPage() {
     return (
       <div className="min-h-[70vh] flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 border-4 border-[#615fff] border-t-transparent rounded-full animate-spin" />
+          <div className="h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
           <p className="text-base font-bold text-slate-500">Loading Batches Workspace...</p>
         </div>
       </div>
@@ -226,7 +226,7 @@ export default function BatchesAdminPage() {
       {/* Header Info */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 select-none">
         <div>
-          <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-[#615fff]/15 border border-[#615fff]/30 text-base font-bold text-[#615fff] uppercase tracking-wider mb-3">
+          <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-[#E61C24]/15 border border-[#E61C24]/30 text-base font-bold text-[#E61C24] uppercase tracking-wider mb-3">
             Academic Operations
           </span>
           <h1 className="text-3xl font-bold font-display text-slate-800 leading-tight">
@@ -239,7 +239,7 @@ export default function BatchesAdminPage() {
 
         <button
           onClick={() => router.push('/admin/batches/new')}
-          className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#615fff] hover:bg-[#5248e8] text-white font-bold text-base rounded-lg transition-colors cursor-pointer border-none shadow-md shadow-[#615fff]/15 shrink-0"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base rounded-lg transition-colors cursor-pointer border-none shadow-md shadow-[#E61C24]/15 shrink-0"
         >
           <FiPlus className="h-5 w-5" />
           <span>Launch Intake Batch</span>
@@ -257,7 +257,7 @@ export default function BatchesAdminPage() {
             value={batchSearchQuery}
             onChange={(e) => setBatchSearchQuery(e.target.value)}
             placeholder="Search batches by title or course name..."
-            className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/60 rounded-lg pl-12 pr-4 py-3.5 text-base font-semibold text-slate-800 outline-none placeholder-slate-400"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/60 rounded-lg pl-12 pr-4 py-3.5 text-base font-semibold text-slate-800 outline-none placeholder-slate-400"
           />
         </div>
 
@@ -287,14 +287,14 @@ export default function BatchesAdminPage() {
                 {filteredBatches.map((batch) => {
                   const isSelectedForStudents = selectedBatch?._id === batch._id
                   return (
-                    <tr key={batch._id} className={`hover:bg-[#1a1a1c]/40 transition-colors ${isSelectedForStudents ? 'bg-[#615fff]/5 hover:bg-[#615fff]/8' : ''}`}>
+                    <tr key={batch._id} className={`hover:bg-[#1a1a1c]/40 transition-colors ${isSelectedForStudents ? 'bg-[#E61C24]/5 hover:bg-[#E61C24]/8' : ''}`}>
                       <td className="p-5">
                         <p className="text-base font-bold text-slate-800">{batch.name}</p>
                         <p className="text-xs text-slate-400 font-semibold mt-0.5">ID: {batch._id.substring(18)}</p>
                       </td>
                       <td className="p-5">
                         <p className="text-base font-bold text-slate-600 flex items-center gap-1.5">
-                          <FiBookOpen className="text-[#615fff] h-4.5 w-4.5 shrink-0" />
+                          <FiBookOpen className="text-[#E61C24] h-4.5 w-4.5 shrink-0" />
                           {batch.course?.title || 'Unknown Course'}
                         </p>
                       </td>
@@ -326,7 +326,7 @@ export default function BatchesAdminPage() {
                           onClick={() => handleSelectBatchStudents(batch)}
                           className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-base font-bold transition-all cursor-pointer select-none whitespace-nowrap active:scale-[0.98] ${
                             isSelectedForStudents
-                              ? 'bg-[#615fff] border-transparent text-slate-800 shadow-md'
+                              ? 'bg-[#E61C24] border-transparent text-slate-800 shadow-md'
                               : 'border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-[#222] text-slate-600 hover:text-slate-800'
                           }`}
                         >
@@ -370,7 +370,7 @@ export default function BatchesAdminPage() {
           <div className="px-6 py-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between select-none">
             <div>
               <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                <FiUsers className="text-[#615fff]" />
+                <FiUsers className="text-[#E61C24]" />
                 <span>Manage Students - {selectedBatch.name}</span>
               </h2>
               <p className="text-sm font-semibold text-slate-400 mt-1">
@@ -433,7 +433,7 @@ export default function BatchesAdminPage() {
               {/* Right Side: Search and Enroll Students */}
               <div className="space-y-4">
                 <h3 className="text-base font-bold text-slate-600 flex items-center gap-2 select-none">
-                  <FiPlus className="text-[#615fff]" />
+                  <FiPlus className="text-[#E61C24]" />
                   <span>Enroll Registered Student</span>
                 </h3>
 
@@ -445,7 +445,7 @@ export default function BatchesAdminPage() {
                     value={studentSearchQuery}
                     onChange={(e) => setStudentSearchQuery(e.target.value)}
                     placeholder="Search by student name or email address..."
-                    className="w-full bg-slate-50 border border-slate-200 focus:border-[#615fff]/60 rounded-lg pl-11 pr-4 py-3 text-base font-semibold text-slate-800 outline-none placeholder-zinc-550"
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/60 rounded-lg pl-11 pr-4 py-3 text-base font-semibold text-slate-800 outline-none placeholder-zinc-550"
                   />
                 </div>
 
@@ -464,7 +464,7 @@ export default function BatchesAdminPage() {
                         </div>
                         <button
                           onClick={() => handleAddStudentToBatch(s)}
-                          className="px-5 py-2.5 rounded-lg bg-[#615fff] hover:bg-[#5248e8] text-white text-base font-bold transition-colors cursor-pointer select-none border-none shadow shadow-[#615fff]/10"
+                          className="px-5 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white text-base font-bold transition-colors cursor-pointer select-none border-none shadow shadow-[#E61C24]/10"
                         >
                           Enroll
                         </button>

@@ -79,7 +79,7 @@ export default function LiveClassesPageClient() {
       <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
         {loading ? (
           <div className="p-16 text-center">
-            <div className="h-10 w-10 border-2 border-[#615fff] border-t-transparent rounded-full animate-spin mx-auto" />
+            <div className="h-10 w-10 border-2 border-[#E61C24] border-t-transparent rounded-full animate-spin mx-auto" />
             <p className="text-base font-semibold text-slate-400 mt-4">Loading active scheduled logs...</p>
           </div>
         ) : lessons.length === 0 ? (
@@ -162,7 +162,7 @@ export default function LiveClassesPageClient() {
                               href={lesson.liveUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center justify-center gap-1.5 py-2 px-4 rounded-lg bg-[#615fff] hover:bg-[#5248e8] active:scale-[0.98] text-white font-bold text-base transition-all shadow-md shadow-[#615fff]/15 whitespace-nowrap cursor-pointer border-none"
+                              className="inline-flex items-center justify-center gap-1.5 py-2 px-4 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] active:scale-[0.98] text-white font-bold text-base transition-all shadow-md shadow-[#E61C24]/15 whitespace-nowrap cursor-pointer border-none"
                             >
                               Join Session
                               <FiExternalLink className="h-4 w-4" />

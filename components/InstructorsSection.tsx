@@ -46,7 +46,7 @@ function AvatarFallback({ name }: { name: string }) {
     .join('')
     .toUpperCase()
   return (
-    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#615fff]/20 to-[#615fff]/5 text-[#615fff] font-bold text-3xl">
+    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#E61C24]/20 to-[#E61C24]/5 text-[#E61C24] font-bold text-3xl">
       {initials}
     </div>
   )
@@ -61,8 +61,8 @@ export default function InstructorsSection({ instructors }: InstructorsSectionPr
     <section className="py-20 md:py-28 px-6 bg-[#0A163A] relative overflow-hidden select-text border-none">
 
       {/* Glowing purple-navy background spotlights */}
-      <div className="absolute top-0 left-1/3 w-[500px] h-[350px] bg-[#615fff]/12 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-[400px] h-[300px] bg-[#615fff]/8 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-0 left-1/3 w-[500px] h-[350px] bg-[#E61C24]/12 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-[400px] h-[300px] bg-[#E61C24]/8 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="container mx-auto relative z-10">
 
@@ -72,7 +72,7 @@ export default function InstructorsSection({ instructors }: InstructorsSectionPr
 
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-lg shadow-sm border border-white/10">
-              <span className="w-2 h-2 rounded-full bg-[#615fff] animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-[#E61C24] animate-pulse" />
               <span className="text-sm font-bold text-white">Our Instructors</span>
             </div>
 
@@ -112,7 +112,7 @@ export default function InstructorsSection({ instructors }: InstructorsSectionPr
             <motion.div
               key={instructor.id}
               variants={cardVariants}
-              className="group bg-[#13234E]/60 border border-white/10 rounded-lg overflow-hidden hover:shadow-xl hover:shadow-[#615fff]/15 transition-all duration-300 hover:-translate-y-1 hover:border-[#615fff]/40"
+              className="group bg-[#13234E]/60 border border-white/10 rounded-lg overflow-hidden hover:shadow-xl hover:shadow-[#E61C24]/15 transition-all duration-300 hover:-translate-y-1 hover:border-[#E61C24]/40"
             >
               {/* Profile Image */}
               <div className="aspect-[4/3] w-full overflow-hidden bg-[#0A163A] relative">

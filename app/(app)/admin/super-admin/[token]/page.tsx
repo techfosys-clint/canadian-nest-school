@@ -2,10 +2,8 @@ import React from 'react'
 import { redirect, notFound } from 'next/navigation'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { User } from '@/lib/db/models/User'
+import { SetupToken } from '@/lib/db/models/SetupToken'
 import RegisterFormClient from './RegisterFormClient'
-
-import fs from 'fs/promises'
-import path from 'path'
 
 export const metadata = {
   title: 'Root Setup Wizard - Canadian Nest School Console',
@@ -23,23 +21,15 @@ export default async function SuperAdminRegisterPage({ params }: Props) {
   const resolvedParams = await params
   const { token } = resolvedParams
 
-  // 1. Read the active setup token from the local file system
-  let activeToken = ''
-  try {
-    const tokenPath = path.join(process.cwd(), 'lib', 'db', 'setup-token.json')
-    const fileData = await fs.readFile(tokenPath, 'utf-8')
-    const parsed = JSON.parse(fileData)
-    activeToken = parsed.token
-  } catch (e) {
-    // File not found or corrupt
-  }
+  await connectToDatabase()
 
-  // 2. If token is incorrect or empty, return 404 immediately so it is hidden
-  if (!activeToken || token !== activeToken) {
+  // 1. Look up the active setup token from MongoDB
+  const setupToken = await SetupToken.findOne().sort({ createdAt: -1 }).lean()
+
+  // 2. If token is incorrect or none exists, return 404 immediately so it is hidden
+  if (!setupToken || token !== setupToken.token) {
     notFound()
   }
-
-  await connectToDatabase()
 
   // 3. Check if an admin account already exists
   const adminExists = await User.findOne({ role: 'admin' }).lean()

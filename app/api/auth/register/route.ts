@@ -210,6 +210,12 @@ export async function POST(request: Request) {
       } catch (emailErr) {
         console.error('Failed to send registration email to staff:', emailErr)
       }
+
+      // The root setup wizard is single-use — clear the token once the first admin exists
+      if (targetRole === 'admin') {
+        const { SetupToken } = await import('@/lib/db/models/SetupToken')
+        await SetupToken.deleteMany({})
+      }
     }
 
     // 6. Resolve profile pic URL for response

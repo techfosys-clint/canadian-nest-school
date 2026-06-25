@@ -2,10 +2,9 @@
 import { redirect } from 'next/navigation'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { User } from '@/lib/db/models/User'
+import { SetupToken } from '@/lib/db/models/SetupToken'
 import LoginFormClient from './LoginFormClient'
 import crypto from 'crypto'
-import fs from 'fs/promises'
-import path from 'path'
 
 export const metadata = {
   title: 'Administrative Sign In - Canadian Nest School Console',
@@ -18,15 +17,17 @@ export default async function AdminLoginPage() {
   // 1. Check if any admin account exists. If not, redirect to setup wizard
   const adminExists = await User.findOne({ role: 'admin' }).lean()
   if (!adminExists) {
-    // Generate a secure random 32-character hex token on the fly
-    const token = crypto.randomBytes(16).toString('hex')
+    // Reuse an existing setup token if one was already issued, so previously
+    // shared links keep working across redeploys/restarts instead of being
+    // silently invalidated by a fresh visit to this page.
+    let setupToken = await SetupToken.findOne().sort({ createdAt: -1 })
 
-    // Write token to workspace-level temporary file
-    const tokenPath = path.join(process.cwd(), 'lib', 'db', 'setup-token.json')
-    await fs.mkdir(path.dirname(tokenPath), { recursive: true })
-    await fs.writeFile(tokenPath, JSON.stringify({ token, createdAt: Date.now() }))
+    if (!setupToken) {
+      const token = crypto.randomBytes(16).toString('hex')
+      setupToken = await SetupToken.create({ token })
+    }
 
-    redirect(`/admin/super-admin/${token}`)
+    redirect(`/admin/super-admin/${setupToken.token}`)
   }
 
   return (

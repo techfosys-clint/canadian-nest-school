@@ -85,11 +85,11 @@ export default function ForgotPasswordForm() {
 
         {/* Top Brand Logo */}
         <div className="relative z-10">
-          <Link href="/" className="flex items-center group bg-white px-3 py-1.5 rounded-lg shadow-sm">
+          <Link href="/" className="inline-flex items-center group bg-white px-3 py-1.5 rounded-lg shadow-sm w-fit">
             <img
               src="/logo.png"
               alt="Canadian Nest School"
-              className="h-13 w-auto object-contain"
+              className="h-12 w-auto object-contain"
             />
           </Link>
         </div>
@@ -127,7 +127,7 @@ export default function ForgotPasswordForm() {
               <img
                 src="/logo.png"
                 alt="Canadian Nest School"
-                className="h-11 w-auto object-contain"
+                className="h-10 w-auto object-contain"
               />
             </Link>
             <span className="px-2.5 py-0.5 text-base font-bold text-[#615fff] bg-[#615fff]/10 rounded-lg border border-[#615fff]/20 uppercase">

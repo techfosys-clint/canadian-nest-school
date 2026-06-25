@@ -86,7 +86,7 @@ export default function LoginForm() {
           <img
             src="/logo.png"
             alt="Canadian Nest School"
-            className="h-13 w-auto object-contain"
+            className="h-12 w-auto object-contain"
           />
         </Link>
 

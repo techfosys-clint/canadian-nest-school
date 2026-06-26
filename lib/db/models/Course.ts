@@ -3,12 +3,12 @@ import mongoose, { Schema, Document } from 'mongoose'
 export interface ICourse extends Document {
   title: string
   slug: string
-  summary: string
-  description: any // Lexical JSON
+  summary?: string
+  description?: any // Lexical JSON
   price: number
   thumbnail: mongoose.Types.ObjectId | string
   category: mongoose.Types.ObjectId | string
-  instructor: mongoose.Types.ObjectId | string
+  instructor?: mongoose.Types.ObjectId | string
   status: 'draft' | 'published'
   duration?: string
   level: 'all' | 'beginner' | 'intermediate' | 'advanced'
@@ -33,12 +33,12 @@ const CourseSchema = new Schema<ICourse>(
   {
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
-    summary: { type: String, required: true },
-    description: { type: Schema.Types.Mixed, required: true }, // Lexical JSON structure
+    summary: { type: String },
+    description: { type: Schema.Types.Mixed }, // Lexical JSON structure
     price: { type: Number, required: true, min: 0 },
     thumbnail: { type: Schema.Types.ObjectId, ref: 'Media', required: true },
     category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
-    instructor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    instructor: { type: Schema.Types.ObjectId, ref: 'User' },
     status: { type: String, enum: ['draft', 'published'], default: 'draft', required: true },
     duration: { type: String },
     level: { type: String, enum: ['all', 'beginner', 'intermediate', 'advanced'], default: 'all', required: true },

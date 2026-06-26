@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { sendGTMEvent } from '@next/third-parties/google'
 import {
   FiZap,
   FiMail,
@@ -78,6 +79,21 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
 
   // Check login session on mount
   useEffect(() => {
+    // Fire begin_checkout GTM event
+    sendGTMEvent({
+      event: 'begin_checkout',
+      currency: 'BDT',
+      value: course.price,
+      items: [
+        {
+          item_id: course.id,
+          item_name: course.title,
+          price: course.price,
+          item_category: course.categoryName
+        }
+      ]
+    })
+
     async function getSession() {
       try {
         const res = await fetch('/api/auth/me')
@@ -173,6 +189,10 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
       const loginData = await loginRes.json()
 
       if (loginRes.ok && loginData.success) {
+        sendGTMEvent({
+          event: 'sign_up',
+          method: 'checkout_inline',
+        })
         setUser(loginData.user)
         setBillingName(loginData.user.name || '')
         setBillingPhone(loginData.user.phone || '')
@@ -257,6 +277,21 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
       const data = await response.json()
 
       if (response.ok && data.success) {
+        sendGTMEvent({
+          event: 'purchase',
+          currency: 'BDT',
+          value: finalPrice,
+          transaction_id: data.enrollmentId || `txn_${Date.now()}`,
+          items: [
+            {
+              item_id: course.id,
+              item_name: course.title,
+              price: course.price,
+              discount: discountAmount,
+              item_category: course.categoryName
+            }
+          ]
+        })
         setCheckoutSuccess(`You have successfully purchased and enrolled in "${course.title}".`)
         setTimeout(() => {
           window.location.href = '/dashboard'

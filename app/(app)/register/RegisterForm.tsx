@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiPhone, FiBookOpen, FiCheck } from 'react-icons/fi'
 import Swal from 'sweetalert2'
+import { sendGTMEvent } from '@next/third-parties/google'
 
 export default function RegisterForm() {
   const router = useRouter()
@@ -216,6 +217,10 @@ export default function RegisterForm() {
       const data = await res.json()
 
       if (res.ok) {
+        sendGTMEvent({
+          event: 'sign_up',
+          method: 'register_form',
+        })
         Swal.fire({
           icon: 'success',
           title: 'Account Created!',

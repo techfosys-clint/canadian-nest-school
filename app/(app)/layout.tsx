@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Nunito, Plus_Jakarta_Sans } from "next/font/google";
+import { GoogleTagManager } from '@next/third-parties/google';
 import "./globals.css";
 import ClientNavbarFooterWrapper from "@/components/ClientNavbarFooterWrapper";
 
@@ -32,6 +33,7 @@ export default function RootLayout({
       lang="en"
       className={`${plusJakartaSans.variable} ${nunito.variable} h-full antialiased`}
     >
+      <GoogleTagManager gtmId="GTM-WSM4637P" />
       <body className="min-h-full flex flex-col">
         <ClientNavbarFooterWrapper>{children}</ClientNavbarFooterWrapper>
       </body>

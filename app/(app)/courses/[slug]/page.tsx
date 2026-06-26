@@ -17,6 +17,7 @@ import {
 } from 'react-icons/fi'
 import LessonsAccordion from '@/components/LessonsAccordion'
 import EnrollButton from '@/components/EnrollButton'
+import GTMTracker from '@/components/GTMTracker'
 
 // ─── Type helpers ─────────────────────────────────────────────────────────────
 
@@ -160,6 +161,16 @@ export default async function CourseDetailPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#ffffff] via-[#fbfcff] to-[#f5f8ff] font-sans text-zinc-900 pb-20 pt-22 relative">
+      <GTMTracker 
+        event="view_content" 
+        data={{
+          content_name: course.title,
+          content_ids: [course._id.toString()],
+          content_type: 'course',
+          value: course.price,
+          currency: 'BDT'
+        }} 
+      />
       
       {/* Background glow accents */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">

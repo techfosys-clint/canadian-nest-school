@@ -403,11 +403,11 @@ export default function CourseFormClient({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!title || !slug || !summary || !description || !category || !thumbnailId) {
+    if (!title || !slug || !category || !thumbnailId) {
       Swal.fire({
         icon: 'warning',
         title: 'Validation Error',
-        text: 'Please complete all required fields, including the Cover Image thumbnail.',
+        text: 'Please complete all required fields (Title, Slug, Category, Cover Image).',
         background: '#ffffff',
         color: '#1a1a1a',
       })
@@ -435,7 +435,7 @@ export default function CourseFormClient({
       price: Number(price),
       thumbnail: thumbnailId,
       category,
-      instructor: user.role === 'instructor' ? user.id : instructor,
+      instructor: (user.role === 'instructor' ? user.id : instructor) || null,
       status,
       duration,
       level,
@@ -563,13 +563,12 @@ export default function CourseFormClient({
             {/* Summary field */}
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <label className="text-base font-bold text-slate-600">Short Summary *</label>
+                <label className="text-base font-bold text-slate-600">Short Summary (Optional)</label>
                 <span className="text-sm font-semibold text-slate-450">
                   {summary.length}/160 characters
                 </span>
               </div>
               <textarea
-                required
                 rows={2}
                 maxLength={160}
                 value={summary}
@@ -581,8 +580,7 @@ export default function CourseFormClient({
 
             {/* Detailed Description */}
             <RichTextEditor
-              label="Detailed Description"
-              required
+              label="Detailed Description (Optional)"
               rows={8}
               value={description}
               onChange={setDescription}
@@ -1015,7 +1013,7 @@ export default function CourseFormClient({
                     >
                       <FiUploadCloud className="h-9 w-9 text-slate-400 group-hover:text-[#E61C24] transition-colors mb-2" />
                       <p className="text-base font-bold text-slate-800">Upload New File</p>
-                      <p className="text-sm font-semibold text-slate-400">PNG, JPEG, WEBP — auto-resized</p>
+                      <p className="text-sm font-semibold text-slate-400">PNG, JPEG, WEBP — Recommended size: 1280x720 (16:9 ratio)</p>
                     </button>
                     <div className="flex items-center gap-3">
                       <div className="flex-1 h-px bg-slate-100" />
@@ -1110,7 +1108,7 @@ export default function CourseFormClient({
 
             {/* Instructors Selector */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-slate-600">Lead Mentor (Instructor) *</label>
+              <label className="text-base font-bold text-slate-600">Lead Mentor (Instructor) (Optional)</label>
               {user.role === 'instructor' ? (
                 <div className="bg-slate-100 border border-slate-200 text-slate-500 rounded-lg p-3 text-base font-semibold select-none flex items-center gap-2">
                   <FiInfo className="text-[#E61C24]" />
@@ -1120,12 +1118,12 @@ export default function CourseFormClient({
                 </div>
               ) : (
                 <select
-                  required
                   value={instructor}
                   onChange={(e) => setInstructor(e.target.value)}
                   className="bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
                 >
-                  <option value="">-- Assign Instructor --</option>
+                  <option value="">-- Unassigned (None) --</option>
+                  <option value={user.id}>Myself ({user.role === 'admin' ? 'Admin' : 'Staff'})</option>
                   {instructors.map((ins) => (
                     <option key={ins.id} value={ins.id}>
                       {ins.name} ({ins.email})

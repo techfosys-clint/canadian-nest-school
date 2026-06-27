@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose'
 
 export interface IStudent extends Document {
-  email?: string
+  email: string
   password?: string
   name: string
   phone: string
@@ -13,7 +13,7 @@ export interface IStudent extends Document {
 
 const StudentSchema = new Schema<IStudent>(
   {
-    email: { type: String, unique: true, sparse: true, lowercase: true },
+    email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String }, // Hashed password
     name: { type: String, required: true },
     phone: { type: String, required: true, unique: true },

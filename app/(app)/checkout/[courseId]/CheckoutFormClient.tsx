@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { sendGTMEvent } from '@next/third-parties/google'
+import { pushToDataLayer, generateEventId } from '@/lib/gtm'
 import {
   FiZap,
   FiMail,
@@ -64,6 +65,15 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
   const [regOtpVerified, setRegOtpVerified] = useState(false)
   const [sendingRegOtp, setSendingRegOtp] = useState(false)
   const [verifyingRegOtp, setVerifyingRegOtp] = useState(false)
+  const [countdown, setCountdown] = useState(0)
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout
+    if (countdown > 0) {
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000)
+    }
+    return () => clearTimeout(timer)
+  }, [countdown])
 
   // Checkout states
   const [billingName, setBillingName] = useState('')
@@ -85,18 +95,30 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
   // Check login session on mount
   useEffect(() => {
     // Fire begin_checkout GTM event
-    sendGTMEvent({
+    pushToDataLayer({
       event: 'begin_checkout',
-      currency: 'BDT',
-      value: course.price,
-      items: [
-        {
+      event_id: generateEventId(),
+      ecommerce: {
+        currency: 'BDT',
+        value: course.price,
+        coupon: '',
+        items: [{
           item_id: course.id,
           item_name: course.title,
+          item_category: course.categoryName,
           price: course.price,
-          item_category: course.categoryName
-        }
-      ]
+          quantity: 1
+        }]
+      },
+      user_data: user ? {
+        user_id: user.id,
+        email: user.email,
+        phone_number: user.phone || '',
+        first_name: user.name ? user.name.split(' ')[0] : '',
+        last_name: user.name && user.name.includes(' ') ? user.name.split(' ').slice(1).join(' ') : '',
+        city: '',
+        country: 'BD'
+      } : undefined
     })
 
     async function getSession() {
@@ -107,6 +129,20 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
           setUser(data.user)
           setBillingName(data.user.name || '')
           setBillingPhone(data.user.phone || '')
+          
+          pushToDataLayer({
+            event: 'user_data_ready',
+            event_id: generateEventId(),
+            user_data: {
+              user_id: data.user.id,
+              email: data.user.email,
+              phone_number: data.user.phone || '',
+              first_name: data.user.name ? data.user.name.split(' ')[0] : '',
+              last_name: data.user.name && data.user.name.includes(' ') ? data.user.name.split(' ').slice(1).join(' ') : '',
+              city: '',
+              country: 'BD'
+            }
+          })
         }
       } catch (err) {
         console.error('Session verify failed:', err)
@@ -141,6 +177,20 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
         setBillingName(data.user.name || '')
         setBillingPhone(data.user.phone || '')
         setAuthSuccess(`Welcome back, ${data.user.name}! Continuing to billing...`)
+        
+        pushToDataLayer({
+          event: 'user_data_ready',
+          event_id: generateEventId(),
+          user_data: {
+            user_id: data.user.id,
+            email: data.user.email,
+            phone_number: data.user.phone || '',
+            first_name: data.user.name ? data.user.name.split(' ')[0] : '',
+            last_name: data.user.name && data.user.name.includes(' ') ? data.user.name.split(' ').slice(1).join(' ') : '',
+            city: '',
+            country: 'BD'
+          }
+        })
       } else {
         throw new Error(data.message || 'Invalid email or password.')
       }
@@ -168,6 +218,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
       const data = await res.json()
       if (res.ok) {
         setRegOtpSent(true)
+        setCountdown(60)
         setAuthSuccess('OTP sent! Please check your phone for the verification code.')
       } else {
         throw new Error(data.error || 'Failed to send OTP.')
@@ -212,8 +263,8 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
     e.preventDefault()
     setAuthError(null)
     setAuthSuccess(null)
-    if (!regName || !regPhone || !regPassword) {
-      setAuthError('Please fill in your name, mobile number, and password.')
+    if (!regName || !regPhone || !regEmail || !regPassword) {
+      setAuthError('Please fill in your name, mobile number, email, and password.')
       return
     }
     if (!regOtpVerified) {
@@ -233,7 +284,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: regName,
-          email: regEmail || undefined,
+          email: regEmail,
           password: regPassword,
           phone: regPhone,
           role: 'student',
@@ -262,6 +313,20 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
         setBillingName(loginData.user.name || '')
         setBillingPhone(loginData.user.phone || '')
         setAuthSuccess(`Account created successfully! Welcome, ${loginData.user.name}.`)
+        
+        pushToDataLayer({
+          event: 'user_data_ready',
+          event_id: generateEventId(),
+          user_data: {
+            user_id: loginData.user.id,
+            email: loginData.user.email,
+            phone_number: loginData.user.phone || '',
+            first_name: loginData.user.name ? loginData.user.name.split(' ')[0] : '',
+            last_name: loginData.user.name && loginData.user.name.includes(' ') ? loginData.user.name.split(' ').slice(1).join(' ') : '',
+            city: '',
+            country: 'BD'
+          }
+        })
       } else {
         throw new Error('Registration succeeded, but login failed. Please sign in manually.')
       }
@@ -349,21 +414,33 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
       }
 
       if (response.ok && data.success) {
-        sendGTMEvent({
+        pushToDataLayer({
           event: 'purchase',
-          currency: 'BDT',
-          value: finalPrice,
-          transaction_id: data.enrollmentId || `txn_${Date.now()}`,
-          items: [
-            {
+          event_id: generateEventId(),
+          ecommerce: {
+            transaction_id: data.enrollmentId || `txn_${Date.now()}`,
+            currency: 'BDT',
+            value: finalPrice,
+            coupon: appliedCoupon ? appliedCoupon.code : '',
+            items: [{
               item_id: course.id,
               item_name: course.title,
+              item_category: course.categoryName,
               price: course.price,
-              discount: discountAmount,
-              item_category: course.categoryName
-            }
-          ]
+              quantity: 1
+            }]
+          },
+          user_data: user ? {
+            user_id: user.id,
+            email: user.email,
+            phone_number: user.phone || '',
+            first_name: user.name ? user.name.split(' ')[0] : '',
+            last_name: user.name && user.name.includes(' ') ? user.name.split(' ').slice(1).join(' ') : '',
+            city: '',
+            country: 'BD'
+          } : undefined
         })
+        
         setCheckoutSuccess(`You have successfully purchased and enrolled in "${course.title}".`)
         setTimeout(() => {
           window.location.href = '/dashboard'
@@ -557,9 +634,10 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                       <label className="text-base font-bold text-zinc-700">Mobile Number</label>
                       <div className="flex gap-2">
                         <div className="relative flex-1">
-                          <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
-                            <FiPhone className="h-5 w-5" />
-                          </span>
+                          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <FiPhone className="text-zinc-400 h-5 w-5 mr-2" />
+                            <span className="text-zinc-500 font-bold text-base border-r border-zinc-200 pr-2">+88</span>
+                          </div>
                           <input
                             type="tel"
                             required
@@ -567,16 +645,26 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                             value={regPhone}
                             onChange={(e) => setRegPhone(e.target.value)}
                             placeholder="01XXXXXXXXX"
-                            className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500"
+                            className="w-full pl-[5.5rem] pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500"
                           />
                         </div>
                         <button
                           type="button"
                           onClick={handleSendRegOtp}
-                          disabled={sendingRegOtp || regOtpVerified}
-                          className="px-4 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                          disabled={sendingRegOtp || regOtpVerified || countdown > 0}
+                          className="px-4 min-w-[140px] flex items-center justify-center rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                         >
-                          {sendingRegOtp ? '...' : regOtpVerified ? <FiCheck className="h-5 w-5" /> : regOtpSent ? 'Resend' : 'Send OTP'}
+                          {sendingRegOtp ? (
+                            <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          ) : regOtpVerified ? (
+                            <FiCheck className="h-5 w-5" />
+                          ) : countdown > 0 ? (
+                            `Resend in ${countdown}s`
+                          ) : regOtpSent ? (
+                            'Resend'
+                          ) : (
+                            'Send OTP'
+                          )}
                         </button>
                       </div>
                     </div>
@@ -606,13 +694,14 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                     )}
 
                     <div className="space-y-1.5">
-                      <label className="text-base font-bold text-zinc-700">Email Address (Optional)</label>
+                      <label className="text-base font-bold text-zinc-700">Email Address</label>
                       <div className="relative">
                         <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
                           <FiMail className="h-5 w-5" />
                         </span>
                         <input
                           type="email"
+                          required
                           value={regEmail}
                           onChange={(e) => setRegEmail(e.target.value)}
                           placeholder="you@example.com"

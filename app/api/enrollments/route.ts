@@ -314,7 +314,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Student account not found.' }, { status: 404 })
     }
 
-    const merchantTransactionId = `ENR${Date.now()}${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+    // Base36 timestamp keeps this short while staying unique, unlike the
+    // full decimal Date.now() which produced unreadably long invoice
+    // references (e.g. "ENR17825344536719L9FLO").
+    const merchantTransactionId = `ENR${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 6).toUpperCase()}`
 
     let pendingEnrollment
     try {

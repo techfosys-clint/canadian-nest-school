@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiPhone, FiBookOpen, FiCheck } from 'react-icons/fi'
 import Swal from 'sweetalert2'
 import { sendGTMEvent } from '@next/third-parties/google'
+import { pushToDataLayer, generateEventId } from '@/lib/gtm'
 
 export default function RegisterForm() {
   const router = useRouter()
@@ -220,6 +221,19 @@ export default function RegisterForm() {
         sendGTMEvent({
           event: 'sign_up',
           method: 'register_form',
+        })
+        pushToDataLayer({
+          event: 'user_data_ready',
+          event_id: generateEventId(),
+          user_data: {
+            user_id: data.user?.id || '',
+            email: email || '',
+            phone_number: '+880' + phone,
+            first_name: name ? name.split(' ')[0] : '',
+            last_name: name && name.includes(' ') ? name.split(' ').slice(1).join(' ') : '',
+            city: '',
+            country: 'BD'
+          }
         })
         Swal.fire({
           icon: 'success',
@@ -467,10 +481,10 @@ export default function RegisterForm() {
                   transition={{ duration: 0.3 }}
                   className="space-y-5"
                 >
-                  {/* Email Address (Optional) */}
+                  {/* Email Address */}
                   <div className="space-y-1.5">
                     <label htmlFor="email" className="text-base font-bold text-zinc-700">
-                      Email Address (Optional)
+                      Email Address
                     </label>
                     <div className="relative">
                       <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
@@ -479,6 +493,7 @@ export default function RegisterForm() {
                       <input
                         id="email"
                         type="email"
+                        required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="you@example.com"

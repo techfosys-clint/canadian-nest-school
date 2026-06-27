@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       )
     }
 
-    if (targetRole !== 'student' && !email) {
+    if (!email) {
       return NextResponse.json(
         { success: false, error: 'Email is required.' },
         { status: 400 }

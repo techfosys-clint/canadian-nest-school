@@ -285,6 +285,19 @@ export async function POST(request: Request) {
         throw enrollError
       }
 
+      const enrolledStudent = await Student.findById(userId).lean()
+      if (enrolledStudent?.email) {
+        const { sendEnrollmentConfirmationEmail } = await import('@/lib/email')
+        sendEnrollmentConfirmationEmail(
+          enrolledStudent.email,
+          enrolledStudent.name,
+          (course as any).title,
+          pricePaid,
+          newEnrollment.paymentReference!,
+          newEnrollment.createdAt
+        ).catch((err) => console.error('Failed to send enrollment confirmation email:', err))
+      }
+
       return NextResponse.json({
         success: true,
         message: 'Enrolled successfully.',

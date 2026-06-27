@@ -24,6 +24,105 @@ export function getGmailTransporter() {
   return cachedTransporter
 }
 
+export async function sendEnrollmentConfirmationEmail(
+  toEmail: string,
+  studentName: string,
+  courseTitle: string,
+  pricePaid: number,
+  paymentReference: string,
+  enrolledAt: Date
+) {
+  const transporter = getGmailTransporter()
+  const fromEmail = process.env.GMAIL_USER
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const logoUrl = `${appUrl}/logo.png`
+
+  if (!transporter) {
+    return false
+  }
+
+  const formattedDate = new Date(enrolledAt).toLocaleString('en-BD', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  })
+
+  const formattedPrice = new Intl.NumberFormat('en-BD', {
+    style: 'currency',
+    currency: 'BDT',
+    minimumFractionDigits: 0,
+  }).format(pricePaid)
+
+  const subject = `🎉 You're Enrolled! "${courseTitle}" - Canadian Nest School`
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1f2937; margin: 0; padding: 40px 20px; }
+        .container { max-width: 560px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e5e7eb; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .logo { display: block; margin-bottom: 24px; }
+        .logo img { height: 44px; width: auto; }
+        .title { font-size: 24px; font-weight: bold; color: #111827; margin-bottom: 16px; }
+        .text { font-size: 16px; line-height: 1.6; color: #4b5563; margin-bottom: 20px; }
+        .invoice { background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 24px 0; }
+        .invoice-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 15px; }
+        .invoice-row span:first-child { color: #6b7280; font-weight: 600; }
+        .invoice-row span:last-child { color: #111827; font-weight: bold; }
+        .invoice-total { border-top: 1px solid #e5e7eb; margin-top: 8px; padding-top: 12px; }
+        .invoice-total span { color: #E61C24 !important; font-size: 18px; }
+        .btn-container { text-align: center; margin: 32px 0; }
+        .btn { display: inline-block; background-color: #E61C24; color: #ffffff !important; padding: 14px 28px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 16px; }
+        .footer { font-size: 13px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 32px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="logo"><img src="${logoUrl}" alt="Canadian Nest School" /></div>
+        <h2 class="title">🎉 Congratulations, ${studentName}!</h2>
+        <p class="text">
+          Your enrollment in <strong>${courseTitle}</strong> is confirmed. You now have full access to the course — let's get started!
+        </p>
+
+        <div class="invoice">
+          <div class="invoice-row"><span>Course</span><span>${courseTitle}</span></div>
+          <div class="invoice-row"><span>Invoice Reference</span><span>${paymentReference}</span></div>
+          <div class="invoice-row"><span>Date</span><span>${formattedDate}</span></div>
+          <div class="invoice-row invoice-total"><span>Amount Paid</span><span>${formattedPrice}</span></div>
+        </div>
+
+        <div class="btn-container">
+          <a href="${appUrl}/dashboard" class="btn" style="color: #ffffff !important;">Go to My Dashboard</a>
+        </div>
+
+        <div class="footer">
+          <p>Keep this email as your receipt for this purchase.</p>
+          <p>&copy; 2026 Canadian Nest School Inc. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `
+
+  try {
+    await transporter.sendMail({
+      from: `Canadian Nest School <${fromEmail}>`,
+      to: toEmail,
+      subject,
+      html: htmlContent,
+    })
+    return true
+  } catch (error) {
+    console.error('Failed to send enrollment confirmation email:', error)
+    return false
+  }
+}
+
 export async function sendStaffRegistrationEmail(toEmail: string, name: string, role: string, rawPassword: string) {
   const transporter = getGmailTransporter()
   const fromEmail = process.env.GMAIL_USER

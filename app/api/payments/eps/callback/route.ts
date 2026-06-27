@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Enrollment } from '@/lib/db/models/Enrollment'
+import { Student } from '@/lib/db/models/Student'
+import { Course } from '@/lib/db/models/Course'
 import { verifyEpsTransaction } from '@/lib/eps'
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
@@ -42,6 +44,24 @@ export async function GET(request: Request) {
     if (result.status?.toLowerCase() === 'success') {
       enrollment.paymentStatus = 'completed'
       await enrollment.save()
+
+      const [student, course] = await Promise.all([
+        Student.findById(enrollment.student).lean(),
+        Course.findById(enrollment.course).lean(),
+      ])
+
+      if (student?.email && course) {
+        const { sendEnrollmentConfirmationEmail } = await import('@/lib/email')
+        sendEnrollmentConfirmationEmail(
+          student.email,
+          student.name,
+          (course as any).title,
+          enrollment.pricePaid,
+          enrollment.paymentReference || enrollment.merchantTransactionId!,
+          enrollment.createdAt
+        ).catch((err) => console.error('Failed to send enrollment confirmation email:', err))
+      }
+
       return NextResponse.redirect(`${appUrl}/dashboard?enrollment=success`)
     }
 

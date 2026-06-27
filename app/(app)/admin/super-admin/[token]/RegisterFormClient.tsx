@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { FiUser, FiMail, FiPhone, FiLock, FiCheckCircle } from 'react-icons/fi'
+import { FiUser, FiMail, FiPhone, FiLock, FiCheckCircle, FiEye, FiEyeOff } from 'react-icons/fi'
 import Swal from 'sweetalert2'
 
 export default function RegisterFormClient() {
@@ -12,6 +12,7 @@ export default function RegisterFormClient() {
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -61,7 +62,7 @@ export default function RegisterFormClient() {
       const loginRes = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, portal: 'admin' }),
       })
 
       await Swal.fire({
@@ -150,13 +151,20 @@ export default function RegisterFormClient() {
         <div className="relative">
           <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
           <input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             required
             placeholder="Minimum 6 characters"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/70 text-slate-800 rounded-lg pl-11 pr-11 py-3 text-base font-semibold outline-none transition-colors"
           />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer flex items-center justify-center"
+          >
+            {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
+          </button>
         </div>
       </div>
 
@@ -166,13 +174,20 @@ export default function RegisterFormClient() {
         <div className="relative">
           <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
           <input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             required
             placeholder="Retype password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/70 text-slate-800 rounded-lg pl-11 pr-4 py-3 text-base font-semibold outline-none transition-colors"
+            className="w-full bg-slate-50 border border-slate-200 focus:border-[#E61C24]/70 text-slate-800 rounded-lg pl-11 pr-11 py-3 text-base font-semibold outline-none transition-colors"
           />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer flex items-center justify-center"
+          >
+            {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
+          </button>
         </div>
       </div>
 

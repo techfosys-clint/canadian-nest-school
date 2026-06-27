@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const { email, password } = body
+    const { email, password, portal } = body
 
     if (!email || !password) {
       return NextResponse.json(
@@ -60,18 +60,22 @@ export async function POST(request: Request) {
     let collectionSlug: 'students' | 'users' = 'users'
     let role = 'student'
 
-    // 1. Try to find student first
-    const student = await Student.findOne(query).populate('profilePic')
-    if (student) {
-      const isMatch = await comparePasswords(password, student.password || '')
-      if (isMatch) {
-        verifiedDoc = student
-        collectionSlug = 'students'
-        role = 'student'
+    // The admin portal must never authenticate a student account — only
+    // look in the staff/admin/instructor collection there, regardless of
+    // whether a Student happens to share the same email/phone+password.
+    if (portal !== 'admin') {
+      const student = await Student.findOne(query).populate('profilePic')
+      if (student) {
+        const isMatch = await comparePasswords(password, student.password || '')
+        if (isMatch) {
+          verifiedDoc = student
+          collectionSlug = 'students'
+          role = 'student'
+        }
       }
     }
 
-    // 2. If not found or password mismatch, try staff/admin
+    // If not found or password mismatch, try staff/admin
     if (!verifiedDoc) {
       const user = await User.findOne(query).populate('profilePic')
       if (user) {

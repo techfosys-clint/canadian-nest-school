@@ -29,7 +29,7 @@ export default function LoginFormClient() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, portal: 'admin' }),
       })
 
       const data = await res.json()

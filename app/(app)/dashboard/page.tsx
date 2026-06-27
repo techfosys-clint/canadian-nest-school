@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { FiUser, FiLogOut, FiBookOpen, FiClock, FiAward, FiBook, FiExternalLink, FiCalendar, FiArrowRight, FiCheckCircle } from 'react-icons/fi'
 import Swal from 'sweetalert2'
+import { pushToDataLayer, generateEventId } from '@/lib/gtm'
 
 interface UserSession {
   id: string
@@ -94,6 +95,52 @@ export default function StudentDashboard() {
             fetchedEnrollments = enrollmentsData.docs
             setEnrollments(fetchedEnrollments)
           }
+        }
+
+        // Fire the GTM purchase event after returning from the EPS payment
+        // gateway callback, since that's the only confirmation point for
+        // paid enrollments (the checkout page can't fire it — the browser
+        // is redirected away to EPS and back). Free enrollments already
+        // fire purchase synchronously from the checkout page itself.
+        const params = new URLSearchParams(window.location.search)
+        if (params.get('enrollment') === 'success') {
+          const enrollmentId = params.get('enrollmentId')
+          const purchasedEnrollment = enrollmentId
+            ? fetchedEnrollments.find((e: any) => e.id === enrollmentId)
+            : fetchedEnrollments[0]
+
+          if (purchasedEnrollment) {
+            const e = purchasedEnrollment as any
+            pushToDataLayer({
+              event: 'purchase',
+              event_id: generateEventId(),
+              ecommerce: {
+                transaction_id: e.paymentReference || e.id,
+                currency: 'BDT',
+                value: e.pricePaid,
+                coupon: e.couponCode || '',
+                items: [{
+                  item_id: e.course?.id || '',
+                  item_name: e.course?.title || '',
+                  item_category: e.course?.category?.name || '',
+                  price: e.course?.price,
+                  quantity: 1
+                }]
+              },
+              user_data: {
+                user_id: sessionData.user.id,
+                email: sessionData.user.email,
+                phone_number: sessionData.user.phone || '',
+                first_name: sessionData.user.name ? sessionData.user.name.split(' ')[0] : '',
+                last_name: sessionData.user.name && sessionData.user.name.includes(' ') ? sessionData.user.name.split(' ').slice(1).join(' ') : '',
+                city: '',
+                country: 'BD'
+              }
+            })
+          }
+
+          // Strip the query params so a page refresh doesn't re-fire purchase
+          window.history.replaceState({}, document.title, window.location.pathname)
         }
 
         // Fetch upcoming live webinars for enrolled courses

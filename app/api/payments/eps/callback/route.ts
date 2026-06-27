@@ -33,7 +33,7 @@ export async function GET(request: Request) {
     // Already processed (e.g. user refreshed the redirect page) — don't
     // re-verify, just route based on the stored result.
     if (enrollment.paymentStatus === 'completed') {
-      return NextResponse.redirect(`${appUrl}/dashboard?enrollment=success`)
+      return NextResponse.redirect(`${appUrl}/dashboard?enrollment=success&enrollmentId=${enrollmentId}`)
     }
     if (enrollment.paymentStatus === 'failed') {
       return NextResponse.redirect(`${appUrl}/checkout/${enrollment.course}?enrollment=failed`)
@@ -62,7 +62,7 @@ export async function GET(request: Request) {
         ).catch((err) => console.error('Failed to send enrollment confirmation email:', err))
       }
 
-      return NextResponse.redirect(`${appUrl}/dashboard?enrollment=success`)
+      return NextResponse.redirect(`${appUrl}/dashboard?enrollment=success&enrollmentId=${enrollmentId}`)
     }
 
     enrollment.paymentStatus = 'failed'

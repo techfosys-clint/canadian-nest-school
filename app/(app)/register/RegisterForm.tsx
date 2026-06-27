@@ -467,10 +467,10 @@ export default function RegisterForm() {
                   transition={{ duration: 0.3 }}
                   className="space-y-5"
                 >
-                  {/* Email Address */}
+                  {/* Email Address (Optional) */}
                   <div className="space-y-1.5">
                     <label htmlFor="email" className="text-base font-bold text-zinc-700">
-                      Email Address
+                      Email Address (Optional)
                     </label>
                     <div className="relative">
                       <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
@@ -479,7 +479,6 @@ export default function RegisterForm() {
                       <input
                         id="email"
                         type="email"
-                        required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="you@example.com"

@@ -18,7 +18,7 @@ const swalTheme = {
 
 export default function ForgotPasswordForm() {
   const router = useRouter()
-  const [method, setMethod] = useState<'email' | 'phone'>('email')
+  const [method, setMethod] = useState<'email' | 'phone'>('phone')
 
   // Email flow state
   const [email, setEmail] = useState('')
@@ -198,21 +198,21 @@ export default function ForgotPasswordForm() {
           <div className="flex gap-2 p-1 bg-zinc-100 rounded-lg w-fit">
             <button
               type="button"
-              onClick={() => setMethod('email')}
-              className={`px-4 py-2 rounded-lg text-base font-bold transition-all cursor-pointer ${
-                method === 'email' ? 'bg-white text-[#E61C24] shadow-sm' : 'text-zinc-500 hover:text-zinc-700'
-              }`}
-            >
-              Email
-            </button>
-            <button
-              type="button"
               onClick={() => setMethod('phone')}
               className={`px-4 py-2 rounded-lg text-base font-bold transition-all cursor-pointer ${
                 method === 'phone' ? 'bg-white text-[#E61C24] shadow-sm' : 'text-zinc-500 hover:text-zinc-700'
               }`}
             >
               Mobile Number
+            </button>
+            <button
+              type="button"
+              onClick={() => setMethod('email')}
+              className={`px-4 py-2 rounded-lg text-base font-bold transition-all cursor-pointer ${
+                method === 'email' ? 'bg-white text-[#E61C24] shadow-sm' : 'text-zinc-500 hover:text-zinc-700'
+              }`}
+            >
+              Email
             </button>
           </div>
 
@@ -277,7 +277,10 @@ export default function ForgotPasswordForm() {
                 </label>
                 <div className="flex gap-2">
                   <div className="relative flex-1">
-                    <FiPhone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 h-5 w-5" />
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                      <FiPhone className="text-zinc-400 h-5 w-5 mr-2" />
+                      <span className="text-zinc-500 font-bold text-base border-r border-zinc-200 pr-2">+88</span>
+                    </div>
                     <input
                       id="phone"
                       type="tel"
@@ -286,7 +289,7 @@ export default function ForgotPasswordForm() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="01XXXXXXXXX"
-                      className="w-full bg-white border border-zinc-200 focus:border-[#E61C24] focus:ring-4 focus:ring-[#E61C24]/10 text-zinc-900 rounded-lg pl-11 pr-4 py-3.5 text-base font-semibold outline-none transition-all placeholder-zinc-400 disabled:bg-zinc-50 disabled:text-zinc-500"
+                      className="w-full bg-white border border-zinc-200 focus:border-[#E61C24] focus:ring-4 focus:ring-[#E61C24]/10 text-zinc-900 rounded-lg pl-[5.5rem] pr-4 py-3.5 text-base font-semibold outline-none transition-all placeholder-zinc-400 disabled:bg-zinc-50 disabled:text-zinc-500"
                     />
                   </div>
                   <button

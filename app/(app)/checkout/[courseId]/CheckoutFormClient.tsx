@@ -276,6 +276,13 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
       })
       const data = await response.json()
 
+      if (response.ok && data.success && data.redirectUrl) {
+        // Paid course — hand off to the EPS payment gateway. The purchase
+        // event fires from the dashboard once the callback confirms payment.
+        window.location.href = data.redirectUrl
+        return
+      }
+
       if (response.ok && data.success) {
         sendGTMEvent({
           event: 'purchase',

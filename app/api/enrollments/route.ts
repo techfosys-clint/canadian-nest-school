@@ -262,33 +262,102 @@ export async function POST(request: Request) {
       }
     }
 
-    // Create enrollment
-    let newEnrollment
+    // pricePaid === 0 (free course, or coupon discounted to free) — enroll
+    // immediately with no payment gateway involved.
+    if (pricePaid === 0) {
+      let newEnrollment
+      try {
+        newEnrollment = await Enrollment.create({
+          student: userId,
+          course: courseId,
+          paymentStatus: 'completed',
+          pricePaid,
+          paymentReference: 'ENROLL-' + Math.random().toString(36).substring(2, 11).toUpperCase(),
+          billingName,
+          billingPhone,
+          billingAddress,
+          couponCode: appliedCoupon ? appliedCoupon.code : undefined,
+        })
+      } catch (enrollError) {
+        if (appliedCoupon) {
+          await Coupon.updateOne({ _id: appliedCoupon._id }, { $inc: { usedCount: -1 } })
+        }
+        throw enrollError
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: 'Enrolled successfully.',
+        enrollmentId: newEnrollment._id.toString()
+      })
+    }
+
+    // Paid enrollment — create a pending record and start an EPS payment
+    // session. The enrollment is only marked 'completed' once the EPS
+    // callback verifies the transaction server-side (see
+    // /api/payments/eps/callback) — never on the client's say-so.
+    const student = await Student.findById(userId).lean()
+    if (!student) {
+      return NextResponse.json({ success: false, error: 'Student account not found.' }, { status: 404 })
+    }
+
+    const merchantTransactionId = `ENR${Date.now()}${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+
+    let pendingEnrollment
     try {
-      newEnrollment = await Enrollment.create({
+      pendingEnrollment = await Enrollment.create({
         student: userId,
         course: courseId,
-        paymentStatus: 'completed',
+        paymentStatus: 'pending',
         pricePaid,
-        paymentReference: 'ENROLL-' + Math.random().toString(36).substring(2, 11).toUpperCase(),
+        merchantTransactionId,
         billingName,
         billingPhone,
         billingAddress,
         couponCode: appliedCoupon ? appliedCoupon.code : undefined,
       })
     } catch (enrollError) {
-      // Roll back the coupon usage claim if enrollment creation failed
       if (appliedCoupon) {
         await Coupon.updateOne({ _id: appliedCoupon._id }, { $inc: { usedCount: -1 } })
       }
       throw enrollError
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Enrolled successfully.',
-      enrollmentId: newEnrollment._id.toString()
-    })
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
+    try {
+      const { initializeEpsPayment } = await import('@/lib/eps')
+      const { redirectUrl } = await initializeEpsPayment({
+        merchantTransactionId,
+        customerOrderId: pendingEnrollment._id.toString(),
+        totalAmount: pricePaid,
+        successUrl: `${appUrl}/api/payments/eps/callback?enrollmentId=${pendingEnrollment._id}&outcome=success`,
+        failUrl: `${appUrl}/api/payments/eps/callback?enrollmentId=${pendingEnrollment._id}&outcome=fail`,
+        cancelUrl: `${appUrl}/api/payments/eps/callback?enrollmentId=${pendingEnrollment._id}&outcome=cancel`,
+        customerName: billingName || (student as any).name,
+        customerEmail: (student as any).email || 'no-reply@canadiannestschool.com',
+        customerPhone: billingPhone || (student as any).phone || '01700000000',
+        productName: (course as any).title,
+      })
+
+      return NextResponse.json({
+        success: true,
+        message: 'Redirecting to payment gateway.',
+        redirectUrl,
+        enrollmentId: pendingEnrollment._id.toString(),
+      })
+    } catch (epsError: any) {
+      console.error('EPS Initialize Error:', epsError)
+      pendingEnrollment.paymentStatus = 'failed'
+      await pendingEnrollment.save()
+      if (appliedCoupon) {
+        await Coupon.updateOne({ _id: appliedCoupon._id }, { $inc: { usedCount: -1 } })
+      }
+      return NextResponse.json(
+        { success: false, error: epsError.message || 'Failed to start payment. Please try again.' },
+        { status: 502 }
+      )
+    }
 
   } catch (error: any) {
     console.error('API Enroll POST Error:', error)

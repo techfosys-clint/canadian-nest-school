@@ -3,6 +3,7 @@ import { connectToDatabase } from '@/lib/db/mongodb'
 import { Enrollment } from '@/lib/db/models/Enrollment'
 import { Student } from '@/lib/db/models/Student'
 import { Course } from '@/lib/db/models/Course'
+import { Coupon } from '@/lib/db/models/Coupon'
 import { verifyEpsTransaction } from '@/lib/eps'
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
@@ -67,6 +68,14 @@ export async function GET(request: Request) {
 
     enrollment.paymentStatus = 'failed'
     await enrollment.save()
+
+    // The payment never went through — release the coupon usage slot that
+    // was claimed at checkout, so a cancelled/failed transaction doesn't
+    // permanently burn down the coupon's maxUses.
+    if (enrollment.couponCode) {
+      await Coupon.updateOne({ code: enrollment.couponCode }, { $inc: { usedCount: -1 } })
+    }
+
     return NextResponse.redirect(`${appUrl}/checkout/${enrollment.course}?enrollment=failed`)
   } catch (error) {
     console.error('EPS Callback Error:', error)

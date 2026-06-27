@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FiMail, FiPhone, FiLock, FiArrowLeft, FiArrowRight } from 'react-icons/fi'
@@ -33,6 +33,15 @@ export default function ForgotPasswordForm() {
   const [otpSent, setOtpSent] = useState(false)
   const [sendingOtp, setSendingOtp] = useState(false)
   const [resettingPassword, setResettingPassword] = useState(false)
+  const [countdown, setCountdown] = useState(0)
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout
+    if (countdown > 0) {
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000)
+    }
+    return () => clearTimeout(timer)
+  }, [countdown])
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -85,6 +94,7 @@ export default function ForgotPasswordForm() {
 
       if (res.ok) {
         setOtpSent(true)
+        setCountdown(60)
         Swal.fire({ icon: 'success', title: 'OTP Sent', text: 'Please check your phone for the verification code.', ...swalTheme })
       } else {
         throw new Error(data.error || 'Failed to send OTP.')
@@ -295,10 +305,18 @@ export default function ForgotPasswordForm() {
                   <button
                     type="button"
                     onClick={handleSendPhoneOtp}
-                    disabled={sendingOtp}
-                    className="px-4 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    disabled={sendingOtp || countdown > 0}
+                    className="px-4 min-w-[140px] flex items-center justify-center rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   >
-                    {sendingOtp ? '...' : otpSent ? 'Resend' : 'Send OTP'}
+                    {sendingOtp ? (
+                      <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : countdown > 0 ? (
+                      `Resend in ${countdown}s`
+                    ) : otpSent ? (
+                      'Resend'
+                    ) : (
+                      'Send OTP'
+                    )}
                   </button>
                 </div>
               </div>

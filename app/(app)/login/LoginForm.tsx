@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from 'react-icons/fi'
 import Swal from 'sweetalert2'
+import { pushToDataLayer, generateEventId } from '@/lib/gtm'
 
 export default function LoginForm() {
   const router = useRouter()
@@ -39,6 +40,20 @@ export default function LoginForm() {
       const data = await res.json()
 
       if (res.ok) {
+        pushToDataLayer({
+          event: 'user_data_ready',
+          event_id: generateEventId(),
+          user_data: {
+            user_id: data.user?.id || '',
+            email: data.user?.email || '',
+            phone_number: data.user?.phone || '',
+            first_name: data.user?.name ? data.user.name.split(' ')[0] : '',
+            last_name: data.user?.name && data.user.name.includes(' ') ? data.user.name.split(' ').slice(1).join(' ') : '',
+            city: '',
+            country: 'BD'
+          }
+        })
+
         Swal.fire({
           icon: 'success',
           title: 'Welcome Back!',

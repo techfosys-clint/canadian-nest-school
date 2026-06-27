@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { sendGTMEvent } from '@next/third-parties/google'
+import { pushToDataLayer, generateEventId } from '@/lib/gtm'
 
 interface GTMTrackerProps {
   event: string
@@ -13,8 +13,9 @@ export default function GTMTracker({ event, data = {} }: GTMTrackerProps) {
 
   useEffect(() => {
     if (!hasFired.current) {
-      sendGTMEvent({
+      pushToDataLayer({
         event,
+        event_id: generateEventId(),
         ...data,
       })
       hasFired.current = true

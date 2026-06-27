@@ -755,6 +755,49 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
           ) : (
             /* USER IS AUTHENTICATED: SHOW BILLING FORM & COUPONS */
             <div className="space-y-6">
+              {/* Promo Code section */}
+              <div className="bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-4">
+                <label className="text-base font-bold text-zinc-800 flex items-center gap-2">
+                  <FiTag className="text-[#E61C24]" />
+                  Apply Coupon / Promo Code
+                </label>
+                
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="e.g. SAVE20"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    className="flex-1 px-3.5 py-2.5 rounded-lg border border-zinc-200 focus:border-[#E61C24] outline-none text-base transition-all font-mono font-bold text-zinc-800"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    disabled={couponLoading}
+                    className="px-5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base transition-all cursor-pointer flex items-center justify-center select-none"
+                  >
+                    {couponLoading ? (
+                      <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      'Apply'
+                    )}
+                  </button>
+                </div>
+
+                {couponError && (
+                  <div className="flex items-center gap-1.5 text-rose-500 text-sm font-semibold">
+                    <FiAlertCircle className="h-4.5 w-4.5 shrink-0" />
+                    <span>{couponError}</span>
+                  </div>
+                )}
+
+                {couponSuccess && (
+                  <div className="flex items-center gap-1.5 text-emerald-600 text-sm font-semibold">
+                    <FiCheck className="h-4.5 w-4.5 shrink-0" />
+                    <span>{couponSuccess}</span>
+                  </div>
+                )}
+              </div>
               
               {/* Billing Info Form */}
               <div className="bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-6">
@@ -917,51 +960,6 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
             </div>
           </div>
 
-          {/* Promo Code section (Shown only if logged in) */}
-          {user && (
-            <div className="bg-white border border-zinc-200 rounded-lg p-6 space-y-4">
-              <label className="text-base font-bold text-zinc-800 flex items-center gap-2">
-                <FiTag className="text-[#E61C24]" />
-                Apply Coupon / Promo Code
-              </label>
-              
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="e.g. SAVE20"
-                  value={couponCode}
-                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                  className="flex-1 px-3.5 py-2.5 rounded-lg border border-zinc-200 focus:border-[#E61C24] outline-none text-base transition-all font-mono font-bold text-zinc-800"
-                />
-                <button
-                  type="button"
-                  onClick={handleApplyCoupon}
-                  disabled={couponLoading}
-                  className="px-5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base transition-all cursor-pointer flex items-center justify-center select-none"
-                >
-                  {couponLoading ? (
-                    <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    'Apply'
-                  )}
-                </button>
-              </div>
-
-              {couponError && (
-                <div className="flex items-center gap-1.5 text-rose-500 text-sm font-semibold">
-                  <FiAlertCircle className="h-4.5 w-4.5 shrink-0" />
-                  <span>{couponError}</span>
-                </div>
-              )}
-
-              {couponSuccess && (
-                <div className="flex items-center gap-1.5 text-emerald-600 text-sm font-semibold">
-                  <FiCheck className="h-4.5 w-4.5 shrink-0" />
-                  <span>{couponSuccess}</span>
-                </div>
-              )}
-            </div>
-          )}
 
         </div>
 

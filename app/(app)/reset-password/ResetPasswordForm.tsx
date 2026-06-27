@@ -163,6 +163,13 @@ function ResetPasswordFormContent() {
               placeholder="••••••••"
               className="w-full pl-11 pr-11 py-3.5 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-4 focus:ring-[#E61C24]/10 outline-none text-base font-semibold text-zinc-900 bg-white transition-all placeholder-zinc-400"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-800 transition-colors cursor-pointer flex items-center justify-center"
+            >
+              {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
+            </button>
           </div>
         </div>
 
@@ -209,7 +216,7 @@ export default function ResetPasswordForm() {
 
         {/* Top Brand Logo */}
         <div className="relative z-10">
-          <Link href="/" className="flex items-center group bg-white px-3 py-1.5 rounded-lg shadow-sm">
+          <Link href="/" className="inline-flex items-center group bg-white px-3 py-1.5 rounded-lg shadow-sm w-fit">
             <img
               src="/logo.png"
               alt="Canadian Nest School"

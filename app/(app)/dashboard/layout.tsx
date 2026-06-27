@@ -302,13 +302,13 @@ export default function DashboardLayout({
           {/* Top Bar Right side Actions */}
           <div className="flex items-center gap-4.5 ml-auto lg:ml-0">
             
-            {/* Back to Home Page Shortcut */}
+            {/* Go to Courses Page Shortcut */}
             <Link
-              href="/"
+              href="/courses"
               className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-base font-semibold text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 transition-colors"
             >
-              <FiHome className="h-4.5 w-4.5" />
-              <span>Home Page</span>
+              <FiBookOpen className="h-4.5 w-4.5" />
+              <span>Courses Page</span>
             </Link>
 
             {/* Notification Bell Icon */}

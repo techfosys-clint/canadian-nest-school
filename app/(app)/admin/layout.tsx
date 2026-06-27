@@ -258,9 +258,16 @@ export default function AdminLayout({
   const isPublicAdminRoute = pathname === '/admin/login' || pathname.startsWith('/admin/super-admin')
 
   useEffect(() => {
-    async function verifyAdminSession() {
+    async function verifyAdminSession(retries = 2) {
       try {
-        const res = await fetch('/api/auth/me')
+        const url = window.location.origin + '/api/auth/me'
+        const res = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache'
+          }
+        })
         const data = await res.json()
 
         if (res.ok && data.authenticated) {
@@ -280,17 +287,24 @@ export default function AdminLayout({
           }
 
           setUser(data.user)
+          setLoading(false)
         } else {
           if (!isPublicAdminRoute) {
             window.location.href = '/admin/login'
           }
+          setLoading(false)
         }
-      } catch (err) {
+      } catch (err: any) {
+        // If it's a TypeError: Failed to fetch, it might be an extension blocking it. Retry a few times.
+        if (err.name === 'TypeError' && err.message === 'Failed to fetch' && retries > 0) {
+          setTimeout(() => verifyAdminSession(retries - 1), 500)
+          return
+        }
+        
         console.error('Admin layout session check error:', err)
         if (!isPublicAdminRoute) {
           window.location.href = '/admin/login'
         }
-      } finally {
         setLoading(false)
       }
     }

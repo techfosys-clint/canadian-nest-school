@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { FaLinkedinIn, FaFacebookF } from 'react-icons/fa'
+import { FaLinkedinIn, FaFacebookF, FaInstagram, FaYoutube } from 'react-icons/fa'
 import Swal from 'sweetalert2'
 
 // Nav link definitions — href is the "page" to match against
@@ -156,7 +156,25 @@ export default function Footer() {
               </h3>
               <div className="flex items-center gap-3">
                 <a
-                  href="https://linkedin.com"
+                  href="https://www.facebook.com/CanadianNestSchoolofBangladesh"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="h-9 w-9 bg-zinc-800 hover:bg-[#E61C24] text-zinc-300 hover:text-white rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer"
+                >
+                  <FaFacebookF className="h-4 w-4" />
+                </a>
+                <a
+                  href="https://www.instagram.com/canadiannestschoolbd/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="h-9 w-9 bg-zinc-800 hover:bg-[#E61C24] text-zinc-300 hover:text-white rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer"
+                >
+                  <FaInstagram className="h-4 w-4" />
+                </a>
+                <a
+                  href="https://www.linkedin.com/company/canadian-nest-school-of-bangladesh/"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="LinkedIn"
@@ -165,13 +183,13 @@ export default function Footer() {
                   <FaLinkedinIn className="h-4 w-4" />
                 </a>
                 <a
-                  href="https://facebook.com"
+                  href="https://www.youtube.com/@Canadian-nest-school"
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Facebook"
+                  aria-label="YouTube"
                   className="h-9 w-9 bg-zinc-800 hover:bg-[#E61C24] text-zinc-300 hover:text-white rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer"
                 >
-                  <FaFacebookF className="h-4 w-4" />
+                  <FaYoutube className="h-4 w-4" />
                 </a>
               </div>
             </div>

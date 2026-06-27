@@ -4,11 +4,14 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { FiZap, FiCheck, FiArrowRight } from 'react-icons/fi'
 import Swal from 'sweetalert2'
+import { pushToDataLayer, generateEventId } from '@/lib/gtm'
 
 interface EnrollButtonProps {
   courseId: string
   courseTitle: string
   courseSlug?: string
+  coursePrice?: number
+  courseCategory?: string
   isLoggedIn: boolean
   isAlreadyEnrolled: boolean
 }
@@ -17,6 +20,8 @@ export default function EnrollButton({
   courseId,
   courseTitle,
   courseSlug,
+  coursePrice = 0,
+  courseCategory = '',
   isLoggedIn,
   isAlreadyEnrolled,
 }: EnrollButtonProps) {
@@ -31,6 +36,21 @@ export default function EnrollButton({
         router.push('/dashboard')
       }
     } else {
+      pushToDataLayer({
+        event: 'add_to_cart',
+        event_id: generateEventId(),
+        ecommerce: {
+          currency: 'BDT',
+          value: coursePrice,
+          items: [{
+            item_id: courseId,
+            item_name: courseTitle,
+            item_category: courseCategory,
+            price: coursePrice,
+            quantity: 1
+          }]
+        }
+      })
       router.push(`/checkout/${courseId}`)
     }
   }

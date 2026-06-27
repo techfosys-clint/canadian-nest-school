@@ -162,13 +162,18 @@ export default async function CourseDetailPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#ffffff] via-[#fbfcff] to-[#f5f8ff] font-sans text-zinc-900 pb-20 pt-22 relative">
       <GTMTracker 
-        event="view_content" 
+        event="view_item" 
         data={{
-          content_name: course.title,
-          content_ids: [course._id.toString()],
-          content_type: 'course',
-          value: course.price,
-          currency: 'BDT'
+          ecommerce: {
+            currency: 'BDT',
+            value: course.price,
+            items: [{
+              item_id: course._id.toString(),
+              item_name: course.title,
+              item_category: categoryName,
+              price: course.price
+            }]
+          }
         }} 
       />
       
@@ -500,6 +505,8 @@ export default async function CourseDetailPage({ params }: Props) {
                 courseId={course._id.toString()}
                 courseTitle={course.title}
                 courseSlug={course.slug}
+                coursePrice={course.price}
+                courseCategory={categoryName}
                 isLoggedIn={!!userId}
                 isAlreadyEnrolled={isAlreadyEnrolled}
               />

@@ -64,3 +64,20 @@ export async function getAuthorizedUser(
 
   return user
 }
+
+/**
+ * Determines whether the given user id is the super admin — the account
+ * with isSuperAdmin: true, or (for accounts created before that field
+ * existed) the oldest admin account as a fallback, so legacy installs still
+ * have exactly one protected root account. Used to block deletion of the
+ * super admin by anyone, including other admins.
+ */
+export async function isSuperAdminAccount(userId: string): Promise<boolean> {
+  const flagged = await User.findOne({ isSuperAdmin: true }).lean()
+  if (flagged) {
+    return flagged._id.toString() === userId
+  }
+
+  const oldestAdmin = await User.findOne({ role: 'admin' }).sort({ createdAt: 1 }).lean()
+  return !!oldestAdmin && oldestAdmin._id.toString() === userId
+}

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { User } from '@/lib/db/models/User'
-import { verifyToken } from '@/lib/auth/auth'
+import { verifyToken, isSuperAdminAccount } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
 import { rateLimit } from '@/lib/rateLimit'
 
@@ -33,6 +33,11 @@ export async function DELETE(
     // Don't allow an admin to delete their own account
     if (user._id.toString() === id) {
       return NextResponse.json({ error: 'Forbidden: You cannot delete your own admin account.' }, { status: 400 })
+    }
+
+    // The super admin account can never be removed by anyone
+    if (await isSuperAdminAccount(id)) {
+      return NextResponse.json({ error: 'Forbidden: The super admin account cannot be removed.' }, { status: 403 })
     }
 
     await User.findByIdAndDelete(id)
@@ -93,6 +98,12 @@ export async function PUT(
     const staffToEdit = await User.findById(id)
     if (!staffToEdit) {
       return NextResponse.json({ error: 'Staff member not found.' }, { status: 404 })
+    }
+
+    // Downgrading the super admin's role is equivalent to removing them —
+    // block it the same way deletion is blocked.
+    if (role !== 'admin' && (await isSuperAdminAccount(id))) {
+      return NextResponse.json({ error: 'Forbidden: The super admin role cannot be changed.' }, { status: 403 })
     }
 
     // Check duplicate email

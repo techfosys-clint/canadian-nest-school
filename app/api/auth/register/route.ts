@@ -112,9 +112,11 @@ export async function POST(request: Request) {
 
     // 3. Role Security Verification
     const sensitiveRoles = ['admin', 'staff', 'instructor']
+    let isFirstAdmin = false
 
     if (sensitiveRoles.includes(targetRole)) {
       const adminCount = await User.countDocuments({ role: 'admin' })
+      isFirstAdmin = targetRole === 'admin' && adminCount === 0
 
       // If no admin exists in the system yet, allow creating the first admin
       if (adminCount > 0) {
@@ -210,6 +212,7 @@ export async function POST(request: Request) {
         role: targetRole,
         designation: designation || undefined,
         permissions: permissions || [],
+        isSuperAdmin: isFirstAdmin,
       })
 
       // Send onboarding email notification to new staff member

@@ -11,6 +11,7 @@ export interface IUser extends Document {
   resetPasswordToken?: string
   resetPasswordExpiration?: Date
   permissions?: string[]
+  isSuperAdmin?: boolean
 }
 
 const UserSchema = new Schema<IUser>(
@@ -25,6 +26,10 @@ const UserSchema = new Schema<IUser>(
     resetPasswordToken: { type: String },
     resetPasswordExpiration: { type: Date },
     permissions: { type: [String], default: [] },
+    // The root account created via the first-time setup wizard. No one —
+    // not even another admin — may delete a super admin account, protecting
+    // the root account from being removed by a compromised or rogue admin.
+    isSuperAdmin: { type: Boolean, default: false },
   },
   { collection: 'users', timestamps: true }
 )

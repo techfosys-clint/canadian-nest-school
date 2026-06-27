@@ -92,8 +92,9 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
     fetch(`/api/admin/courses/${courseId}`)
       .then((res) => res.json())
       .then((data) => {
-        if (data.course && data.course.modules) {
-          const courseMods = data.course.modules as string[]
+        const course = data.data?.course
+        if (course && course.modules) {
+          const courseMods = course.modules as string[]
           setExistingModules(courseMods)
           
           // If editing a lesson, and its current moduleName is not in the course's modules,

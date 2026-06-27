@@ -70,12 +70,12 @@ export async function sendEnrollmentConfirmationEmail(
         .logo img { height: 44px; width: auto; }
         .title { font-size: 24px; font-weight: bold; color: #111827; margin-bottom: 16px; }
         .text { font-size: 16px; line-height: 1.6; color: #4b5563; margin-bottom: 20px; }
-        .invoice { background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 24px 0; }
-        .invoice-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 15px; }
-        .invoice-row span:first-child { color: #6b7280; font-weight: 600; }
-        .invoice-row span:last-child { color: #111827; font-weight: bold; }
-        .invoice-total { border-top: 1px solid #e5e7eb; margin-top: 8px; padding-top: 12px; }
-        .invoice-total span { color: #E61C24 !important; font-size: 18px; }
+        .invoice { background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 4px 20px; margin: 24px 0; width: 100%; border-collapse: collapse; }
+        .invoice-row td { padding: 12px 0; font-size: 15px; border-bottom: 1px solid #e5e7eb; }
+        .invoice-row td:first-child { color: #6b7280; font-weight: 600; }
+        .invoice-row td:last-child { color: #111827; font-weight: bold; text-align: right; }
+        .invoice-total td { border-bottom: none; }
+        .invoice-total td:last-child { color: #E61C24 !important; font-size: 18px; }
         .btn-container { text-align: center; margin: 32px 0; }
         .btn { display: inline-block; background-color: #E61C24; color: #ffffff !important; padding: 14px 28px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 16px; }
         .footer { font-size: 13px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 32px; }
@@ -89,12 +89,24 @@ export async function sendEnrollmentConfirmationEmail(
           Your enrollment in <strong>${courseTitle}</strong> is confirmed. You now have full access to the course — let's get started!
         </p>
 
-        <div class="invoice">
-          <div class="invoice-row"><span>Course</span><span>${courseTitle}</span></div>
-          <div class="invoice-row"><span>Invoice Reference</span><span>${paymentReference}</span></div>
-          <div class="invoice-row"><span>Date</span><span>${formattedDate}</span></div>
-          <div class="invoice-row invoice-total"><span>Amount Paid</span><span>${formattedPrice}</span></div>
-        </div>
+        <table class="invoice" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%; background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; margin: 24px 0;">
+          <tr class="invoice-row">
+            <td style="padding: 12px 20px; font-size: 15px; color: #6b7280; font-weight: 600; border-bottom: 1px solid #e5e7eb;">Course</td>
+            <td style="padding: 12px 20px; font-size: 15px; color: #111827; font-weight: bold; text-align: right; border-bottom: 1px solid #e5e7eb;">${courseTitle}</td>
+          </tr>
+          <tr class="invoice-row">
+            <td style="padding: 12px 20px; font-size: 15px; color: #6b7280; font-weight: 600; border-bottom: 1px solid #e5e7eb;">Invoice Reference</td>
+            <td style="padding: 12px 20px; font-size: 15px; color: #111827; font-weight: bold; text-align: right; border-bottom: 1px solid #e5e7eb;">${paymentReference}</td>
+          </tr>
+          <tr class="invoice-row">
+            <td style="padding: 12px 20px; font-size: 15px; color: #6b7280; font-weight: 600; border-bottom: 1px solid #e5e7eb;">Date</td>
+            <td style="padding: 12px 20px; font-size: 15px; color: #111827; font-weight: bold; text-align: right; border-bottom: 1px solid #e5e7eb;">${formattedDate}</td>
+          </tr>
+          <tr class="invoice-row invoice-total">
+            <td style="padding: 12px 20px; font-size: 15px; color: #6b7280; font-weight: 600;">Amount Paid</td>
+            <td style="padding: 12px 20px; font-size: 18px; color: #E61C24; font-weight: bold; text-align: right;">${formattedPrice}</td>
+          </tr>
+        </table>
 
         <div class="btn-container">
           <a href="${appUrl}/dashboard" class="btn" style="color: #ffffff !important;">Go to My Dashboard</a>

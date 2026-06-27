@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
 import {
   FiGrid, FiCode, FiLayers, FiClipboard,
@@ -281,10 +282,13 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                     {/* Image */}
                     <div className="lg:col-span-6 relative aspect-[16/10] bg-[#f9fafb] rounded-lg overflow-hidden border border-zinc-100">
                       {getImageUrl(featuredCourse.thumbnail) ? (
-                        <img
+                        <Image
                           src={getImageUrl(featuredCourse.thumbnail)}
                           alt={featuredCourse.title}
-                          className="w-full h-full object-cover pointer-events-none"
+                          fill
+                          sizes="(min-width: 1024px) 40vw, 90vw"
+                          priority
+                          className="object-cover pointer-events-none"
                           onError={(e) => {
                             // Clear src so we can render the CSS fallback instead of a broken image
                             (e.target as HTMLImageElement).style.display = 'none';
@@ -413,10 +417,13 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                         {/* Aspect-ratio constrained image wrapper */}
                         <div className="relative aspect-[16/10] bg-[#f9fafb] overflow-hidden rounded-t-lg">
                           {getImageUrl(course.thumbnail) ? (
-                            <img
+                            <Image
                               src={getImageUrl(course.thumbnail)}
                               alt={course.title}
-                              className="w-full h-full object-cover pointer-events-none group-hover:scale-[1.03] transition-transform duration-500 rounded-t-lg"
+                              fill
+                              sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 90vw"
+                              loading="lazy"
+                              className="object-cover pointer-events-none group-hover:scale-[1.03] transition-transform duration-500 rounded-t-lg"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).style.display = 'none';
                                 const parent = (e.target as HTMLImageElement).parentElement;

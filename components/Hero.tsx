@@ -2,6 +2,9 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
+
+const MotionImage = motion.create(Image)
 
 export default function Hero({ children }: { children?: React.ReactNode }) {
   return (
@@ -50,9 +53,12 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
                 transition={{ duration: 0.5, delay: 0.3, type: 'spring', stiffness: 120 }}
                 className="inline-block align-middle -ml-[16px] md:-ml-[26px] relative -top-0.5 md:-top-0.5 z-10"
               >
-                <img 
-                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150&h=150" 
-                  alt="Instructor" 
+                <Image
+                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150&h=150"
+                  alt="Instructor"
+                  width={48}
+                  height={48}
+                  priority
                   className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full border-2 md:border-3 border-white shadow-md object-cover"
                 />
               </motion.span>
@@ -78,20 +84,24 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
 
               {/* Double Overlapping Avatars - Staggered entrance */}
               <span className="inline-flex items-center justify-center align-middle mx-1.5 md:mx-3 translate-y-0.5">
-                <motion.img 
+                <MotionImage
                   initial={{ opacity: 0, x: -15 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.35, ease: 'easeOut' }}
-                  src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150&h=150" 
-                  alt="Student 1" 
+                  src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150&h=150"
+                  alt="Student 1"
+                  width={48}
+                  height={48}
                   className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full border-2 md:border-3 border-white shadow-md object-cover -mr-2 md:-mr-3 relative z-20"
                 />
-                <motion.img 
+                <MotionImage
                   initial={{ opacity: 0, x: 15 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.45, ease: 'easeOut' }}
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150&h=150" 
-                  alt="Student 2" 
+                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150&h=150"
+                  alt="Student 2"
+                  width={48}
+                  height={48}
                   className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full border-2 md:border-3 border-white shadow-md object-cover relative z-10"
                 />
               </span>

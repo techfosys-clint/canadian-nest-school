@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Coupon } from '@/lib/db/models/Coupon'
+import { releaseStalePendingCouponUses } from '@/lib/coupons'
 
 export async function POST(request: Request) {
   try {
@@ -13,7 +14,7 @@ export async function POST(request: Request) {
 
     const uppercaseCode = code.toUpperCase().trim()
 
-    const coupon = await Coupon.findOne({ code: uppercaseCode })
+    let coupon = await Coupon.findOne({ code: uppercaseCode })
     if (!coupon) {
       return NextResponse.json({ success: false, error: 'Invalid coupon code.' }, { status: 404 })
     }
@@ -27,7 +28,15 @@ export async function POST(request: Request) {
     }
 
     if (coupon.maxUses && coupon.usedCount >= coupon.maxUses) {
-      return NextResponse.json({ success: false, error: 'This coupon has reached its usage limit.' }, { status: 400 })
+      // Before declaring it exhausted, release any abandoned EPS sessions
+      // (pending enrollments whose buyer never completed or cancelled
+      // payment) that are still holding a usedCount slot.
+      await releaseStalePendingCouponUses(uppercaseCode)
+      coupon = await Coupon.findOne({ code: uppercaseCode })
+
+      if (!coupon || (coupon.maxUses && coupon.usedCount >= coupon.maxUses)) {
+        return NextResponse.json({ success: false, error: 'This coupon has reached its usage limit.' }, { status: 400 })
+      }
     }
 
     return NextResponse.json({

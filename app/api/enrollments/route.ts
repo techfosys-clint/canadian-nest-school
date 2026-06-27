@@ -230,7 +230,16 @@ export async function POST(request: Request) {
       }
 
       if (coupon.maxUses && coupon.usedCount >= coupon.maxUses) {
-        return NextResponse.json({ success: false, error: 'This coupon has reached its usage limit.' }, { status: 400 })
+        // Release any abandoned EPS sessions still holding a usedCount slot
+        // before declaring the coupon exhausted.
+        const { releaseStalePendingCouponUses } = await import('@/lib/coupons')
+        await releaseStalePendingCouponUses(uppercaseCode)
+
+        const refreshedCoupon = await Coupon.findById(coupon._id)
+        if (!refreshedCoupon || (refreshedCoupon.maxUses && refreshedCoupon.usedCount >= refreshedCoupon.maxUses)) {
+          return NextResponse.json({ success: false, error: 'This coupon has reached its usage limit.' }, { status: 400 })
+        }
+        coupon.usedCount = refreshedCoupon.usedCount
       }
 
       // Calculate discount

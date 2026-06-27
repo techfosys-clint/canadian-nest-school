@@ -59,6 +59,11 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
   const [regEmail, setRegEmail] = useState('')
   const [regPassword, setRegPassword] = useState('')
   const [regPhone, setRegPhone] = useState('')
+  const [regOtp, setRegOtp] = useState('')
+  const [regOtpSent, setRegOtpSent] = useState(false)
+  const [regOtpVerified, setRegOtpVerified] = useState(false)
+  const [sendingRegOtp, setSendingRegOtp] = useState(false)
+  const [verifyingRegOtp, setVerifyingRegOtp] = useState(false)
 
   // Checkout states
   const [billingName, setBillingName] = useState('')
@@ -146,13 +151,73 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
     }
   }
 
+  // Handle OTP send for inline registration
+  const handleSendRegOtp = async () => {
+    if (!regPhone) {
+      setAuthError('Please enter your mobile number first.')
+      return
+    }
+    setAuthError(null)
+    setSendingRegOtp(true)
+    try {
+      const res = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: regPhone }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setRegOtpSent(true)
+        setAuthSuccess('OTP sent! Please check your phone for the verification code.')
+      } else {
+        throw new Error(data.error || 'Failed to send OTP.')
+      }
+    } catch (err: any) {
+      setAuthError(err.message || 'Failed to send OTP.')
+    } finally {
+      setSendingRegOtp(false)
+    }
+  }
+
+  // Handle OTP verify for inline registration
+  const handleVerifyRegOtp = async () => {
+    if (!regOtp) {
+      setAuthError('Please enter the verification code sent to your phone.')
+      return
+    }
+    setAuthError(null)
+    setVerifyingRegOtp(true)
+    try {
+      const res = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: regPhone, otp: regOtp }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setRegOtpVerified(true)
+        setAuthSuccess('Phone number verified successfully!')
+      } else {
+        throw new Error(data.error || 'Incorrect OTP.')
+      }
+    } catch (err: any) {
+      setAuthError(err.message || 'Verification failed.')
+    } finally {
+      setVerifyingRegOtp(false)
+    }
+  }
+
   // Handle Registration submission + silent login
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setAuthError(null)
     setAuthSuccess(null)
-    if (!regName || !regEmail || !regPassword) {
-      setAuthError('Please fill in all required fields.')
+    if (!regName || !regPhone || !regPassword) {
+      setAuthError('Please fill in your name, mobile number, and password.')
+      return
+    }
+    if (!regOtpVerified) {
+      setAuthError('Please verify your mobile number with the OTP code first.')
       return
     }
     if (regPassword.length < 6) {
@@ -168,23 +233,23 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: regName,
-          email: regEmail,
+          email: regEmail || undefined,
           password: regPassword,
-          phone: regPhone || undefined,
+          phone: regPhone,
           role: 'student',
         }),
       })
       const regData = await regRes.json()
 
       if (!regRes.ok || !regData.success) {
-        throw new Error(regData.error || 'Registration failed. Email might already exist.')
+        throw new Error(regData.error || 'Registration failed. Phone number might already be registered.')
       }
 
       // 2. Perform silent login
       const loginRes = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: regEmail, password: regPassword }),
+        body: JSON.stringify({ email: regPhone, password: regPassword }),
       })
       const loginData = await loginRes.json()
 
@@ -489,14 +554,65 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-base font-bold text-zinc-700">Email Address</label>
+                      <label className="text-base font-bold text-zinc-700">Mobile Number</label>
+                      <div className="flex gap-2">
+                        <div className="relative flex-1">
+                          <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
+                            <FiPhone className="h-5 w-5" />
+                          </span>
+                          <input
+                            type="tel"
+                            required
+                            disabled={regOtpVerified}
+                            value={regPhone}
+                            onChange={(e) => setRegPhone(e.target.value)}
+                            placeholder="01XXXXXXXXX"
+                            className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleSendRegOtp}
+                          disabled={sendingRegOtp || regOtpVerified}
+                          className="px-4 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        >
+                          {sendingRegOtp ? '...' : regOtpVerified ? <FiCheck className="h-5 w-5" /> : regOtpSent ? 'Resend' : 'Send OTP'}
+                        </button>
+                      </div>
+                    </div>
+
+                    {regOtpSent && !regOtpVerified && (
+                      <div className="space-y-1.5">
+                        <label className="text-base font-bold text-zinc-700">Verification Code</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={regOtp}
+                            onChange={(e) => setRegOtp(e.target.value)}
+                            placeholder="6-digit code"
+                            className="flex-1 px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleVerifyRegOtp}
+                            disabled={verifyingRegOtp}
+                            className="px-4 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                          >
+                            {verifyingRegOtp ? '...' : 'Verify'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="space-y-1.5">
+                      <label className="text-base font-bold text-zinc-700">Email Address (Optional)</label>
                       <div className="relative">
                         <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
                           <FiMail className="h-5 w-5" />
                         </span>
                         <input
                           type="email"
-                          required
                           value={regEmail}
                           onChange={(e) => setRegEmail(e.target.value)}
                           placeholder="you@example.com"
@@ -526,22 +642,6 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                         >
                           {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
                         </button>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-base font-bold text-zinc-700">Phone Number (Optional)</label>
-                      <div className="relative">
-                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
-                          <FiPhone className="h-5 w-5" />
-                        </span>
-                        <input
-                          type="tel"
-                          value={regPhone}
-                          onChange={(e) => setRegPhone(e.target.value)}
-                          placeholder="+1 (555) 000-0000"
-                          className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
-                        />
                       </div>
                     </div>
 

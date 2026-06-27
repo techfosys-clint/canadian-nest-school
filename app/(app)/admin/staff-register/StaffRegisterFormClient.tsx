@@ -103,7 +103,7 @@ export default function StaffRegisterFormClient() {
         throw new Error(data.error || 'Registration failed.')
       }
 
-      router.push('/admin/staff-register?success=registered')
+      router.push(`/admin/staff-register?success=registered&emailSent=${data.emailSent !== false}`)
       router.refresh()
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred.')

@@ -48,7 +48,12 @@ export default function StaffListPageClient({ initialStaff }: StaffListPageClien
     const params = new URLSearchParams(window.location.search)
     const successType = params.get('success')
     if (successType === 'registered') {
-      setSuccessMsg('Faculty member account has been registered successfully!')
+      const emailSent = params.get('emailSent') !== 'false'
+      setSuccessMsg(
+        emailSent
+          ? 'Faculty member account has been registered successfully! A welcome email with login credentials was sent.'
+          : 'Faculty member account has been registered successfully, but the welcome email could not be sent — please share the login credentials manually.'
+      )
     } else if (successType === 'updated') {
       setSuccessMsg('Faculty member profile details updated successfully!')
     } else if (successType === 'deleted') {

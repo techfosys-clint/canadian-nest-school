@@ -27,6 +27,7 @@ export function getGmailTransporter() {
 export async function sendStaffRegistrationEmail(toEmail: string, name: string, role: string, rawPassword: string) {
   const transporter = getGmailTransporter()
   const fromEmail = process.env.GMAIL_USER
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
   if (!transporter) {
     return false
@@ -45,7 +46,7 @@ export async function sendStaffRegistrationEmail(toEmail: string, name: string, 
         <p style="margin: 8px 0; font-size: 16px;"><strong>Password:</strong> <span style="font-family: monospace; font-weight: bold; background: #e5e7eb; padding: 2px 6px; border-radius: 4px;">${rawPassword}</span></p>
       </div>
       <p style="font-size: 16px; color: #4b5563; line-height: 1.6;">
-        You can log in to your dashboard here: <a href="http://localhost:3000/admin/login" style="color: #615fff; font-weight: bold; text-decoration: none;">Canadian Nest School Admin Login</a>
+        You can log in to your dashboard here: <a href="${appUrl}/admin/login" style="color: #615fff; font-weight: bold; text-decoration: none;">Canadian Nest School Admin Login</a>
       </p>
       <p style="font-size: 14px; color: #9ca3af; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 15px;">
         For security reasons, we highly recommend changing your password after your first login.

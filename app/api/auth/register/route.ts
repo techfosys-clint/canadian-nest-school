@@ -189,6 +189,7 @@ export async function POST(request: Request) {
     // 5. Hash Password & Register User in appropriate collection
     const hashedPassword = await hashPassword(password)
     let newUser: any
+    let staffEmailSent = false
 
     if (targetRole === 'student') {
       newUser = await Student.create({
@@ -218,7 +219,7 @@ export async function POST(request: Request) {
       // Send onboarding email notification to new staff member
       try {
         const { sendStaffRegistrationEmail } = await import('@/lib/email')
-        await sendStaffRegistrationEmail(emailLower, name, targetRole, password)
+        staffEmailSent = await sendStaffRegistrationEmail(emailLower, name, targetRole, password)
       } catch (emailErr) {
         console.error('Failed to send registration email to staff:', emailErr)
       }
@@ -252,6 +253,7 @@ export async function POST(request: Request) {
       success: true,
       message: `${targetRole.charAt(0).toUpperCase() + targetRole.slice(1)} registered successfully.`,
       user: safeUser,
+      ...(targetRole !== 'student' ? { emailSent: staffEmailSent } : {}),
     }, { status: 201 })
 
   } catch (error: any) {

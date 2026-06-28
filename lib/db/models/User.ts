@@ -12,6 +12,7 @@ export interface IUser extends Document {
   resetPasswordExpiration?: Date
   permissions?: string[]
   isSuperAdmin?: boolean
+  status: 'active' | 'suspended'
 }
 
 const UserSchema = new Schema<IUser>(
@@ -30,6 +31,7 @@ const UserSchema = new Schema<IUser>(
     // not even another admin — may delete a super admin account, protecting
     // the root account from being removed by a compromised or rogue admin.
     isSuperAdmin: { type: Boolean, default: false },
+    status: { type: String, enum: ['active', 'suspended'], default: 'active', required: true },
   },
   { collection: 'users', timestamps: true }
 )

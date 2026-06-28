@@ -34,8 +34,8 @@ export default async function CourseWatchPage({ params }: Props) {
 
   // Fetch course
   const course = await Course.findOne({ slug, status: 'published' })
-    .populate('categories')
-    .populate('instructors')
+    .populate('category')
+    .populate('instructor')
     .lean() as any
 
   if (!course) notFound()
@@ -103,11 +103,11 @@ export default async function CourseWatchPage({ params }: Props) {
     title: course.title,
     slug: course.slug,
     summary: course.summary || '',
-    category: course.categories?.[0] ? {
-      name: course.categories[0].name
+    category: course.category ? {
+      name: course.category.name
     } : undefined,
-    instructor: course.instructors?.[0] ? {
-      name: course.instructors[0].name || course.instructors[0].email
+    instructor: course.instructor ? {
+      name: course.instructor.name || course.instructor.email
     } : undefined,
   }
 

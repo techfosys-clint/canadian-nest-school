@@ -7,7 +7,9 @@ export interface ICourse extends Document {
   description?: any // Lexical JSON
   price?: number
   thumbnail?: mongoose.Types.ObjectId | string
+  category?: mongoose.Types.ObjectId | string
   categories?: (mongoose.Types.ObjectId | string)[]
+  instructor?: mongoose.Types.ObjectId | string
   instructors?: (mongoose.Types.ObjectId | string)[]
   status: 'draft' | 'published'
   duration?: string
@@ -37,7 +39,9 @@ const CourseSchema = new Schema<ICourse>(
     description: { type: Schema.Types.Mixed }, // Lexical JSON structure
     price: { type: Number, min: 0 },
     thumbnail: { type: Schema.Types.ObjectId, ref: 'Media' },
+    category: { type: Schema.Types.ObjectId, ref: 'Category' },
     categories: [{ type: Schema.Types.ObjectId, ref: 'Category' }],
+    instructor: { type: Schema.Types.ObjectId, ref: 'User' },
     instructors: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     status: { type: String, enum: ['draft', 'published'], default: 'draft' },
     duration: { type: String },
@@ -72,7 +76,7 @@ const CourseSchema = new Schema<ICourse>(
 )
 
 // Clear old model cache in development if modules field is not registered in compiled schema paths
-if (mongoose.models.Course && !mongoose.models.Course.schema.paths.modules) {
+if (mongoose.models.Course && (!mongoose.models.Course.schema.paths.modules || !mongoose.models.Course.schema.paths.category)) {
   delete mongoose.models.Course
 }
 

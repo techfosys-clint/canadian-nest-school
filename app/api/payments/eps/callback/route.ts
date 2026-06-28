@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Enrollment } from '@/lib/db/models/Enrollment'
 import { Student } from '@/lib/db/models/Student'
+import { User } from '@/lib/db/models/User'
 import { Course } from '@/lib/db/models/Course'
 import { Coupon } from '@/lib/db/models/Coupon'
 import { verifyEpsTransaction } from '@/lib/eps'
@@ -46,10 +47,11 @@ export async function GET(request: Request) {
       enrollment.paymentStatus = 'completed'
       await enrollment.save()
 
-      const [student, course] = await Promise.all([
-        Student.findById(enrollment.student).lean(),
-        Course.findById(enrollment.course).lean(),
-      ])
+      let student = await Student.findById(enrollment.student).lean()
+      if (!student) {
+        student = await User.findById(enrollment.student).lean()
+      }
+      const course = await Course.findById(enrollment.course).lean()
 
       if (student?.email && course) {
         const { sendEnrollmentConfirmationEmail } = await import('@/lib/email')

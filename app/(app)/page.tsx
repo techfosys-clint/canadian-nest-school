@@ -27,9 +27,9 @@ export default async function Home() {
     Course.find({ status: 'published' })
       .sort({ createdAt: -1 })
       .limit(12)
-      .populate('categories')
+      .populate('category')
       .populate('thumbnail')
-      .populate('instructors')
+      .populate('instructor')
       .lean(),
     Category.find()
       .limit(50)
@@ -89,14 +89,14 @@ export default async function Home() {
         alt: doc.thumbnail.alt || null,
         sizes: doc.thumbnail.sizes || null,
       } : null,
-      category: doc.categories?.[0] ? {
-        id: doc.categories[0]._id.toString(),
-        name: doc.categories[0].name,
-        slug: doc.categories[0].slug,
+      category: doc.category ? {
+        id: doc.category._id.toString(),
+        name: doc.category.name,
+        slug: doc.category.slug,
       } : null,
-      instructor: doc.instructors?.[0] && typeof doc.instructors[0] === 'object' ? {
-        id: doc.instructors[0]._id.toString(),
-        name: doc.instructors[0].name || doc.instructors[0].email || 'Instructor',
+      instructor: doc.instructor && typeof doc.instructor === 'object' ? {
+        id: doc.instructor._id.toString(),
+        name: doc.instructor.name || doc.instructor.email || 'Instructor',
       } : null,
       duration: doc.duration || null,
       level: doc.level || 'all',

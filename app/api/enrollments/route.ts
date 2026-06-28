@@ -118,10 +118,18 @@ export async function GET(request: Request) {
             id: doc.course.category._id.toString(),
             ...doc.course.category
           } : null,
+          categories: doc.course.category ? [{
+            id: doc.course.category._id.toString(),
+            ...doc.course.category
+          }] : [],
           instructor: doc.course.instructor ? {
             id: doc.course.instructor._id.toString(),
             ...doc.course.instructor
           } : null,
+          instructors: doc.course.instructor ? [{
+            id: doc.course.instructor._id.toString(),
+            ...doc.course.instructor
+          }] : [],
           thumbnail: doc.course.thumbnail ? {
             id: doc.course.thumbnail._id.toString(),
             ...doc.course.thumbnail
@@ -299,7 +307,10 @@ export async function POST(request: Request) {
         throw enrollError
       }
 
-      const enrolledStudent = await Student.findById(userId).lean()
+      let enrolledStudent = await Student.findById(userId).lean()
+      if (!enrolledStudent) {
+        enrolledStudent = await User.findById(userId).lean()
+      }
       if (enrolledStudent?.email) {
         const { sendEnrollmentConfirmationEmail } = await import('@/lib/email')
         sendEnrollmentConfirmationEmail(
@@ -323,7 +334,10 @@ export async function POST(request: Request) {
     // session. The enrollment is only marked 'completed' once the EPS
     // callback verifies the transaction server-side (see
     // /api/payments/eps/callback) — never on the client's say-so.
-    const student = await Student.findById(userId).lean()
+    let student = await Student.findById(userId).lean()
+    if (!student) {
+      student = await User.findById(userId).lean()
+    }
     if (!student) {
       return NextResponse.json({ success: false, error: 'Student account not found.' }, { status: 404 })
     }

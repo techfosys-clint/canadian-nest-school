@@ -1,56 +1,59 @@
-import { NextResponse } from 'next/server'
-import { connectToDatabase } from '@/lib/db/mongodb'
-import { Student } from '@/lib/db/models/Student'
-import { User } from '@/lib/db/models/User'
-import { getGmailTransporter } from '@/lib/email'
-import crypto from 'crypto'
+import { Student } from '@/lib/db/models/Student';
+import { User } from '@/lib/db/models/User';
+import { connectToDatabase } from '@/lib/db/mongodb';
+import { getGmailTransporter } from '@/lib/email';
+import crypto from 'crypto';
+import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    const { email } = body
+    const body = await request.json();
+    const { email } = body;
 
     if (!email) {
       return NextResponse.json(
         { success: false, error: 'Email is required.' },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
-    await connectToDatabase()
+    await connectToDatabase();
 
-    const emailLower = email.toLowerCase()
-    let account: any = null
-    
+    const emailLower = email.toLowerCase();
+    let account;
+
     // 1. Check Student first
-    account = await Student.findOne({ email: emailLower })
-    
+    account = await Student.findOne({ email: emailLower });
+
     // 2. Check User if not found in Student
     if (!account) {
-      account = await User.findOne({ email: emailLower })
+      account = await User.findOne({ email: emailLower });
     }
 
     if (!account) {
       return NextResponse.json(
-        { success: false, error: 'This email address is not registered in our database.' },
-        { status: 404 }
-      )
+        {
+          success: false,
+          error: 'This email address is not registered in our database.',
+        },
+        { status: 404 },
+      );
     }
 
     // 3. Generate token and set expiration (1 hour)
-    const token = crypto.randomBytes(32).toString('hex')
-    const expiration = new Date(Date.now() + 3600000) // 1 hour
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiration = new Date(Date.now() + 3600000); // 1 hour
 
-    account.resetPasswordToken = token
-    account.resetPasswordExpiration = expiration
-    await account.save()
+    account.resetPasswordToken = token;
+    account.resetPasswordExpiration = expiration;
+    await account.save();
 
     // 4. Send the actual email using Gmail SMTP via nodemailer
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    const resetUrl = `${appUrl}/reset-password?token=${token}`
-    const logoUrl = `${appUrl}/logo.png`
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const resetUrl = `${appUrl}/reset-password?token=${token}`;
+    const logoUrl = `${appUrl}/logo.png`;
 
-    const transporter = getGmailTransporter()
+    const transporter = getGmailTransporter();
 
     if (transporter) {
       try {
@@ -95,12 +98,14 @@ export async function POST(request: Request) {
               </body>
               </html>
             `,
-        })
+        });
       } catch (mailError) {
-        console.error('Failed to send email via Gmail SMTP:', mailError)
+        console.error('Failed to send email via Gmail SMTP:', mailError);
       }
     } else {
-      console.warn('Gmail SMTP credentials missing. Skipping real email dispatch.')
+      console.warn(
+        'Gmail SMTP credentials missing. Skipping real email dispatch.',
+      );
     }
 
     // 5. Return success response
@@ -108,23 +113,23 @@ export async function POST(request: Request) {
     // never infer this from NODE_ENV, since a misconfigured staging/preview
     // deploy without NODE_ENV=production would otherwise leak reset tokens
     // (full account takeover without needing to read the email).
-    const debugTokensEnabled = process.env.ENABLE_DEBUG_TOKEN === 'true'
+    const debugTokensEnabled = process.env.ENABLE_DEBUG_TOKEN === 'true';
 
     return NextResponse.json({
       success: true,
       message: 'If the email exists, a password reset link has been generated.',
       ...(debugTokensEnabled ? { debugToken: token } : {}),
-    })
-
+    });
   } catch (error: any) {
-    console.error('Forgot Password Error:', error)
+    console.error('Forgot Password Error:', error);
     return NextResponse.json(
       {
         success: false,
-        error: error.message || 'An error occurred while processing forgot password request.',
+        error:
+          error.message ||
+          'An error occurred while processing forgot password request.',
       },
-      { status: 400 }
-    )
+      { status: 400 },
+    );
   }
 }
-

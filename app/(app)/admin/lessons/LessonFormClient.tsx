@@ -602,7 +602,6 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                               type="button"
                               onClick={() => {
                                 const newQuestions = [...quizQuestions]
-                                newQuestions[qIdx].image = undefined
                                 newQuestions[qIdx].imageUrl = undefined
                                 setQuizQuestions(newQuestions)
                               }}

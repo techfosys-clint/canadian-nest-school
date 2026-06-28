@@ -87,7 +87,7 @@ export default function StudentDashboard() {
         setUser(sessionData.user)
 
         // Fetch student's enrollments with depth=2 to populate course and media details
-        const enrollmentsRes = await fetch('/api/enrollments?depth=2')
+        const enrollmentsRes = await fetch('/api/enrollments?depth=2', { cache: 'no-store' })
         let fetchedEnrollments: EnrollmentItem[] = []
         if (enrollmentsRes.ok) {
           const enrollmentsData = await enrollmentsRes.json()

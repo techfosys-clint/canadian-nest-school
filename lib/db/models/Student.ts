@@ -16,7 +16,7 @@ const StudentSchema = new Schema<IStudent>(
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String }, // Hashed password
     name: { type: String, required: true },
-    phone: { type: String, required: true, unique: true },
+    phone: { type: String, required: true },
     profilePic: { type: Schema.Types.ObjectId, ref: 'Media' },
     status: { type: String, enum: ['active', 'suspended'], default: 'active', required: true },
     resetPasswordToken: { type: String },

@@ -92,14 +92,6 @@ export async function POST(request: Request) {
     }
 
     if (targetRole === 'student') {
-      const existingPhone = await Student.findOne({ phone })
-      if (existingPhone) {
-        return NextResponse.json(
-          { success: false, error: 'Phone number is already registered.' },
-          { status: 400 }
-        )
-      }
-
       // 2b. Require a verified OTP for this phone number before registering
       const otpRecord = await OtpVerification.findOne({ phone })
       if (!otpRecord || !otpRecord.verified || otpRecord.expiresAt < new Date()) {

@@ -62,7 +62,7 @@ export default function MyCoursesPage() {
         setUser(sessionData.user)
 
         // Fetch student's enrollments
-        const enrollmentsRes = await fetch('/api/enrollments?depth=2')
+        const enrollmentsRes = await fetch('/api/enrollments?depth=2', { cache: 'no-store' })
         let fetchedEnrollments: EnrollmentItem[] = []
         if (enrollmentsRes.ok) {
           const enrollmentsData = await enrollmentsRes.json()

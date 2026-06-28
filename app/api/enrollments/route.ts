@@ -9,6 +9,8 @@ import { Lesson } from '@/lib/db/models/Lesson'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: Request) {
   try {
     await connectToDatabase()
@@ -51,12 +53,12 @@ export async function GET(request: Request) {
     const studentQueryParam = searchParams.get('student')
 
     // Determine query target student ID/filter criteria
-    let query: any = { student: userId }
+    let query: any = { student: userId, paymentStatus: 'completed' }
     if (isAdminOrStaff) {
       if (studentQueryParam) {
-        query = { student: studentQueryParam }
+        query = { student: studentQueryParam, paymentStatus: 'completed' }
       } else {
-        query = {} // Admin/Staff querying all student enrollments
+        query = { paymentStatus: 'completed' } // Admin/Staff querying all student enrollments
       }
     }
 

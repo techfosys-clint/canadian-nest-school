@@ -29,13 +29,8 @@ export async function POST(request: Request) {
 
     await connectToDatabase()
 
-    const existingStudent = await Student.findOne({ phone })
-    if (existingStudent) {
-      return NextResponse.json(
-        { success: false, error: 'This phone number is already registered.' },
-        { status: 400 }
-      )
-    }
+    // We intentionally removed the existingStudent phone check here
+    // to allow a single phone number to be used for multiple student accounts.
 
     const isResend = await OtpVerification.exists({ phone })
 

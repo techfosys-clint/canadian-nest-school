@@ -137,6 +137,9 @@ export async function GET(request: Request) {
 
   } catch (error: any) {
     console.error('API Enrollments Error:', error)
+    try {
+      require('fs').writeFileSync('enrollments-error.log', String(error.stack || error.message));
+    } catch (e) {}
     return NextResponse.json(
       { success: false, error: 'Failed to fetch enrollments.' },
       { status: 500 }

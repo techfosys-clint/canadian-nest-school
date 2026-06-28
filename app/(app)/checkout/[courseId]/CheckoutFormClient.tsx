@@ -888,7 +888,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                     ) : (
                       <>
                         <FiZap className="h-5 w-5 fill-white" />
-                        <span>Complete Course Purchase (৳{finalPrice.toLocaleString('en-BD')})</span>
+                        <span>Complete Course Purchase ({!finalPrice || finalPrice === 0 ? 'Free' : `৳${finalPrice.toLocaleString('en-BD')}`})</span>
                       </>
                     )}
                   </button>
@@ -938,7 +938,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                 
                 <div className="flex justify-between items-center text-base font-semibold text-zinc-600">
                   <span>Base Course Price</span>
-                  <span className="font-bold text-zinc-800">৳{basePrice.toLocaleString('en-BD')}</span>
+                  <span className="font-bold text-zinc-800">{!basePrice || basePrice === 0 ? 'Free' : `৳${basePrice.toLocaleString('en-BD')}`}</span>
                 </div>
 
                 {appliedCoupon && (
@@ -954,7 +954,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                 <div className="border-t border-zinc-100 pt-3.5 flex justify-between items-center">
                   <span className="text-base font-bold text-zinc-800">Total Investment</span>
                   <span className="text-3xl font-bold text-[#E61C24]">
-                    ৳{finalPrice.toLocaleString('en-BD')}
+                    {!finalPrice || finalPrice === 0 ? 'Free' : `৳${finalPrice.toLocaleString('en-BD')}`}
                   </span>
                 </div>
               </div>

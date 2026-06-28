@@ -28,9 +28,9 @@ export default async function CheckoutPage({ params }: Props) {
   // Format course for the client component
   const serializedCourse = {
     id: course._id.toString(),
-    slug: course.slug,
-    title: course.title,
-    summary: course.summary,
+    slug: course.slug || '',
+    title: course.title || '',
+    summary: course.summary || '',
     price: course.price || 0,
     imageUrl: course.thumbnail?.sizes?.card?.url ?? course.thumbnail?.sizes?.hero?.url ?? course.thumbnail?.url ?? '',
     instructorName: course.instructors?.[0]?.name || 'Expert Instructor',

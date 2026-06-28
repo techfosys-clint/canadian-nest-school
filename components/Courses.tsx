@@ -65,8 +65,8 @@ function getImageUrl(thumbnail: CourseDoc['thumbnail']): string {
   return thumbnail.sizes?.card?.url ?? thumbnail.url ?? ''
 }
 
-function formatPrice(price: number): string {
-  if (price === 0) return 'Free'
+function formatPrice(price?: number | null): string {
+  if (!price || price === 0) return 'Free'
   return `৳${price.toLocaleString('en-BD')}`
 }
 

@@ -50,7 +50,7 @@ export default async function EditCoursePage({ params }: Props) {
   // 3. Fetch dependencies
   const [categoriesDocs, instructorsDocs] = await Promise.all([
     Category.find().lean(),
-    User.find({ role: 'instructor' }).lean(),
+    User.find({ role: { $in: ['admin', 'staff', 'instructor'] } }).lean(),
   ])
 
   const categories = categoriesDocs.map((cat: any) => ({

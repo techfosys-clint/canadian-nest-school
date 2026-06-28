@@ -18,7 +18,7 @@ export async function comparePasswords(password: string, hash: string): Promise<
 }
 
 export function signToken(payload: any): string {
-  return jwt.sign(payload, PAYLOAD_SECRET, { expiresIn: '2h' })
+  return jwt.sign(payload, PAYLOAD_SECRET, { expiresIn: '365d' })
 }
 
 export function verifyToken(token: string): any {

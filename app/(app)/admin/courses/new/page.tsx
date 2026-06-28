@@ -1,4 +1,4 @@
-﻿import React from 'react'
+import React from 'react'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { connectToDatabase } from '@/lib/db/mongodb'
@@ -33,7 +33,7 @@ export default async function NewCoursePage() {
   // 2. Fetch dependencies
   const [categoriesDocs, instructorsDocs] = await Promise.all([
     Category.find().lean(),
-    User.find({ role: 'instructor' }).lean(),
+    User.find({ role: { $in: ['admin', 'staff', 'instructor'] } }).lean(),
   ])
 
   // 3. Serialize options for client components

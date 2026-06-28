@@ -823,11 +823,10 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
     {/* Quiz Media Picker Modal */}
     {showMediaPickerForQuestion !== null && (
       <MediaPickerModal
-        isOpen={true}
+        open={true}
         onClose={() => setShowMediaPickerForQuestion(null)}
         onSelect={(media) => {
           const newQuestions = [...quizQuestions]
-          newQuestions[showMediaPickerForQuestion].image = media._id
           newQuestions[showMediaPickerForQuestion].imageUrl = media.url
           setQuizQuestions(newQuestions)
           setShowMediaPickerForQuestion(null)

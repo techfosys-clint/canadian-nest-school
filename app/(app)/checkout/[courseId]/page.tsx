@@ -18,8 +18,8 @@ export default async function CheckoutPage({ params }: Props) {
   await connectToDatabase()
 
   const course = await Course.findById(courseId)
-    .populate('category')
-    .populate('instructor')
+    .populate('categories')
+    .populate('instructors')
     .populate('thumbnail')
     .lean() as any
 
@@ -32,8 +32,8 @@ export default async function CheckoutPage({ params }: Props) {
     summary: course.summary,
     price: course.price || 0,
     imageUrl: course.thumbnail?.sizes?.card?.url ?? course.thumbnail?.sizes?.hero?.url ?? course.thumbnail?.url ?? '',
-    instructorName: course.instructor?.name || 'Expert Instructor',
-    categoryName: course.category?.name || '',
+    instructorName: course.instructors?.[0]?.name || 'Expert Instructor',
+    categoryName: course.categories?.[0]?.name || '',
   }
 
   return (

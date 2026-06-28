@@ -34,8 +34,8 @@ export default async function CourseWatchPage({ params }: Props) {
 
   // Fetch course
   const course = await Course.findOne({ slug, status: 'published' })
-    .populate('category')
-    .populate('instructor')
+    .populate('categories')
+    .populate('instructors')
     .lean() as any
 
   if (!course) notFound()
@@ -103,11 +103,11 @@ export default async function CourseWatchPage({ params }: Props) {
     title: course.title,
     slug: course.slug,
     summary: course.summary || '',
-    category: course.category ? {
-      name: course.category.name
+    category: course.categories?.[0] ? {
+      name: course.categories[0].name
     } : undefined,
-    instructor: course.instructor ? {
-      name: course.instructor.name || course.instructor.email
+    instructor: course.instructors?.[0] ? {
+      name: course.instructors[0].name || course.instructors[0].email
     } : undefined,
   }
 
@@ -124,6 +124,7 @@ export default async function CourseWatchPage({ params }: Props) {
     videoUrl: l.videoUrl || '',
     liveUrl: l.liveUrl || '',
     moduleName: l.moduleName || 'General Module',
+    content: l.content || undefined,
     quizQuestions: l.quizQuestions ? JSON.parse(JSON.stringify(l.quizQuestions)) : undefined,
   }))
 

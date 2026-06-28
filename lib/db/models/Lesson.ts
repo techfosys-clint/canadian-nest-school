@@ -4,6 +4,8 @@ export interface IQuizQuestion {
   questionText: string
   options: string[]
   correctAnswerIndex: number
+  image?: mongoose.Types.ObjectId | string
+  imageUrl?: string
 }
 
 export interface ILesson extends Document {
@@ -35,7 +37,9 @@ export interface ILesson extends Document {
 const QuizQuestionSchema = new Schema<IQuizQuestion>({
   questionText: { type: String, required: true },
   options: [{ type: String, required: true }],
-  correctAnswerIndex: { type: Number, required: true }
+  correctAnswerIndex: { type: Number, required: true },
+  image: { type: Schema.Types.ObjectId, ref: 'Media' },
+  imageUrl: String
 }, { _id: false })
 
 const LessonSchema = new Schema<ILesson>(

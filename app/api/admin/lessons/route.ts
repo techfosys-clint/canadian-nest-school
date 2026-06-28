@@ -95,13 +95,13 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { title, slug, course: courseId, order, moduleName, lessonType, videoUrl, livePlatform, liveUrl, liveDate, content, duration, isPreviewable, autoGenerateZoom, quizQuestions } = body
 
-    if (!title || !slug || !courseId || !order || !duration) {
+    if (!title || !slug || !courseId || !duration) {
       return NextResponse.json(
         {
           success: false,
           error: 'Missing required fields',
           code: 'VALIDATION_ERROR',
-          message: 'Required fields: title, slug, course, order, duration.',
+          message: 'Required fields: title, slug, course, duration.',
         },
         { status: 400 }
       )
@@ -177,8 +177,16 @@ export async function POST(request: Request) {
       actualLiveUrl = zoomDetails.joinUrl
     }
 
+    let finalOrder = order
+    if (!finalOrder) {
+      const lastLesson = await Lesson.findOne({ course: courseId, moduleName: moduleName || 'General Module' })
+        .sort({ order: -1 })
+        .lean()
+      finalOrder = lastLesson && lastLesson.order ? lastLesson.order + 1 : 1
+    }
+
     const newLesson = new Lesson({
-      title, slug, course: courseId, order, moduleName, lessonType: lessonType || 'recorded',
+      title, slug, course: courseId, order: finalOrder, moduleName, lessonType: lessonType || 'recorded',
       videoUrl, livePlatform, liveUrl: actualLiveUrl,
       liveDate: liveDate ? new Date(liveDate) : undefined,
       content, duration: Number(duration),

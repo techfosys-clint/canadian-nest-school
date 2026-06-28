@@ -32,8 +32,8 @@ interface CourseFormProps {
 
 export default function CourseFormClient({
   initialData,
-  categories,
-  instructors,
+  categories: categoriesOptions,
+  instructors: instructorsOptions,
   user,
 }: CourseFormProps) {
   const router = useRouter()
@@ -53,13 +53,36 @@ export default function CourseFormClient({
   const [price, setPrice] = useState(initialData?.price || 0)
   const [duration, setDuration] = useState(initialData?.duration || '')
   const [level, setLevel] = useState<string>(initialData?.level || 'all')
-  const [category, setCategory] = useState(
-    initialData?.category?._id || initialData?.category || ''
+  const [categories, setCategories] = useState<string[]>(
+    initialData?.categories?.map((c: any) => c._id || c) || (initialData?.category ? [initialData.category._id || initialData.category] : [])
   )
-  const [instructor, setInstructor] = useState(
-    initialData?.instructor?._id || initialData?.instructor || (user.role === 'instructor' ? user.id : '')
+  const [instructors, setInstructors] = useState<string[]>(
+    initialData?.instructors?.map((i: any) => i._id || i) || (initialData?.instructor ? [initialData.instructor._id || initialData.instructor] : (user.role === 'instructor' ? [user.id] : []))
   )
   const [status, setStatus] = useState<string>(initialData?.status || 'draft')
+
+  const [selectedCategory, setSelectedCategory] = useState('')
+  const [selectedInstructor, setSelectedInstructor] = useState('')
+
+  const handleAddCategory = () => {
+    if (selectedCategory && !categories.includes(selectedCategory)) {
+      setCategories([...categories, selectedCategory])
+    }
+    setSelectedCategory('')
+  }
+  const handleRemoveCategory = (id: string) => {
+    setCategories(categories.filter(c => c !== id))
+  }
+
+  const handleAddInstructor = () => {
+    if (selectedInstructor && !instructors.includes(selectedInstructor)) {
+      setInstructors([...instructors, selectedInstructor])
+    }
+    setSelectedInstructor('')
+  }
+  const handleRemoveInstructor = (id: string) => {
+    setInstructors(instructors.filter(i => i !== id))
+  }
 
   // Thumbnail state (either Mongoose ID or populated Media doc)
   const [thumbnailId, setThumbnailId] = useState<string>(
@@ -403,11 +426,11 @@ export default function CourseFormClient({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!title || !slug || !category || !thumbnailId) {
+    if (!title || !slug) {
       Swal.fire({
         icon: 'warning',
         title: 'Validation Error',
-        text: 'Please complete all required fields (Title, Slug, Category, Cover Image).',
+        text: 'Please complete required fields (Title, Slug).',
         background: '#ffffff',
         color: '#1a1a1a',
       })
@@ -434,8 +457,8 @@ export default function CourseFormClient({
       description,
       price: Number(price),
       thumbnail: thumbnailId,
-      category,
-      instructor: (user.role === 'instructor' ? user.id : instructor) || null,
+      categories,
+      instructors: user.role === 'instructor' ? [user.id] : instructors,
       status,
       duration,
       level,
@@ -1058,10 +1081,9 @@ export default function CourseFormClient({
 
             {/* Price field */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-slate-600">Price (BDT) *</label>
+              <label className="text-base font-bold text-slate-600">Price (BDT)</label>
               <input
                 type="number"
-                required
                 min={0}
                 value={price}
                 onChange={(e) => setPrice(Number(e.target.value))}
@@ -1090,46 +1112,102 @@ export default function CourseFormClient({
 
             {/* Categories Selector */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-slate-600">Course Category *</label>
-              <select
-                required
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
-              >
-                <option value="">-- Choose Category --</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
+              <label className="text-base font-bold text-slate-600">Course Categories</label>
+              <div className="flex gap-2">
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors cursor-pointer"
+                >
+                  <option value="">-- Select a Category --</option>
+                  {categoriesOptions.map((cat) => (
+                    <option key={cat.id} value={cat.id} disabled={categories.includes(cat.id)}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={handleAddCategory}
+                  disabled={!selectedCategory}
+                  className="bg-[#E61C24] text-white px-4 rounded-lg font-bold hover:bg-[#E61C24]/90 disabled:opacity-50 transition-colors shrink-0"
+                >
+                  Add
+                </button>
+              </div>
+              
+              {/* Selected Categories List */}
+              {categories.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {categories.map((catId) => {
+                    const catName = categoriesOptions.find(c => c.id === catId)?.name || 'Unknown'
+                    return (
+                      <span key={catId} className="bg-slate-100 border border-slate-200 text-slate-700 px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-2">
+                        {catName}
+                        <button type="button" onClick={() => handleRemoveCategory(catId)} className="text-slate-400 hover:text-[#E61C24] transition-colors">
+                          <FiX className="h-4 w-4" />
+                        </button>
+                      </span>
+                    )
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Instructors Selector */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-slate-600">Lead Mentor (Instructor) (Optional)</label>
+              <label className="text-base font-bold text-slate-600">Lead Mentor(s) (Instructor)</label>
               {user.role === 'instructor' ? (
                 <div className="bg-slate-100 border border-slate-200 text-slate-500 rounded-lg p-3 text-base font-semibold select-none flex items-center gap-2">
                   <FiInfo className="text-[#E61C24]" />
                   <span>
-                    {instructors.find((ins) => ins.id === user.id)?.name || 'You (Assigned Mentor)'}
+                    {instructorsOptions.find((ins) => ins.id === user.id)?.name || 'You (Assigned Mentor)'}
                   </span>
                 </div>
               ) : (
-                <select
-                  value={instructor}
-                  onChange={(e) => setInstructor(e.target.value)}
-                  className="bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer"
-                >
-                  <option value="">-- Unassigned (None) --</option>
-                  <option value={user.id}>Myself ({user.role === 'admin' ? 'Admin' : 'Staff'})</option>
-                  {instructors.map((ins) => (
-                    <option key={ins.id} value={ins.id}>
-                      {ins.name} ({ins.email})
-                    </option>
-                  ))}
-                </select>
+                <>
+                  <div className="flex gap-2">
+                    <select
+                      value={selectedInstructor}
+                      onChange={(e) => setSelectedInstructor(e.target.value)}
+                      className="bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors cursor-pointer"
+                    >
+                      <option value="">-- Select an Instructor --</option>
+                      <option value={user.id} disabled={instructors.includes(user.id)}>Myself ({user.role === 'admin' ? 'Admin' : 'Staff'})</option>
+                      {instructorsOptions.map((ins) => (
+                        <option key={ins.id} value={ins.id} disabled={instructors.includes(ins.id)}>
+                          {ins.name} ({ins.email})
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={handleAddInstructor}
+                      disabled={!selectedInstructor}
+                      className="bg-[#E61C24] text-white px-4 rounded-lg font-bold hover:bg-[#E61C24]/90 disabled:opacity-50 transition-colors shrink-0"
+                    >
+                      Add
+                    </button>
+                  </div>
+
+                  {/* Selected Instructors List */}
+                  {instructors.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {instructors.map((insId) => {
+                        const insData = instructorsOptions.find(i => i.id === insId)
+                        const insName = insId === user.id ? `Myself (${user.role === 'admin' ? 'Admin' : 'Staff'})` : (insData?.name || 'Unknown')
+                        return (
+                          <span key={insId} className="bg-slate-100 border border-slate-200 text-slate-700 px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-2">
+                            {insName}
+                            <button type="button" onClick={() => handleRemoveInstructor(insId)} className="text-slate-400 hover:text-[#E61C24] transition-colors">
+                              <FiX className="h-4 w-4" />
+                            </button>
+                          </span>
+                        )
+                      })}
+                    </div>
+                  )}
+                </>
               )}
             </div>
 

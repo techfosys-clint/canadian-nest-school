@@ -85,8 +85,8 @@ export default async function CourseDetailPage({ params }: Props) {
 
   // Fetch course
   const course = await Course.findOne({ slug, status: 'published' })
-    .populate('category')
-    .populate('instructor')
+    .populate('categories')
+    .populate('instructors')
     .populate('thumbnail')
     .lean() as any
 
@@ -131,9 +131,9 @@ export default async function CourseDetailPage({ params }: Props) {
   const lessonCount = lessonsDocs.length
   const reviews = reviewsDocs as any[]
   const avgRating = getStarCount(reviews)
-  const categoryName = course.category && typeof course.category === 'object' ? course.category.name : ''
-  const instructorName = course.instructor && typeof course.instructor === 'object'
-    ? course.instructor.name ?? course.instructor.email
+  const categoryName = course.categories?.[0] && typeof course.categories[0] === 'object' ? course.categories[0].name : ''
+  const instructorName = course.instructors?.[0] && typeof course.instructors[0] === 'object'
+    ? course.instructors[0].name ?? course.instructors[0].email
     : 'Expert Instructor'
   const imageUrl = getImageUrl(course.thumbnail)
 

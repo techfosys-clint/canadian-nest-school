@@ -1,4 +1,4 @@
-﻿import React from 'react'
+import React from 'react'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Course } from '@/lib/db/models/Course'
 import { cookies } from 'next/headers'
@@ -28,8 +28,8 @@ export default async function AdminCoursesPage() {
 
   // 2. Fetch courses with Mongoose populates
   const coursesDocs = await Course.find()
-    .populate('category')
-    .populate('instructor')
+    .populate('categories')
+    .populate('instructors')
     .populate('thumbnail')
     .sort({ createdAt: -1 })
     .lean()
@@ -49,8 +49,8 @@ export default async function AdminCoursesPage() {
       status: c.status,
       level: c.level,
       duration: c.duration || 'N/A',
-      categoryName: c.category && typeof c.category === 'object' ? c.category.name : 'Unassigned',
-      instructorName: c.instructor && typeof c.instructor === 'object' ? c.instructor.name : 'Unknown',
+      categoryName: c.categories?.[0] && typeof c.categories[0] === 'object' ? c.categories[0].name : 'Unassigned',
+      instructorName: c.instructors?.[0] && typeof c.instructors[0] === 'object' ? c.instructors[0].name : 'Unknown',
       thumbnail: thumbnailUrl,
       createdAt: c.createdAt ? c.createdAt.toISOString() : null,
     }

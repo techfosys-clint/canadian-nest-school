@@ -5,13 +5,13 @@ export interface ICourse extends Document {
   slug: string
   summary?: string
   description?: any // Lexical JSON
-  price: number
-  thumbnail: mongoose.Types.ObjectId | string
-  category: mongoose.Types.ObjectId | string
-  instructor?: mongoose.Types.ObjectId | string
+  price?: number
+  thumbnail?: mongoose.Types.ObjectId | string
+  categories?: (mongoose.Types.ObjectId | string)[]
+  instructors?: (mongoose.Types.ObjectId | string)[]
   status: 'draft' | 'published'
   duration?: string
-  level: 'all' | 'beginner' | 'intermediate' | 'advanced'
+  level?: 'all' | 'beginner' | 'intermediate' | 'advanced'
   meetingLink?: string
   whatYouWillLearn?: Array<{ outcome: string }>
   requirements?: Array<{ requirement: string }>
@@ -35,13 +35,13 @@ const CourseSchema = new Schema<ICourse>(
     slug: { type: String, required: true, unique: true },
     summary: { type: String },
     description: { type: Schema.Types.Mixed }, // Lexical JSON structure
-    price: { type: Number, required: true, min: 0 },
-    thumbnail: { type: Schema.Types.ObjectId, ref: 'Media', required: true },
-    category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
-    instructor: { type: Schema.Types.ObjectId, ref: 'User' },
-    status: { type: String, enum: ['draft', 'published'], default: 'draft', required: true },
+    price: { type: Number, min: 0 },
+    thumbnail: { type: Schema.Types.ObjectId, ref: 'Media' },
+    categories: [{ type: Schema.Types.ObjectId, ref: 'Category' }],
+    instructors: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    status: { type: String, enum: ['draft', 'published'], default: 'draft' },
     duration: { type: String },
-    level: { type: String, enum: ['all', 'beginner', 'intermediate', 'advanced'], default: 'all', required: true },
+    level: { type: String, enum: ['all', 'beginner', 'intermediate', 'advanced'], default: 'all' },
     meetingLink: { type: String },
     whatYouWillLearn: [
       {

@@ -30,12 +30,12 @@ interface CourseItem {
     url: string
     alt?: string
   }
-  category?: {
+  categories?: {
     name: string
-  }
-  instructor?: {
+  }[]
+  instructors?: {
     name: string
-  }
+  }[]
 }
 
 interface EnrollmentItem {
@@ -421,7 +421,7 @@ export default function StudentDashboard() {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 pointer-events-none" />
                         <span className="absolute top-3 left-3 bg-[#E61C24]/10 backdrop-blur-md text-[#E61C24] border border-[#E61C24]/20 px-3 py-1 rounded-lg text-sm font-bold uppercase tracking-wider">
-                          {course.category && typeof course.category === 'object' ? course.category.name : 'LMS'}
+                          {course.categories?.[0] && typeof course.categories[0] === 'object' ? course.categories[0].name : 'LMS'}
                         </span>
                         {course.level && (
                           <span className="absolute bottom-3 right-3 bg-zinc-900/60 backdrop-blur-sm text-zinc-100 px-2.5 py-0.5 rounded-lg text-xs font-semibold capitalize tracking-wide">
@@ -445,12 +445,12 @@ export default function StudentDashboard() {
                         {/* Instructor detail row */}
                         <div className="flex items-center gap-2.5 pt-2 border-t border-zinc-100">
                           <div className="h-7 w-7 rounded-full bg-[#E61C24]/10 flex items-center justify-center font-bold text-xs text-[#E61C24] uppercase shrink-0">
-                            {course.instructor && typeof course.instructor === 'object' ? course.instructor.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2) : 'EX'}
+                            {course.instructors?.[0] && typeof course.instructors[0] === 'object' ? course.instructors[0].name.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2) : 'EX'}
                           </div>
                           <div className="min-w-0">
                             <p className="text-xs font-semibold text-zinc-500 uppercase leading-none">Instructor</p>
                             <p className="text-sm font-bold text-zinc-700 truncate mt-0.5">
-                              {course.instructor && typeof course.instructor === 'object' ? course.instructor.name : 'Expert Instructor'}
+                              {course.instructors?.[0] && typeof course.instructors[0] === 'object' ? course.instructors[0].name : 'Expert Instructor'}
                             </p>
                           </div>
                         </div>

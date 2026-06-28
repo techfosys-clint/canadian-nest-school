@@ -1,10 +1,12 @@
-﻿'use client'
+'use client'
 
 import React, { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { FiSave, FiX, FiVideo, FiRadio, FiHelpCircle, FiPlus, FiTrash2, FiFileText } from 'react-icons/fi'
+import { FiSave, FiX, FiVideo, FiRadio, FiHelpCircle, FiPlus, FiTrash2, FiFileText, FiImage } from 'react-icons/fi'
 import Swal from 'sweetalert2'
 import VideoUploadWidget from '@/components/VideoUploadWidget'
+import RichTextEditor from '@/components/RichTextEditor'
+import MediaPickerModal from '@/components/MediaPickerModal'
 
 interface CourseOption {
   id: string
@@ -36,6 +38,7 @@ interface LessonFormProps {
     autoGenerateZoom?: boolean
     quizQuestions?: QuizQuestion[]
     totalMarks?: number
+    content?: any
   }
 }
 
@@ -61,7 +64,10 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
   const [title, setTitle] = useState(initialData?.title || '')
   const [slug, setSlug] = useState(initialData?.slug || '')
   const [moduleName, setModuleName] = useState(initialData?.moduleName || 'General Module')
-  const [order, setOrder] = useState(initialData?.order || 1)
+  const [order, setOrder] = useState<number | ''>(initialData?.order || '')
+  const [content, setContent] = useState<string>(
+    initialData?.content || ''
+  )
   const [lessonType, setLessonType] = useState<'recorded' | 'live' | 'quiz' | 'assignment'>(
     initialData?.lessonType || 'recorded'
   )
@@ -82,6 +88,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
   )
   const [saving, setSaving] = useState(false)
   const [existingModules, setExistingModules] = useState<string[]>([])
+  const [showMediaPickerForQuestion, setShowMediaPickerForQuestion] = useState<number | null>(null)
 
   // Fetch unique module names of the selected course
   React.useEffect(() => {
@@ -179,6 +186,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
         autoGenerateZoom: lessonType === 'live' && livePlatform === 'zoom' ? autoGenerateZoom : false,
         quizQuestions: lessonType === 'quiz' ? quizQuestions : undefined,
         totalMarks: (lessonType === 'quiz' || lessonType === 'assignment') ? totalMarks : undefined,
+        content: content || undefined,
       }
 
       const url = isEditMode ? `/api/admin/lessons/${initialData?.id}` : '/api/admin/lessons'
@@ -220,6 +228,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
   }
 
   return (
+    <>
     <form onSubmit={handleSave} className="container mx-auto px-6 py-8 space-y-6">
       
       {/* Back & Heading panel */}
@@ -580,6 +589,37 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                           className="bg-white border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none w-full transition-colors"
                         />
                       </div>
+                      
+                      {/* Optional Question Image */}
+                      <div className="flex flex-col gap-2">
+                        <label className="text-base font-bold text-slate-600">Optional Image</label>
+                        {q.imageUrl ? (
+                          <div className="relative inline-block w-48 h-32 rounded-lg overflow-hidden border border-slate-200">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={q.imageUrl} alt="Question" className="w-full h-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newQuestions = [...quizQuestions]
+                                newQuestions[qIdx].image = undefined
+                                newQuestions[qIdx].imageUrl = undefined
+                                setQuizQuestions(newQuestions)
+                              }}
+                              className="absolute top-1 right-1 bg-black/50 hover:bg-[#E61C24] text-white p-1 rounded-md transition-colors"
+                            >
+                              <FiX className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setShowMediaPickerForQuestion(qIdx)}
+                            className="flex items-center justify-center gap-2 w-48 h-12 bg-slate-100 hover:bg-slate-200 border border-dashed border-slate-300 rounded-lg text-slate-600 font-bold transition-colors cursor-pointer"
+                          >
+                            <FiImage className="w-5 h-5" /> Add Image
+                          </button>
+                        )}
+                      </div>
 
                       {/* Options Section Header */}
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
@@ -695,13 +735,39 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
 
             {/* Duration */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-slate-600">Lecture Duration (Minutes)</label>
+              <label className="text-base font-bold text-slate-600">Lecture Duration (Minutes) *</label>
               <input
                 type="number"
                 min={1}
+                required
                 value={duration}
                 onChange={(e) => setDuration(Number(e.target.value))}
                 className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+              />
+            </div>
+
+            {/* Order */}
+            <div className="flex flex-col gap-2">
+              <label className="text-base font-bold text-slate-600">Lecture Order</label>
+              <input
+                type="number"
+                min={1}
+                value={order}
+                onChange={(e) => setOrder(e.target.value ? Number(e.target.value) : '')}
+                placeholder="Auto-assigned if left blank"
+                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+              />
+              <p className="text-xs text-slate-500 font-semibold mt-1">Leave empty to auto-assign the next logical sequence for this module.</p>
+            </div>
+
+            {/* Content / Description */}
+            <div className="flex flex-col gap-2 pt-4 border-t border-slate-100 mt-4">
+              <label className="text-base font-bold text-slate-600">Lesson Notes / Description</label>
+              <p className="text-sm font-medium text-slate-500 mb-2">Optional content shown beneath the lesson video or assignment.</p>
+              <RichTextEditor
+                value={content}
+                onChange={setContent}
+                placeholder="Write lesson notes, attach links, or provide further instructions..."
               />
             </div>
 
@@ -753,5 +819,22 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
       </div>
 
     </form>
+
+    {/* Quiz Media Picker Modal */}
+    {showMediaPickerForQuestion !== null && (
+      <MediaPickerModal
+        isOpen={true}
+        onClose={() => setShowMediaPickerForQuestion(null)}
+        onSelect={(media) => {
+          const newQuestions = [...quizQuestions]
+          newQuestions[showMediaPickerForQuestion].image = media._id
+          newQuestions[showMediaPickerForQuestion].imageUrl = media.url
+          setQuizQuestions(newQuestions)
+          setShowMediaPickerForQuestion(null)
+        }}
+        typeFilter="image"
+      />
+    )}
+    </>
   )
 }

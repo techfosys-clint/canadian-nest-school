@@ -32,8 +32,8 @@ export default async function EditCoursePage({ params }: Props) {
 
   // 2. Fetch the course to edit
   const course = await Course.findById(id)
-    .populate('category')
-    .populate('instructor')
+    .populate('categories')
+    .populate('instructors')
     .populate('thumbnail')
     .lean()
 
@@ -42,7 +42,7 @@ export default async function EditCoursePage({ params }: Props) {
   // Instructors can only edit their own courses
   if (
     sessionUser.role === 'instructor' &&
-    (course as any).instructor?._id?.toString() !== sessionUser._id.toString()
+    !(course as any).instructors?.some((inst: any) => inst?._id?.toString() === sessionUser._id.toString())
   ) {
     redirect('/admin/courses')
   }

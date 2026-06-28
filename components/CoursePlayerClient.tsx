@@ -39,6 +39,7 @@ interface QuizQuestion {
   questionText: string
   options: string[]
   correctAnswerIndex: number
+  imageUrl?: string
 }
 
 interface LessonItem {
@@ -56,6 +57,7 @@ interface LessonItem {
   liveUrl?: string
   quizQuestions?: QuizQuestion[]
   totalMarks?: number
+  content?: any
 }
 
 interface CourseItem {
@@ -195,27 +197,9 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
     setRetakeQuiz(false)
   }, [activeLesson?.id])
 
-  // Sort lessons by order
-  const sortedLessons = [...lessons].sort((a, b) => a.order - b.order)
-
-  // Sidebar expanded modules state
-  const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({})
-
-  // Expand the module of the current active lesson automatically
-  useEffect(() => {
-    const activeL = activeLesson || sortedLessons[0]
-    if (activeL) {
-      const activeModule = activeL.moduleName || 'General Module'
-      setExpandedModules((prev) => ({
-        ...prev,
-        [activeModule]: true,
-      }))
-    }
-  }, [activeLesson?.id, sortedLessons.length])
-
   // Group lessons by moduleName
-  const grouped: Record<string, typeof sortedLessons> = {}
-  sortedLessons.forEach((lesson) => {
+  const grouped: Record<string, typeof lessons> = {}
+  lessons.forEach((lesson) => {
     const mod = lesson.moduleName || 'General Module'
     if (!grouped[mod]) {
       grouped[mod] = []
@@ -235,6 +219,25 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
   })
 
   moduleGroups.sort((a, b) => a.minOrder - b.minOrder)
+
+  // Now create the true sortedLessons by flattening moduleGroups
+  // This prevents the bug where clicking "Next" jumps to another module if orders are interleaved.
+  const sortedLessons = moduleGroups.flatMap(mg => mg.lessons)
+
+  // Sidebar expanded modules state
+  const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({})
+
+  // Expand the module of the current active lesson automatically
+  useEffect(() => {
+    const activeL = activeLesson || sortedLessons[0]
+    if (activeL) {
+      const activeModule = activeL.moduleName || 'General Module'
+      setExpandedModules((prev) => ({
+        ...prev,
+        [activeModule]: true,
+      }))
+    }
+  }, [activeLesson?.id, sortedLessons.length])
 
   // Initialize active lesson from query search params or default to first lesson
   useEffect(() => {
@@ -877,6 +880,17 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                     <h3 className="text-xl sm:text-2xl font-bold font-display leading-snug text-white select-text animate-fadeIn">
                       {currentLesson.quizQuestions[currentQuestionIndex].questionText}
                     </h3>
+                    
+                    {currentLesson.quizQuestions[currentQuestionIndex].imageUrl && (
+                      <div className="w-full max-w-lg mx-auto rounded-lg overflow-hidden border border-zinc-800 mt-4 shadow-lg shadow-black/20">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img 
+                          src={currentLesson.quizQuestions[currentQuestionIndex].imageUrl} 
+                          alt="Quiz Question" 
+                          className="w-full h-auto object-contain max-h-[300px]" 
+                        />
+                      </div>
+                    )}
                   </div>
 
                   {/* Options list */}
@@ -1360,11 +1374,18 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
       {/* Lesson Overview Description */}
       <div className="space-y-4">
         <h3 className="text-base font-bold text-zinc-700 uppercase tracking-widest">Lesson Overview</h3>
-        <p className="text-base font-semibold text-zinc-600 leading-relaxed font-sans select-text">
-          {currentLesson.lessonType === 'live'
-            ? 'Join this dynamic live webinar class. Be sure to log in a few minutes before the schedule, ensure your internet connection is robust, and have your code editor prepared. This live stream incorporates instructor coding demonstrations, conceptual deep dives, and student code review. Recordings are automatically catalogued here once the broadcast concludes.'
-            : 'This high-definition recorded syllabus session includes detailed explanations and step-by-step instructions. We strongly advise pausing the video to implement matching exercises, reviewing linked reference materials, and working through the assignments at your own comfortable pace.'}
-        </p>
+        {currentLesson.content ? (
+          <div 
+            className="course-description-content font-sans select-text text-base font-semibold text-zinc-600 leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: currentLesson.content }}
+          />
+        ) : (
+          <p className="text-base font-semibold text-zinc-600 leading-relaxed font-sans select-text">
+            {currentLesson.lessonType === 'live'
+              ? 'Join this dynamic live webinar class. Be sure to log in a few minutes before the schedule, ensure your internet connection is robust, and have your code editor prepared. This live stream incorporates instructor coding demonstrations, conceptual deep dives, and student code review. Recordings are automatically catalogued here once the broadcast concludes.'
+              : 'This high-definition recorded syllabus session includes detailed explanations and step-by-step instructions. We strongly advise pausing the video to implement matching exercises, reviewing linked reference materials, and working through the assignments at your own comfortable pace.'}
+          </p>
+        )}
       </div>
 
       {/* Verified Instructor footer within widget */}

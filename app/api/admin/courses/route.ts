@@ -142,8 +142,8 @@ export async function POST(request: Request) {
       description,
       price,
       thumbnail,
-      category,
-      instructor,
+      categories,
+      instructors,
       status,
       duration,
       level,
@@ -154,13 +154,13 @@ export async function POST(request: Request) {
       modules,
     } = body
 
-    if (!title || !slug || !summary || !description || price === undefined || !thumbnail || !category) {
+    if (!title || !slug) {
       return NextResponse.json(
         {
           success: false,
           error: 'Missing required parameters',
           code: 'VALIDATION_ERROR',
-          message: 'Required fields: title, slug, summary, description, price, thumbnail, category.',
+          message: 'Required fields: title, slug.',
         },
         { status: 400 }
       )
@@ -207,7 +207,7 @@ export async function POST(request: Request) {
     }
 
     // Force instructor ID for instructor role
-    const finalInstructor = user.role === 'instructor' ? user._id.toString() : (instructor || user._id.toString())
+    const finalInstructors = user.role === 'instructor' ? [user._id.toString()] : (instructors?.length ? instructors : [user._id.toString()])
 
     // 3. Create course document
     const newCourse = new Course({
@@ -215,10 +215,10 @@ export async function POST(request: Request) {
       slug,
       summary,
       description,
-      price: Number(price),
+      price: price ? Number(price) : undefined,
       thumbnail,
-      category,
-      instructor: finalInstructor,
+      categories: categories || [],
+      instructors: finalInstructors,
       status: status || 'draft',
       duration,
       level: level || 'all',

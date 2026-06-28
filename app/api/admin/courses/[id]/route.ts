@@ -38,8 +38,8 @@ export async function GET(
     const { id } = await params
 
     const course = await Course.findById(id)
-      .populate('category')
-      .populate('instructor')
+      .populate('categories')
+      .populate('instructors')
       .populate('thumbnail')
       .lean()
 
@@ -283,7 +283,7 @@ export async function PUT(
     }
 
     // Instructor owner verification
-    if (user.role === 'instructor' && course.instructor.toString() !== user._id.toString()) {
+    if (user.role === 'instructor' && !course.instructors.some((inst: any) => inst.toString() === user._id.toString())) {
       return NextResponse.json(
         {
           success: false,
@@ -304,8 +304,8 @@ export async function PUT(
       description,
       price,
       thumbnail,
-      category,
-      instructor,
+      categories,
+      instructors,
       status,
       duration,
       level,
@@ -316,13 +316,13 @@ export async function PUT(
       modules,
     } = body
 
-    if (!title || !slug || !summary || !description || price === undefined || !thumbnail || !category) {
+    if (!title || !slug) {
       return NextResponse.json(
         {
           success: false,
           error: 'Missing required parameters',
           code: 'VALIDATION_ERROR',
-          message: 'Required fields: title, slug, summary, description, price, thumbnail, category.',
+          message: 'Required fields: title, slug.',
         },
         { status: 400 }
       )
@@ -376,12 +376,12 @@ export async function PUT(
     course.slug = slug
     course.summary = summary
     course.description = description
-    course.price = Number(price)
+    course.price = price ? Number(price) : undefined
     course.thumbnail = thumbnail
-    course.category = category
+    course.categories = categories || course.categories || []
     // Admin can reassign instructors, instructor cannot reassign themselves
-    if (user.role === 'admin' && instructor) {
-      course.instructor = instructor
+    if (user.role === 'admin' && instructors) {
+      course.instructors = instructors
     }
     course.status = status || course.status
     course.duration = duration

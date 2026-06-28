@@ -15,6 +15,7 @@ interface CourseOption {
 
 interface QuizQuestion {
   questionText: string
+  imageUrl?: string
   options: string[]
   correctAnswerIndex: number
 }

@@ -50,7 +50,7 @@ export default function CourseFormClient({
       ? JSON.stringify(initialData.description) // legacy fallback
       : ''
   )
-  const [price, setPrice] = useState(initialData?.price || 0)
+  const [price, setPrice] = useState<number | ''>(initialData?.price ?? '')
   const [duration, setDuration] = useState(initialData?.duration || '')
   const [level, setLevel] = useState<string>(initialData?.level || 'all')
   const [categories, setCategories] = useState<string[]>(
@@ -456,7 +456,7 @@ export default function CourseFormClient({
       summary,
       description,
       price: Number(price),
-      thumbnail: thumbnailId,
+      thumbnail: thumbnailId || null,
       categories,
       instructors: user.role === 'instructor' ? [user.id] : instructors,
       status,
@@ -1086,7 +1086,7 @@ export default function CourseFormClient({
                 type="number"
                 min={0}
                 value={price}
-                onChange={(e) => setPrice(Number(e.target.value))}
+                onChange={(e) => setPrice(e.target.value === '' ? '' : Number(e.target.value))}
                 placeholder="4500"
                 className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
               />

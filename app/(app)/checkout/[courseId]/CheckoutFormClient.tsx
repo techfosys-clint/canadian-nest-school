@@ -31,6 +31,7 @@ interface CourseData {
   imageUrl: string
   instructorName: string
   categoryName: string
+  slug: string
 }
 
 interface UserSession {
@@ -470,7 +471,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
     <div className="container mx-auto px-6 pt-28 pb-16">
       {/* Back button */}
       <Link
-        href={`/courses/${course.id}`}
+        href={`/courses/${course.slug}`}
         className="inline-flex items-center gap-2 text-base font-bold text-zinc-500 hover:text-zinc-900 transition-colors mb-8 group"
       >
         <FiChevronLeft className="h-5 w-5 transition-transform group-hover:-translate-x-0.5" />

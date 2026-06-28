@@ -372,7 +372,7 @@ export default function StudentDashboard() {
                 You haven't purchased any courses yet. Browse our premium list of courses to get started!
               </p>
               <Link
-                href="/"
+                href="/courses"
                 className="px-6 py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#E61C24]/95 text-white font-bold text-base transition-all duration-300"
               >
                 Browse Premium Courses

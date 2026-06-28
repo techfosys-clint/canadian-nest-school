@@ -96,7 +96,7 @@ export async function GET(request: Request) {
     // Serve file as inline preview if PDF, otherwise as attachment download
     const disposition = ext === '.pdf' ? 'inline' : 'attachment'
 
-    return new Response(new Uint8Array(fileData.buffer), {
+    return new Response(fileData.buffer as any, {
       status: 200,
       headers: {
         'Content-Type': contentType,

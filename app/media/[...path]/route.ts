@@ -7,7 +7,7 @@ export async function GET(
 ) {
   try {
     const { path: pathSegments } = await params
-    const filename = pathSegments.join('/')
+    const filename = decodeURIComponent(pathSegments.join('/'))
 
     const { getFromStorage } = await import('@/lib/storage')
     const fileData = await getFromStorage(filename, 'media')
@@ -26,7 +26,7 @@ export async function GET(
       else if (ext === '.gif') contentType = 'image/gif'
     }
 
-    return new Response(new Uint8Array(fileData.buffer), {
+    return new Response(fileData.buffer as any, {
       status: 200,
       headers: {
         'Content-Type': contentType,

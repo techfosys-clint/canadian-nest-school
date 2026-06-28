@@ -1117,7 +1117,7 @@ export default function CourseFormClient({
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors cursor-pointer"
+                  className="bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 min-w-0 truncate transition-colors cursor-pointer"
                 >
                   <option value="">-- Select a Category --</option>
                   {categoriesOptions.map((cat) => (
@@ -1170,7 +1170,7 @@ export default function CourseFormClient({
                     <select
                       value={selectedInstructor}
                       onChange={(e) => setSelectedInstructor(e.target.value)}
-                      className="bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 transition-colors cursor-pointer"
+                      className="bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none flex-1 min-w-0 truncate transition-colors cursor-pointer"
                     >
                       <option value="">-- Select an Instructor --</option>
                       <option value={user.id} disabled={instructors.includes(user.id)}>Myself ({user.role === 'admin' ? 'Admin' : 'Staff'})</option>

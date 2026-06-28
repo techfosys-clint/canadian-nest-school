@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import connectDB from '@/lib/db'
+import { connectToDatabase } from '@/lib/db/mongodb'
 import { User } from '@/lib/db/models/User'
 import { Student } from '@/lib/db/models/Student'
-import { checkAdminSession } from '@/lib/auth'
+import { getAuthorizedUser } from '@/lib/auth/auth'
 
 export async function GET(req: NextRequest) {
   try {
-    const adminUser = await checkAdminSession(req)
+    const adminUser = await getAuthorizedUser(['admin'])
     if (!adminUser || adminUser.role !== 'admin') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    await connectDB()
+    await connectToDatabase()
 
     const users = await User.find({}).select('-password').populate('profilePic').lean()
     const students = await Student.find({}).select('-password').populate('profilePic').lean()
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const adminUser = await checkAdminSession(req)
+    const adminUser = await getAuthorizedUser(['admin'])
     if (!adminUser || adminUser.role !== 'admin') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
@@ -59,7 +59,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    await connectDB()
+    await connectToDatabase()
 
     let updated
     if (type === 'student') {
@@ -88,7 +88,7 @@ export async function PATCH(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const adminUser = await checkAdminSession(req)
+    const adminUser = await getAuthorizedUser(['admin'])
     if (!adminUser || adminUser.role !== 'admin') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
@@ -101,7 +101,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Missing id or type' }, { status: 400 })
     }
 
-    await connectDB()
+    await connectToDatabase()
 
     if (type === 'student') {
       const deleted = await Student.findByIdAndDelete(id)

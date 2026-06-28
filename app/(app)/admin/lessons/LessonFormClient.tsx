@@ -831,7 +831,6 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
           setQuizQuestions(newQuestions)
           setShowMediaPickerForQuestion(null)
         }}
-        typeFilter="image"
       />
     )}
     </>

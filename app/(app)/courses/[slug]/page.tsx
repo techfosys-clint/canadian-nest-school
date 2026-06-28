@@ -195,13 +195,13 @@ export default async function CourseDetailPage({ params }: Props) {
       </div>
 
       {/* ── Breathtaking Hero Section (Premium Dark Sapphire Glow) ── */}
-      <div className="relative bg-gradient-to-br from-[#0A163A] via-[#121F4C] to-[#0A163A] text-white border-b border-[#1A2E66] overflow-hidden select-text z-10">
+      <div className="relative bg-black text-white border-b border-zinc-800 overflow-hidden select-text z-10">
         {/* Soft decorative glows inside banner */}
         <div className="absolute -bottom-12 -right-12 w-96 h-96 bg-[#E61C24]/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Premium Dot grid overlay */}
         <div
-          className="absolute inset-0 opacity-[0.22] pointer-events-none"
+          className="absolute inset-0 opacity-[0.55] pointer-events-none"
           style={{ 
             backgroundImage: 'radial-gradient(#E61C24 1.2px, transparent 1.2px)', 
             backgroundSize: '24px 24px',

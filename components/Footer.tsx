@@ -197,6 +197,20 @@ export default function Footer() {
 
         </div>
 
+        {/* ── Payment Methods Gateway Banner ── */}
+        <div className="mt-12 flex justify-center items-center">
+          <img
+            src="/EPS-PGW_Footer_Merchant_Website/Footer-Desktop-Light-Version.png.png"
+            alt="Payment Methods"
+            className="hidden md:block w-full h-auto object-contain"
+          />
+          <img
+            src="/EPS-PGW_Footer_Merchant_Website/Footer-Mobile-Light-Version.png.png"
+            alt="Payment Methods"
+            className="block md:hidden w-full h-auto object-contain"
+          />
+        </div>
+
         {/* ── Bottom bar ── */}
         <div className="border-t border-zinc-800 mt-14 pt-8 pb-2 flex flex-col md:flex-row items-center justify-between gap-4 text-base text-zinc-500 relative z-10">
           <Link

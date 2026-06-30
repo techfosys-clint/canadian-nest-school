@@ -7,6 +7,7 @@ import {
   FiUploadCloud, FiArrowLeft, FiCheck, FiAlertCircle, FiX,
   FiFile, FiImage, FiFilm, FiFileText,
 } from 'react-icons/fi'
+import { parseJsonResponse } from '@/lib/safeJson'
 
 interface FileEntry {
   id: string
@@ -100,7 +101,7 @@ export default function MediaUploadClient() {
 
       try {
         const res = await fetch('/api/admin/media/upload', { method: 'POST', body: formData })
-        const data = await res.json()
+        const data = await parseJsonResponse(res)
         if (res.ok && data.media) {
           setEntries(prev => prev.map(e => e.id === entry.id ? { ...e, status: 'done' } : e))
         } else {

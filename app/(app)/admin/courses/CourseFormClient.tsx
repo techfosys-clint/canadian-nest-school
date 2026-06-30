@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FiPlus, FiTrash2, FiUploadCloud, FiCheck, FiX, FiInfo, FiImage, FiVideo, FiRadio, FiEdit2, FiHelpCircle } from 'react-icons/fi'
 import Swal from 'sweetalert2'
+import { parseJsonResponse } from '@/lib/safeJson'
 import RichTextEditor from '@/components/RichTextEditor'
 import MediaPickerModal from '@/components/MediaPickerModal'
 import type { MediaItem } from '@/components/MediaPickerModal'
@@ -293,7 +294,7 @@ export default function CourseFormClient({
         method: 'POST',
         body: formData,
       })
-      const data = await res.json()
+      const data = await parseJsonResponse(res)
 
       if (!res.ok) {
         throw new Error(data.error || 'Failed to upload cover image.')
@@ -340,7 +341,7 @@ export default function CourseFormClient({
         method: 'POST',
         body: formData,
       })
-      const data = await res.json()
+      const data = await parseJsonResponse(res)
 
       if (!res.ok) {
         throw new Error(data.error || 'Failed to upload document.')
@@ -401,7 +402,7 @@ export default function CourseFormClient({
 
     try {
       const res = await fetch('/api/admin/media/upload', { method: 'POST', body: formData })
-      const data = await res.json()
+      const data = await parseJsonResponse(res)
       if (!res.ok) throw new Error(data.error || 'Failed to upload image.')
       setThumbnailId(data.media.id)
       setThumbnailUrl(data.media.url)

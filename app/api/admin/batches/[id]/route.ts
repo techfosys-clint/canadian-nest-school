@@ -4,6 +4,7 @@ import { Batch } from '@/lib/db/models/Batch'
 import { User } from '@/lib/db/models/User'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
+import { isBatchAcceptingStudents } from '@/lib/batchCapacity'
 
 type Props = {
   params: Promise<{ id: string }>
@@ -41,7 +42,7 @@ export async function GET(request: Request, { params }: Props) {
       return NextResponse.json({ error: 'Batch not found.' }, { status: 404 })
     }
 
-    return NextResponse.json({ success: true, batch })
+    return NextResponse.json({ success: true, batch: { ...batch, isAcceptingStudents: isBatchAcceptingStudents(batch as any) } })
 
   } catch (error: any) {
     console.error('Get Batch API Error:', error)
@@ -72,7 +73,7 @@ export async function PUT(request: Request, { params }: Props) {
     }
 
     const body = await request.json()
-    const { name, instructor, startDate, endDate, status, students } = body
+    const { name, instructor, startDate, endDate, status, students, maxStudents, reactivateDate } = body
 
     const batch = await Batch.findById(id)
     if (!batch) {
@@ -89,7 +90,20 @@ export async function PUT(request: Request, { params }: Props) {
     if (startDate) batch.startDate = new Date(startDate)
     if (endDate) batch.endDate = new Date(endDate)
     if (status) batch.status = status
-    if (students) batch.students = students
+    if (maxStudents !== undefined) batch.maxStudents = Number(maxStudents) || 0
+    if (reactivateDate !== undefined) batch.reactivateDate = reactivateDate ? new Date(reactivateDate) : null
+
+    if (students) {
+      // Only enforce the capacity gate when the roster is growing — removing
+      // students should always be allowed regardless of capacity.
+      if (students.length > batch.students.length && !isBatchAcceptingStudents(batch)) {
+        return NextResponse.json(
+          { error: `This batch is full (max ${batch.maxStudents} students). Set a reactivate date or raise the limit to allow more joins.` },
+          { status: 400 }
+        )
+      }
+      batch.students = students
+    }
 
     await batch.save()
 

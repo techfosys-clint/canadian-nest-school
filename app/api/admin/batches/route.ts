@@ -45,7 +45,13 @@ export async function GET(request: Request) {
       .sort({ createdAt: -1 })
       .lean()
 
-    return NextResponse.json({ success: true, batches })
+    const { isBatchAcceptingStudents } = await import('@/lib/batchCapacity')
+    const batchesWithStatus = batches.map((b: any) => ({
+      ...b,
+      isAcceptingStudents: isBatchAcceptingStudents(b),
+    }))
+
+    return NextResponse.json({ success: true, batches: batchesWithStatus })
 
   } catch (error: any) {
     console.error('Get Batches API Error:', error)
@@ -75,7 +81,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { name, course, instructor, startDate, endDate, status } = body
+    const { name, course, instructor, startDate, endDate, status, maxStudents, reactivateDate } = body
 
     if (!name || !course || !startDate || !endDate) {
       return NextResponse.json({ error: 'Missing required batch parameters.' }, { status: 400 })
@@ -92,6 +98,8 @@ export async function POST(request: Request) {
       endDate: new Date(endDate),
       status: status || 'upcoming',
       students: [],
+      maxStudents: Number(maxStudents) || 0,
+      reactivateDate: reactivateDate ? new Date(reactivateDate) : null,
     })
 
     await newBatch.save()

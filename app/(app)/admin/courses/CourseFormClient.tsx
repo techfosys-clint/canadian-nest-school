@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { FiPlus, FiTrash2, FiUploadCloud, FiCheck, FiX, FiInfo, FiImage, FiVideo, FiRadio, FiEdit2, FiHelpCircle } from 'react-icons/fi'
+import { FiPlus, FiTrash2, FiUploadCloud, FiCheck, FiX, FiInfo, FiImage, FiVideo, FiRadio, FiEdit2, FiHelpCircle, FiUsers, FiCalendar, FiSearch, FiCheckCircle, FiUser } from 'react-icons/fi'
 import Swal from 'sweetalert2'
 import { parseJsonResponse } from '@/lib/safeJson'
 import RichTextEditor from '@/components/RichTextEditor'
@@ -173,6 +173,215 @@ export default function CourseFormClient({
       .catch(console.error)
       .finally(() => setLessonsLoading(false))
   }, [savedCourseId])
+
+  // ── Batches (intake groups, available once the course has been saved) ──
+  interface BatchStudent { _id: string; name: string; email: string }
+  interface BatchItem {
+    _id: string
+    name: string
+    instructor: { _id: string; name: string } | null
+    startDate: string
+    endDate: string
+    status: 'upcoming' | 'active' | 'completed'
+    students: BatchStudent[]
+    maxStudents: number
+    reactivateDate: string | null
+    isAcceptingStudents: boolean
+  }
+
+  const [batches, setBatches] = useState<BatchItem[]>([])
+  const [batchesLoading, setBatchesLoading] = useState(false)
+  const [courseStudents, setCourseStudents] = useState<BatchStudent[]>([])
+
+  // Add-batch inline form
+  const [showAddBatchForm, setShowAddBatchForm] = useState(false)
+  const [newBatchName, setNewBatchName] = useState('')
+  const [newBatchInstructor, setNewBatchInstructor] = useState('')
+  const [newBatchStart, setNewBatchStart] = useState('')
+  const [newBatchEnd, setNewBatchEnd] = useState('')
+  const [newBatchMax, setNewBatchMax] = useState<number | ''>(0)
+  const [newBatchReactivate, setNewBatchReactivate] = useState('')
+
+  // Inline batch detail / student manager panel
+  const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null)
+  const [studentSearchQuery, setStudentSearchQuery] = useState('')
+  const [batchActionMsg, setBatchActionMsg] = useState('')
+
+  const fetchBatches = React.useCallback(() => {
+    if (!savedCourseId) return
+    setBatchesLoading(true)
+    fetch(`/api/admin/batches?course=${savedCourseId}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.batches) {
+          setBatches(data.batches.map((b: any) => ({
+            _id: b._id,
+            name: b.name,
+            instructor: b.instructor,
+            startDate: b.startDate,
+            endDate: b.endDate,
+            status: b.status,
+            students: b.students || [],
+            maxStudents: b.maxStudents || 0,
+            reactivateDate: b.reactivateDate || null,
+            isAcceptingStudents: b.isAcceptingStudents,
+          })))
+        }
+      })
+      .catch(console.error)
+      .finally(() => setBatchesLoading(false))
+  }, [savedCourseId])
+
+  useEffect(() => {
+    fetchBatches()
+  }, [fetchBatches])
+
+  // Students enrolled in this specific course (candidates for batch assignment)
+  useEffect(() => {
+    if (!savedCourseId) return
+    fetch('/api/enrollments?depth=2')
+      .then(r => r.json())
+      .then(data => {
+        const docs = data.docs || []
+        const uniqueMap: Record<string, BatchStudent> = {}
+        docs.forEach((d: any) => {
+          if (d.student && typeof d.student === 'object' && d.course?.id === savedCourseId) {
+            uniqueMap[d.student._id || d.student.id] = {
+              _id: d.student._id || d.student.id,
+              name: d.student.name,
+              email: d.student.email,
+            }
+          }
+        })
+        setCourseStudents(Object.values(uniqueMap))
+      })
+      .catch(console.error)
+  }, [savedCourseId])
+
+  const handleAddBatch = async () => {
+    if (!savedCourseId) return
+    if (!newBatchName.trim() || !newBatchInstructor || !newBatchStart || !newBatchEnd) {
+      Swal.fire({ icon: 'warning', title: 'Missing Fields', text: 'Please fill in batch name, instructor, and dates.', background: '#ffffff', color: '#1a1a1a' })
+      return
+    }
+
+    try {
+      const res = await fetch('/api/admin/batches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newBatchName,
+          course: savedCourseId,
+          instructor: newBatchInstructor,
+          startDate: newBatchStart,
+          endDate: newBatchEnd,
+          maxStudents: newBatchMax === '' ? 0 : Number(newBatchMax),
+          reactivateDate: newBatchReactivate || undefined,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to create batch.')
+
+      setNewBatchName('')
+      setNewBatchInstructor('')
+      setNewBatchStart('')
+      setNewBatchEnd('')
+      setNewBatchMax(0)
+      setNewBatchReactivate('')
+      setShowAddBatchForm(false)
+      fetchBatches()
+
+      Swal.fire({ icon: 'success', title: 'Batch Created', timer: 1200, showConfirmButton: false, background: '#ffffff', color: '#1a1a1a' })
+    } catch (err: any) {
+      Swal.fire({ icon: 'error', title: 'Failed to Create Batch', text: err.message, background: '#ffffff', color: '#1a1a1a' })
+    }
+  }
+
+  const handleDeleteBatch = async (batchId: string) => {
+    const confirmed = window.confirm('Are you sure you want to delete this batch?')
+    if (!confirmed) return
+
+    try {
+      const res = await fetch(`/api/admin/batches/${batchId}`, { method: 'DELETE' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to delete batch.')
+
+      setBatches(prev => prev.filter(b => b._id !== batchId))
+      if (selectedBatchId === batchId) setSelectedBatchId(null)
+    } catch (err: any) {
+      Swal.fire({ icon: 'error', title: 'Failed to Delete Batch', text: err.message, background: '#ffffff', color: '#1a1a1a' })
+    }
+  }
+
+  const handleUpdateBatchField = async (batchId: string, field: 'maxStudents' | 'reactivateDate' | 'status', value: any) => {
+    try {
+      const res = await fetch(`/api/admin/batches/${batchId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [field]: value }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to update batch.')
+      fetchBatches()
+    } catch (err: any) {
+      Swal.fire({ icon: 'error', title: 'Update Failed', text: err.message, background: '#ffffff', color: '#1a1a1a' })
+    }
+  }
+
+  const handleAddStudentToBatch = async (batch: BatchItem, student: BatchStudent) => {
+    if (batch.students.some(s => s._id === student._id)) return
+
+    if (!batch.isAcceptingStudents) {
+      setBatchActionMsg(`This batch is full (max ${batch.maxStudents} students).`)
+      setTimeout(() => setBatchActionMsg(''), 3000)
+      return
+    }
+
+    const updatedIds = [...batch.students.map(s => s._id), student._id]
+    try {
+      const res = await fetch(`/api/admin/batches/${batch._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ students: updatedIds }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to add student.')
+
+      setBatchActionMsg(`Added ${student.name} to the batch.`)
+      setTimeout(() => setBatchActionMsg(''), 3000)
+      fetchBatches()
+    } catch (err: any) {
+      setBatchActionMsg(err.message || 'Failed to add student.')
+      setTimeout(() => setBatchActionMsg(''), 3000)
+    }
+  }
+
+  const handleRemoveStudentFromBatch = async (batch: BatchItem, studentId: string) => {
+    const updatedIds = batch.students.map(s => s._id).filter(id => id !== studentId)
+    try {
+      const res = await fetch(`/api/admin/batches/${batch._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ students: updatedIds }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to remove student.')
+
+      setBatchActionMsg('Student removed from batch.')
+      setTimeout(() => setBatchActionMsg(''), 3000)
+      fetchBatches()
+    } catch (err: any) {
+      setBatchActionMsg(err.message || 'Failed to remove student.')
+      setTimeout(() => setBatchActionMsg(''), 3000)
+    }
+  }
+
+  const selectedBatch = batches.find(b => b._id === selectedBatchId) || null
+  const availableStudentsForSelectedBatch = courseStudents.filter(s =>
+    (s.name.toLowerCase().includes(studentSearchQuery.toLowerCase()) ||
+      s.email.toLowerCase().includes(studentSearchQuery.toLowerCase())) &&
+    !selectedBatch?.students.some(bs => bs._id === s._id)
+  )
 
   // Slug states
   const [slugChecking, setSlugChecking] = useState(false)
@@ -1055,7 +1264,300 @@ export default function CourseFormClient({
               )}
           </div>
 
+          {/* ── Batches (Intake Groups) ────────────────────── */}
+          <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h2 className="text-xl font-bold text-slate-800 tracking-tight">Batches</h2>
+                <p className="text-sm font-semibold text-slate-400 mt-1">Group enrolled students into intakes with optional seat limits.</p>
+              </div>
+              {savedCourseId && (
+                <button
+                  type="button"
+                  onClick={() => setShowAddBatchForm(v => !v)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#E61C24]/15 hover:bg-[#E61C24]/25 text-[#E61C24] border border-[#E61C24]/20 rounded-lg text-base font-bold transition-colors cursor-pointer"
+                >
+                  <FiPlus className="h-4 w-4" /> Add Batch
+                </button>
+              )}
+            </div>
 
+            {!savedCourseId ? (
+              <div className="flex flex-col items-center justify-center py-10 gap-3 text-center">
+                <FiUsers className="h-10 w-10 text-zinc-700" />
+                <p className="text-base font-semibold text-slate-400">Save the course first (or click "Add Lesson" above) to start creating batches.</p>
+              </div>
+            ) : (
+              <>
+                {/* Add Batch inline form */}
+                {showAddBatchForm && (
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-5 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-base font-bold text-slate-600">Batch Name *</label>
+                        <input
+                          type="text"
+                          value={newBatchName}
+                          onChange={(e) => setNewBatchName(e.target.value)}
+                          placeholder="e.g. Batch 1 / Jan Intake 2026"
+                          className="bg-white border border-slate-200 focus:border-[#E61C24]/80 rounded-lg p-3 text-base font-semibold outline-none w-full"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-base font-bold text-slate-600">Instructor *</label>
+                        <select
+                          value={newBatchInstructor}
+                          onChange={(e) => setNewBatchInstructor(e.target.value)}
+                          className="bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none w-full cursor-pointer"
+                        >
+                          <option value="">-- Select Instructor --</option>
+                          <option value={user.id}>Myself ({user.role})</option>
+                          {instructorsOptions.map(ins => (
+                            <option key={ins.id} value={ins.id}>{ins.name} ({ins.email})</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-base font-bold text-slate-600">Start Date *</label>
+                        <input
+                          type="date"
+                          value={newBatchStart}
+                          onChange={(e) => setNewBatchStart(e.target.value)}
+                          className="bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none w-full cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-base font-bold text-slate-600">End Date *</label>
+                        <input
+                          type="date"
+                          value={newBatchEnd}
+                          onChange={(e) => setNewBatchEnd(e.target.value)}
+                          className="bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none w-full cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-base font-bold text-slate-600">Max Students (0 = unlimited)</label>
+                        <input
+                          type="number"
+                          min={0}
+                          value={newBatchMax}
+                          onChange={(e) => setNewBatchMax(e.target.value === '' ? '' : Number(e.target.value))}
+                          placeholder="0"
+                          className="bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none w-full"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-base font-bold text-slate-600">Reactivate Date (Optional)</label>
+                        <input
+                          type="date"
+                          value={newBatchReactivate}
+                          onChange={(e) => setNewBatchReactivate(e.target.value)}
+                          className="bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none w-full cursor-pointer"
+                        />
+                        <p className="text-xs font-semibold text-slate-400">Once the seat limit is reached, joins reopen automatically on this date.</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-end gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setShowAddBatchForm(false)}
+                        className="px-4 py-2.5 bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 rounded-lg text-base font-bold transition-colors cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleAddBatch}
+                        className="px-5 py-2.5 bg-[#E61C24] hover:bg-[#CC181F] text-white rounded-lg text-base font-bold transition-all cursor-pointer"
+                      >
+                        Create Batch
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Batches list */}
+                {batchesLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="h-6 w-6 border-2 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
+                  </div>
+                ) : batches.length === 0 ? (
+                  <p className="text-base font-semibold text-slate-400 py-2">No batches yet. Click "Add Batch" to create your first intake group.</p>
+                ) : (
+                  <div className="space-y-2.5">
+                    {batches.map((batch) => {
+                      const isSelected = selectedBatchId === batch._id
+                      return (
+                        <div key={batch._id} className={`border rounded-lg transition-colors ${isSelected ? 'border-[#E61C24]/40 bg-[#E61C24]/5' : 'border-slate-200 bg-slate-50'}`}>
+                          <div className="flex flex-wrap items-center gap-3 p-4">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-base font-bold text-slate-800">{batch.name}</p>
+                              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-semibold text-slate-500 mt-1">
+                                <span className="flex items-center gap-1.5"><FiUser className="h-3.5 w-3.5" />{batch.instructor?.name || 'Unassigned'}</span>
+                                <span className="flex items-center gap-1.5"><FiCalendar className="h-3.5 w-3.5" />{new Date(batch.startDate).toLocaleDateString()} - {new Date(batch.endDate).toLocaleDateString()}</span>
+                              </div>
+                            </div>
+
+                            <span className={`inline-block px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider ${
+                              batch.status === 'active' ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-600'
+                                : batch.status === 'completed' ? 'bg-slate-200 border border-slate-300 text-slate-500'
+                                : 'bg-amber-500/10 border border-amber-500/20 text-amber-600'
+                            }`}>
+                              {batch.status}
+                            </span>
+
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold ${
+                              batch.isAcceptingStudents ? 'bg-slate-100 text-slate-600' : 'bg-rose-500/10 text-rose-600 border border-rose-500/20'
+                            }`}>
+                              <FiUsers className="h-4 w-4" />
+                              {batch.students.length}{batch.maxStudents > 0 ? `/${batch.maxStudents}` : ''}
+                              {!batch.isAcceptingStudents && ' (Full)'}
+                            </span>
+
+                            <button
+                              type="button"
+                              onClick={() => { setSelectedBatchId(isSelected ? null : batch._id); setStudentSearchQuery('') }}
+                              className="px-3.5 py-2 rounded-lg border border-slate-200 hover:border-slate-300 bg-white text-slate-600 hover:text-slate-800 text-sm font-bold transition-colors cursor-pointer"
+                            >
+                              {isSelected ? 'Close' : 'Manage'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteBatch(batch._id)}
+                              className="p-2 rounded-lg border border-red-500/15 hover:border-red-500 bg-white text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                              title="Delete batch"
+                            >
+                              <FiTrash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+
+                          {/* Inline manage panel */}
+                          {isSelected && (
+                            <div className="border-t border-slate-200 p-5 space-y-5">
+                              {batchActionMsg && (
+                                <div className="p-3 rounded-lg bg-[#E61C24]/10 border border-[#E61C24]/20 text-[#E61C24] font-semibold text-sm">
+                                  {batchActionMsg}
+                                </div>
+                              )}
+
+                              {/* Capacity & status controls */}
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div className="flex flex-col gap-1.5">
+                                  <label className="text-sm font-bold text-slate-600">Max Students (0 = unlimited)</label>
+                                  <input
+                                    type="number"
+                                    min={0}
+                                    defaultValue={batch.maxStudents}
+                                    onBlur={(e) => handleUpdateBatchField(batch._id, 'maxStudents', Number(e.target.value) || 0)}
+                                    className="bg-white border border-slate-200 rounded-lg p-2.5 text-base font-semibold outline-none w-full"
+                                  />
+                                </div>
+                                <div className="flex flex-col gap-1.5">
+                                  <label className="text-sm font-bold text-slate-600">Reactivate Date</label>
+                                  <input
+                                    type="date"
+                                    defaultValue={batch.reactivateDate ? batch.reactivateDate.split('T')[0] : ''}
+                                    onBlur={(e) => handleUpdateBatchField(batch._id, 'reactivateDate', e.target.value || null)}
+                                    className="bg-white border border-slate-200 rounded-lg p-2.5 text-base font-semibold outline-none w-full cursor-pointer"
+                                  />
+                                </div>
+                                <div className="flex flex-col gap-1.5">
+                                  <label className="text-sm font-bold text-slate-600">Status</label>
+                                  <select
+                                    defaultValue={batch.status}
+                                    onChange={(e) => handleUpdateBatchField(batch._id, 'status', e.target.value)}
+                                    className="bg-white border border-slate-200 rounded-lg p-2.5 text-base font-semibold outline-none w-full cursor-pointer"
+                                  >
+                                    <option value="upcoming">Upcoming</option>
+                                    <option value="active">Active</option>
+                                    <option value="completed">Completed</option>
+                                  </select>
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                                {/* Current students */}
+                                <div className="space-y-3">
+                                  <h4 className="text-sm font-bold text-slate-600 flex items-center gap-2">
+                                    <FiCheckCircle className="text-emerald-500 h-4 w-4" />
+                                    Students in this batch ({batch.students.length})
+                                  </h4>
+                                  <div className="border border-slate-200 rounded-lg bg-white p-3 max-h-[260px] overflow-y-auto space-y-2">
+                                    {batch.students.length === 0 ? (
+                                      <p className="text-sm font-semibold text-slate-400 text-center py-6">No students added yet.</p>
+                                    ) : (
+                                      batch.students.map(s => (
+                                        <div key={s._id} className="p-3 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-between gap-3">
+                                          <div className="min-w-0">
+                                            <p className="text-sm font-bold text-slate-800 truncate">{s.name}</p>
+                                            <p className="text-xs text-slate-400 truncate">{s.email}</p>
+                                          </div>
+                                          <button
+                                            type="button"
+                                            onClick={() => handleRemoveStudentFromBatch(batch, s._id)}
+                                            className="px-3 py-1.5 rounded-lg border border-red-500/15 hover:border-red-500 bg-white text-red-500 hover:bg-red-50 text-sm font-bold transition-all cursor-pointer shrink-0"
+                                          >
+                                            Remove
+                                          </button>
+                                        </div>
+                                      ))
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Add students */}
+                                <div className="space-y-3">
+                                  <h4 className="text-sm font-bold text-slate-600 flex items-center gap-2">
+                                    <FiPlus className="text-[#E61C24] h-4 w-4" />
+                                    Add enrolled students
+                                  </h4>
+                                  <div className="relative">
+                                    <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <input
+                                      type="text"
+                                      value={studentSearchQuery}
+                                      onChange={(e) => setStudentSearchQuery(e.target.value)}
+                                      placeholder="Search enrolled students..."
+                                      className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2.5 text-sm font-semibold outline-none"
+                                    />
+                                  </div>
+                                  <div className="border border-slate-200 rounded-lg bg-white p-3 max-h-[220px] overflow-y-auto space-y-2">
+                                    {availableStudentsForSelectedBatch.length === 0 ? (
+                                      <p className="text-sm font-semibold text-slate-400 text-center py-6">No matching enrolled students.</p>
+                                    ) : (
+                                      availableStudentsForSelectedBatch.map(s => (
+                                        <div key={s._id} className="p-3 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-between gap-3">
+                                          <div className="min-w-0">
+                                            <p className="text-sm font-bold text-slate-800 truncate">{s.name}</p>
+                                            <p className="text-xs text-slate-400 truncate">{s.email}</p>
+                                          </div>
+                                          <button
+                                            type="button"
+                                            onClick={() => handleAddStudentToBatch(batch, s)}
+                                            disabled={!batch.isAcceptingStudents}
+                                            className="px-3 py-1.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white text-sm font-bold transition-colors cursor-pointer shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
+                                          >
+                                            Add
+                                          </button>
+                                        </div>
+                                      ))
+                                    )}
+                                  </div>
+                                  {!batch.isAcceptingStudents && (
+                                    <p className="text-xs font-semibold text-rose-500">This batch is full. Set a reactivate date or raise the max students limit to allow more joins.</p>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
 
         </div>
 

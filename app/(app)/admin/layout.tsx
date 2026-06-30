@@ -62,7 +62,6 @@ const NAV_GROUPS: SidebarGroup[] = [
       { label: 'Lessons Syllabus', href: '/admin/lessons', icon: FiList, roles: ['admin', 'instructor'], permission: 'lessons' },
       { label: 'Grading Submissions', href: '/admin/submissions', icon: FiFileText, roles: ['admin', 'instructor'], permission: 'lessons' },
       { label: 'Live Classes', href: '/admin/live-classes', icon: FiRadio, roles: ['admin', 'instructor'], permission: 'live-classes' },
-      { label: 'Batches', href: '/admin/batches', icon: FiUsers, roles: ['admin', 'instructor'], permission: 'batches' },
       { label: 'Attendance', href: '/admin/attendance', icon: FiList, roles: ['admin', 'instructor'], permission: 'attendance' },
     ],
   },

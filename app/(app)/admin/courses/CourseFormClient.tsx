@@ -144,15 +144,20 @@ export default function CourseFormClient({
 
 
 
-  // Curriculum lessons (edit mode only)
+  // Tracks the persisted course ID once this draft has been saved at least
+  // once — starts as the real ID in edit mode, or null for a brand-new
+  // course that hasn't been saved yet.
+  const [savedCourseId, setSavedCourseId] = useState<string | null>(initialData?._id || null)
+
+  // Curriculum lessons (available once the course has been saved at least once)
   interface LessonSummary { id: string; title: string; order: number; lessonType: 'recorded' | 'live' | 'quiz'; duration: number }
   const [lessons, setLessons] = useState<LessonSummary[]>([])
   const [lessonsLoading, setLessonsLoading] = useState(false)
 
   useEffect(() => {
-    if (!isEditMode || !initialData?._id) return
+    if (!savedCourseId) return
     setLessonsLoading(true)
-    fetch(`/api/admin/lessons?courseId=${initialData._id}`)
+    fetch(`/api/admin/lessons?courseId=${savedCourseId}`)
       .then(r => r.json())
       .then(data => {
         if (data.success && data.data?.lessons) {
@@ -167,7 +172,7 @@ export default function CourseFormClient({
       })
       .catch(console.error)
       .finally(() => setLessonsLoading(false))
-  }, [isEditMode, initialData?._id])
+  }, [savedCourseId])
 
   // Slug states
   const [slugChecking, setSlugChecking] = useState(false)
@@ -423,6 +428,104 @@ export default function CourseFormClient({
     setThumbnailAlt(item.alt)
   }
 
+  // Builds the API payload from current form state
+  const buildPayload = () => ({
+    title,
+    slug,
+    summary,
+    description,
+    price: Number(price),
+    thumbnail: thumbnailId || null,
+    categories,
+    instructors: user.role === 'instructor' ? [user.id] : instructors,
+    status,
+    duration,
+    level,
+    whatYouWillLearn: whatYouWillLearn.filter((item) => item.outcome.trim() !== ''),
+    requirements: requirements.filter((item) => item.requirement.trim() !== ''),
+    studyMaterials: studyMaterials.filter((item) => item.title.trim() !== '' && item.url.trim() !== ''),
+    modules,
+    seo: {
+      metaTitle,
+      metaDescription,
+      keywords,
+    },
+  })
+
+  // Creates (POST) or updates (PUT, once savedCourseId exists) the course.
+  // Used by both the explicit Save button and the "save as draft before
+  // adding a lesson" flow. Returns the course ID on success, or null.
+  const saveCourse = async (): Promise<string | null> => {
+    const url = savedCourseId ? `/api/admin/courses/${savedCourseId}` : `/api/admin/courses`
+    const method = savedCourseId ? 'PUT' : 'POST'
+
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(buildPayload()),
+    })
+
+    const data = await res.json()
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to save course.')
+    }
+
+    const newId: string = data.data?.course?._id || savedCourseId
+    if (newId && newId !== savedCourseId) {
+      setSavedCourseId(newId)
+      // Switch the URL to the edit route for this now-persisted course
+      // without a full page reload, so "Save" never creates a duplicate.
+      router.replace(`/admin/courses/${newId}/edit`)
+    }
+    return newId
+  }
+
+  // Saves the course (if needed) and takes the admin to the lesson form for
+  // it — lessons can only be created against a real, persisted course ID.
+  const handleAddLessonClick = async () => {
+    if (!title || !slug) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Add a Title First',
+        text: 'Please fill in the course title and slug before adding lessons.',
+        background: '#ffffff',
+        color: '#1a1a1a',
+      })
+      return
+    }
+    if (slugStatus === 'invalid') {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Slug',
+        text: 'This course URL slug is already taken. Please provide a unique one.',
+        background: '#ffffff',
+        color: '#1a1a1a',
+      })
+      return
+    }
+
+    if (savedCourseId) {
+      router.push(`/admin/lessons/new?courseId=${savedCourseId}`)
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const id = await saveCourse()
+      if (id) router.push(`/admin/lessons/new?courseId=${id}`)
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Could Not Save Draft',
+        text: err.message || 'Please try again.',
+        background: '#ffffff',
+        color: '#1a1a1a',
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   // Form Submit handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -451,55 +554,21 @@ export default function CourseFormClient({
 
     setIsSubmitting(true)
 
-    const payload = {
-      title,
-      slug,
-      summary,
-      description,
-      price: Number(price),
-      thumbnail: thumbnailId || null,
-      categories,
-      instructors: user.role === 'instructor' ? [user.id] : instructors,
-      status,
-      duration,
-      level,
-      whatYouWillLearn: whatYouWillLearn.filter((item) => item.outcome.trim() !== ''),
-      requirements: requirements.filter((item) => item.requirement.trim() !== ''),
-      studyMaterials: studyMaterials.filter((item) => item.title.trim() !== '' && item.url.trim() !== ''),
-      modules,
-      seo: {
-        metaTitle,
-        metaDescription,
-        keywords,
-      },
-    }
-
     try {
-      const url = isEditMode ? `/api/admin/courses/${initialData._id}` : `/api/admin/courses`
-      const method = isEditMode ? 'PUT' : 'POST'
-
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-
-      const data = await res.json()
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to save course.')
-      }
+      await saveCourse()
 
       await Swal.fire({
         icon: 'success',
-        title: isEditMode ? 'Course Updated' : 'Course Created',
-        text: isEditMode ? 'Syllabus parameters successfully edited.' : 'New curriculum published.',
+        title: savedCourseId ? 'Course Updated' : 'Course Created',
+        text: 'Syllabus parameters saved successfully.',
         timer: 1500,
         showConfirmButton: false,
         background: '#ffffff',
         color: '#1a1a1a',
       })
 
-      router.push('/admin/courses')
+      // Stay on the page (now in edit mode for this course) instead of
+      // navigating away, so the admin can keep adding lessons/materials.
       router.refresh()
     } catch (err: any) {
       Swal.fire({
@@ -521,7 +590,7 @@ export default function CourseFormClient({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200/40">
         <div>
           <h1 className="text-3xl font-bold font-display text-slate-800">
-            {isEditMode ? `Edit Course: ${initialData.title}` : 'Publish New Course'}
+            {savedCourseId ? `Edit Course: ${title}` : 'Publish New Course'}
           </h1>
           <p className="text-base font-semibold text-slate-500 mt-1">
             Build and optimize platform syllabus programs
@@ -907,20 +976,26 @@ export default function CourseFormClient({
             )}
           </div>
 
-          {/* ── Course Curriculum (edit mode only) ────────────────────── */}
-          {isEditMode && (
-            <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4">
+          {/* ── Course Curriculum ────────────────────── */}
+          <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h2 className="text-xl font-bold text-slate-800 tracking-tight">Course Curriculum</h2>
-                <Link
-                  href={`/admin/lessons/new?courseId=${initialData._id}`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#E61C24]/15 hover:bg-[#E61C24]/25 text-[#E61C24] border border-[#E61C24]/20 rounded-lg text-base font-bold transition-colors"
+                <button
+                  type="button"
+                  onClick={handleAddLessonClick}
+                  disabled={isSubmitting}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#E61C24]/15 hover:bg-[#E61C24]/25 text-[#E61C24] border border-[#E61C24]/20 rounded-lg text-base font-bold transition-colors cursor-pointer disabled:opacity-50"
                 >
                   <FiPlus className="h-4 w-4" /> Add Lesson
-                </Link>
+                </button>
               </div>
 
-              {lessonsLoading ? (
+              {!savedCourseId ? (
+                <div className="flex flex-col items-center justify-center py-10 gap-3 text-center">
+                  <FiVideo className="h-10 w-10 text-zinc-700" />
+                  <p className="text-base font-semibold text-slate-400">Add a title and modules above, then click "Add Lesson" — the course will be saved as a draft automatically.</p>
+                </div>
+              ) : lessonsLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="h-6 w-6 border-2 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
                 </div>
@@ -928,12 +1003,14 @@ export default function CourseFormClient({
                 <div className="flex flex-col items-center justify-center py-10 gap-3 text-center">
                   <FiVideo className="h-10 w-10 text-zinc-700" />
                   <p className="text-base font-semibold text-slate-400">No lessons yet. Add your first lesson to build the curriculum.</p>
-                  <Link
-                    href={`/admin/lessons/new?courseId=${initialData._id}`}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#E61C24] hover:bg-[#CC181F] text-white rounded-lg font-bold text-base transition-all"
+                  <button
+                    type="button"
+                    onClick={handleAddLessonClick}
+                    disabled={isSubmitting}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#E61C24] hover:bg-[#CC181F] text-white rounded-lg font-bold text-base transition-all cursor-pointer disabled:opacity-50"
                   >
                     <FiPlus className="h-4 w-4" /> Add First Lesson
-                  </Link>
+                  </button>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -976,8 +1053,7 @@ export default function CourseFormClient({
                   </p>
                 </div>
               )}
-            </div>
-          )}
+          </div>
 
 
 
@@ -1303,7 +1379,7 @@ export default function CourseFormClient({
                   <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   <span>Saving course to Mongoose...</span>
                 </div>
-              ) : isEditMode ? (
+              ) : savedCourseId ? (
                 'Save Changes'
               ) : (
                 'Publish Course Cover & Metadata'

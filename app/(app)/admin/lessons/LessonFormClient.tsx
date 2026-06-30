@@ -213,7 +213,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
         color: '#1a1a1a',
       })
 
-      router.push(`/admin/lessons?courseId=${courseId}`)
+      router.push(`/admin/courses/${courseId}/edit`)
       router.refresh()
     } catch (err: any) {
       Swal.fire({
@@ -244,7 +244,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
         </div>
         <button
           type="button"
-          onClick={() => router.push(courseId ? `/admin/lessons?courseId=${courseId}` : '/admin/lessons')}
+          onClick={() => router.push(courseId ? `/admin/courses/${courseId}/edit` : '/admin/lessons')}
           className="px-4 py-2 bg-slate-100 hover:bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-800 rounded-lg text-base font-bold transition-colors cursor-pointer"
         >
           Cancel & Back

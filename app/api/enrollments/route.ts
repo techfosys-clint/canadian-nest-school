@@ -405,8 +405,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error('API Enroll POST Error:', error)
     return NextResponse.json(
-      { success: false, error: 'Failed to complete enrollment.' },
-      { status: 500 }
+      { success: false, error: 'Failed to complete enrollment. Please try again.' }
     )
   }
 }

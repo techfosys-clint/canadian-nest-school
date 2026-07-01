@@ -70,7 +70,14 @@ async function getEpsToken(): Promise<string> {
     throw err
   }
 
-  const data = await res.json()
+  const rawAuth = await res.text()
+  let data: any
+  try {
+    data = JSON.parse(rawAuth)
+  } catch {
+    console.error(`EPS auth returned non-JSON (HTTP ${res.status}):`, rawAuth.slice(0, 500))
+    throw new Error('EPS payment gateway returned an unexpected response during authentication. Please try again.')
+  }
 
   if (!res.ok || !data.token) {
     throw new Error(data.errorMessage || 'Failed to authenticate with EPS payment gateway.')
@@ -149,7 +156,14 @@ export async function initializeEpsPayment(params: InitializeEpsPaymentParams): 
     throw err
   }
 
-  const data = await res.json()
+  const rawInit = await res.text()
+  let data: any
+  try {
+    data = JSON.parse(rawInit)
+  } catch {
+    console.error(`EPS initialize returned non-JSON (HTTP ${res.status}):`, rawInit.slice(0, 500))
+    throw new Error('EPS payment gateway returned an unexpected response during payment initialization. Please try again.')
+  }
 
   if (!res.ok || !data.RedirectURL) {
     throw new Error(data.ErrorMessage || 'Failed to initialize EPS payment.')
@@ -191,7 +205,14 @@ export async function verifyEpsTransaction(merchantTransactionId: string): Promi
     throw err
   }
 
-  const data = await res.json()
+  const rawVerify = await res.text()
+  let data: any
+  try {
+    data = JSON.parse(rawVerify)
+  } catch {
+    console.error(`EPS verify returned non-JSON (HTTP ${res.status}):`, rawVerify.slice(0, 500))
+    throw new Error('EPS payment gateway returned an unexpected response during verification. Please try again.')
+  }
 
   if (!res.ok) {
     throw new Error(data.ErrorMessage || 'Failed to verify EPS transaction.')

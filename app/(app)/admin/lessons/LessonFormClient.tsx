@@ -89,6 +89,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
   )
   const [saving, setSaving] = useState(false)
   const [existingModules, setExistingModules] = useState<string[]>([])
+  const [autoOrderLoading, setAutoOrderLoading] = useState(false)
   const [showMediaPickerForQuestion, setShowMediaPickerForQuestion] = useState<number | null>(null)
 
   // Fetch unique module names of the selected course
@@ -104,7 +105,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
         if (course && course.modules) {
           const courseMods = course.modules as string[]
           setExistingModules(courseMods)
-          
+
           // If editing a lesson, and its current moduleName is not in the course's modules,
           // we append it so it's selectable/visible
           const initialModName = initialData?.moduleName
@@ -120,6 +121,22 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
       })
       .catch((err) => console.error('Failed to load course modules:', err))
   }, [courseId, initialData])
+
+  // Auto-calculate order number for NEW lessons when course or module changes
+  React.useEffect(() => {
+    if (isEditMode || !courseId) return
+    setAutoOrderLoading(true)
+    fetch(`/api/admin/lessons?courseId=${courseId}`)
+      .then(r => r.json())
+      .then(data => {
+        const lessons: any[] = data.data?.lessons || []
+        const inModule = lessons.filter(l => (l.moduleName || 'General Module') === (moduleName || 'General Module'))
+        const maxOrder = inModule.reduce((max: number, l: any) => Math.max(max, l.order || 0), 0)
+        setOrder(maxOrder + 1)
+      })
+      .catch(() => {})
+      .finally(() => setAutoOrderLoading(false))
+  }, [courseId, moduleName, isEditMode])
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value
@@ -325,7 +342,14 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-base font-bold text-slate-600">Display / Lecture Order *</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-base font-bold text-slate-600">Display / Lecture Order *</label>
+                  {!isEditMode && (
+                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-500 select-none">
+                      {autoOrderLoading ? 'Calculating...' : 'Auto-set · editable'}
+                    </span>
+                  )}
+                </div>
                 <input
                   type="number"
                   required
@@ -334,6 +358,11 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                   onChange={(e) => setOrder(Number(e.target.value))}
                   className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                 />
+                {!isEditMode && (
+                  <p className="text-sm font-semibold text-slate-400">
+                    Auto-counted from existing lessons in this module. Change if needed.
+                  </p>
+                )}
               </div>
             </div>
 

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { FiPlus, FiTrash2, FiUploadCloud, FiCheck, FiX, FiInfo, FiImage, FiVideo, FiRadio, FiEdit2, FiHelpCircle, FiUsers, FiCalendar, FiSearch, FiCheckCircle, FiUser } from 'react-icons/fi'
+import { FiPlus, FiTrash2, FiUploadCloud, FiCheck, FiX, FiInfo, FiImage, FiVideo, FiRadio, FiEdit2, FiHelpCircle, FiUsers, FiCalendar, FiSearch, FiCheckCircle, FiUser, FiArrowUp, FiArrowDown } from 'react-icons/fi'
 import Swal from 'sweetalert2'
 import { parseJsonResponse } from '@/lib/safeJson'
 import RichTextEditor from '@/components/RichTextEditor'
@@ -130,6 +130,14 @@ export default function CourseFormClient({
 
   const handleRemoveModule = (indexToRemove: number) => {
     setModules(modules.filter((_, idx) => idx !== indexToRemove))
+  }
+
+  const handleMoveModule = (index: number, direction: 'up' | 'down') => {
+    const swapIndex = direction === 'up' ? index - 1 : index + 1
+    if (swapIndex < 0 || swapIndex >= modules.length) return
+    const updated = [...modules]
+    ;[updated[index], updated[swapIndex]] = [updated[swapIndex], updated[index]]
+    setModules(updated)
   }
 
   const handleEditModule = (indexToEdit: number) => {
@@ -1236,15 +1244,38 @@ export default function CourseFormClient({
                       </div>
                     ) : (
                       <>
-                        <span className="text-slate-800 font-bold text-base">{modName}</span>
-                        <div className="flex gap-2">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <span className="flex items-center justify-center h-6 w-6 shrink-0 rounded bg-[#E61C24]/10 text-[#E61C24] text-xs font-bold select-none">
+                            {idx + 1}
+                          </span>
+                          <span className="text-slate-800 font-bold text-base truncate">{modName}</span>
+                        </div>
+                        <div className="flex gap-1.5 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => handleMoveModule(idx, 'up')}
+                            disabled={idx === 0}
+                            className="p-2 text-slate-400 hover:text-slate-700 bg-slate-100/60 border border-slate-200 rounded-lg transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                            title="Move up"
+                          >
+                            <FiArrowUp className="h-4 w-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleMoveModule(idx, 'down')}
+                            disabled={idx === modules.length - 1}
+                            className="p-2 text-slate-400 hover:text-slate-700 bg-slate-100/60 border border-slate-200 rounded-lg transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                            title="Move down"
+                          >
+                            <FiArrowDown className="h-4 w-4" />
+                          </button>
                           <button
                             type="button"
                             onClick={() => handleEditModule(idx)}
                             className="p-2 text-slate-400 hover:text-blue-500 bg-slate-100/60 border border-slate-200 rounded-lg transition-colors cursor-pointer"
                             title="Edit module"
                           >
-                            <FiEdit2 className="h-5 w-5" />
+                            <FiEdit2 className="h-4 w-4" />
                           </button>
                           <button
                             type="button"
@@ -1252,7 +1283,7 @@ export default function CourseFormClient({
                             className="p-2 text-slate-400 hover:text-red-400 bg-slate-100/60 border border-slate-200 rounded-lg transition-colors cursor-pointer"
                             title="Remove module"
                           >
-                            <FiTrash2 className="h-5 w-5" />
+                            <FiTrash2 className="h-4 w-4" />
                           </button>
                         </div>
                       </>

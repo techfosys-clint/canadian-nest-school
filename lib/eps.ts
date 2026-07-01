@@ -126,7 +126,7 @@ export async function initializeEpsPayment(params: InitializeEpsPaymentParams): 
         storeId: config.storeId,
         CustomerOrderId: params.customerOrderId,
         merchantTransactionId: params.merchantTransactionId,
-        transactionTypeId: 1,
+        transactionTypeId: 10,
         financialEntityId: 0,
         transitionStatusId: 0,
         totalAmount: params.totalAmount,

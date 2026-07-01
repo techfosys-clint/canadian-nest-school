@@ -398,8 +398,7 @@ export async function POST(request: Request) {
         await Coupon.updateOne({ _id: appliedCoupon._id }, { $inc: { usedCount: -1 } })
       }
       return NextResponse.json(
-        { success: false, error: epsError.message || 'Failed to start payment. Please try again.' },
-        { status: 422 }
+        { success: false, error: epsError.message || 'Failed to start payment. Please try again.' }
       )
     }
 

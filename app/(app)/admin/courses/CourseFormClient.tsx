@@ -108,6 +108,8 @@ export default function CourseFormClient({
   )
   const [modules, setModules] = useState<string[]>(initialData?.modules || [])
   const [newModuleName, setNewModuleName] = useState('')
+  const [editingModuleIndex, setEditingModuleIndex] = useState<number | null>(null)
+  const [editingModuleName, setEditingModuleName] = useState<string>('')
 
   const handleAddModule = () => {
     const trimmed = newModuleName.trim()
@@ -128,6 +130,34 @@ export default function CourseFormClient({
 
   const handleRemoveModule = (indexToRemove: number) => {
     setModules(modules.filter((_, idx) => idx !== indexToRemove))
+  }
+
+  const handleEditModule = (indexToEdit: number) => {
+    setEditingModuleIndex(indexToEdit)
+    setEditingModuleName(modules[indexToEdit])
+  }
+
+  const handleSaveEditedModule = () => {
+    if (editingModuleIndex === null) return
+    const trimmed = editingModuleName.trim()
+    if (!trimmed) {
+      setEditingModuleIndex(null)
+      return
+    }
+    if (trimmed !== modules[editingModuleIndex] && modules.includes(trimmed)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Duplicate Module',
+        text: 'This module name already exists.',
+        background: '#ffffff',
+        color: '#1a1a1a',
+      })
+      return
+    }
+    const updatedModules = [...modules]
+    updatedModules[editingModuleIndex] = trimmed
+    setModules(updatedModules)
+    setEditingModuleIndex(null)
   }
 
   const [studyMaterials, setStudyMaterials] = useState<Array<{ title: string; url: string; materialType: 'pdf' | 'epub' | 'link' | 'other'; coverImage?: string }>>(
@@ -1170,15 +1200,63 @@ export default function CourseFormClient({
               <div className="space-y-2.5 pt-2">
                 {modules.map((modName, idx) => (
                   <div key={idx} className="flex items-center justify-between bg-slate-100 border border-slate-200 hover:border-zinc-750 px-4 py-3 rounded-lg transition-colors">
-                    <span className="text-slate-800 font-bold text-base">{modName}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveModule(idx)}
-                      className="p-2 text-slate-400 hover:text-red-400 bg-slate-100/60 border border-slate-200 rounded-lg transition-colors cursor-pointer"
-                      title="Remove module"
-                    >
-                      <FiTrash2 className="h-5 w-5" />
-                    </button>
+                    {editingModuleIndex === idx ? (
+                      <div className="flex items-center gap-2 w-full">
+                        <input
+                          type="text"
+                          value={editingModuleName}
+                          onChange={(e) => setEditingModuleName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault()
+                              handleSaveEditedModule()
+                            } else if (e.key === 'Escape') {
+                              setEditingModuleIndex(null)
+                            }
+                          }}
+                          autoFocus
+                          className="bg-white border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-2 text-base font-semibold outline-none flex-1 transition-colors"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleSaveEditedModule}
+                          className="p-2 text-emerald-500 hover:text-white hover:bg-emerald-500 bg-emerald-500/10 border border-emerald-500/20 rounded-lg transition-colors cursor-pointer"
+                          title="Save module"
+                        >
+                          <FiCheck className="h-5 w-5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingModuleIndex(null)}
+                          className="p-2 text-slate-400 hover:text-white hover:bg-slate-400 bg-slate-100/60 border border-slate-200 rounded-lg transition-colors cursor-pointer"
+                          title="Cancel"
+                        >
+                          <FiX className="h-5 w-5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="text-slate-800 font-bold text-base">{modName}</span>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleEditModule(idx)}
+                            className="p-2 text-slate-400 hover:text-blue-500 bg-slate-100/60 border border-slate-200 rounded-lg transition-colors cursor-pointer"
+                            title="Edit module"
+                          >
+                            <FiEdit2 className="h-5 w-5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveModule(idx)}
+                            className="p-2 text-slate-400 hover:text-red-400 bg-slate-100/60 border border-slate-200 rounded-lg transition-colors cursor-pointer"
+                            title="Remove module"
+                          >
+                            <FiTrash2 className="h-5 w-5" />
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))}
               </div>
@@ -1250,7 +1328,7 @@ export default function CourseFormClient({
                       </span>
                       <Link
                         href={`/admin/lessons/${lesson.id}/edit`}
-                        className="p-2 rounded-lg bg-slate-100 hover:bg-zinc-700 text-slate-500 hover:text-slate-800 transition-all"
+                        className="p-2 rounded-lg bg-slate-100 hover:bg-zinc-700 text-slate-500 hover:text-white transition-all"
                         title="Edit lesson"
                       >
                         <FiEdit2 className="h-4 w-4" />

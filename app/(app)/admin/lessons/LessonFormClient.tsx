@@ -552,7 +552,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                       {/* Card Header */}
                       <div className="flex items-center justify-between pb-4 border-b border-slate-100/50">
                         <div className="flex items-center gap-3">
-                          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-[#E61C24] to-[#CC181F] text-slate-800 font-bold text-base shadow-md shadow-[#E61C24]/20 select-none">
+                          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-[#E61C24] to-[#CC181F] text-white font-bold text-base shadow-md shadow-[#E61C24]/20 select-none">
                             {String(qIdx + 1).padStart(2, '0')}
                           </span>
                           <div>
@@ -587,7 +587,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                             setQuizQuestions(newQuestions)
                           }}
                           placeholder="e.g. What does CSS stand for in web development?"
-                          className="bg-white border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none w-full transition-colors"
+                          className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3.5 text-base font-semibold outline-none w-full transition-colors"
                         />
                       </div>
                       
@@ -720,7 +720,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                                 className={`bg-slate-100 border rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors ${
                                   isCorrect 
                                     ? 'border-emerald-500/30 focus:border-emerald-500 text-slate-800 focus:ring-1 focus:ring-emerald-500' 
-                                    : 'border-slate-200/80 focus:border-slate-300/80 text-slate-600 focus:text-slate-800 focus:ring-1 focus:ring-zinc-700'
+                                    : 'border-slate-200/80 focus:border-slate-300/80 text-slate-800 focus:ring-1 focus:ring-[#E61C24]/80'
                                 }`}
                               />
                             </div>

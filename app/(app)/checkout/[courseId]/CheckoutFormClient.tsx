@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { sendGTMEvent } from '@next/third-parties/google'
 import { pushToDataLayer, generateEventId } from '@/lib/gtm'
+import { parseJsonResponse } from '@/lib/safeJson'
 import {
   FiZap,
   FiMail,
@@ -405,7 +406,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
           billingAddress,
         }),
       })
-      const data = await response.json()
+      const data = await parseJsonResponse(response)
 
       if (response.ok && data.success && data.redirectUrl) {
         // Paid course — hand off to the EPS payment gateway. The purchase

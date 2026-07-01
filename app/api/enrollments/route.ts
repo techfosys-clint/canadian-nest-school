@@ -399,7 +399,7 @@ export async function POST(request: Request) {
       }
       return NextResponse.json(
         { success: false, error: epsError.message || 'Failed to start payment. Please try again.' },
-        { status: 502 }
+        { status: 422 }
       )
     }
 

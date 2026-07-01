@@ -34,6 +34,12 @@ function generateHash(value: string, hashKey: string): string {
     .digest('base64')
 }
 
+const EPS_TIMEOUT_MS = 15_000
+
+function epsSignal(): AbortSignal {
+  return AbortSignal.timeout(EPS_TIMEOUT_MS)
+}
+
 let cachedToken: { token: string; expireAt: number } | null = null
 
 async function getEpsToken(): Promise<string> {
@@ -43,17 +49,26 @@ async function getEpsToken(): Promise<string> {
     return cachedToken.token
   }
 
-  const res = await fetch(`${config.baseUrl}/v1/Auth/GetToken`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-hash': generateHash(config.username, config.hashKey),
-    },
-    body: JSON.stringify({
-      userName: config.username,
-      password: config.password,
-    }),
-  })
+  let res: Response
+  try {
+    res = await fetch(`${config.baseUrl}/v1/Auth/GetToken`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-hash': generateHash(config.username, config.hashKey),
+      },
+      body: JSON.stringify({
+        userName: config.username,
+        password: config.password,
+      }),
+      signal: epsSignal(),
+    })
+  } catch (err: any) {
+    if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
+      throw new Error('EPS payment gateway did not respond in time. Please try again.')
+    }
+    throw err
+  }
 
   const data = await res.json()
 
@@ -91,39 +106,48 @@ export async function initializeEpsPayment(params: InitializeEpsPaymentParams): 
   const config = getEpsConfig()
   const token = await getEpsToken()
 
-  const res = await fetch(`${config.baseUrl}/v1/EPSEngine/InitializeEPS`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-      'x-hash': generateHash(params.merchantTransactionId, config.hashKey),
-    },
-    body: JSON.stringify({
-      storeId: config.storeId,
-      CustomerOrderId: params.customerOrderId,
-      merchantTransactionId: params.merchantTransactionId,
-      transactionTypeId: 1, // Web
-      financialEntityId: 0,
-      transitionStatusId: 0,
-      totalAmount: params.totalAmount,
-      ipAddress: '127.0.0.1',
-      version: '1',
-      successUrl: params.successUrl,
-      failUrl: params.failUrl,
-      cancelUrl: params.cancelUrl,
-      customerName: params.customerName,
-      customerEmail: params.customerEmail,
-      customerAddress: 'N/A',
-      customerCity: 'N/A',
-      customerState: 'N/A',
-      customerPostcode: 'N/A',
-      customerCountry: 'BD',
-      customerPhone: params.customerPhone,
-      productName: params.productName,
-      productProfile: 'general',
-      productCategory: 'Online Course',
-    }),
-  })
+  let res: Response
+  try {
+    res = await fetch(`${config.baseUrl}/v1/EPSEngine/InitializeEPS`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        'x-hash': generateHash(params.merchantTransactionId, config.hashKey),
+      },
+      body: JSON.stringify({
+        storeId: config.storeId,
+        CustomerOrderId: params.customerOrderId,
+        merchantTransactionId: params.merchantTransactionId,
+        transactionTypeId: 1,
+        financialEntityId: 0,
+        transitionStatusId: 0,
+        totalAmount: params.totalAmount,
+        ipAddress: '127.0.0.1',
+        version: '1',
+        successUrl: params.successUrl,
+        failUrl: params.failUrl,
+        cancelUrl: params.cancelUrl,
+        customerName: params.customerName,
+        customerEmail: params.customerEmail,
+        customerAddress: 'N/A',
+        customerCity: 'N/A',
+        customerState: 'N/A',
+        customerPostcode: 'N/A',
+        customerCountry: 'BD',
+        customerPhone: params.customerPhone,
+        productName: params.productName,
+        productProfile: 'general',
+        productCategory: 'Online Course',
+      }),
+      signal: epsSignal(),
+    })
+  } catch (err: any) {
+    if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
+      throw new Error('EPS payment gateway did not respond in time. Please try again.')
+    }
+    throw err
+  }
 
   const data = await res.json()
 
@@ -147,16 +171,25 @@ export async function verifyEpsTransaction(merchantTransactionId: string): Promi
   const config = getEpsConfig()
   const token = await getEpsToken()
 
-  const res = await fetch(
-    `${config.baseUrl}/v1/EPSEngine/CheckMerchantTransactionStatus?merchantTransactionId=${encodeURIComponent(merchantTransactionId)}`,
-    {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'x-hash': generateHash(merchantTransactionId, config.hashKey),
-      },
+  let res: Response
+  try {
+    res = await fetch(
+      `${config.baseUrl}/v1/EPSEngine/CheckMerchantTransactionStatus?merchantTransactionId=${encodeURIComponent(merchantTransactionId)}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'x-hash': generateHash(merchantTransactionId, config.hashKey),
+        },
+        signal: epsSignal(),
+      }
+    )
+  } catch (err: any) {
+    if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
+      throw new Error('EPS payment gateway did not respond in time.')
     }
-  )
+    throw err
+  }
 
   const data = await res.json()
 

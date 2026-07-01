@@ -28,7 +28,9 @@ export default async function AdminCoursesPage() {
 
   // 2. Fetch courses with Mongoose populates
   const coursesDocs = await Course.find()
+    .populate('category')
     .populate('categories')
+    .populate('instructor')
     .populate('instructors')
     .populate('thumbnail')
     .sort({ createdAt: -1 })
@@ -49,8 +51,10 @@ export default async function AdminCoursesPage() {
       status: c.status,
       level: c.level,
       duration: c.duration || 'N/A',
-      categoryName: c.categories?.[0] && typeof c.categories[0] === 'object' ? c.categories[0].name : 'Unassigned',
-      instructorName: c.instructors?.[0] && typeof c.instructors[0] === 'object' ? c.instructors[0].name : 'Unknown',
+      categoryName: (c.category && typeof c.category === 'object' ? (c.category as any).name : null)
+        ?? (c.categories?.[0] && typeof c.categories[0] === 'object' ? (c.categories[0] as any).name : 'Unassigned'),
+      instructorName: (c.instructor && typeof c.instructor === 'object' ? (c.instructor as any).name : null)
+        ?? (c.instructors?.[0] && typeof c.instructors[0] === 'object' ? (c.instructors[0] as any).name : 'Unassigned'),
       thumbnail: thumbnailUrl,
       createdAt: c.createdAt ? c.createdAt.toISOString() : null,
     }

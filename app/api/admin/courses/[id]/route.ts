@@ -379,10 +379,13 @@ export async function PUT(
     course.price = price ? Number(price) : undefined
     course.thumbnail = thumbnail
     course.categories = categories || course.categories || []
+    course.category = course.categories[0] || null
     // Admin can reassign instructors, instructor cannot reassign themselves
     if (user.role === 'admin' && instructors) {
       course.instructors = instructors
     }
+    // Sync singular instructor field for public pages
+    course.instructor = course.instructors?.[0] || null
     course.status = status || course.status
     course.duration = duration
     course.level = level || course.level

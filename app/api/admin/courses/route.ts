@@ -210,6 +210,7 @@ export async function POST(request: Request) {
     const finalInstructors = user.role === 'instructor' ? [user._id.toString()] : (instructors?.length ? instructors : [user._id.toString()])
 
     // 3. Create course document
+    const finalCategories = categories || []
     const newCourse = new Course({
       title,
       slug,
@@ -217,8 +218,10 @@ export async function POST(request: Request) {
       description,
       price: price ? Number(price) : undefined,
       thumbnail,
-      categories: categories || [],
+      categories: finalCategories,
+      category: finalCategories[0] || undefined,
       instructors: finalInstructors,
+      instructor: finalInstructors[0] || undefined,
       status: status || 'draft',
       duration,
       level: level || 'all',

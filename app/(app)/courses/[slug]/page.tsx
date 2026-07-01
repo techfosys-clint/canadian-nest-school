@@ -86,7 +86,12 @@ export default async function CourseDetailPage({ params }: Props) {
   // Fetch course
   const course = await Course.findOne({ slug, status: 'published' })
     .populate('category')
-    .populate('instructor')
+    .populate('categories')
+    .populate({
+      path: 'instructor',
+      populate: { path: 'profilePic' }
+    })
+    .populate('instructors')
     .populate('thumbnail')
     .lean() as any
 
@@ -131,11 +136,15 @@ export default async function CourseDetailPage({ params }: Props) {
   const lessonCount = lessonsDocs.length
   const reviews = reviewsDocs as any[]
   const avgRating = getStarCount(reviews)
-  const categoryName = course.category && typeof course.category === 'object' ? course.category.name : ''
-  const instructorName = course.instructor && typeof course.instructor === 'object'
-    ? course.instructor.name ?? course.instructor.email
+  const resolvedInstructor = (course.instructor && typeof course.instructor === 'object' ? course.instructor : null)
+    ?? (course.instructors?.[0] && typeof course.instructors[0] === 'object' ? course.instructors[0] : null)
+  const categoryName = (course.category && typeof course.category === 'object' ? course.category.name : null)
+    ?? (course.categories?.[0] && typeof course.categories[0] === 'object' ? course.categories[0].name : '')
+  const instructorName = resolvedInstructor
+    ? (resolvedInstructor.name ?? resolvedInstructor.email)
     : 'Expert Instructor'
   const imageUrl = getImageUrl(course.thumbnail)
+  const instructorPicUrl = resolvedInstructor?.profilePic ? getImageUrl(resolvedInstructor.profilePic) : ''
 
   const serializedLessons = (lessonsDocs as any[]).map((l: any) => ({
     id: l._id.toString(),
@@ -273,9 +282,17 @@ export default async function CourseDetailPage({ params }: Props) {
 
             {/* Instructor Details Bar */}
             <div className="flex items-center gap-3 pt-3">
-              <div className="h-11 w-11 rounded-lg bg-[#E61C24]/20 border border-[#E61C24]/30 flex items-center justify-center font-bold text-white text-base">
-                {initials}
-              </div>
+              {instructorPicUrl ? (
+                <img
+                  src={instructorPicUrl}
+                  alt={instructorName}
+                  className="h-11 w-11 rounded-lg object-cover border border-[#E61C24]/30"
+                />
+              ) : (
+                <div className="h-11 w-11 rounded-lg bg-[#E61C24]/20 border border-[#E61C24]/30 flex items-center justify-center font-bold text-white text-base">
+                  {initials}
+                </div>
+              )}
               <div>
                 <p className="text-base font-bold text-zinc-400">Instructed by</p>
                 <p className="text-base font-bold text-white">{instructorName}</p>
@@ -547,9 +564,17 @@ export default async function CourseDetailPage({ params }: Props) {
 
               {/* Verified Instructor footer within widget */}
               <div className="border-t border-zinc-100 pt-4 flex items-center gap-3">
-                <div className="h-9 w-9 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center justify-center font-bold text-zinc-500 text-base">
-                  {initials}
-                </div>
+                {instructorPicUrl ? (
+                  <img
+                    src={instructorPicUrl}
+                    alt={instructorName}
+                    className="h-9 w-9 rounded-lg object-cover border border-zinc-200/80"
+                  />
+                ) : (
+                  <div className="h-9 w-9 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center justify-center font-bold text-zinc-500 text-base">
+                    {initials}
+                  </div>
+                )}
                 <div>
                   <p className="text-base font-bold text-zinc-400 uppercase tracking-wide">Instructor</p>
                   <p className="text-base font-bold text-zinc-800 truncate max-w-[200px]">{instructorName}</p>

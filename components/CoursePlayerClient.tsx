@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
@@ -465,7 +465,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
     }
   }
 
-  // Handle Mark as Completed â€” persists to DB
+  // Handle Mark as Completed — persists to DB
   const handleToggleComplete = async (lessonId: string, advance: boolean = false) => {
     const willBeCompleted = !completedLessonIds.includes(lessonId)
     const updatedCompleted = willBeCompleted
@@ -498,7 +498,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
         icon: 'success',
         title: 'Outstanding Work!',
         text: advance && !isLast
-          ? 'Lesson completed. Moving to the next lessonâ€¦'
+          ? 'Lesson completed. Moving to the next lesson…'
           : 'Lesson marked as completed. Keep up the streak!',
         toast: true,
         position: 'top-end',
@@ -584,7 +584,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
       : `${pad(hours)}h ${pad(mins)}m ${pad(secs)}s`
   })()
 
-  // â”€â”€â”€ Render Sub-Components for clean split layouts â”€â”€â”€
+  // ─── Render Sub-Components for clean split layouts ───
   const renderLiveJoinButton = (isMobile: boolean = false) => {
     if (currentLesson.lessonType !== 'live') return null;
     return (
@@ -1009,7 +1009,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
       )}
 
       {currentLesson.lessonType === 'recorded' && currentLesson.videoUrl ? (
-        // Private R2-hosted video â†’ secure signed-URL streaming player
+        // Private R2-hosted video → secure signed-URL streaming player
         !isExternalEmbed(currentLesson.videoUrl) ? (
           <SecureVideoPlayer lessonId={currentLesson.id} title={currentLesson.title} />
         ) : getEmbedUrl(currentLesson.videoUrl) ? (
@@ -1279,7 +1279,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
               <FiClock className="h-4 w-4 shrink-0" />
               <span>{currentLesson.duration} minutes duration</span>
             </span>
-            <span>â€¢</span>
+            <span>•</span>
             <span className="capitalize">{currentLesson.lessonType} lesson</span>
           </div>
         </div>
@@ -1345,7 +1345,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
         <div className="mx-4 mt-4 p-4 bg-slate-50 border border-zinc-200 rounded-lg flex flex-col gap-3 shadow-sm select-none animate-fadeIn">
           <div className="flex items-center gap-2">
             <FiAward className="h-6 w-6 text-[#E61C24]" />
-            <h3 className="text-base font-bold text-zinc-900 leading-tight">Course Completed! ðŸŽ“</h3>
+            <h3 className="text-base font-bold text-zinc-900 leading-tight">Course Completed! 🎓</h3>
           </div>
           
           {!certRequest ? (
@@ -1473,7 +1473,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                           </p>
                           <div className="flex items-center gap-1.5 text-[11px] font-bold text-zinc-450 uppercase tracking-wide">
                             <span>{lesson.duration} mins</span>
-                            <span>â€¢</span>
+                            <span>•</span>
                             <span className={
                               lesson.lessonType === 'live' 
                                 ? 'text-rose-500' 
@@ -1512,7 +1512,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-zinc-800 pb-16 relative">
       
-      {/* â”€â”€â”€ Top Course Navigation Bar (Premium Glassmorphism) â”€â”€â”€ */}
+      {/* ─── Top Course Navigation Bar (Premium Glassmorphism) ─── */}
       <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200">
         <div className="container mx-auto px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 select-none">
           {/* Back button and title */}
@@ -1583,7 +1583,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
         </div>
       </div>
 
-      {/* â”€â”€â”€ Main Viewport Grid â”€â”€â”€ */}
+      {/* ─── Main Viewport Grid ─── */}
       <div className="container mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {isTheaterMode ? (

@@ -75,7 +75,8 @@ export async function PUT(
     Object.assign(lesson, {
       title: finalTitle,
       slug: body.slug ?? lesson.slug,
-      order: body.order ?? lesson.order,
+      // order (course-wide serial) is server-managed and never editable
+      moduleOrder: body.moduleOrder ? Number(body.moduleOrder) : lesson.moduleOrder,
       moduleName: body.moduleName ?? lesson.moduleName,
       lessonType: finalLessonType,
       videoUrl: body.videoUrl ?? lesson.videoUrl,

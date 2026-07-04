@@ -28,6 +28,7 @@ interface LessonFormProps {
     title: string
     slug: string
     order: number
+    moduleOrder?: number
     moduleName?: string
     lessonType: 'recorded' | 'live' | 'quiz' | 'assignment'
     videoUrl?: string
@@ -66,7 +67,10 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
   const [title, setTitle] = useState(initialData?.title || '')
   const [slug, setSlug] = useState(initialData?.slug || '')
   const [moduleName, setModuleName] = useState(initialData?.moduleName || 'General Module')
+  // Course-wide serial — auto-tracked by the server, shown read-only
   const [order, setOrder] = useState<number | ''>(initialData?.order || '')
+  // Position within the module — auto-suggested, editable
+  const [moduleOrder, setModuleOrder] = useState<number | ''>(initialData?.moduleOrder || '')
   const [content, setContent] = useState<string>(
     initialData?.content || ''
   )
@@ -123,7 +127,9 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
       .catch((err) => console.error('Failed to load course modules:', err))
   }, [courseId, initialData])
 
-  // Auto-calculate order number for NEW lessons when course or module changes
+  // Auto-calculate both order numbers for NEW lessons when course or module changes:
+  // - order (Lecture Order): next serial across the whole course — read-only
+  // - moduleOrder (Display Order): next number inside the chosen module — editable
   React.useEffect(() => {
     if (isEditMode || !courseId) return
     setAutoOrderLoading(true)
@@ -131,9 +137,11 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
       .then(r => r.json())
       .then(data => {
         const lessons: any[] = data.data?.lessons || []
+        const maxCourseOrder = lessons.reduce((max: number, l: any) => Math.max(max, l.order || 0), 0)
+        setOrder(maxCourseOrder + 1)
         const inModule = lessons.filter(l => (l.moduleName || 'General Module') === (moduleName || 'General Module'))
-        const maxOrder = inModule.reduce((max: number, l: any) => Math.max(max, l.order || 0), 0)
-        setOrder(maxOrder + 1)
+        const maxModuleOrder = inModule.reduce((max: number, l: any) => Math.max(max, l.moduleOrder || 0), 0)
+        setModuleOrder(maxModuleOrder > 0 ? maxModuleOrder + 1 : inModule.length + 1)
       })
       .catch(() => {})
       .finally(() => setAutoOrderLoading(false))
@@ -193,7 +201,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
         title,
         slug,
         course: courseId,
-        order,
+        moduleOrder,
         moduleName,
         lessonType,
         videoUrl: lessonType === 'recorded' ? videoUrl : undefined,
@@ -344,7 +352,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
               </div>
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-base font-bold text-slate-600">Display / Lecture Order *</label>
+                  <label className="text-base font-bold text-slate-600">Display Order (within module) *</label>
                   {!isEditMode && (
                     <span className="text-xs font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-500 select-none">
                       {autoOrderLoading ? 'Calculating...' : 'Auto-set · editable'}
@@ -355,15 +363,13 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                   type="number"
                   required
                   min={1}
-                  value={order}
-                  onChange={(e) => setOrder(Number(e.target.value))}
+                  value={moduleOrder}
+                  onChange={(e) => setModuleOrder(Number(e.target.value))}
                   className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                 />
-                {!isEditMode && (
-                  <p className="text-sm font-semibold text-slate-400">
-                    Auto-counted from existing lessons in this module. Change if needed.
-                  </p>
-                )}
+                <p className="text-sm font-semibold text-slate-400">
+                  What number this lesson is inside its module (1st lesson of a module = 1). Auto-counted; change if needed.
+                </p>
               </div>
             </div>
 
@@ -776,18 +782,24 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
               />
             </div>
 
-            {/* Order */}
+            {/* Course-wide serial — auto-tracked, locked */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-slate-600">Lecture Order</label>
+              <div className="flex items-center justify-between">
+                <label className="text-base font-bold text-slate-600">Lecture Order (course serial)</label>
+                <span className="text-xs font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-500 select-none">
+                  {autoOrderLoading ? 'Calculating...' : 'Auto-tracked · locked'}
+                </span>
+              </div>
               <input
                 type="number"
-                min={1}
                 value={order}
-                onChange={(e) => setOrder(e.target.value ? Number(e.target.value) : '')}
-                placeholder="Auto-assigned if left blank"
-                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                readOnly
+                disabled
+                className="bg-slate-200/60 border border-slate-200 text-slate-500 rounded-lg p-3 text-base font-semibold outline-none w-full cursor-not-allowed"
               />
-              <p className="text-xs text-slate-500 font-semibold mt-1">Leave empty to auto-assign the next logical sequence for this module.</p>
+              <p className="text-xs text-slate-500 font-semibold mt-1">
+                This lesson&apos;s serial number across the whole course. Assigned automatically — cannot be changed.
+              </p>
             </div>
 
             {/* Content / Description */}

@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { title, slug, course: courseId, order, moduleName, lessonType, videoUrl, livePlatform, liveUrl, liveDate, content, duration, isPreviewable, autoGenerateZoom, quizQuestions } = body
+    const { title, slug, course: courseId, moduleOrder, moduleName, lessonType, videoUrl, livePlatform, liveUrl, liveDate, content, duration, isPreviewable, autoGenerateZoom, quizQuestions } = body
 
     if (!title || !slug || !courseId || !duration) {
       return NextResponse.json(
@@ -178,16 +178,26 @@ export async function POST(request: Request) {
       actualLiveUrl = zoomDetails.joinUrl
     }
 
-    let finalOrder = order
-    if (!finalOrder) {
-      const lastLesson = await Lesson.findOne({ course: courseId, moduleName: moduleName || 'General Module' })
-        .sort({ order: -1 })
+    // Course-wide serial (Lecture Order) is always assigned by the server —
+    // it tracks what number lesson this is across the entire course and is
+    // never taken from the client.
+    const lastCourseLesson = await Lesson.findOne({ course: courseId })
+      .sort({ order: -1 })
+      .lean()
+    const finalOrder = lastCourseLesson && lastCourseLesson.order ? lastCourseLesson.order + 1 : 1
+
+    // Module-level position: use the value from the form, else auto-append
+    // to the end of the module.
+    let finalModuleOrder = moduleOrder ? Number(moduleOrder) : undefined
+    if (!finalModuleOrder) {
+      const lastModuleLesson = await Lesson.findOne({ course: courseId, moduleName: moduleName || 'General Module' })
+        .sort({ moduleOrder: -1 })
         .lean()
-      finalOrder = lastLesson && lastLesson.order ? lastLesson.order + 1 : 1
+      finalModuleOrder = lastModuleLesson && lastModuleLesson.moduleOrder ? lastModuleLesson.moduleOrder + 1 : 1
     }
 
     const newLesson = new Lesson({
-      title, slug, course: courseId, order: finalOrder, moduleName, lessonType: lessonType || 'recorded',
+      title, slug, course: courseId, order: finalOrder, moduleOrder: finalModuleOrder, moduleName, lessonType: lessonType || 'recorded',
       videoUrl, livePlatform, liveUrl: actualLiveUrl,
       liveDate: liveDate ? parseBdDate(liveDate) : undefined,
       content, duration: Number(duration),

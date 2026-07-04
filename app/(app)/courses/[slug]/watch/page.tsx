@@ -116,6 +116,7 @@ export default async function CourseWatchPage({ params }: Props) {
     title: l.title,
     slug: l.slug,
     order: l.order || 1,
+    moduleOrder: l.moduleOrder || undefined,
     lessonType: l.lessonType || 'recorded',
     duration: l.duration || 10,
     isPreviewable: l.isPreviewable || false,

@@ -13,6 +13,7 @@ export interface ILesson extends Document {
   slug: string
   course: mongoose.Types.ObjectId | string
   order: number
+  moduleOrder?: number
   moduleName?: string
   lessonType: 'recorded' | 'live' | 'quiz' | 'assignment'
   totalMarks?: number
@@ -47,7 +48,11 @@ const LessonSchema = new Schema<ILesson>(
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
     course: { type: Schema.Types.ObjectId, ref: 'Course', required: true },
+    // Course-wide serial number — assigned automatically on the server,
+    // never editable from the admin form.
     order: { type: Number, required: true, min: 1 },
+    // Position of the lesson inside its module (1st lesson of a module = 1)
+    moduleOrder: { type: Number, min: 1 },
     moduleName: { type: String, default: 'General Module' },
     lessonType: { type: String, enum: ['recorded', 'live', 'quiz', 'assignment'], default: 'recorded', required: true },
     totalMarks: { type: Number, default: 100 },
@@ -71,8 +76,8 @@ const LessonSchema = new Schema<ILesson>(
   { collection: 'lessons', timestamps: true }
 )
 
-// Clear old model cache in development if moduleName field is not registered in compiled schema paths
-if (mongoose.models.Lesson && !mongoose.models.Lesson.schema.paths.moduleName) {
+// Clear old model cache in development if newly added fields are not registered in compiled schema paths
+if (mongoose.models.Lesson && (!mongoose.models.Lesson.schema.paths.moduleName || !mongoose.models.Lesson.schema.paths.moduleOrder)) {
   delete mongoose.models.Lesson
 }
 

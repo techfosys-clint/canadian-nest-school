@@ -47,6 +47,7 @@ interface LessonItem {
   title: string
   slug: string
   order: number
+  moduleOrder?: number
   moduleName?: string
   lessonType: 'recorded' | 'live' | 'quiz' | 'assignment'
   duration: number
@@ -216,7 +217,11 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
 
   // Convert to array and sort modules by the minimum order of their lessons
   const moduleGroups = Object.keys(grouped).map((name) => {
-    const moduleLessons = [...grouped[name]].sort((a, b) => a.order - b.order)
+    // Sort by position within the module when available, falling back to
+    // the course-wide serial for older lessons without moduleOrder.
+    const moduleLessons = [...grouped[name]].sort(
+      (a, b) => (a.moduleOrder ?? a.order) - (b.moduleOrder ?? b.order)
+    )
     const minOrder = Math.min(...moduleLessons.map((l) => l.order))
     return {
       name,
@@ -696,7 +701,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
           {/* Middle class details block */}
           <div className="space-y-4 max-w-xl relative z-10">
             <h3 className="text-2xl sm:text-3xl font-bold font-display leading-tight text-white">
-              {currentLesson.order}. {currentLesson.title}
+              {currentLesson.moduleOrder ?? currentLesson.order}. {currentLesson.title}
             </h3>
             <p className="text-base font-semibold text-slate-350 leading-relaxed font-sans">
               Join our live class and interact directly with your instructor in real time! Ask questions, work through code challenges, and participate in Q&A sessions.
@@ -1261,7 +1266,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
               <div className="flex-1 py-6 space-y-5 flex flex-col justify-center max-w-xl mx-auto w-full min-h-0">
                 <div className="space-y-1.5 text-center sm:text-left">
                   <h3 className="text-2xl font-bold font-display text-white">
-                    {currentLesson.order}. {currentLesson.title} Submission
+                    {currentLesson.moduleOrder ?? currentLesson.order}. {currentLesson.title} Submission
                   </h3>
                   <p className="text-base font-medium text-zinc-400 leading-relaxed">
                     Upload your project task deliverables inside your personal Google Drive, set sharing rights to **"Anyone with the link can view"**, and submit the URL below for grading.
@@ -1378,7 +1383,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
         <div className="space-y-1.5">
           <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">
-            {currentLesson.order}. {currentLesson.title}
+            {currentLesson.moduleOrder ?? currentLesson.order}. {currentLesson.title}
           </h2>
           <div className="flex flex-wrap items-center gap-3 text-base font-semibold text-zinc-500">
             <span className="flex items-center gap-1.5 text-zinc-650">
@@ -1575,7 +1580,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                         {/* Title and Duration */}
                         <div className="min-w-0 flex-1 space-y-0.5 select-none">
                           <p className={`text-sm leading-snug line-clamp-2 ${isActive ? 'font-bold text-zinc-900' : 'font-semibold text-zinc-650'}`}>
-                            {lesson.order}. {lesson.title}
+                            {lesson.moduleOrder ?? lesson.order}. {lesson.title}
                           </p>
                           <div className="flex items-center gap-1.5 text-[11px] font-bold text-zinc-450 uppercase tracking-wide">
                             <span>{lesson.duration} mins</span>

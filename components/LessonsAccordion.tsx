@@ -10,6 +10,7 @@ interface LessonItem {
   title: string
   slug: string
   order: number
+  moduleOrder?: number
   moduleName?: string
   lessonType: 'recorded' | 'live' | 'quiz' | 'assignment'
   duration: number
@@ -73,7 +74,11 @@ export default function LessonsAccordion({
 
   // Convert to array and sort modules by the minimum order of their lessons
   const moduleGroups = Object.keys(grouped).map((name) => {
-    const moduleLessons = [...grouped[name]].sort((a, b) => a.order - b.order)
+    // Sort by position within the module when available, falling back to
+    // the course-wide serial for older lessons without moduleOrder.
+    const moduleLessons = [...grouped[name]].sort(
+      (a, b) => (a.moduleOrder ?? a.order) - (b.moduleOrder ?? b.order)
+    )
     const minOrder = Math.min(...moduleLessons.map((l) => l.order))
     const totalDuration = moduleLessons.reduce((sum, l) => sum + l.duration, 0)
     return {
@@ -186,7 +191,7 @@ export default function LessonsAccordion({
                               {/* Lesson Title & duration */}
                               <div className="min-w-0">
                                 <p className="font-bold text-[#0A163A] text-base leading-snug truncate">
-                                  {lesson.order}. {lesson.title}
+                                  {lesson.moduleOrder ?? lesson.order}. {lesson.title}
                                 </p>
                                 <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-zinc-455 mt-1 uppercase tracking-wide">
                                   <span>{lesson.duration} mins duration</span>

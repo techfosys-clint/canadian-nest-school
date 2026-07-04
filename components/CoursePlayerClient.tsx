@@ -667,10 +667,12 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
   const renderPlayer = () => (
     <div
       ref={videoContainerRef}
-      className={`bg-slate-900 border border-slate-950 rounded-lg overflow-hidden shadow-xl relative ${
+      className={`bg-slate-900 border border-slate-950 rounded-lg overflow-hidden shadow-xl relative flex flex-col ${
         currentLesson.lessonType === 'recorded' 
           ? 'aspect-video' 
-          : 'aspect-square sm:aspect-video'
+          : currentLesson.lessonType === 'quiz'
+            ? 'min-h-[85vh] sm:min-h-0 sm:aspect-video'
+            : 'aspect-square sm:aspect-video'
       }`}
       style={{
         WebkitUserSelect: 'none',
@@ -943,7 +945,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                   </div>
 
                   {/* Options list */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1 items-center overflow-y-auto overflow-x-hidden max-h-[220px] pr-1 font-sans">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1 content-start overflow-y-auto overflow-x-hidden sm:max-h-[280px] pr-1 pb-4 font-sans scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent">
                     {currentLesson.quizQuestions[currentQuestionIndex].options.map((option, idx) => {
                       const isSelected = selectedAnswers[currentQuestionIndex] === idx
                       return (

@@ -413,41 +413,8 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
     }
     window.addEventListener('keyup', handleKeyUp)
 
-    // 6. Focus & blur window detection (blackout screen when focus is lost)
-    const handleBlur = () => {
-      if (!window.location.pathname.includes('/watch')) return
-      // Small timeout to allow document.activeElement to update
-      setTimeout(() => {
-        const activeEl = document.activeElement
-        if (activeEl && (activeEl.tagName === 'IFRAME' || activeEl instanceof HTMLIFrameElement)) {
-          // Focus shifted inside the video player iframe, do not blackout
-          return
-        }
-        setIsBlackout(true)
-      }, 200)
-    }
-
-    const handleFocus = () => {
-      if (!window.location.pathname.includes('/watch')) return
-      setTimeout(() => {
-        setIsBlackout(false)
-      }, 1000)
-    }
-
-    const handleVisibilityChange = () => {
-      if (!window.location.pathname.includes('/watch')) return
-      if (document.visibilityState === 'hidden') {
-        setIsBlackout(true)
-      } else {
-        setTimeout(() => {
-          setIsBlackout(false)
-        }, 1000)
-      }
-    }
-
-    window.addEventListener('blur', handleBlur)
-    window.addEventListener('focus', handleFocus)
-    document.addEventListener('visibilitychange', handleVisibilityChange)
+    // 6. Focus & blur window detection (Removed as per user request to allow background playing)
+    // Removed handleBlur, handleFocus, handleVisibilityChange
 
     // 7. DevTools open detection via window inner/outer size gap (blackout while open)
     const checkDevTools = () => {
@@ -482,9 +449,6 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
       document.removeEventListener('copy', handleCopy)
       window.removeEventListener('keydown', handleScreenshotKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
-      window.removeEventListener('blur', handleBlur)
-      window.removeEventListener('focus', handleFocus)
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
       clearInterval(devToolsInterval)
       document.removeEventListener('touchstart', handleTouchStart)
       document.removeEventListener('dragstart', handleDragStart)

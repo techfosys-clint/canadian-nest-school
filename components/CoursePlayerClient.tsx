@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
@@ -465,7 +465,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
     }
   }
 
-  // Handle Mark as Completed — persists to DB
+  // Handle Mark as Completed â€” persists to DB
   const handleToggleComplete = async (lessonId: string, advance: boolean = false) => {
     const willBeCompleted = !completedLessonIds.includes(lessonId)
     const updatedCompleted = willBeCompleted
@@ -498,7 +498,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
         icon: 'success',
         title: 'Outstanding Work!',
         text: advance && !isLast
-          ? 'Lesson completed. Moving to the next lesson…'
+          ? 'Lesson completed. Moving to the next lessonâ€¦'
           : 'Lesson marked as completed. Keep up the streak!',
         toast: true,
         position: 'top-end',
@@ -584,7 +584,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
       : `${pad(hours)}h ${pad(mins)}m ${pad(secs)}s`
   })()
 
-  // ─── Render Sub-Components for clean split layouts ───
+  // â”€â”€â”€ Render Sub-Components for clean split layouts â”€â”€â”€
   const renderLiveJoinButton = (isMobile: boolean = false) => {
     if (currentLesson.lessonType !== 'live') return null;
     return (
@@ -628,6 +628,356 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
     );
   };
 
+  // ─── Standalone Quiz Experience ───
+  // Quizzes render as a full page-flow section (NOT inside the video frame
+  // box) with a light theme that reads well on mobile.
+  const renderQuiz = () => {
+    const questions = currentLesson.quizQuestions || []
+    const submission = submissionsMap[currentLesson.id]
+    const showPreSubmitted = submission && !retakeQuiz && !quizCompleted
+
+    const handleSubmitQuiz = async () => {
+      let correctCount = 0
+      questions.forEach((q, qIdx) => {
+        if (selectedAnswers[qIdx] === q.correctAnswerIndex) {
+          correctCount++
+        }
+      })
+      setQuizScore(correctCount)
+      setQuizCompleted(true)
+
+      if (!completedLessonIds.includes(currentLesson.id)) {
+        handleToggleComplete(currentLesson.id)
+      }
+
+      const answersArray = Array.from({ length: questions.length }, (_, idx) =>
+        selectedAnswers[idx] !== undefined ? selectedAnswers[idx] : -1
+      )
+
+      try {
+        await fetch('/api/submissions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            courseId: course.id,
+            lessonId: currentLesson.id,
+            type: 'quiz',
+            quizCorrectAnswers: correctCount,
+            quizTotalQuestions: questions.length,
+            selectedAnswers: answersArray
+          })
+        })
+        loadCourseData()
+      } catch (err) {
+        console.error('Failed to save quiz score to DB', err)
+      }
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Quiz Finished!',
+        text: `You have successfully completed this quiz lesson! Correct answers: ${correctCount} of ${questions.length}.`,
+        confirmButtonColor: '#E61C24'
+      })
+    }
+
+    // Shared review list used by both the pre-submitted and fresh-result views
+    const renderReview = (getUserAns: (qIdx: number) => number | null | undefined) => (
+      <div className="space-y-4">
+        {questions.map((q: any, qIdx: number) => {
+          const userAnsIndex = getUserAns(qIdx)
+          const answered = userAnsIndex !== null && userAnsIndex !== undefined && userAnsIndex !== -1
+          const isCorrect = answered && userAnsIndex === q.correctAnswerIndex
+
+          return (
+            <div key={qIdx} className="bg-zinc-50/60 p-4 sm:p-5 border border-zinc-200 rounded-lg space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:justify-between">
+                <h5 className="text-base font-bold text-zinc-800 select-text leading-snug">
+                  {qIdx + 1}. {q.questionText}
+                </h5>
+                {answered ? (
+                  isCorrect ? (
+                    <span className="self-start px-2.5 py-0.5 bg-emerald-50 border border-emerald-200 text-emerald-600 text-base font-semibold rounded-lg shrink-0">
+                      Correct
+                    </span>
+                  ) : (
+                    <span className="self-start px-2.5 py-0.5 bg-rose-50 border border-rose-200 text-rose-600 text-base font-semibold rounded-lg shrink-0">
+                      Incorrect
+                    </span>
+                  )
+                ) : (
+                  <span className="self-start px-2.5 py-0.5 bg-zinc-100 border border-zinc-200 text-zinc-500 text-base font-semibold rounded-lg shrink-0">
+                    Not Answered
+                  </span>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {q.options.map((option: string, optIdx: number) => {
+                  const isCorrectOpt = optIdx === q.correctAnswerIndex
+                  const isUserSelectedOpt = userAnsIndex === optIdx
+
+                  let optClass = 'bg-white border-zinc-200 text-zinc-600'
+                  if (isCorrectOpt) {
+                    optClass = 'bg-emerald-50 border-emerald-300 text-emerald-700'
+                  } else if (isUserSelectedOpt && !isCorrect) {
+                    optClass = 'bg-rose-50 border-rose-300 text-rose-700'
+                  }
+
+                  return (
+                    <div
+                      key={optIdx}
+                      className={`p-3 rounded-lg border text-base font-medium flex items-center justify-between gap-2 select-text ${optClass}`}
+                    >
+                      <span className="leading-tight">{option}</span>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {isCorrectOpt && (
+                          <span className="text-emerald-600 text-sm font-bold flex items-center gap-1 uppercase tracking-wide">
+                            <FiCheck className="h-4 w-4" /> Correct
+                          </span>
+                        )}
+                        {isUserSelectedOpt && !isCorrectOpt && (
+                          <span className="text-rose-600 text-sm font-bold flex items-center gap-1 uppercase tracking-wide">
+                            <FiX className="h-4 w-4" /> Selected
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    )
+
+    const nextLessonButton = sortedLessons.findIndex(l => l.id === currentLesson.id) < sortedLessons.length - 1 && (
+      <button
+        type="button"
+        onClick={() => {
+          const nextIdx = sortedLessons.findIndex(l => l.id === currentLesson.id) + 1
+          if (nextIdx < sortedLessons.length) {
+            const nextL = sortedLessons[nextIdx]
+            setActiveLesson(nextL)
+            router.replace(`/courses/${course.slug}/watch?lesson=${nextL.id}`)
+          }
+        }}
+        className="w-full sm:w-auto px-6 py-2.5 bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base rounded-lg cursor-pointer transition-all shadow-md shadow-[#E61C24]/15 border-none"
+      >
+        Next Lesson
+      </button>
+    )
+
+    return (
+      <div className="bg-white border border-zinc-200 rounded-lg shadow-sm overflow-hidden">
+        {/* Quiz Header */}
+        <div className="px-5 sm:px-8 py-5 border-b border-zinc-100 bg-zinc-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <span className="inline-flex self-start items-center gap-2 px-3.5 py-1.5 bg-[#E61C24]/10 border border-[#E61C24]/20 text-[#E61C24] text-base font-bold rounded-lg uppercase tracking-wide">
+            <FiAward className="h-4.5 w-4.5" />
+            Interactive Quiz
+          </span>
+          <span className="text-base font-bold text-zinc-500">
+            {showPreSubmitted
+              ? 'Completed'
+              : !quizCompleted
+              ? `Question ${currentQuestionIndex + 1} of ${questions.length}`
+              : 'Quiz Finished'}
+          </span>
+        </div>
+
+        <div className="p-5 sm:p-8">
+          {showPreSubmitted ? (
+            /* Previously submitted — show grade summary + full review */
+            <div className="space-y-6 animate-fadeIn">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-emerald-50/60 p-5 border border-emerald-200 rounded-lg">
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 bg-emerald-100 border border-emerald-200 text-emerald-600 rounded-lg flex items-center justify-center shrink-0">
+                    <FiCheckCircle className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-zinc-800 leading-tight">Quiz Already Completed</h3>
+                    <p className="text-base text-zinc-500 mt-0.5">Below are your logged grade details and question review.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-6">
+                  <div className="text-center sm:text-right">
+                    <p className="text-sm font-bold text-zinc-500 uppercase tracking-wide">Accuracy</p>
+                    <p className="text-lg font-bold text-zinc-800">
+                      {submission.quizCorrectAnswers} / {submission.quizTotalQuestions} Correct
+                    </p>
+                  </div>
+                  <div className="h-8 w-px bg-emerald-200 hidden sm:block" />
+                  <div className="text-center sm:text-right">
+                    <p className="text-sm font-bold text-zinc-500 uppercase tracking-wide">Marks</p>
+                    <p className="text-lg font-bold text-emerald-600">
+                      {submission.marksObtained} / {submission.totalMarks} Marks
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-lg font-bold text-zinc-800 flex items-center gap-2 border-b border-zinc-100 pb-2.5">
+                  <FiBookOpen className="h-5 w-5 text-[#E61C24]" />
+                  Question & Answer Review
+                </h4>
+                {renderReview((qIdx) => submission.selectedAnswers ? submission.selectedAnswers[qIdx] : null)}
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                {nextLessonButton}
+              </div>
+            </div>
+          ) : questions.length === 0 ? (
+            <div className="flex flex-col items-center justify-center text-center py-12">
+              <FiBookOpen className="h-12 w-12 text-zinc-300 mb-3" />
+              <p className="text-base font-bold text-zinc-500">No questions defined for this quiz yet.</p>
+            </div>
+          ) : !quizCompleted ? (
+            /* Active quiz question */
+            <div className="space-y-6">
+              {/* Progress bar */}
+              <div className="w-full bg-zinc-100 h-2 rounded-lg overflow-hidden">
+                <div
+                  className="bg-[#E61C24] h-full rounded-lg transition-all duration-300"
+                  style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
+                />
+              </div>
+
+              {/* Question */}
+              <h3 className="text-xl sm:text-2xl font-bold leading-snug text-zinc-900 select-text animate-fadeIn">
+                {questions[currentQuestionIndex].questionText}
+              </h3>
+
+              {questions[currentQuestionIndex].imageUrl && (
+                <div className="w-full max-w-lg mx-auto rounded-lg overflow-hidden border border-zinc-200 shadow-sm">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={questions[currentQuestionIndex].imageUrl}
+                    alt="Quiz Question"
+                    className="w-full h-auto object-contain max-h-[300px]"
+                  />
+                </div>
+              )}
+
+              {/* Options */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                {questions[currentQuestionIndex].options.map((option, idx) => {
+                  const isSelected = selectedAnswers[currentQuestionIndex] === idx
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setSelectedAnswers({ ...selectedAnswers, [currentQuestionIndex]: idx })}
+                      className={`w-full p-4 rounded-lg border text-left font-bold text-base transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#E61C24]/5 border-[#E61C24] text-zinc-900 shadow-md shadow-[#E61C24]/5'
+                          : 'bg-white border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:text-zinc-900'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`h-5 w-5 rounded-full border flex items-center justify-center shrink-0 ${
+                          isSelected ? 'border-[#E61C24] bg-[#E61C24]' : 'border-zinc-300 bg-white'
+                        }`}>
+                          {isSelected && <FiCheck className="h-3 w-3 text-white" />}
+                        </div>
+                        <span className="select-text leading-tight">{option}</span>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Back / Next actions */}
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-between gap-3 pt-4 border-t border-zinc-100">
+                <button
+                  type="button"
+                  disabled={currentQuestionIndex === 0}
+                  onClick={() => setCurrentQuestionIndex(currentQuestionIndex - 1)}
+                  className={`px-4 py-2.5 rounded-lg border text-base font-bold transition-all ${
+                    currentQuestionIndex === 0
+                      ? 'border-zinc-100 text-zinc-300 cursor-not-allowed select-none'
+                      : 'border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:text-zinc-900 cursor-pointer'
+                  }`}
+                >
+                  Back
+                </button>
+
+                {selectedAnswers[currentQuestionIndex] !== undefined ? (
+                  currentQuestionIndex < questions.length - 1 ? (
+                    <button
+                      type="button"
+                      onClick={() => setCurrentQuestionIndex(currentQuestionIndex + 1)}
+                      className="px-5 py-2.5 bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base rounded-lg cursor-pointer transition-all shadow-md shadow-[#E61C24]/15 border-none"
+                    >
+                      Next Question
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleSubmitQuiz}
+                      className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-base rounded-lg cursor-pointer transition-all shadow-md shadow-emerald-600/15 border-none"
+                    >
+                      Submit Quiz
+                    </button>
+                  )
+                ) : (
+                  <div className="text-base font-bold text-zinc-400 text-center bg-zinc-50 px-3 py-2.5 rounded-lg border border-zinc-100 select-none">
+                    Select an answer to proceed
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            /* Fresh submission — congrats + review */
+            <div className="space-y-6 animate-fadeIn">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-emerald-50/60 p-5 border border-emerald-200 rounded-lg">
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 bg-emerald-100 border border-emerald-200 text-emerald-600 rounded-lg flex items-center justify-center shrink-0">
+                    <FiAward className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-zinc-800 leading-tight">Quiz Results Summary</h3>
+                    <p className="text-base text-zinc-500 mt-0.5">Awesome job! Below is your live performance review.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-6">
+                  <div className="text-center sm:text-right">
+                    <p className="text-sm font-bold text-zinc-500 uppercase tracking-wide">Accuracy</p>
+                    <p className="text-lg font-bold text-zinc-800">
+                      {Math.round((quizScore / questions.length) * 100)}% Correct
+                    </p>
+                  </div>
+                  <div className="h-8 w-px bg-emerald-200 hidden sm:block" />
+                  <div className="text-center sm:text-right">
+                    <p className="text-sm font-bold text-zinc-500 uppercase tracking-wide">Marks</p>
+                    <p className="text-lg font-bold text-emerald-600">
+                      {Math.round((quizScore / questions.length) * (currentLesson.totalMarks || 100))} / {currentLesson.totalMarks || 100}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-lg font-bold text-zinc-800 flex items-center gap-2 border-b border-zinc-100 pb-2.5">
+                  <FiBookOpen className="h-5 w-5 text-[#E61C24]" />
+                  Question & Answer Review
+                </h4>
+                {renderReview((qIdx) => selectedAnswers[qIdx])}
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                {nextLessonButton}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   const renderPlayer = () => (
     <div
       ref={videoContainerRef}
@@ -659,7 +1009,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
       )}
 
       {currentLesson.lessonType === 'recorded' && currentLesson.videoUrl ? (
-        // Private R2-hosted video → secure signed-URL streaming player
+        // Private R2-hosted video â†’ secure signed-URL streaming player
         !isExternalEmbed(currentLesson.videoUrl) ? (
           <SecureVideoPlayer lessonId={currentLesson.id} title={currentLesson.title} />
         ) : getEmbedUrl(currentLesson.videoUrl) ? (
@@ -720,439 +1070,6 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
           {/* Bottom dynamic RSVP/Join button */}
           {renderLiveJoinButton(false)}
         </div>
-      ) : currentLesson.lessonType === 'quiz' ? (
-        // Render stunning interactive quiz player layout
-        (() => {
-          const submission = submissionsMap[currentLesson.id]
-          const showPreSubmitted = submission && !retakeQuiz && !quizCompleted
-
-          return (
-            <div className="w-full h-full bg-[#080d1a] text-white p-6 sm:p-8 flex flex-col justify-between select-none relative overflow-y-auto overflow-x-hidden">
-              {/* Decorative glows */}
-              <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#E61C24 1.5px, transparent 1.5px)', backgroundSize: '20px 20px' }} />
-              <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#E61C24]/10 rounded-full blur-2xl pointer-events-none" />
-
-              {/* Title and score or question counter */}
-              <div className="flex justify-between items-center border-b border-white/5 pb-4 shrink-0 font-sans">
-                <span className="px-3.5 py-1 bg-[#E61C24]/20 border border-[#E61C24]/30 text-[#FF4D55] text-base font-bold rounded-lg flex items-center gap-2 uppercase tracking-wide animate-fadeIn">
-                  <FiAward className="h-4 w-4" />
-                  Interactive Quiz
-                </span>
-                <span className="text-base font-bold text-slate-400">
-                  {showPreSubmitted 
-                    ? 'Completed'
-                    : !quizCompleted 
-                    ? `Question ${currentQuestionIndex + 1} of ${currentLesson.quizQuestions?.length || 0}`
-                    : `Quiz Finished`
-                  }
-                </span>
-              </div>
-
-              {/* Main Quiz Content */}
-              {showPreSubmitted ? (
-                // Display pre-submitted quiz result details and review list
-                <div className="flex-1 flex flex-col p-4 sm:p-6 space-y-6 animate-fadeIn font-sans overflow-y-auto overflow-x-hidden max-h-full">
-                  {/* Results Header Summary */}
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/60 p-5 border border-zinc-800 rounded-lg shadow-xl backdrop-blur-sm">
-                    <div className="flex items-center gap-4">
-                      <div className="h-12 w-12 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 rounded-lg flex items-center justify-center shrink-0">
-                        <FiCheckCircle className="h-6 w-6 text-emerald-400" />
-                      </div>
-                      <div className="text-left">
-                        <h3 className="text-xl font-bold text-white leading-tight">Quiz Already Completed</h3>
-                        <p className="text-base text-zinc-400 mt-0.5">Below are your logged grade details and question review.</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-6 text-base font-sans">
-                      <div className="text-center sm:text-right">
-                        <p className="text-base font-bold text-zinc-400 uppercase tracking-wide">Accuracy</p>
-                        <p className="text-lg font-bold text-white">
-                          {submission.quizCorrectAnswers} / {submission.quizTotalQuestions} Correct
-                        </p>
-                      </div>
-                      <div className="h-8 w-px bg-zinc-800 hidden sm:block" />
-                      <div className="text-center sm:text-right">
-                        <p className="text-base font-bold text-zinc-400 uppercase tracking-wide">Marks</p>
-                        <p className="text-lg font-bold text-emerald-400">
-                          {submission.marksObtained} / {submission.totalMarks} Marks
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Question Answers Review Section */}
-                  <div className="space-y-4 text-left">
-                    <h4 className="text-lg font-bold text-white flex items-center gap-2 border-b border-zinc-800 pb-2">
-                      <FiBookOpen className="h-5 w-5 text-[#FF4D55]" />
-                      Question & Answer Review
-                    </h4>
-
-                    <div className="space-y-4">
-                      {(currentLesson.quizQuestions || []).map((q: any, qIdx: number) => {
-                        const userAnsIndex = submission.selectedAnswers ? submission.selectedAnswers[qIdx] : null
-                        const isCorrect = userAnsIndex === q.correctAnswerIndex
-
-                        return (
-                          <div key={qIdx} className="bg-slate-950/60 p-4 border border-zinc-800 rounded-lg space-y-3">
-                            <div className="flex items-start gap-2.5 justify-between">
-                              <h5 className="text-base font-bold text-white select-text">
-                                {qIdx + 1}. {q.questionText}
-                              </h5>
-                              {userAnsIndex !== null && userAnsIndex !== undefined && userAnsIndex !== -1 ? (
-                                isCorrect ? (
-                                  <span className="px-2.5 py-0.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-base font-semibold rounded-lg shrink-0">
-                                    Correct
-                                  </span>
-                                ) : (
-                                  <span className="px-2.5 py-0.5 bg-rose-500/10 border border-rose-500/30 text-rose-400 text-base font-semibold rounded-lg shrink-0">
-                                    Incorrect
-                                  </span>
-                                )
-                              ) : (
-                                <span className="px-2.5 py-0.5 bg-zinc-800 border border-zinc-700 text-zinc-400 text-base font-semibold rounded-lg shrink-0">
-                                  Submitted
-                                </span>
-                              )}
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                              {q.options.map((option: string, optIdx: number) => {
-                                const isCorrectOpt = optIdx === q.correctAnswerIndex
-                                const isUserSelectedOpt = userAnsIndex === optIdx
-
-                                let optBgBorder = 'bg-slate-900/35 border-zinc-850 text-zinc-350'
-                                if (isCorrectOpt) {
-                                  optBgBorder = 'bg-emerald-500/10 border-emerald-500/40 text-emerald-300'
-                                } else if (isUserSelectedOpt && !isCorrect) {
-                                  optBgBorder = 'bg-rose-500/10 border-rose-500/40 text-rose-300'
-                                }
-
-                                return (
-                                  <div
-                                    key={optIdx}
-                                    className={`p-3 rounded-lg border text-base font-medium flex items-center justify-between select-text ${optBgBorder}`}
-                                  >
-                                    <span className="leading-tight">{option}</span>
-                                    <div className="flex items-center gap-1.5 shrink-0">
-                                      {isCorrectOpt && (
-                                        <span className="text-emerald-400 text-base font-bold flex items-center gap-1 uppercase tracking-wide">
-                                          <FiCheck className="h-4 w-4" /> Correct
-                                        </span>
-                                      )}
-                                      {isUserSelectedOpt && !isCorrectOpt && (
-                                        <span className="text-rose-400 text-base font-bold flex items-center gap-1 uppercase tracking-wide">
-                                          <FiX className="h-4 w-4" /> Selected
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
-                                )
-                              })}
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Actions (Next Lesson / Close) */}
-                  <div className="flex items-center justify-end gap-3 pt-2">
-                    {sortedLessons.findIndex(l => l.id === currentLesson.id) < sortedLessons.length - 1 && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const nextIdx = sortedLessons.findIndex(l => l.id === currentLesson.id) + 1
-                          if (nextIdx < sortedLessons.length) {
-                            const nextL = sortedLessons[nextIdx]
-                            setActiveLesson(nextL)
-                            router.replace(`/courses/${course.slug}/watch?lesson=${nextL.id}`)
-                          }
-                        }}
-                        className="px-6 py-2.5 bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base rounded-lg cursor-pointer transition-all shadow-md shadow-[#E61C24]/15 border-none"
-                      >
-                        Next Lesson
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ) : !currentLesson.quizQuestions || currentLesson.quizQuestions.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center text-center p-6 font-sans">
-                  <FiBookOpen className="h-12 w-12 text-slate-600 mb-3" />
-                  <p className="text-base font-bold text-slate-450">No questions defined for this quiz yet.</p>
-                </div>
-              ) : !quizCompleted ? (
-                // Active quiz question display
-                <div className="flex-1 flex flex-col justify-between py-6 gap-6 min-h-0">
-                  {/* Question Text */}
-                  <div className="space-y-3 shrink-0 font-sans">
-                    <div className="w-full bg-slate-950 h-2 rounded-lg overflow-hidden">
-                      <div 
-                        className="bg-[#E61C24] h-full rounded-lg transition-all duration-300"
-                        style={{ width: `${((currentQuestionIndex + 1) / currentLesson.quizQuestions.length) * 100}%` }}
-                      />
-                    </div>
-                    <h3 className="text-xl sm:text-2xl font-bold font-display leading-snug text-white select-text animate-fadeIn">
-                      {currentLesson.quizQuestions[currentQuestionIndex].questionText}
-                    </h3>
-                    
-                    {currentLesson.quizQuestions[currentQuestionIndex].imageUrl && (
-                      <div className="w-full max-w-lg mx-auto rounded-lg overflow-hidden border border-zinc-800 mt-4 shadow-lg shadow-black/20">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img 
-                          src={currentLesson.quizQuestions[currentQuestionIndex].imageUrl} 
-                          alt="Quiz Question" 
-                          className="w-full h-auto object-contain max-h-[300px]" 
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Options list */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1 content-start overflow-y-auto overflow-x-hidden sm:max-h-[280px] pr-1 pb-4 font-sans scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent">
-                    {currentLesson.quizQuestions[currentQuestionIndex].options.map((option, idx) => {
-                      const isSelected = selectedAnswers[currentQuestionIndex] === idx
-                      return (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => setSelectedAnswers({ ...selectedAnswers, [currentQuestionIndex]: idx })}
-                          className={`w-full p-4 rounded-lg border text-left font-bold text-base transition-all cursor-pointer ${
-                            isSelected
-                              ? 'bg-[#E61C24]/15 border-[#E61C24] text-white shadow-lg shadow-[#E61C24]/10'
-                              : 'bg-slate-950/45 border-zinc-800 text-zinc-350 hover:border-zinc-700 hover:text-white'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className={`h-5 w-5 rounded-full border flex items-center justify-center shrink-0 ${
-                              isSelected ? 'border-[#E61C24] bg-[#E61C24]' : 'border-zinc-700 bg-transparent'
-                            }`}>
-                              {isSelected && <FiCheck className="h-3 w-3 text-white" />}
-                            </div>
-                            <span className="select-text leading-tight">{option}</span>
-                          </div>
-                        </button>
-                      )
-                    })}
-                  </div>
-
-                  {/* Back / Next actions */}
-                  <div className="flex items-center justify-between pt-4 border-t border-white/5 shrink-0 font-sans">
-                    <button
-                      type="button"
-                      disabled={currentQuestionIndex === 0}
-                      onClick={() => setCurrentQuestionIndex(currentQuestionIndex - 1)}
-                      className={`px-4 py-2.5 rounded-lg border text-base font-bold transition-all cursor-pointer ${
-                        currentQuestionIndex === 0
-                          ? 'border-zinc-850 text-zinc-650 cursor-not-allowed select-none'
-                          : 'border-zinc-800 text-zinc-300 hover:border-zinc-700 hover:text-white'
-                      }`}
-                    >
-                      Back
-                    </button>
-
-                    {selectedAnswers[currentQuestionIndex] !== undefined ? (
-                      currentQuestionIndex < currentLesson.quizQuestions.length - 1 ? (
-                        <button
-                          type="button"
-                          onClick={() => setCurrentQuestionIndex(currentQuestionIndex + 1)}
-                          className="px-5 py-2.5 bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base rounded-lg cursor-pointer transition-all shadow-md shadow-[#E61C24]/15 border-none"
-                        >
-                          Next Question
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={async () => {
-                            const questions = currentLesson.quizQuestions || []
-                            let correctCount = 0
-                            questions.forEach((q, qIdx) => {
-                              if (selectedAnswers[qIdx] === q.correctAnswerIndex) {
-                                correctCount++
-                              }
-                            })
-                            setQuizScore(correctCount)
-                            setQuizCompleted(true)
-
-                            // Automatically mark the quiz lesson as completed!
-                            if (!completedLessonIds.includes(currentLesson.id)) {
-                              handleToggleComplete(currentLesson.id)
-                            }
-
-                            const answersArray = Array.from({ length: questions.length }, (_, idx) => 
-                              selectedAnswers[idx] !== undefined ? selectedAnswers[idx] : -1
-                            )
-
-                            try {
-                              await fetch('/api/submissions', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                  courseId: course.id,
-                                  lessonId: currentLesson.id,
-                                  type: 'quiz',
-                                  quizCorrectAnswers: correctCount,
-                                  quizTotalQuestions: questions.length,
-                                  selectedAnswers: answersArray
-                                })
-                              })
-                              loadCourseData()
-                            } catch (err) {
-                              console.error('Failed to save quiz score to DB', err)
-                            }
-
-                            Swal.fire({
-                              icon: 'success',
-                              title: 'Quiz Finished!',
-                              text: `You have successfully completed this quiz lesson! Correct answers: ${correctCount} of ${questions.length}.`,
-                              background: '#1a1a1a',
-                              color: '#ffffff',
-                              confirmButtonColor: '#E61C24'
-                            })
-                          }}
-                          className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-base rounded-lg cursor-pointer transition-all shadow-md shadow-emerald-600/15 border-none"
-                        >
-                          Submit Quiz
-                        </button>
-                      )
-                    ) : (
-                      <div className="text-base font-bold text-zinc-500 animate-pulse bg-zinc-950 px-3 py-2 rounded border border-zinc-850">
-                        Select an answer to proceed
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                // Quiz completed congrats page with live question/answers review list
-                 <div className="flex-1 flex flex-col p-4 sm:p-6 space-y-6 animate-fadeIn font-sans overflow-y-auto overflow-x-hidden max-h-full">
-                   {/* Results Header Summary */}
-                   <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/60 p-5 border border-zinc-800 rounded-lg shadow-xl backdrop-blur-sm">
-                     <div className="flex items-center gap-4">
-                       <div className="h-12 w-12 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 rounded-lg flex items-center justify-center shrink-0">
-                         <FiAward className="h-6 w-6 text-emerald-400" />
-                       </div>
-                       <div className="text-left">
-                         <h3 className="text-xl font-bold text-white leading-tight">Quiz Results Summary</h3>
-                         <p className="text-base text-zinc-400 mt-0.5">Awesome job! Below is your live performance review.</p>
-                       </div>
-                     </div>
-
-                     <div className="flex items-center gap-6">
-                       <div className="text-center sm:text-right">
-                         <p className="text-base font-bold text-zinc-400 uppercase tracking-wide">Accuracy</p>
-                         <p className="text-lg font-bold text-white">
-                           {Math.round((quizScore / currentLesson.quizQuestions.length) * 100)}% Correct
-                         </p>
-                       </div>
-                       <div className="h-8 w-px bg-zinc-800 hidden sm:block" />
-                       <div className="text-center sm:text-right">
-                         <p className="text-base font-bold text-zinc-400 uppercase tracking-wide">Marks</p>
-                         <p className="text-lg font-bold text-emerald-400">
-                           {Math.round((quizScore / currentLesson.quizQuestions.length) * (currentLesson.totalMarks || 100))} / {currentLesson.totalMarks || 100}
-                         </p>
-                       </div>
-                     </div>
-                   </div>
-
-                   {/* Question Answers Review Section */}
-                   <div className="space-y-4 text-left">
-                     <h4 className="text-lg font-bold text-white flex items-center gap-2 border-b border-zinc-800 pb-2">
-                       <FiBookOpen className="h-5 w-5 text-[#FF4D55]" />
-                       Question & Answer Review
-                     </h4>
-
-                     <div className="space-y-4">
-                       {(currentLesson.quizQuestions || []).map((q: any, qIdx: number) => {
-                         const userAnsIndex = selectedAnswers[qIdx]
-                         const isCorrect = userAnsIndex === q.correctAnswerIndex
-
-                         return (
-                           <div key={qIdx} className="bg-slate-950/60 p-4 border border-zinc-800 rounded-lg space-y-3">
-                             <div className="flex items-start gap-2.5 justify-between">
-                               <h5 className="text-base font-bold text-white select-text">
-                                 {qIdx + 1}. {q.questionText}
-                               </h5>
-                               {userAnsIndex !== null && userAnsIndex !== undefined ? (
-                                 isCorrect ? (
-                                   <span className="px-2.5 py-0.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-base font-semibold rounded-lg shrink-0">
-                                     Correct
-                                   </span>
-                                 ) : (
-                                   <span className="px-2.5 py-0.5 bg-rose-500/10 border border-rose-500/30 text-rose-400 text-base font-semibold rounded-lg shrink-0">
-                                     Incorrect
-                                   </span>
-                                 )
-                               ) : (
-                                 <span className="px-2.5 py-0.5 bg-zinc-800 border border-zinc-700 text-zinc-400 text-base font-semibold rounded-lg shrink-0">
-                                   Not Answered
-                                 </span>
-                               )}
-                             </div>
-
-                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                               {q.options.map((option: string, optIdx: number) => {
-                                 const isCorrectOpt = optIdx === q.correctAnswerIndex
-                                 const isUserSelectedOpt = userAnsIndex === optIdx
-
-                                 let optBgBorder = 'bg-slate-900/35 border-zinc-850 text-zinc-350'
-                                 if (isCorrectOpt) {
-                                   optBgBorder = 'bg-emerald-500/10 border-emerald-500/40 text-emerald-300'
-                                 } else if (isUserSelectedOpt && !isCorrect) {
-                                   optBgBorder = 'bg-rose-500/10 border-rose-500/40 text-rose-300'
-                                 }
-
-                                 return (
-                                   <div
-                                     key={optIdx}
-                                     className={`p-3 rounded-lg border text-base font-medium flex items-center justify-between select-text ${optBgBorder}`}
-                                   >
-                                     <span className="leading-tight">{option}</span>
-                                     <div className="flex items-center gap-1.5 shrink-0">
-                                       {isCorrectOpt && (
-                                         <span className="text-emerald-400 text-base font-bold flex items-center gap-1 uppercase tracking-wide">
-                                           <FiCheck className="h-4 w-4" /> Correct
-                                         </span>
-                                       )}
-                                       {isUserSelectedOpt && !isCorrectOpt && (
-                                         <span className="text-rose-400 text-base font-bold flex items-center gap-1 uppercase tracking-wide">
-                                           <FiX className="h-4 w-4" /> Selected
-                                         </span>
-                                       )}
-                                     </div>
-                                   </div>
-                                 )
-                               })}
-                             </div>
-                           </div>
-                         )
-                       })}
-                     </div>
-                   </div>
-
-                   {/* Actions */}
-                   <div className="flex items-center justify-end gap-3 pt-2">
-                     {sortedLessons.findIndex(l => l.id === currentLesson.id) < sortedLessons.length - 1 && (
-                       <button
-                         type="button"
-                         onClick={() => {
-                           const nextIdx = sortedLessons.findIndex(l => l.id === currentLesson.id) + 1
-                           if (nextIdx < sortedLessons.length) {
-                             const nextL = sortedLessons[nextIdx]
-                             setActiveLesson(nextL)
-                             router.replace(`/courses/${course.slug}/watch?lesson=${nextL.id}`)
-                           }
-                         }}
-                         className="px-6 py-2.5 bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base rounded-lg cursor-pointer transition-all shadow-md shadow-[#E61C24]/15 border-none"
-                       >
-                         Next Lesson
-                       </button>
-                     )}
-                   </div>
-                 </div>
-              )}
-            </div>
-          )
-        })()
       ) : currentLesson.lessonType === 'assignment' ? (
         // Render Assignment submission portal
         (() => {
@@ -1362,7 +1279,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
               <FiClock className="h-4 w-4 shrink-0" />
               <span>{currentLesson.duration} minutes duration</span>
             </span>
-            <span>•</span>
+            <span>â€¢</span>
             <span className="capitalize">{currentLesson.lessonType} lesson</span>
           </div>
         </div>
@@ -1428,7 +1345,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
         <div className="mx-4 mt-4 p-4 bg-slate-50 border border-zinc-200 rounded-lg flex flex-col gap-3 shadow-sm select-none animate-fadeIn">
           <div className="flex items-center gap-2">
             <FiAward className="h-6 w-6 text-[#E61C24]" />
-            <h3 className="text-base font-bold text-zinc-900 leading-tight">Course Completed! 🎓</h3>
+            <h3 className="text-base font-bold text-zinc-900 leading-tight">Course Completed! ðŸŽ“</h3>
           </div>
           
           {!certRequest ? (
@@ -1556,7 +1473,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
                           </p>
                           <div className="flex items-center gap-1.5 text-[11px] font-bold text-zinc-450 uppercase tracking-wide">
                             <span>{lesson.duration} mins</span>
-                            <span>•</span>
+                            <span>â€¢</span>
                             <span className={
                               lesson.lessonType === 'live' 
                                 ? 'text-rose-500' 
@@ -1595,7 +1512,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-zinc-800 pb-16 relative">
       
-      {/* ─── Top Course Navigation Bar (Premium Glassmorphism) ─── */}
+      {/* â”€â”€â”€ Top Course Navigation Bar (Premium Glassmorphism) â”€â”€â”€ */}
       <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200">
         <div className="container mx-auto px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 select-none">
           {/* Back button and title */}
@@ -1666,14 +1583,14 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
         </div>
       </div>
 
-      {/* ─── Main Viewport Grid ─── */}
+      {/* â”€â”€â”€ Main Viewport Grid â”€â”€â”€ */}
       <div className="container mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {isTheaterMode ? (
             <>
               {/* Theater Mode: Full-width top player column (12 cols) */}
               <div className="lg:col-span-12">
-                {renderPlayer()}
+                {currentLesson.lessonType === 'quiz' ? renderQuiz() : renderPlayer()}
                 <div className="mt-6 sm:mt-0">
                   {renderLiveJoinButton(true)}
                 </div>
@@ -1692,7 +1609,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
             <>
               {/* Classic split screen side-by-side layout */}
               <div className="lg:col-span-8 space-y-6">
-                {renderPlayer()}
+                {currentLesson.lessonType === 'quiz' ? renderQuiz() : renderPlayer()}
                 {renderLiveJoinButton(true)}
                 {renderDetails()}
               </div>

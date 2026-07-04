@@ -14,10 +14,12 @@ interface CouponFormClientProps {
     expirationDate?: string
     maxUses?: number | string
     isActive: boolean
+    course?: string
   }
+  courses?: { id: string; title: string }[]
 }
 
-export default function CouponFormClient({ initialCoupon }: CouponFormClientProps) {
+export default function CouponFormClient({ initialCoupon, courses = [] }: CouponFormClientProps) {
   const router = useRouter()
   
   const [code, setCode] = useState(initialCoupon?.code || '')
@@ -30,6 +32,7 @@ export default function CouponFormClient({ initialCoupon }: CouponFormClientProp
   const [expirationDate, setExpirationDate] = useState(initialCoupon?.expirationDate || '')
   const [maxUses, setMaxUses] = useState<number | string>(initialCoupon?.maxUses || '')
   const [isActive, setIsActive] = useState(initialCoupon?.isActive !== undefined ? initialCoupon.isActive : true)
+  const [courseId, setCourseId] = useState(initialCoupon?.course || '')
   
   const [saving, setSaving] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
@@ -67,6 +70,7 @@ export default function CouponFormClient({ initialCoupon }: CouponFormClientProp
       expirationDate: expirationDate || undefined,
       maxUses: maxUses ? Number(maxUses) : undefined,
       isActive,
+      course: courseId || null,
     }
 
     try {
@@ -215,6 +219,24 @@ export default function CouponFormClient({ initialCoupon }: CouponFormClientProp
                 className="w-full px-4 py-3 rounded-lg bg-slate-100 border border-slate-200 focus:border-[#E61C24]/60 text-slate-800 font-semibold text-base focus:outline-none transition-colors"
               />
             </div>
+          </div>
+
+          {/* Course Restriction */}
+          <div className="flex flex-col gap-2">
+            <label className="text-base font-bold text-slate-600">Restrict to Course (optional)</label>
+            <select
+              value={courseId}
+              onChange={(e) => setCourseId(e.target.value)}
+              className="w-full px-4 py-3 rounded-lg bg-slate-100 border border-slate-200 focus:border-[#E61C24]/60 text-slate-800 font-semibold text-base focus:outline-none transition-colors"
+            >
+              <option value="">All courses (no restriction)</option>
+              {courses.map((c) => (
+                <option key={c.id} value={c.id}>{c.title}</option>
+              ))}
+            </select>
+            <p className="text-base text-slate-500">
+              Select a course to make this coupon work only on that course&apos;s checkout.
+            </p>
           </div>
 
           {/* Status Checkbox toggle */}

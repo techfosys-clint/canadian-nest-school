@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiVideo, FiRadio, FiEye, FiChevronDown, FiChevronUp, FiX, FiPlay, FiLock, FiHelpCircle, FiFileText } from 'react-icons/fi'
@@ -49,6 +49,13 @@ export default function LessonsAccordion({
 }) {
   const [openModuleIndex, setOpenModuleIndex] = useState<number | null>(0)
   const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null)
+
+  // Ticking clock so live class links unlock exactly on schedule
+  const [nowTs, setNowTs] = useState(() => Date.now())
+  useEffect(() => {
+    const timer = setInterval(() => setNowTs(Date.now()), 1000)
+    return () => clearInterval(timer)
+  }, [])
 
   const toggleAccordion = (index: number) => {
     setOpenModuleIndex(openModuleIndex === index ? null : index)
@@ -136,6 +143,7 @@ export default function LessonsAccordion({
                     <div className="border-t border-[#E61C24]/20 divide-y divide-[#E61C24]/10 bg-white">
                       {group.lessons.map((lesson) => {
                         const dateObj = lesson.liveDate ? new Date(lesson.liveDate) : null
+                        const isLiveLocked = dateObj ? dateObj.getTime() > nowTs : false
                         const formattedDate = dateObj
                           ? dateObj.toLocaleString('en-BD', {
                               weekday: 'short',
@@ -144,6 +152,7 @@ export default function LessonsAccordion({
                               hour: '2-digit',
                               minute: '2-digit',
                               hour12: true,
+                              timeZone: 'Asia/Dhaka',
                             })
                           : null
 
@@ -209,7 +218,15 @@ export default function LessonsAccordion({
                               {/* If not enrolled */}
                               {!isEnrolled ? (
                                 <>
-                                  {lesson.isPreviewable && lesson.lessonType === 'live' && lesson.liveUrl ? (
+                                  {lesson.isPreviewable && lesson.lessonType === 'live' && lesson.liveUrl && isLiveLocked ? (
+                                    <span
+                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-50 border border-zinc-200 text-zinc-500 rounded-lg text-sm font-bold cursor-not-allowed select-none"
+                                      title="The join link unlocks when the class starts"
+                                    >
+                                      <FiLock className="h-3.5 w-3.5 text-[#E61C24]" />
+                                      <span>Unlocks at class time</span>
+                                    </span>
+                                  ) : lesson.isPreviewable && lesson.lessonType === 'live' && lesson.liveUrl ? (
                                     <a
                                       href={lesson.liveUrl}
                                       target="_blank"

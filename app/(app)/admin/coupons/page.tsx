@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Coupon } from '@/lib/db/models/Coupon'
+import '@/lib/db/models/Course'
 import { User } from '@/lib/db/models/User'
 import { verifyToken } from '@/lib/auth/auth'
 import CouponsPageClient from './CouponsPageClient'
@@ -26,7 +27,7 @@ export default async function CouponsPage() {
   const sessionUser = await User.findById(decoded.id).lean()
   if (!sessionUser || !['admin', 'staff'].includes(sessionUser.role)) redirect('/login')
 
-  const couponsDocs = await Coupon.find().sort({ createdAt: -1 }).lean()
+  const couponsDocs = await Coupon.find().populate('course', 'title').sort({ createdAt: -1 }).lean()
   const coupons = couponsDocs.map((c: any) => ({
     id: c._id.toString(),
     code: c.code,
@@ -36,6 +37,7 @@ export default async function CouponsPage() {
     isActive: c.isActive,
     maxUses: c.maxUses !== undefined ? c.maxUses : '',
     usedCount: c.usedCount || 0,
+    courseTitle: c.course && typeof c.course === 'object' ? c.course.title : '',
   }))
 
   return (

@@ -9,7 +9,7 @@ export async function GET() {
     const user = await getAuthorizedUser(['admin', 'staff'], 'coupons')
     if (!user) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
 
-    const coupons = await Coupon.find().sort({ createdAt: -1 }).lean()
+    const coupons = await Coupon.find().populate('course', 'title').sort({ createdAt: -1 }).lean()
     return NextResponse.json({ success: true, coupons })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     if (!user) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
 
     const body = await request.json()
-    const { code, discountType, discountValue, expirationDate, maxUses, isActive } = body
+    const { code, discountType, discountValue, expirationDate, maxUses, isActive, course } = body
 
     if (!code || !discountType || discountValue === undefined) {
       return NextResponse.json({ error: 'code, discountType and discountValue are required.' }, { status: 400 })
@@ -44,6 +44,7 @@ export async function POST(request: Request) {
       expirationDate: expirationDate ? new Date(expirationDate) : undefined,
       maxUses: maxUses ? parseInt(maxUses, 10) : undefined,
       isActive: isActive !== undefined ? isActive : true,
+      course: course || null,
     })
 
     await coupon.save()
@@ -60,7 +61,7 @@ export async function PUT(request: Request) {
     if (!user) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
 
     const body = await request.json()
-    const { id, discountType, discountValue, expirationDate, maxUses, isActive } = body
+    const { id, discountType, discountValue, expirationDate, maxUses, isActive, course } = body
 
     if (!id) {
       return NextResponse.json({ error: 'Coupon id is required.' }, { status: 400 })
@@ -76,6 +77,7 @@ export async function PUT(request: Request) {
     if (expirationDate !== undefined) coupon.expirationDate = expirationDate ? new Date(expirationDate) : undefined
     if (maxUses !== undefined) coupon.maxUses = maxUses ? parseInt(maxUses, 10) : undefined
     if (isActive !== undefined) coupon.isActive = isActive
+    if (course !== undefined) coupon.course = course || null
 
     await coupon.save()
     return NextResponse.json({ success: true, coupon })

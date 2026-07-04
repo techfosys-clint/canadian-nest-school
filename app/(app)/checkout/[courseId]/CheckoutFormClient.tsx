@@ -49,7 +49,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
   // Auth states
   const [user, setUser] = useState<UserSession | null>(null)
   const [loadingSession, setLoadingSession] = useState(true)
-  const [authTab, setAuthTab] = useState<'login' | 'register'>('login')
+  const [authTab, setAuthTab] = useState<'login' | 'register'>('register')
   const [showPassword, setShowPassword] = useState(false)
 
   // Login form states
@@ -353,7 +353,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
       const res = await fetch('/api/coupons/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: couponCode }),
+        body: JSON.stringify({ code: couponCode, courseId: course.id }),
       })
       const data = await res.json()
 

@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Coupon } from '@/lib/db/models/Coupon'
+import { Course } from '@/lib/db/models/Course'
 import { User } from '@/lib/db/models/User'
 import { verifyToken } from '@/lib/auth/auth'
 import CouponFormClient from '../../CouponFormClient'
@@ -50,11 +51,15 @@ export default async function EditCouponPage({ params }: Props) {
     expirationDate: couponDoc.expirationDate ? couponDoc.expirationDate.toISOString().split('T')[0] : '',
     maxUses: couponDoc.maxUses !== undefined ? couponDoc.maxUses : '',
     isActive: couponDoc.isActive,
+    course: couponDoc.course ? couponDoc.course.toString() : '',
   }
+
+  const courseDocs = await Course.find().select('title').sort({ title: 1 }).lean() as any[]
+  const courses = courseDocs.map((c) => ({ id: c._id.toString(), title: c.title }))
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-800">
-      <CouponFormClient initialCoupon={serializedCoupon} />
+      <CouponFormClient initialCoupon={serializedCoupon} courses={courses} />
     </div>
   )
 }

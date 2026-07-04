@@ -242,6 +242,11 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: false, error: 'This coupon has expired.' }, { status: 400 })
       }
 
+      // Course-restricted coupon: only valid on its designated course
+      if (coupon.course && coupon.course.toString() !== courseId.toString()) {
+        return NextResponse.json({ success: false, error: 'This coupon is not valid for this course.' }, { status: 400 })
+      }
+
       if (coupon.maxUses && coupon.usedCount >= coupon.maxUses) {
         // Release any abandoned EPS sessions still holding a usedCount slot
         // before declaring the coupon exhausted.

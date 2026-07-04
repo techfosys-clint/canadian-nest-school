@@ -7,6 +7,7 @@ import Swal from 'sweetalert2'
 import VideoUploadWidget from '@/components/VideoUploadWidget'
 import RichTextEditor from '@/components/RichTextEditor'
 import MediaPickerModal from '@/components/MediaPickerModal'
+import { toBdInputValue } from '@/lib/bdTime'
 
 interface CourseOption {
   id: string
@@ -77,7 +78,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
   const [livePlatform, setLivePlatform] = useState(initialData?.livePlatform || 'zoom')
   const [liveUrl, setLiveUrl] = useState(initialData?.liveUrl || '')
   const [liveDate, setLiveDate] = useState(
-    initialData?.liveDate ? initialData.liveDate.slice(0, 16) : ''
+    initialData?.liveDate ? toBdInputValue(initialData.liveDate) : ''
   )
   const [duration, setDuration] = useState(initialData?.duration || 60)
   const [isPreviewable, setIsPreviewable] = useState(initialData?.isPreviewable || false)
@@ -471,7 +472,7 @@ export default function LessonFormClient({ courses, initialData }: LessonFormPro
                     </select>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-base font-bold text-slate-600">Scheduled Time & Date</label>
+                    <label className="text-base font-bold text-slate-600">Scheduled Time & Date (Bangladesh time)</label>
                     <input
                       type="datetime-local"
                       value={liveDate}

@@ -6,7 +6,7 @@ import { releaseStalePendingCouponUses } from '@/lib/coupons'
 export async function POST(request: Request) {
   try {
     await connectToDatabase()
-    const { code } = await request.json()
+    const { code, courseId } = await request.json()
 
     if (!code) {
       return NextResponse.json({ success: false, error: 'Coupon code is required.' }, { status: 400 })
@@ -25,6 +25,11 @@ export async function POST(request: Request) {
 
     if (coupon.expirationDate && new Date() > new Date(coupon.expirationDate)) {
       return NextResponse.json({ success: false, error: 'This coupon has expired.' }, { status: 400 })
+    }
+
+    // Course-restricted coupon: only valid on its designated course
+    if (coupon.course && (!courseId || coupon.course.toString() !== courseId.toString())) {
+      return NextResponse.json({ success: false, error: 'This coupon is not valid for this course.' }, { status: 400 })
     }
 
     if (coupon.maxUses && coupon.usedCount >= coupon.maxUses) {

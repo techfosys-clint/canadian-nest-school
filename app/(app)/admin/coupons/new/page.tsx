@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { User } from '@/lib/db/models/User'
+import { Course } from '@/lib/db/models/Course'
 import { verifyToken } from '@/lib/auth/auth'
 import CouponFormClient from '../CouponFormClient'
 
@@ -25,9 +26,12 @@ export default async function NewCouponPage() {
   const sessionUser = await User.findById(decoded.id).lean()
   if (!sessionUser || !['admin', 'staff'].includes(sessionUser.role)) redirect('/login')
 
+  const courseDocs = await Course.find().select('title').sort({ title: 1 }).lean() as any[]
+  const courses = courseDocs.map((c) => ({ id: c._id.toString(), title: c.title }))
+
   return (
     <div className="min-h-screen bg-slate-100 text-slate-800">
-      <CouponFormClient />
+      <CouponFormClient courses={courses} />
     </div>
   )
 }

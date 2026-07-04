@@ -136,6 +136,13 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
   const [driveLinkInput, setDriveLinkInput] = useState('')
   const [submittingDrive, setSubmittingDrive] = useState(false)
 
+  // Ticking clock for the live class countdown / link gating
+  const [nowTs, setNowTs] = useState(() => Date.now())
+  useEffect(() => {
+    const timer = setInterval(() => setNowTs(Date.now()), 1000)
+    return () => clearInterval(timer)
+  }, [])
+
   // Combined fetch for course data (progress, submissions, certificates)
   // Eliminates 3 separate API calls and consolidates into 1
   const loadCourseData = async () => {
@@ -588,10 +595,25 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
         hour: '2-digit',
         minute: '2-digit',
         hour12: true,
+        timeZone: 'Asia/Dhaka',
       })
     : null
 
-  const isLiveUpcoming = liveDateObj ? liveDateObj.getTime() > Date.now() : false
+  const isLiveUpcoming = liveDateObj ? liveDateObj.getTime() > nowTs : false
+
+  // Human countdown until the class link unlocks (e.g. "1d 4h 20m 05s")
+  const countdownLabel = (() => {
+    if (!liveDateObj || !isLiveUpcoming) return ''
+    let diff = Math.max(0, Math.floor((liveDateObj.getTime() - nowTs) / 1000))
+    const days = Math.floor(diff / 86400); diff %= 86400
+    const hours = Math.floor(diff / 3600); diff %= 3600
+    const mins = Math.floor(diff / 60)
+    const secs = diff % 60
+    const pad = (n: number) => String(n).padStart(2, '0')
+    return days > 0
+      ? `${days}d ${pad(hours)}h ${pad(mins)}m ${pad(secs)}s`
+      : `${pad(hours)}h ${pad(mins)}m ${pad(secs)}s`
+  })()
 
   // ─── Render Sub-Components for clean split layouts ───
   const renderPlayer = () => (
@@ -687,10 +709,22 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
               </p>
             </div>
 
-            {currentLesson.liveUrl || currentLesson.videoUrl ? (
-              <a 
-                href={currentLesson.liveUrl || currentLesson.videoUrl} 
-                target="_blank" 
+            {(currentLesson.liveUrl || currentLesson.videoUrl) && isLiveUpcoming ? (
+              /* Class link stays locked until the scheduled time arrives */
+              <div className="flex flex-col gap-2">
+                <span className="py-2.5 px-4.5 rounded-lg bg-zinc-800 text-zinc-300 font-bold text-base whitespace-nowrap inline-flex items-center gap-2 border border-zinc-700 select-none cursor-not-allowed">
+                  <FiLock className="h-4.5 w-4.5 text-[#FF4D55]" />
+                  <span>Class Locked</span>
+                </span>
+                <span className="text-base font-bold text-[#FF4D55] tabular-nums whitespace-nowrap flex items-center gap-1.5">
+                  <FiClock className="h-4.5 w-4.5" />
+                  <span>Unlocks in {countdownLabel}</span>
+                </span>
+              </div>
+            ) : currentLesson.liveUrl || currentLesson.videoUrl ? (
+              <a
+                href={currentLesson.liveUrl || currentLesson.videoUrl}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="py-2.5 px-4.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base whitespace-nowrap transition-all transform hover:-translate-y-0.5 shadow-lg shadow-[#E61C24]/15 cursor-pointer inline-flex items-center gap-2"
               >

@@ -14,6 +14,7 @@ interface CouponItem {
   isActive: boolean
   maxUses?: number | string
   usedCount: number
+  courseTitle?: string
 }
 
 export default function CouponsPageClient({
@@ -139,6 +140,7 @@ export default function CouponsPageClient({
                 <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold text-sm uppercase tracking-wider select-none">
                   <th className="px-6 py-4">Promo Code</th>
                   <th className="px-6 py-4">Discount Value</th>
+                  <th className="px-6 py-4">Course</th>
                   <th className="px-6 py-4">Expiry Date</th>
                   <th className="px-6 py-4">Usage Stats</th>
                   <th className="px-6 py-4">Status</th>
@@ -167,6 +169,13 @@ export default function CouponsPageClient({
                         {coupon.discountType === 'percentage'
                           ? `${coupon.discountValue}% Off`
                           : `৳${coupon.discountValue.toLocaleString('en-BD')} Off`}
+                      </span>
+                    </td>
+
+                    {/* Course restriction */}
+                    <td className="px-6 py-4">
+                      <span className="font-semibold text-slate-500 text-base">
+                        {coupon.courseTitle || 'All Courses'}
                       </span>
                     </td>
 

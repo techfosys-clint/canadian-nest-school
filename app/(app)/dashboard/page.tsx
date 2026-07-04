@@ -542,6 +542,7 @@ export default function StudentDashboard() {
                         hour: '2-digit',
                         minute: '2-digit',
                         hour12: true,
+                        timeZone: 'Asia/Dhaka',
                       })
                     : 'Not Scheduled'
 
@@ -562,20 +563,19 @@ export default function StudentDashboard() {
                       
                       {isUpcoming && webinar.liveUrl && (
                         <div className="flex items-center gap-3 pt-2">
-                          <button 
+                          <button
                             onClick={() => handleRegisterSeat(webinar.title)}
                             className="px-3.5 py-2 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white text-sm font-bold transition-colors cursor-pointer border-none"
                           >
                             RSVP Seat
                           </button>
-                          <a 
-                            href={webinar.liveUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-3.5 py-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-sm font-bold transition-colors"
+                          {/* Join link stays locked until the class actually starts */}
+                          <span
+                            className="px-3.5 py-2 rounded-lg bg-zinc-100 text-zinc-500 text-sm font-bold cursor-not-allowed select-none"
+                            title="The join link unlocks when the class starts"
                           >
-                            Join Webinar
-                          </a>
+                            Unlocks at class time
+                          </span>
                         </div>
                       )}
                     </div>

@@ -6,6 +6,12 @@ import { Media } from '@/lib/db/models/Media'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
 
+export const dynamic = 'force-dynamic'
+
+// Session state must never be cached — a cached "authenticated" response
+// would let a logged-out browser keep seeing logged-in UI (and vice versa).
+const NO_STORE = { 'Cache-Control': 'no-store, no-cache, must-revalidate, private' }
+
 export async function GET() {
   try {
     await connectToDatabase()
@@ -38,7 +44,7 @@ export async function GET() {
     if (!verifiedDoc) {
       return NextResponse.json(
         { success: false, authenticated: false, error: 'Not authenticated.' },
-        { status: 401 }
+        { status: 401, headers: NO_STORE }
       )
     }
 
@@ -60,11 +66,14 @@ export async function GET() {
       permissions: verifiedDoc.permissions || [],
     }
 
-    return NextResponse.json({
-      success: true,
-      authenticated: true,
-      user: safeUser,
-    })
+    return NextResponse.json(
+      {
+        success: true,
+        authenticated: true,
+        user: safeUser,
+      },
+      { headers: NO_STORE }
+    )
 
   } catch (error: any) {
     console.error('Auth Check Error:', error)

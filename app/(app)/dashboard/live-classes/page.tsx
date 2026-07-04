@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { FiCalendar, FiClock, FiRadio, FiExternalLink, FiVideo } from 'react-icons/fi'
+import { FiCalendar, FiClock, FiRadio, FiExternalLink, FiVideo, FiLock } from 'react-icons/fi'
 import Swal from 'sweetalert2'
 
 interface UserSession {
@@ -29,6 +29,25 @@ export default function LiveClassesPage() {
   const [loading, setLoading] = useState(true)
   const [webinars, setWebinars] = useState<LiveWebinar[]>([])
   const [filter, setFilter] = useState<'all' | 'upcoming' | 'ended'>('all')
+
+  // Ticking clock so countdowns update and join links unlock exactly on time
+  const [nowTs, setNowTs] = useState(() => Date.now())
+  useEffect(() => {
+    const timer = setInterval(() => setNowTs(Date.now()), 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const formatCountdown = (targetTs: number) => {
+    let diff = Math.max(0, Math.floor((targetTs - nowTs) / 1000))
+    const days = Math.floor(diff / 86400); diff %= 86400
+    const hours = Math.floor(diff / 3600); diff %= 3600
+    const mins = Math.floor(diff / 60)
+    const secs = diff % 60
+    const pad = (n: number) => String(n).padStart(2, '0')
+    return days > 0
+      ? `${days}d ${pad(hours)}h ${pad(mins)}m ${pad(secs)}s`
+      : `${pad(hours)}h ${pad(mins)}m ${pad(secs)}s`
+  }
 
   useEffect(() => {
     async function init() {
@@ -80,7 +99,7 @@ export default function LiveClassesPage() {
 
   if (!user) return null
 
-  const now = Date.now()
+  const now = nowTs
   const filtered = webinars.filter(w => {
     if (filter === 'all') return true
     const ts = w.liveDate ? new Date(w.liveDate).getTime() : 0
@@ -166,6 +185,7 @@ export default function LiveClassesPage() {
                   hour: '2-digit',
                   minute: '2-digit',
                   hour12: true,
+                  timeZone: 'Asia/Dhaka',
                 })
               : 'Date TBD'
 
@@ -235,19 +255,25 @@ export default function LiveClassesPage() {
                         <FiRadio className="h-4 w-4" /> RSVP Seat
                       </button>
                     )}
-                    {webinar.liveUrl && (
+                    {webinar.liveUrl && isUpcoming && (
+                      /* Link stays locked until class time; countdown shows when it unlocks */
+                      <div
+                        className="flex-none px-4 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-base font-bold border bg-zinc-50 border-zinc-200 text-zinc-500 cursor-not-allowed select-none"
+                        title="The join link unlocks when the class starts"
+                      >
+                        <FiLock className="h-4 w-4 text-[#E61C24]" />
+                        <span className="tabular-nums">{dateObj ? formatCountdown(dateObj.getTime()) : 'Locked'}</span>
+                      </div>
+                    )}
+                    {webinar.liveUrl && !isUpcoming && (
                       <a
                         href={webinar.liveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-base font-bold transition-all border ${
-                          isUpcoming
-                            ? 'flex-none px-4 bg-zinc-50 hover:bg-zinc-100 border-zinc-200 text-zinc-700'
-                            : 'flex-1 bg-zinc-50 hover:bg-zinc-100 border-zinc-200 text-zinc-600'
-                        }`}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-base font-bold transition-all border bg-zinc-50 hover:bg-zinc-100 border-zinc-200 text-zinc-600"
                       >
                         <FiVideo className="h-4 w-4" />
-                        {isUpcoming ? 'Join' : 'Recording'}
+                        Join / Recording
                         <FiExternalLink className="h-3.5 w-3.5" />
                       </a>
                     )}

@@ -6,6 +6,7 @@ import { User } from '@/lib/db/models/User'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
 import { createZoomMeeting } from '@/lib/zoom'
+import { parseBdDate } from '@/lib/bdTime'
 import { revalidatePath } from 'next/cache'
 
 async function authCheck() {
@@ -42,7 +43,7 @@ export async function PUT(
     const finalLessonType = body.lessonType ?? lesson.lessonType
     const finalLivePlatform = body.livePlatform ?? lesson.livePlatform
     const finalAutoGenerateZoom = body.autoGenerateZoom ?? lesson.autoGenerateZoom
-    const finalLiveDate = body.liveDate ? new Date(body.liveDate) : lesson.liveDate
+    const finalLiveDate = body.liveDate ? parseBdDate(body.liveDate) : lesson.liveDate
     const finalTitle = body.title ?? lesson.title
     const finalDuration = body.duration ? Number(body.duration) : lesson.duration
 
@@ -55,7 +56,7 @@ export async function PUT(
       (
         !lesson.liveUrl || 
         !lesson.autoGenerateZoom ||
-        (body.liveDate && new Date(body.liveDate).getTime() !== new Date(lesson.liveDate).getTime()) ||
+        (body.liveDate && parseBdDate(body.liveDate).getTime() !== new Date(lesson.liveDate).getTime()) ||
         (body.title && body.title !== lesson.title)
       )
 

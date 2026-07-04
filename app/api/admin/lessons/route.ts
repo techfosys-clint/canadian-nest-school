@@ -6,6 +6,7 @@ import { User } from '@/lib/db/models/User'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
 import { createZoomMeeting } from '@/lib/zoom'
+import { parseBdDate } from '@/lib/bdTime'
 import { revalidatePath } from 'next/cache'
 
 /**
@@ -162,7 +163,7 @@ export async function POST(request: Request) {
         )
       }
 
-      const zoomDetails = await createZoomMeeting(title, liveDate, Number(duration) || 60)
+      const zoomDetails = await createZoomMeeting(title, parseBdDate(liveDate).toISOString(), Number(duration) || 60)
       if (!zoomDetails) {
         return NextResponse.json(
           {
@@ -188,7 +189,7 @@ export async function POST(request: Request) {
     const newLesson = new Lesson({
       title, slug, course: courseId, order: finalOrder, moduleName, lessonType: lessonType || 'recorded',
       videoUrl, livePlatform, liveUrl: actualLiveUrl,
-      liveDate: liveDate ? new Date(liveDate) : undefined,
+      liveDate: liveDate ? parseBdDate(liveDate) : undefined,
       content, duration: Number(duration),
       isPreviewable: isPreviewable || false,
       autoGenerateZoom: finalAutoGenerate,

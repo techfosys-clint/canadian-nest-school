@@ -631,12 +631,12 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
   const renderPlayer = () => (
     <div
       ref={videoContainerRef}
-      className={`bg-slate-900 border border-slate-950 rounded-lg overflow-hidden shadow-xl relative flex flex-col ${
-        currentLesson.lessonType === 'recorded' 
-          ? 'aspect-video' 
-          : currentLesson.lessonType === 'quiz'
-            ? 'min-h-[85vh] sm:min-h-0 sm:aspect-video'
-            : 'aspect-square sm:aspect-video'
+      className={`${
+        currentLesson.lessonType === 'quiz'
+          ? 'bg-[#080d1a] sm:bg-slate-900 sm:border sm:border-slate-950 sm:rounded-lg sm:overflow-hidden sm:shadow-xl relative flex flex-col min-h-[90vh] sm:min-h-0 sm:aspect-video -mx-6 sm:mx-0 -mt-8 sm:mt-0 pb-6 sm:pb-0'
+          : `bg-slate-900 border border-slate-950 rounded-lg overflow-hidden shadow-xl relative flex flex-col ${
+              currentLesson.lessonType === 'recorded' ? 'aspect-video' : 'aspect-square sm:aspect-video'
+            }`
       }`}
       style={{
         WebkitUserSelect: 'none',

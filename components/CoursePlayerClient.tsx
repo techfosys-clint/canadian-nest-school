@@ -621,6 +621,49 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
   })()
 
   // ─── Render Sub-Components for clean split layouts ───
+  const renderLiveJoinButton = (isMobile: boolean = false) => {
+    if (currentLesson.lessonType !== 'live') return null;
+    return (
+      <div className={`flex-col sm:flex-row items-start sm:items-center gap-6 ${isMobile ? 'flex sm:hidden bg-slate-900 p-6 rounded-lg border border-slate-800 shadow-sm' : 'hidden sm:flex pt-6 border-t border-white/5 relative z-10'}`}>
+        <div className="space-y-1 w-full sm:w-auto">
+          <p className={`text-xs font-bold uppercase tracking-widest ${isMobile ? 'text-zinc-500' : 'text-slate-400'}`}>Broadcast Time</p>
+          <p className={`text-base font-bold flex items-center gap-1.5 mt-0.5 ${isMobile ? 'text-indigo-500' : 'text-[#b2b0ff]'}`}>
+            <FiCalendar className="h-4.5 w-4.5" />
+            <span>{formattedLiveDate || 'TBD (Not Scheduled)'}</span>
+          </p>
+        </div>
+
+        {(currentLesson.liveUrl || currentLesson.videoUrl) && isLiveUpcoming ? (
+          <div className="flex flex-col gap-2 w-full sm:w-auto">
+            <span className={`py-2.5 px-4.5 rounded-lg bg-zinc-800 text-zinc-300 font-bold text-base whitespace-nowrap inline-flex items-center gap-2 border border-zinc-700 select-none cursor-not-allowed ${isMobile ? 'justify-center w-full' : ''}`}>
+              <FiLock className="h-4.5 w-4.5 text-[#FF4D55]" />
+              <span>Class Locked</span>
+            </span>
+            <span className={`text-base font-bold text-[#FF4D55] tabular-nums whitespace-nowrap flex items-center gap-1.5 ${isMobile ? 'justify-center w-full' : ''}`}>
+              <FiClock className="h-4.5 w-4.5" />
+              <span>Unlocks in {countdownLabel}</span>
+            </span>
+          </div>
+        ) : currentLesson.liveUrl || currentLesson.videoUrl ? (
+          <a
+            href={currentLesson.liveUrl || currentLesson.videoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`py-2.5 px-4.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base whitespace-nowrap transition-all transform hover:-translate-y-0.5 shadow-lg shadow-[#E61C24]/15 cursor-pointer inline-flex items-center gap-2 ${isMobile ? 'justify-center w-full' : ''}`}
+          >
+            <FiRadio className="h-5 w-5 animate-pulse" />
+            <span>Join Live Broadcast</span>
+          </a>
+        ) : (
+          <span className={`py-2.5 px-4.5 rounded-lg bg-zinc-800 text-zinc-400 font-bold text-base whitespace-nowrap cursor-not-allowed inline-flex items-center gap-2 border border-zinc-700 select-none ${isMobile ? 'justify-center w-full' : ''}`}>
+            <FiLock className="h-4.5 w-4.5 text-zinc-500" />
+            <span>Link Not Available</span>
+          </span>
+        )}
+      </div>
+    );
+  };
+
   const renderPlayer = () => (
     <div
       ref={videoContainerRef}
@@ -709,44 +752,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
           </div>
 
           {/* Bottom dynamic RSVP/Join button */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 pt-6 border-t border-white/5 relative z-10">
-            <div className="space-y-1">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Broadcast Time</p>
-              <p className="text-base font-bold text-[#b2b0ff] flex items-center gap-1.5 mt-0.5">
-                <FiCalendar className="h-4.5 w-4.5" />
-                <span>{formattedLiveDate || 'TBD (Not Scheduled)'}</span>
-              </p>
-            </div>
-
-            {(currentLesson.liveUrl || currentLesson.videoUrl) && isLiveUpcoming ? (
-              /* Class link stays locked until the scheduled time arrives */
-              <div className="flex flex-col gap-2">
-                <span className="py-2.5 px-4.5 rounded-lg bg-zinc-800 text-zinc-300 font-bold text-base whitespace-nowrap inline-flex items-center gap-2 border border-zinc-700 select-none cursor-not-allowed">
-                  <FiLock className="h-4.5 w-4.5 text-[#FF4D55]" />
-                  <span>Class Locked</span>
-                </span>
-                <span className="text-base font-bold text-[#FF4D55] tabular-nums whitespace-nowrap flex items-center gap-1.5">
-                  <FiClock className="h-4.5 w-4.5" />
-                  <span>Unlocks in {countdownLabel}</span>
-                </span>
-              </div>
-            ) : currentLesson.liveUrl || currentLesson.videoUrl ? (
-              <a
-                href={currentLesson.liveUrl || currentLesson.videoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="py-2.5 px-4.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base whitespace-nowrap transition-all transform hover:-translate-y-0.5 shadow-lg shadow-[#E61C24]/15 cursor-pointer inline-flex items-center gap-2"
-              >
-                <FiRadio className="h-5 w-5 animate-pulse" />
-                <span>Join Live Broadcast</span>
-              </a>
-            ) : (
-              <span className="py-2.5 px-4.5 rounded-lg bg-zinc-800 text-zinc-400 font-bold text-base whitespace-nowrap cursor-not-allowed inline-flex items-center gap-2 border border-zinc-700 select-none">
-                <FiLock className="h-4.5 w-4.5 text-zinc-500" />
-                <span>Link Not Available</span>
-              </span>
-            )}
-          </div>
+          {renderLiveJoinButton(false)}
         </div>
       ) : currentLesson.lessonType === 'quiz' ? (
         // Render stunning interactive quiz player layout
@@ -1702,6 +1708,9 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
               {/* Theater Mode: Full-width top player column (12 cols) */}
               <div className="lg:col-span-12">
                 {renderPlayer()}
+                <div className="mt-6 sm:mt-0">
+                  {renderLiveJoinButton(true)}
+                </div>
               </div>
 
               {/* Theater Mode details split columns at bottom */}
@@ -1718,6 +1727,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
               {/* Classic split screen side-by-side layout */}
               <div className="lg:col-span-8 space-y-6">
                 {renderPlayer()}
+                {renderLiveJoinButton(true)}
                 {renderDetails()}
               </div>
               

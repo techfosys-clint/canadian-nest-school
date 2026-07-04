@@ -619,7 +619,11 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
   const renderPlayer = () => (
     <div
       ref={videoContainerRef}
-      className="bg-slate-900 border border-slate-950 rounded-lg overflow-hidden shadow-xl aspect-video relative"
+      className={`bg-slate-900 border border-slate-950 rounded-lg overflow-hidden shadow-xl relative ${
+        currentLesson.lessonType === 'recorded' 
+          ? 'aspect-video' 
+          : 'aspect-square sm:aspect-video'
+      }`}
       style={{
         WebkitUserSelect: 'none',
         userSelect: 'none',
@@ -673,7 +677,7 @@ export default function CoursePlayerClient({ course, lessons, student }: CourseP
         )
       ) : currentLesson.lessonType === 'live' ? (
         // Premium Live Session Dashboard Card inside Video Box
-        <div className="w-full h-full bg-gradient-to-br from-[#0F1B40] via-[#08102B] to-[#0A163A] text-white p-8 sm:p-12 flex flex-col justify-between select-none relative overflow-hidden">
+        <div className="w-full h-full bg-gradient-to-br from-[#0F1B40] via-[#08102B] to-[#0A163A] text-white p-6 sm:p-12 flex flex-col justify-between gap-6 sm:gap-0 select-none relative overflow-y-auto overflow-x-hidden">
           {/* Decorative glowing grid background */}
           <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#E61C24 1.5px, transparent 1.5px)', backgroundSize: '20px 20px' }} />
           <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#E61C24]/20 rounded-full blur-2xl" />

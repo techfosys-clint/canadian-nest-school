@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useCallback, useEffect } from 'react'
+import Image from 'next/image'
 import {
   FiUploadCloud, FiImage, FiSearch, FiX, FiCheck,
   FiGrid, FiUpload, FiAlertCircle,
@@ -269,9 +270,11 @@ export default function MediaPickerModal({
                         >
                           <div className="aspect-square bg-[#0e1322] flex items-center justify-center overflow-hidden">
                             {isImg ? (
-                              <img
+                              <Image
                                 src={item.thumbnailUrl || item.url}
                                 alt={item.alt}
+                                width={item.width ?? 100}
+                                height={item.height ?? 100}
                                 className="w-full h-full object-cover"
                               />
                             ) : (

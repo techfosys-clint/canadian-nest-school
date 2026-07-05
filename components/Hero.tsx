@@ -30,7 +30,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
               transition={{ duration: 0.9, delay: 0.4, ease: 'easeOut' }}
               className="absolute -left-24 -top-12 w-32 h-32 pointer-events-none hidden lg:block"
             >
-              <img src="/svg/heading-svg.svg" alt="arrow pointer" className="w-full h-full object-contain" />
+              <Image src="/svg/heading-svg.svg" alt="arrow pointer" width={128} height={128} className="w-full h-full object-contain" />
             </motion.span>
 
             <span className="align-middle">Master </span>
@@ -73,7 +73,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
               transition={{ duration: 0.9, delay: 0.5, ease: 'easeOut' }}
               className="absolute right-2 -top-8 w-20 h-20 pointer-events-none hidden lg:block"
             >
-              <img src="/svg/heading-svg2.svg" alt="spark accents" className="w-full h-full object-contain" />
+              <Image src="/svg/heading-svg2.svg" alt="spark accents" width={80} height={80} className="w-full h-full object-contain" />
             </motion.span>
           </span>
 

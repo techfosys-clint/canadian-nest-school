@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { FaLinkedinIn, FaFacebookF, FaInstagram, FaYoutube } from 'react-icons/fa'
@@ -74,9 +75,11 @@ export default function Footer() {
           {/* Col 1 – Branding & Info */}
           <div className="lg:col-span-5 space-y-6">
             <Link href="/" className="inline-flex items-center bg-white px-3 py-1.5 rounded-lg shadow-sm group">
-              <img
+              <Image
                 src="/logo.png"
                 alt="Canadian Nest School"
+                width={150}
+                height={60}
                 className="h-15 w-auto object-contain transition-transform group-hover:scale-102 duration-300"
               />
             </Link>
@@ -199,14 +202,18 @@ export default function Footer() {
 
         {/* ── Payment Methods Gateway Banner ── */}
         <div className="mt-12 flex justify-center items-center">
-          <img
+          <Image
             src="/EPS-PGW_Footer_Merchant_Website/Footer-Desktop-Light-Version.png.png"
             alt="Payment Methods"
+            width={1200}
+            height={80}
             className="hidden md:block w-full h-auto object-contain"
           />
-          <img
+          <Image
             src="/EPS-PGW_Footer_Merchant_Website/Footer-Mobile-Light-Version.png.png"
             alt="Payment Methods"
+            width={600}
+            height={80}
             className="block md:hidden w-full h-auto object-contain"
           />
         </div>

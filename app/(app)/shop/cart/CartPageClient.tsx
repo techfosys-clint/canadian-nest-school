@@ -1,6 +1,7 @@
 'use client';
 
 import { useCart } from '@/context/CartContext';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -88,10 +89,11 @@ export default function CartPageClient() {
                     >
                       <div className='h-16 w-14 shrink-0 rounded-lg bg-zinc-100 border border-zinc-200/80 overflow-hidden flex items-center justify-center'>
                         {item.thumbnail ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
+                          <Image
                             src={item.thumbnail}
                             alt={item.title}
+                            width={56}
+                            height={64}
                             className='h-full w-full object-cover'
                           />
                         ) : (

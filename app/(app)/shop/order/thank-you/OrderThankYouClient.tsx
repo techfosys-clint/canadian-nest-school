@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import {
   FiArrowRight,
@@ -86,10 +87,11 @@ export default function OrderThankYouClient({
                   >
                     <div className='h-12 w-10 shrink-0 rounded-lg bg-zinc-100 border border-zinc-200/80 flex items-center justify-center overflow-hidden'>
                       {item.thumbnail ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <Image
                           src={item.thumbnail}
                           alt={item.title}
+                          width={40}
+                          height={48}
                           className='h-full w-full object-cover'
                         />
                       ) : (

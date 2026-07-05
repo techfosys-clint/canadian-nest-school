@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 
 interface MarqueeClientProps {
@@ -65,7 +66,7 @@ export default function MarqueeClient({ items }: MarqueeClientProps) {
             {repeatedItems.map((item, index) => (
               <React.Fragment key={`g1-${index}`}>
                 <span>{item}</span>
-                <img src="/svg/sparkle.png" alt="sparkle" className="h-5 w-5 object-contain shrink-0 filter brightness-0 invert" />
+                <Image src="/svg/sparkle.png" alt="sparkle" width={20} height={20} className="h-5 w-5 object-contain shrink-0 filter brightness-0 invert" />
               </React.Fragment>
             ))}
           </div>
@@ -83,7 +84,7 @@ export default function MarqueeClient({ items }: MarqueeClientProps) {
             {repeatedItems.map((item, index) => (
               <React.Fragment key={`g2-${index}`}>
                 <span>{item}</span>
-                <img src="/svg/sparkle.png" alt="sparkle" className="h-5 w-5 object-contain shrink-0 filter brightness-0 invert" />
+                <Image src="/svg/sparkle.png" alt="sparkle" width={20} height={20} className="h-5 w-5 object-contain shrink-0 filter brightness-0 invert" />
               </React.Fragment>
             ))}
           </div>
@@ -126,9 +127,11 @@ export default function MarqueeClient({ items }: MarqueeClientProps) {
             {repeatedItems.slice().reverse().map((item, index) => (
               <React.Fragment key={`g1-rev-${index}`}>
                 <span>{item}</span>
-                <img 
+                <Image 
                   src="/svg/sparkle.png" 
                   alt="sparkle" 
+                  width={20}
+                  height={20}
                   className="h-5 w-5 object-contain shrink-0" 
                   style={{ filter: 'invert(16%) sepia(99%) saturate(5436%) hue-rotate(352deg) brightness(95%) contrast(91%)' }} 
                 />
@@ -149,9 +152,11 @@ export default function MarqueeClient({ items }: MarqueeClientProps) {
             {repeatedItems.slice().reverse().map((item, index) => (
               <React.Fragment key={`g2-rev-${index}`}>
                 <span>{item}</span>
-                <img 
+                <Image 
                   src="/svg/sparkle.png" 
                   alt="sparkle" 
+                  width={20}
+                  height={20}
                   className="h-5 w-5 object-contain shrink-0" 
                   style={{ filter: 'invert(16%) sepia(99%) saturate(5436%) hue-rotate(352deg) brightness(95%) contrast(91%)' }} 
                 />

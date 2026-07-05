@@ -1,98 +1,102 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { sendGTMEvent } from '@next/third-parties/google'
-import { pushToDataLayer, generateEventId } from '@/lib/gtm'
-import { parseJsonResponse } from '@/lib/safeJson'
+import { generateEventId, pushToDataLayer } from '@/lib/gtm';
+import { parseJsonResponse } from '@/lib/safeJson';
+import { sendGTMEvent } from '@next/third-parties/google';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 import {
-  FiZap,
-  FiMail,
-  FiLock,
-  FiUser,
-  FiPhone,
-  FiMapPin,
-  FiTag,
-  FiCheckCircle,
-  FiCheck,
   FiAlertCircle,
-  FiChevronLeft,
   FiArrowRight,
+  FiCheck,
+  FiCheckCircle,
+  FiChevronLeft,
   FiEye,
   FiEyeOff,
-} from 'react-icons/fi'
-import Swal from 'sweetalert2'
+  FiLock,
+  FiMail,
+  FiMapPin,
+  FiPhone,
+  FiTag,
+  FiUser,
+  FiZap,
+} from 'react-icons/fi';
 
 interface CourseData {
-  id: string
-  title: string
-  summary: string
-  price: number
-  imageUrl: string
-  instructorName: string
-  categoryName: string
-  slug: string
+  id: string;
+  title: string;
+  summary: string;
+  price: number;
+  imageUrl: string;
+  instructorName: string;
+  categoryName: string;
+  slug: string;
 }
 
 interface UserSession {
-  id: string
-  name: string
-  email: string
-  phone?: string
-  role: string
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role: string;
 }
 
 export default function CheckoutFormClient({ course }: { course: CourseData }) {
-  const router = useRouter()
-  
+  const router = useRouter();
+
   // Auth states
-  const [user, setUser] = useState<UserSession | null>(null)
-  const [loadingSession, setLoadingSession] = useState(true)
-  const [authTab, setAuthTab] = useState<'login' | 'register'>('register')
-  const [showPassword, setShowPassword] = useState(false)
+  const [user, setUser] = useState<UserSession | null>(null);
+  const [loadingSession, setLoadingSession] = useState(true);
+  const [authTab, setAuthTab] = useState<'login' | 'register'>('register');
+  const [showPassword, setShowPassword] = useState(false);
 
   // Login form states
-  const [loginEmail, setLoginEmail] = useState('')
-  const [loginPassword, setLoginPassword] = useState('')
-  const [authLoading, setAuthLoading] = useState(false)
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
 
   // Register form states
-  const [regName, setRegName] = useState('')
-  const [regEmail, setRegEmail] = useState('')
-  const [regPassword, setRegPassword] = useState('')
-  const [regPhone, setRegPhone] = useState('')
-  const [regOtp, setRegOtp] = useState('')
-  const [regOtpSent, setRegOtpSent] = useState(false)
-  const [regOtpVerified, setRegOtpVerified] = useState(false)
-  const [sendingRegOtp, setSendingRegOtp] = useState(false)
-  const [verifyingRegOtp, setVerifyingRegOtp] = useState(false)
-  const [countdown, setCountdown] = useState(0)
+  const [regName, setRegName] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+  const [regPhone, setRegPhone] = useState('');
+  const [regOtp, setRegOtp] = useState('');
+  const [regOtpSent, setRegOtpSent] = useState(false);
+  const [regOtpVerified, setRegOtpVerified] = useState(false);
+  const [sendingRegOtp, setSendingRegOtp] = useState(false);
+  const [verifyingRegOtp, setVerifyingRegOtp] = useState(false);
+  const [countdown, setCountdown] = useState(0);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout
+    let timer: NodeJS.Timeout;
     if (countdown > 0) {
-      timer = setTimeout(() => setCountdown(countdown - 1), 1000)
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
     }
-    return () => clearTimeout(timer)
-  }, [countdown])
+    return () => clearTimeout(timer);
+  }, [countdown]);
 
   // Checkout states
-  const [billingName, setBillingName] = useState('')
-  const [billingPhone, setBillingPhone] = useState('')
-  const [billingAddress, setBillingAddress] = useState('')
-  const [couponCode, setCouponCode] = useState('')
-  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discountType: string; discountValue: number } | null>(null)
-  const [couponError, setCouponError] = useState('')
-  const [couponSuccess, setCouponSuccess] = useState('')
-  const [couponLoading, setCouponLoading] = useState(false)
-  const [purchaseLoading, setPurchaseLoading] = useState(false)
+  const [billingName, setBillingName] = useState('');
+  const [billingPhone, setBillingPhone] = useState('');
+  const [billingAddress, setBillingAddress] = useState('');
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discountType: string;
+    discountValue: number;
+  } | null>(null);
+  const [couponError, setCouponError] = useState('');
+  const [couponSuccess, setCouponSuccess] = useState('');
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [purchaseLoading, setPurchaseLoading] = useState(false);
 
   // Pop-up free inline alert states
-  const [authError, setAuthError] = useState<string | null>(null)
-  const [authSuccess, setAuthSuccess] = useState<string | null>(null)
-  const [checkoutError, setCheckoutError] = useState<string | null>(null)
-  const [checkoutSuccess, setCheckoutSuccess] = useState<string | null>(null)
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [authSuccess, setAuthSuccess] = useState<string | null>(null);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [checkoutSuccess, setCheckoutSuccess] = useState<string | null>(null);
 
   // Check login session on mount
   useEffect(() => {
@@ -104,34 +108,41 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
         currency: 'BDT',
         value: course.price,
         coupon: '',
-        items: [{
-          item_id: course.id,
-          item_name: course.title,
-          item_category: course.categoryName,
-          price: course.price,
-          quantity: 1
-        }]
+        items: [
+          {
+            item_id: course.id,
+            item_name: course.title,
+            item_category: course.categoryName,
+            price: course.price,
+            quantity: 1,
+          },
+        ],
       },
-      user_data: user ? {
-        user_id: user.id,
-        email: user.email,
-        phone_number: user.phone || '',
-        first_name: user.name ? user.name.split(' ')[0] : '',
-        last_name: user.name && user.name.includes(' ') ? user.name.split(' ').slice(1).join(' ') : '',
-        city: '',
-        country: 'BD'
-      } : undefined
-    })
+      user_data: user
+        ? {
+            user_id: user.id,
+            email: user.email,
+            phone_number: user.phone || '',
+            first_name: user.name ? user.name.split(' ')[0] : '',
+            last_name:
+              user.name && user.name.includes(' ')
+                ? user.name.split(' ').slice(1).join(' ')
+                : '',
+            city: '',
+            country: 'BD',
+          }
+        : undefined,
+    });
 
     async function getSession() {
       try {
-        const res = await fetch('/api/auth/me')
-        const data = await res.json()
+        const res = await fetch('/api/auth/me');
+        const data = await res.json();
         if (res.ok && data.authenticated) {
-          setUser(data.user)
-          setBillingName(data.user.name || '')
-          setBillingPhone(data.user.phone || '')
-          
+          setUser(data.user);
+          setBillingName(data.user.name || '');
+          setBillingPhone(data.user.phone || '');
+
           pushToDataLayer({
             event: 'user_data_ready',
             event_id: generateEventId(),
@@ -140,46 +151,51 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
               email: data.user.email,
               phone_number: data.user.phone || '',
               first_name: data.user.name ? data.user.name.split(' ')[0] : '',
-              last_name: data.user.name && data.user.name.includes(' ') ? data.user.name.split(' ').slice(1).join(' ') : '',
+              last_name:
+                data.user.name && data.user.name.includes(' ')
+                  ? data.user.name.split(' ').slice(1).join(' ')
+                  : '',
               city: '',
-              country: 'BD'
-            }
-          })
+              country: 'BD',
+            },
+          });
         }
       } catch (err) {
-        console.error('Session verify failed:', err)
+        console.error('Session verify failed:', err);
       } finally {
-        setLoadingSession(false)
+        setLoadingSession(false);
       }
     }
-    getSession()
-  }, [])
+    getSession();
+  }, []);
 
   // Handle Login submission
   const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setAuthError(null)
-    setAuthSuccess(null)
+    e.preventDefault();
+    setAuthError(null);
+    setAuthSuccess(null);
     if (!loginEmail || !loginPassword) {
-      setAuthError('Please fill in both email and password.')
-      return
+      setAuthError('Please fill in both email and password.');
+      return;
     }
 
-    setAuthLoading(true)
+    setAuthLoading(true);
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: loginEmail, password: loginPassword }),
-      })
-      const data = await res.json()
+      });
+      const data = await res.json();
 
       if (res.ok && data.success) {
-        setUser(data.user)
-        setBillingName(data.user.name || '')
-        setBillingPhone(data.user.phone || '')
-        setAuthSuccess(`Welcome back, ${data.user.name}! Continuing to billing...`)
-        
+        setUser(data.user);
+        setBillingName(data.user.name || '');
+        setBillingPhone(data.user.phone || '');
+        setAuthSuccess(
+          `Welcome back, ${data.user.name}! Continuing to billing...`,
+        );
+
         pushToDataLayer({
           event: 'user_data_ready',
           event_id: generateEventId(),
@@ -188,97 +204,104 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
             email: data.user.email,
             phone_number: data.user.phone || '',
             first_name: data.user.name ? data.user.name.split(' ')[0] : '',
-            last_name: data.user.name && data.user.name.includes(' ') ? data.user.name.split(' ').slice(1).join(' ') : '',
+            last_name:
+              data.user.name && data.user.name.includes(' ')
+                ? data.user.name.split(' ').slice(1).join(' ')
+                : '',
             city: '',
-            country: 'BD'
-          }
-        })
+            country: 'BD',
+          },
+        });
       } else {
-        throw new Error(data.message || 'Invalid email or password.')
+        throw new Error(data.message || 'Invalid email or password.');
       }
     } catch (err: any) {
-      setAuthError(err.message || 'Authentication failed.')
+      setAuthError(err.message || 'Authentication failed.');
     } finally {
-      setAuthLoading(false)
+      setAuthLoading(false);
     }
-  }
+  };
 
   // Handle OTP send for inline registration
   const handleSendRegOtp = async () => {
     if (!regPhone) {
-      setAuthError('Please enter your mobile number first.')
-      return
+      setAuthError('Please enter your mobile number first.');
+      return;
     }
-    setAuthError(null)
-    setSendingRegOtp(true)
+    setAuthError(null);
+    setSendingRegOtp(true);
     try {
       const res = await fetch('/api/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone: regPhone }),
-      })
-      const data = await res.json()
+      });
+      const data = await res.json();
       if (res.ok) {
-        setRegOtpSent(true)
-        setCountdown(60)
-        setAuthSuccess('OTP sent! Please check your phone for the verification code.')
+        setRegOtpSent(true);
+        setCountdown(60);
+        setAuthSuccess(
+          'OTP sent! Please check your phone for the verification code.',
+        );
       } else {
-        throw new Error(data.error || 'Failed to send OTP.')
+        throw new Error(data.error || 'Failed to send OTP.');
       }
     } catch (err: any) {
-      setAuthError(err.message || 'Failed to send OTP.')
+      setAuthError(err.message || 'Failed to send OTP.');
     } finally {
-      setSendingRegOtp(false)
+      setSendingRegOtp(false);
     }
-  }
+  };
 
   // Handle OTP verify for inline registration
   const handleVerifyRegOtp = async () => {
     if (!regOtp) {
-      setAuthError('Please enter the verification code sent to your phone.')
-      return
+      setAuthError('Please enter the verification code sent to your phone.');
+      return;
     }
-    setAuthError(null)
-    setVerifyingRegOtp(true)
+    setAuthError(null);
+    setVerifyingRegOtp(true);
     try {
       const res = await fetch('/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone: regPhone, otp: regOtp }),
-      })
-      const data = await res.json()
+      });
+      const data = await res.json();
       if (res.ok) {
-        setRegOtpVerified(true)
-        setAuthSuccess('Phone number verified successfully!')
+        setRegOtpVerified(true);
+        setAuthSuccess('Phone number verified successfully!');
       } else {
-        throw new Error(data.error || 'Incorrect OTP.')
+        throw new Error(data.error || 'Incorrect OTP.');
       }
     } catch (err: any) {
-      setAuthError(err.message || 'Verification failed.')
+      setAuthError(err.message || 'Verification failed.');
     } finally {
-      setVerifyingRegOtp(false)
+      setVerifyingRegOtp(false);
     }
-  }
+  };
 
   // Handle Registration submission + silent login
   const handleRegisterSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setAuthError(null)
-    setAuthSuccess(null)
+    e.preventDefault();
+    setAuthError(null);
+    setAuthSuccess(null);
     if (!regName || !regPhone || !regEmail || !regPassword) {
-      setAuthError('Please fill in your name, mobile number, email, and password.')
-      return
+      setAuthError(
+        'Please fill in your name, mobile number, email, and password.',
+      );
+      return;
     }
     if (!regOtpVerified) {
-      setAuthError('Please verify your mobile number with the OTP code first.')
-      return
+      setAuthError('Please verify your mobile number with the OTP code first.');
+      return;
     }
     if (regPassword.length < 6) {
-      setAuthError('Password must be at least 6 characters long.')
-      return
+      setAuthError('Password must be at least 6 characters long.');
+      return;
     }
 
-    setAuthLoading(true)
+    setAuthLoading(true);
     try {
       // 1. Create account
       const regRes = await fetch('/api/auth/register', {
@@ -291,11 +314,14 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
           phone: regPhone,
           role: 'student',
         }),
-      })
-      const regData = await regRes.json()
+      });
+      const regData = await regRes.json();
 
       if (!regRes.ok || !regData.success) {
-        throw new Error(regData.error || 'Registration failed. Phone number might already be registered.')
+        throw new Error(
+          regData.error ||
+            'Registration failed. Phone number might already be registered.',
+        );
       }
 
       // 2. Perform silent login
@@ -303,19 +329,21 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: regPhone, password: regPassword }),
-      })
-      const loginData = await loginRes.json()
+      });
+      const loginData = await loginRes.json();
 
       if (loginRes.ok && loginData.success) {
         sendGTMEvent({
           event: 'sign_up',
           method: 'checkout_inline',
-        })
-        setUser(loginData.user)
-        setBillingName(loginData.user.name || '')
-        setBillingPhone(loginData.user.phone || '')
-        setAuthSuccess(`Account created successfully! Welcome, ${loginData.user.name}.`)
-        
+        });
+        setUser(loginData.user);
+        setBillingName(loginData.user.name || '');
+        setBillingPhone(loginData.user.phone || '');
+        setAuthSuccess(
+          `Account created successfully! Welcome, ${loginData.user.name}.`,
+        );
+
         pushToDataLayer({
           event: 'user_data_ready',
           event_id: generateEventId(),
@@ -323,77 +351,86 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
             user_id: loginData.user.id,
             email: loginData.user.email,
             phone_number: loginData.user.phone || '',
-            first_name: loginData.user.name ? loginData.user.name.split(' ')[0] : '',
-            last_name: loginData.user.name && loginData.user.name.includes(' ') ? loginData.user.name.split(' ').slice(1).join(' ') : '',
+            first_name: loginData.user.name
+              ? loginData.user.name.split(' ')[0]
+              : '',
+            last_name:
+              loginData.user.name && loginData.user.name.includes(' ')
+                ? loginData.user.name.split(' ').slice(1).join(' ')
+                : '',
             city: '',
-            country: 'BD'
-          }
-        })
+            country: 'BD',
+          },
+        });
       } else {
-        throw new Error('Registration succeeded, but login failed. Please sign in manually.')
+        throw new Error(
+          'Registration succeeded, but login failed. Please sign in manually.',
+        );
       }
     } catch (err: any) {
-      setAuthError(err.message || 'Registration failed.')
+      setAuthError(err.message || 'Registration failed.');
     } finally {
-      setAuthLoading(false)
+      setAuthLoading(false);
     }
-  }
+  };
 
   // Handle Coupon code verification
   const handleApplyCoupon = async () => {
-    setCouponError('')
-    setCouponSuccess('')
+    setCouponError('');
+    setCouponSuccess('');
     if (!couponCode.trim()) {
-      setCouponError('Please enter a coupon code.')
-      return
+      setCouponError('Please enter a coupon code.');
+      return;
     }
 
-    setCouponLoading(true)
+    setCouponLoading(true);
     try {
       const res = await fetch('/api/coupons/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: couponCode, courseId: course.id }),
-      })
-      const data = await res.json()
+      });
+      const data = await res.json();
 
       if (res.ok && data.success) {
-        setAppliedCoupon(data.coupon)
-        setCouponSuccess(`Coupon "${data.coupon.code}" applied successfully!`)
+        setAppliedCoupon(data.coupon);
+        setCouponSuccess(`Coupon "${data.coupon.code}" applied successfully!`);
       } else {
-        throw new Error(data.error || 'Invalid coupon.')
+        throw new Error(data.error || 'Invalid coupon.');
       }
     } catch (err: any) {
-      setCouponError(err.message)
-      setAppliedCoupon(null)
+      setCouponError(err.message);
+      setAppliedCoupon(null);
     } finally {
-      setCouponLoading(false)
+      setCouponLoading(false);
     }
-  }
+  };
 
   // Recalculate prices
-  const basePrice = course.price
-  let discountAmount = 0
+  const basePrice = course.price;
+  let discountAmount = 0;
   if (appliedCoupon) {
     if (appliedCoupon.discountType === 'percentage') {
-      discountAmount = (basePrice * appliedCoupon.discountValue) / 100
+      discountAmount = (basePrice * appliedCoupon.discountValue) / 100;
     } else {
-      discountAmount = appliedCoupon.discountValue
+      discountAmount = appliedCoupon.discountValue;
     }
   }
-  const finalPrice = Math.max(0, basePrice - discountAmount)
+  const finalPrice = Math.max(0, basePrice - discountAmount);
 
   // Complete course purchase / checkout
   const handleCompletePurchase = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setCheckoutError(null)
-    setCheckoutSuccess(null)
+    e.preventDefault();
+    setCheckoutError(null);
+    setCheckoutSuccess(null);
     if (!billingName.trim() || !billingPhone.trim() || !billingAddress.trim()) {
-      setCheckoutError('Please fill in your name, phone number, and billing address.')
-      return
+      setCheckoutError(
+        'Please fill in your name, phone number, and billing address.',
+      );
+      return;
     }
 
-    setPurchaseLoading(true)
+    setPurchaseLoading(true);
     try {
       const response = await fetch('/api/enrollments', {
         method: 'POST',
@@ -405,14 +442,14 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
           billingPhone,
           billingAddress,
         }),
-      })
-      const data = await parseJsonResponse(response)
+      });
+      const data = await parseJsonResponse(response);
 
       if (response.ok && data.success && data.redirectUrl) {
         // Paid course — hand off to the EPS payment gateway. The purchase
         // event fires from the dashboard once the callback confirms payment.
-        window.location.href = data.redirectUrl
-        return
+        window.location.href = data.redirectUrl;
+        return;
       }
 
       if (response.ok && data.success) {
@@ -424,72 +461,82 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
             currency: 'BDT',
             value: finalPrice,
             coupon: appliedCoupon ? appliedCoupon.code : '',
-            items: [{
-              item_id: course.id,
-              item_name: course.title,
-              item_category: course.categoryName,
-              price: course.price,
-              quantity: 1
-            }]
+            items: [
+              {
+                item_id: course.id,
+                item_name: course.title,
+                item_category: course.categoryName,
+                price: course.price,
+                quantity: 1,
+              },
+            ],
           },
-          user_data: user ? {
-            user_id: user.id,
-            email: user.email,
-            phone_number: user.phone || '',
-            first_name: user.name ? user.name.split(' ')[0] : '',
-            last_name: user.name && user.name.includes(' ') ? user.name.split(' ').slice(1).join(' ') : '',
-            city: '',
-            country: 'BD'
-          } : undefined
-        })
-        
-        setCheckoutSuccess(`You have successfully purchased and enrolled in "${course.title}".`)
+          user_data: user
+            ? {
+                user_id: user.id,
+                email: user.email,
+                phone_number: user.phone || '',
+                first_name: user.name ? user.name.split(' ')[0] : '',
+                last_name:
+                  user.name && user.name.includes(' ')
+                    ? user.name.split(' ').slice(1).join(' ')
+                    : '',
+                city: '',
+                country: 'BD',
+              }
+            : undefined,
+        });
+
+        setCheckoutSuccess(
+          `You have successfully purchased and enrolled in "${course.title}".`,
+        );
         setTimeout(() => {
-          window.location.href = '/dashboard'
-        }, 1500)
+          window.location.href = '/dashboard';
+        }, 1500);
       } else {
-        throw new Error(data.error || 'Failed to complete transaction.')
+        throw new Error(data.error || 'Failed to complete transaction.');
       }
     } catch (err: any) {
-      setCheckoutError(err.message || 'There was an issue processing your checkout.')
+      setCheckoutError(
+        err.message || 'There was an issue processing your checkout.',
+      );
     } finally {
-      setPurchaseLoading(false)
+      setPurchaseLoading(false);
     }
-  }
+  };
 
   if (loadingSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-50">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
-          <p className="text-base font-bold text-zinc-600">Loading Checkout Workspace...</p>
+      <div className='min-h-screen flex items-center justify-center bg-zinc-50'>
+        <div className='flex flex-col items-center gap-4'>
+          <div className='h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin' />
+          <p className='text-base font-bold text-zinc-600'>
+            Loading Checkout Workspace...
+          </p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="container mx-auto px-6 pt-28 pb-16">
+    <div className='container mx-auto px-6 pt-28 pb-16'>
       {/* Back button */}
       <Link
         href={`/courses/${course.slug}`}
-        className="inline-flex items-center gap-2 text-base font-bold text-zinc-500 hover:text-zinc-900 transition-colors mb-8 group"
+        className='inline-flex items-center gap-2 text-base font-bold text-zinc-500 hover:text-zinc-900 transition-colors mb-8 group'
       >
-        <FiChevronLeft className="h-5 w-5 transition-transform group-hover:-translate-x-0.5" />
+        <FiChevronLeft className='h-5 w-5 transition-transform group-hover:-translate-x-0.5' />
         <span>Return to Course Page</span>
       </Link>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-        
+      <div className='grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start'>
         {/* LEFT COLUMN: AUTH WORKSPACE OR CHECKOUT BILLING */}
-        <div className="lg:col-span-7 space-y-8 order-2 lg:order-1">
-          
+        <div className='lg:col-span-7 space-y-8 order-2 lg:order-1'>
           {!user ? (
             /* USER IS ANONYMOUS: SIGN IN OR SIGN UP WORKSPACE */
-            <div className="bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-6">
-              
+            <div className='bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-6'>
               {/* Tab Header */}
-              <div className="flex border-b border-zinc-200">
+              <div className='flex border-b border-zinc-200'>
                 <button
                   onClick={() => setAuthTab('login')}
                   className={`flex-1 pb-4 text-base font-bold transition-all border-b-2 text-center select-none ${
@@ -514,79 +561,89 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
 
               {authTab === 'login' ? (
                 /* INLINE LOGIN FORM */
-                <form onSubmit={handleLoginSubmit} className="space-y-4">
+                <form onSubmit={handleLoginSubmit} className='space-y-4'>
                   <div>
-                    <h3 className="text-xl font-bold text-zinc-800">Sign in to complete purchase</h3>
-                    <p className="text-sm font-semibold text-zinc-450 mt-1">
+                    <h3 className='text-xl font-bold text-zinc-800'>
+                      Sign in to complete purchase
+                    </h3>
+                    <p className='text-sm font-semibold text-zinc-450 mt-1'>
                       Access your student credentials to log your enrollment.
                     </p>
                   </div>
 
                   {authError && (
-                    <div className="p-3.5 bg-rose-50 border border-rose-100 rounded-lg text-rose-650 font-semibold text-base">
+                    <div className='p-3.5 bg-rose-50 border border-rose-100 rounded-lg text-rose-650 font-semibold text-base'>
                       {authError}
                     </div>
                   )}
 
                   {authSuccess && (
-                    <div className="p-3.5 bg-emerald-50 border border-emerald-100 rounded-lg text-emerald-700 font-bold text-base animate-pulse">
+                    <div className='p-3.5 bg-emerald-50 border border-emerald-100 rounded-lg text-emerald-700 font-bold text-base animate-pulse'>
                       {authSuccess}
                     </div>
                   )}
 
-                  <div className="space-y-4 pt-2">
-                    <div className="space-y-1.5">
-                      <label className="text-base font-bold text-zinc-700">Email Address or Mobile Number</label>
-                      <div className="relative">
-                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
-                          <FiMail className="h-5 w-5" />
+                  <div className='space-y-4 pt-2'>
+                    <div className='space-y-1.5'>
+                      <label className='text-base font-bold text-zinc-700'>
+                        Email Address or Mobile Number
+                      </label>
+                      <div className='relative'>
+                        <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
+                          <FiMail className='h-5 w-5' />
                         </span>
                         <input
-                          type="text"
+                          type='text'
                           required
                           value={loginEmail}
                           onChange={(e) => setLoginEmail(e.target.value)}
-                          placeholder="you@example.com or 01XXXXXXXXX"
-                          className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
+                          placeholder='you@example.com or 01XXXXXXXXX'
+                          className='w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white'
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-base font-bold text-zinc-700">Password</label>
-                      <div className="relative">
-                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
-                          <FiLock className="h-5 w-5" />
+                    <div className='space-y-1.5'>
+                      <label className='text-base font-bold text-zinc-700'>
+                        Password
+                      </label>
+                      <div className='relative'>
+                        <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
+                          <FiLock className='h-5 w-5' />
                         </span>
                         <input
                           type={showPassword ? 'text' : 'password'}
                           required
                           value={loginPassword}
                           onChange={(e) => setLoginPassword(e.target.value)}
-                          placeholder="••••••••"
-                          className="w-full pl-11 pr-11 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
+                          placeholder='••••••••'
+                          className='w-full pl-11 pr-11 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white'
                         />
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-zinc-400 hover:text-zinc-600 transition-colors"
+                          className='absolute inset-y-0 right-0 pr-3.5 flex items-center text-zinc-400 hover:text-zinc-600 transition-colors'
                         >
-                          {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
+                          {showPassword ? (
+                            <FiEyeOff className='h-5 w-5' />
+                          ) : (
+                            <FiEye className='h-5 w-5' />
+                          )}
                         </button>
                       </div>
                     </div>
 
                     <button
-                      type="submit"
+                      type='submit'
                       disabled={authLoading}
-                      className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all select-none cursor-pointer mt-4"
+                      className='w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all select-none cursor-pointer mt-4'
                     >
                       {authLoading ? (
-                        <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
                       ) : (
                         <>
                           <span>Sign In & Continue</span>
-                          <FiArrowRight className="h-5 w-5" />
+                          <FiArrowRight className='h-5 w-5' />
                         </>
                       )}
                     </button>
@@ -594,72 +651,83 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                 </form>
               ) : (
                 /* INLINE REGISTER FORM */
-                <form onSubmit={handleRegisterSubmit} className="space-y-4">
+                <form onSubmit={handleRegisterSubmit} className='space-y-4'>
                   <div>
-                    <h3 className="text-xl font-bold text-zinc-800">Register new student account</h3>
-                    <p className="text-sm font-semibold text-zinc-450 mt-1">
-                      Set up your credentials to manage courses and trace progress.
+                    <h3 className='text-xl font-bold text-zinc-800'>
+                      Register new student account
+                    </h3>
+                    <p className='text-sm font-semibold text-zinc-450 mt-1'>
+                      Set up your credentials to manage courses and trace
+                      progress.
                     </p>
                   </div>
 
                   {authError && (
-                    <div className="p-3.5 bg-rose-50 border border-rose-100 rounded-lg text-rose-655 font-semibold text-base">
+                    <div className='p-3.5 bg-rose-50 border border-rose-100 rounded-lg text-rose-655 font-semibold text-base'>
                       {authError}
                     </div>
                   )}
 
                   {authSuccess && (
-                    <div className="p-3.5 bg-emerald-50 border border-emerald-100 rounded-lg text-emerald-700 font-bold text-base animate-pulse">
+                    <div className='p-3.5 bg-emerald-50 border border-emerald-100 rounded-lg text-emerald-700 font-bold text-base animate-pulse'>
                       {authSuccess}
                     </div>
                   )}
 
-                  <div className="space-y-4 pt-2">
-                    <div className="space-y-1.5">
-                      <label className="text-base font-bold text-zinc-700">Full Name</label>
-                      <div className="relative">
-                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
-                          <FiUser className="h-5 w-5" />
+                  <div className='space-y-4 pt-2'>
+                    <div className='space-y-1.5'>
+                      <label className='text-base font-bold text-zinc-700'>
+                        Full Name
+                      </label>
+                      <div className='relative'>
+                        <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
+                          <FiUser className='h-5 w-5' />
                         </span>
                         <input
-                          type="text"
+                          type='text'
                           required
                           value={regName}
                           onChange={(e) => setRegName(e.target.value)}
-                          placeholder="John Doe"
-                          className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
+                          placeholder='John Doe'
+                          className='w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white'
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-base font-bold text-zinc-700">Mobile Number</label>
-                      <div className="flex gap-2">
-                        <div className="relative flex-1">
-                          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                            <FiPhone className="text-zinc-400 h-5 w-5 mr-2" />
-                            <span className="text-zinc-500 font-bold text-base border-r border-zinc-200 pr-2">+88</span>
+                    <div className='space-y-1.5'>
+                      <label className='text-base font-bold text-zinc-700'>
+                        Mobile Number
+                      </label>
+                      <div className='flex gap-2'>
+                        <div className='relative flex-1'>
+                          <div className='absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none'>
+                            <FiPhone className='text-zinc-400 h-5 w-5 mr-2' />
+                            <span className='text-zinc-500 font-bold text-base border-r border-zinc-200 pr-2'>
+                              +88
+                            </span>
                           </div>
                           <input
-                            type="tel"
+                            type='tel'
                             required
                             disabled={regOtpVerified}
                             value={regPhone}
                             onChange={(e) => setRegPhone(e.target.value)}
-                            placeholder="01XXXXXXXXX"
-                            className="w-full pl-[5.5rem] pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500"
+                            placeholder='01XXXXXXXXX'
+                            className='w-full pl-[5.5rem] pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500'
                           />
                         </div>
                         <button
-                          type="button"
+                          type='button'
                           onClick={handleSendRegOtp}
-                          disabled={sendingRegOtp || regOtpVerified || countdown > 0}
-                          className="px-4 min-w-[140px] flex items-center justify-center rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                          disabled={
+                            sendingRegOtp || regOtpVerified || countdown > 0
+                          }
+                          className='px-4 min-w-[140px] flex items-center justify-center rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
                         >
                           {sendingRegOtp ? (
-                            <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
                           ) : regOtpVerified ? (
-                            <FiCheck className="h-5 w-5" />
+                            <FiCheck className='h-5 w-5' />
                           ) : countdown > 0 ? (
                             `Resend in ${countdown}s`
                           ) : regOtpSent ? (
@@ -672,22 +740,24 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                     </div>
 
                     {regOtpSent && !regOtpVerified && (
-                      <div className="space-y-1.5">
-                        <label className="text-base font-bold text-zinc-700">Verification Code</label>
-                        <div className="flex gap-2">
+                      <div className='space-y-1.5'>
+                        <label className='text-base font-bold text-zinc-700'>
+                          Verification Code
+                        </label>
+                        <div className='flex gap-2'>
                           <input
-                            type="text"
-                            inputMode="numeric"
+                            type='text'
+                            inputMode='numeric'
                             value={regOtp}
                             onChange={(e) => setRegOtp(e.target.value)}
-                            placeholder="6-digit code"
-                            className="flex-1 px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
+                            placeholder='6-digit code'
+                            className='flex-1 px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white'
                           />
                           <button
-                            type="button"
+                            type='button'
                             onClick={handleVerifyRegOtp}
                             disabled={verifyingRegOtp}
-                            className="px-4 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                            className='px-4 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
                           >
                             {verifyingRegOtp ? '...' : 'Verify'}
                           </button>
@@ -695,58 +765,66 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                       </div>
                     )}
 
-                    <div className="space-y-1.5">
-                      <label className="text-base font-bold text-zinc-700">Email Address</label>
-                      <div className="relative">
-                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
-                          <FiMail className="h-5 w-5" />
+                    <div className='space-y-1.5'>
+                      <label className='text-base font-bold text-zinc-700'>
+                        Email Address
+                      </label>
+                      <div className='relative'>
+                        <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
+                          <FiMail className='h-5 w-5' />
                         </span>
                         <input
-                          type="email"
+                          type='email'
                           required
                           value={regEmail}
                           onChange={(e) => setRegEmail(e.target.value)}
-                          placeholder="you@example.com"
-                          className="w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
+                          placeholder='you@example.com'
+                          className='w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white'
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-base font-bold text-zinc-700">Password (Min 6 chars)</label>
-                      <div className="relative">
-                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400">
-                          <FiLock className="h-5 w-5" />
+                    <div className='space-y-1.5'>
+                      <label className='text-base font-bold text-zinc-700'>
+                        Password (Min 6 chars)
+                      </label>
+                      <div className='relative'>
+                        <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
+                          <FiLock className='h-5 w-5' />
                         </span>
                         <input
                           type={showPassword ? 'text' : 'password'}
                           required
                           value={regPassword}
                           onChange={(e) => setRegPassword(e.target.value)}
-                          placeholder="••••••••"
-                          className="w-full pl-11 pr-11 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white"
+                          placeholder='••••••••'
+                          className='w-full pl-11 pr-11 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white'
                         />
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-zinc-400 hover:text-zinc-600 transition-colors"
+                          className='absolute inset-y-0 right-0 pr-3.5 flex items-center text-zinc-400 hover:text-zinc-600 transition-colors'
                         >
-                          {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
+                          {showPassword ? (
+                            <FiEyeOff className='h-5 w-5' />
+                          ) : (
+                            <FiEye className='h-5 w-5' />
+                          )}
                         </button>
                       </div>
                     </div>
 
                     <button
-                      type="submit"
+                      type='submit'
                       disabled={authLoading}
-                      className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all select-none cursor-pointer mt-4"
+                      className='w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all select-none cursor-pointer mt-4'
                     >
                       {authLoading ? (
-                        <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
                       ) : (
                         <>
                           <span>Create Account & Sign In</span>
-                          <FiArrowRight className="h-5 w-5" />
+                          <FiArrowRight className='h-5 w-5' />
                         </>
                       )}
                     </button>
@@ -756,30 +834,32 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
             </div>
           ) : (
             /* USER IS AUTHENTICATED: SHOW BILLING FORM & COUPONS */
-            <div className="space-y-6">
+            <div className='space-y-6'>
               {/* Promo Code section */}
-              <div className="bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-4">
-                <label className="text-base font-bold text-zinc-800 flex items-center gap-2">
-                  <FiTag className="text-[#E61C24]" />
+              <div className='bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-4'>
+                <label className='text-base font-bold text-zinc-800 flex items-center gap-2'>
+                  <FiTag className='text-[#E61C24]' />
                   Apply Coupon / Promo Code
                 </label>
-                
-                <div className="flex gap-2">
+
+                <div className='flex gap-2'>
                   <input
-                    type="text"
-                    placeholder="e.g. SAVE20"
+                    type='text'
+                    placeholder='e.g. SAVE20'
                     value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                    className="flex-1 px-3.5 py-2.5 rounded-lg border border-zinc-200 focus:border-[#E61C24] outline-none text-base transition-all font-mono font-bold text-zinc-800"
+                    onChange={(e) =>
+                      setCouponCode(e.target.value.toUpperCase())
+                    }
+                    className='flex-1 px-3.5 py-2.5 rounded-lg border border-zinc-200 focus:border-[#E61C24] outline-none text-base transition-all font-mono font-bold text-zinc-800'
                   />
                   <button
-                    type="button"
+                    type='button'
                     onClick={handleApplyCoupon}
                     disabled={couponLoading}
-                    className="px-5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base transition-all cursor-pointer flex items-center justify-center select-none"
+                    className='px-5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base transition-all cursor-pointer flex items-center justify-center select-none'
                   >
                     {couponLoading ? (
-                      <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
                     ) : (
                       'Apply'
                     )}
@@ -787,109 +867,130 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                 </div>
 
                 {couponError && (
-                  <div className="flex items-center gap-1.5 text-rose-500 text-sm font-semibold">
-                    <FiAlertCircle className="h-4.5 w-4.5 shrink-0" />
+                  <div className='flex items-center gap-1.5 text-rose-500 text-sm font-semibold'>
+                    <FiAlertCircle className='h-4.5 w-4.5 shrink-0' />
                     <span>{couponError}</span>
                   </div>
                 )}
 
                 {couponSuccess && (
-                  <div className="flex items-center gap-1.5 text-emerald-600 text-sm font-semibold">
-                    <FiCheck className="h-4.5 w-4.5 shrink-0" />
+                  <div className='flex items-center gap-1.5 text-emerald-600 text-sm font-semibold'>
+                    <FiCheck className='h-4.5 w-4.5 shrink-0' />
                     <span>{couponSuccess}</span>
                   </div>
                 )}
               </div>
-              
+
               {/* Billing Info Form */}
-              <div className="bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-6">
+              <div className='bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-6'>
                 <div>
-                  <h3 className="text-xl font-bold text-zinc-800 flex items-center gap-2">
-                    <FiMapPin className="text-[#E61C24]" />
+                  <h3 className='text-xl font-bold text-zinc-800 flex items-center gap-2'>
+                    <FiMapPin className='text-[#E61C24]' />
                     Billing Information
                   </h3>
-                  <p className="text-sm font-semibold text-zinc-450 mt-1">
-                    Provide billing address credentials to verify this transaction.
+                  <p className='text-sm font-semibold text-zinc-450 mt-1'>
+                    Provide billing address credentials to verify this
+                    transaction.
                   </p>
                 </div>
 
-                <form onSubmit={handleCompletePurchase} className="space-y-4">
+                <form onSubmit={handleCompletePurchase} className='space-y-4'>
                   {checkoutError && (
-                    <div className="p-3.5 bg-rose-50 border border-rose-105 rounded-lg text-rose-650 font-semibold text-base">
+                    <div className='p-3.5 bg-rose-50 border border-rose-105 rounded-lg text-rose-650 font-semibold text-base'>
                       {checkoutError}
                     </div>
                   )}
 
                   {checkoutSuccess && (
-                    <div className="p-4 bg-emerald-50 border border-emerald-150 rounded-lg text-emerald-800 text-center flex flex-col items-center gap-2">
-                      <FiCheckCircle className="h-7 w-7 text-emerald-500 animate-bounce" />
-                      <span className="font-bold text-lg leading-tight">Purchase Confirmed!</span>
-                      <span className="text-sm font-semibold text-emerald-700 leading-relaxed">{checkoutSuccess}</span>
-                      <span className="text-zinc-500 text-xs font-semibold mt-1 animate-pulse">Redirecting you to active learning space...</span>
+                    <div className='p-4 bg-emerald-50 border border-emerald-150 rounded-lg text-emerald-800 text-center flex flex-col items-center gap-2'>
+                      <FiCheckCircle className='h-7 w-7 text-emerald-500 animate-bounce' />
+                      <span className='font-bold text-lg leading-tight'>
+                        Purchase Confirmed!
+                      </span>
+                      <span className='text-sm font-semibold text-emerald-700 leading-relaxed'>
+                        {checkoutSuccess}
+                      </span>
+                      <span className='text-zinc-500 text-xs font-semibold mt-1 animate-pulse'>
+                        Redirecting you to active learning space...
+                      </span>
                     </div>
                   )}
 
                   {/* Name */}
-                  <div className="space-y-1.5">
-                    <label className="text-base font-bold text-zinc-700">Full Billing Name</label>
+                  <div className='space-y-1.5'>
+                    <label className='text-base font-bold text-zinc-700'>
+                      Full Billing Name
+                    </label>
                     <input
-                      type="text"
+                      type='text'
                       required
                       value={billingName}
                       onChange={(e) => setBillingName(e.target.value)}
-                      placeholder="Enter full name"
-                      className="w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800"
+                      placeholder='Enter full name'
+                      className='w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800'
                     />
                   </div>
 
                   {/* Email */}
-                  <div className="space-y-1.5">
-                    <label className="text-base font-bold text-zinc-700">Email Address (Account Reference)</label>
+                  <div className='space-y-1.5'>
+                    <label className='text-base font-bold text-zinc-700'>
+                      Email Address (Account Reference)
+                    </label>
                     <input
-                      type="email"
+                      type='email'
                       disabled
                       value={user.email}
-                      className="w-full px-4 py-3 rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-500 font-semibold text-base outline-none cursor-not-allowed"
+                      className='w-full px-4 py-3 rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-500 font-semibold text-base outline-none cursor-not-allowed'
                     />
                   </div>
 
                   {/* Phone */}
-                  <div className="space-y-1.5">
-                    <label className="text-base font-bold text-zinc-700">Contact Phone Number</label>
+                  <div className='space-y-1.5'>
+                    <label className='text-base font-bold text-zinc-700'>
+                      Contact Phone Number
+                    </label>
                     <input
-                      type="tel"
+                      type='tel'
                       required
                       value={billingPhone}
                       onChange={(e) => setBillingPhone(e.target.value)}
-                      placeholder="e.g. +1 555-0199"
-                      className="w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800"
+                      placeholder='e.g. +1 555-0199'
+                      className='w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800'
                     />
                   </div>
 
                   {/* Billing Address */}
-                  <div className="space-y-1.5">
-                    <label className="text-base font-bold text-zinc-700">Billing Address</label>
+                  <div className='space-y-1.5'>
+                    <label className='text-base font-bold text-zinc-700'>
+                      Billing Address
+                    </label>
                     <textarea
                       required
                       rows={3}
                       value={billingAddress}
                       onChange={(e) => setBillingAddress(e.target.value)}
-                      placeholder="Street address, City, State, ZIP code, Country"
-                      className="w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800"
+                      placeholder='Street address, City, State, ZIP code, Country'
+                      className='w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800'
                     />
                   </div>
 
                   <button
-                    type="submit"
+                    type='submit'
                     disabled={purchaseLoading}
-                    className="w-full flex items-center justify-center gap-2 py-4 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all select-none cursor-pointer mt-6"
+                    className='w-full flex items-center justify-center gap-2 py-4 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all select-none cursor-pointer mt-6'
                   >
                     {purchaseLoading ? (
-                      <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
                     ) : (
                       <>
-                        <FiZap className="h-5 w-5 fill-white" />
-                        <span>Complete Course Purchase ({!finalPrice || finalPrice === 0 ? 'Free' : `৳${finalPrice.toLocaleString('en-BD')}`})</span>
+                        <FiZap className='h-5 w-5 fill-white' />
+                        <span>
+                          Complete Course Purchase (
+                          {!finalPrice || finalPrice === 0
+                            ? 'Free'
+                            : `৳${finalPrice.toLocaleString('en-BD')}`}
+                          )
+                        </span>
                       </>
                     )}
                   </button>
@@ -900,72 +1001,83 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
         </div>
 
         {/* RIGHT COLUMN: STICKY COURSE SUMMARY CARD & COUPON APPLICATION */}
-        <div className="lg:col-span-5 relative z-10 w-full order-1 lg:order-2 space-y-6 lg:sticky lg:top-32">
-          
+        <div className='lg:col-span-5 relative z-10 w-full order-1 lg:order-2 space-y-6 lg:sticky lg:top-32'>
           {/* Sticky Course details widget */}
-          <div className="bg-white border border-zinc-200 rounded-lg overflow-hidden">
-            
+          <div className='bg-white border border-zinc-200 rounded-lg overflow-hidden'>
             {/* Banner image */}
             {course.imageUrl && (
-              <div className="aspect-[16/10] overflow-hidden bg-zinc-50 border-b border-zinc-100 relative">
-                <img
+              <div className='aspect-16/10 overflow-hidden bg-zinc-50 border-b border-zinc-100 relative'>
+                <Image
                   src={course.imageUrl}
                   alt={course.title}
-                  className="w-full h-full object-cover"
+                  className='w-full h-full object-cover'
+                  width={100}
+                  height={100}
                 />
               </div>
             )}
 
-            <div className="p-6 space-y-6">
-              
+            <div className='p-6 space-y-6'>
               {/* Category, Title, Instructor */}
-              <div className="space-y-2">
+              <div className='space-y-2'>
                 {course.categoryName && (
-                  <span className="inline-block px-3 py-1 bg-[#E61C24]/10 rounded-lg font-bold text-xs text-[#E61C24] uppercase tracking-wide">
+                  <span className='inline-block px-3 py-1 bg-[#E61C24]/10 rounded-lg font-bold text-xs text-[#E61C24] uppercase tracking-wide'>
                     {course.categoryName}
                   </span>
                 )}
-                <h2 className="text-xl sm:text-2xl font-bold text-zinc-800 tracking-tight leading-snug">
+                <h2 className='text-xl sm:text-2xl font-bold text-zinc-800 tracking-tight leading-snug'>
                   {course.title}
                 </h2>
-                <p className="text-base font-semibold text-zinc-500">
-                  Instructed by <span className="font-bold text-zinc-800">{course.instructorName}</span>
+                <p className='text-base font-semibold text-zinc-500'>
+                  Instructed by{' '}
+                  <span className='font-bold text-zinc-800'>
+                    {course.instructorName}
+                  </span>
                 </p>
               </div>
 
               {/* Price list breakdown */}
-              <div className="border-t border-zinc-100 pt-5 space-y-3.5">
-                <p className="text-base font-bold text-zinc-800">Order Investment Summary</p>
-                
-                <div className="flex justify-between items-center text-base font-semibold text-zinc-600">
+              <div className='border-t border-zinc-100 pt-5 space-y-3.5'>
+                <p className='text-base font-bold text-zinc-800'>
+                  Order Investment Summary
+                </p>
+
+                <div className='flex justify-between items-center text-base font-semibold text-zinc-600'>
                   <span>Base Course Price</span>
-                  <span className="font-bold text-zinc-800">{!basePrice || basePrice === 0 ? 'Free' : `৳${basePrice.toLocaleString('en-BD')}`}</span>
+                  <span className='font-bold text-zinc-800'>
+                    {!basePrice || basePrice === 0
+                      ? 'Free'
+                      : `৳${basePrice.toLocaleString('en-BD')}`}
+                  </span>
                 </div>
 
                 {appliedCoupon && (
-                  <div className="flex justify-between items-center text-base font-semibold text-emerald-600">
-                    <span className="flex items-center gap-1.5">
-                      <FiTag className="h-4 w-4" />
+                  <div className='flex justify-between items-center text-base font-semibold text-emerald-600'>
+                    <span className='flex items-center gap-1.5'>
+                      <FiTag className='h-4 w-4' />
                       Promo code ({appliedCoupon.code})
                     </span>
-                    <span className="font-bold">-৳{discountAmount.toLocaleString('en-BD')}</span>
+                    <span className='font-bold'>
+                      -৳{discountAmount.toLocaleString('en-BD')}
+                    </span>
                   </div>
                 )}
 
-                <div className="border-t border-zinc-100 pt-3.5 flex justify-between items-center">
-                  <span className="text-base font-bold text-zinc-800">Total Investment</span>
-                  <span className="text-3xl font-bold text-[#E61C24]">
-                    {!finalPrice || finalPrice === 0 ? 'Free' : `৳${finalPrice.toLocaleString('en-BD')}`}
+                <div className='border-t border-zinc-100 pt-3.5 flex justify-between items-center'>
+                  <span className='text-base font-bold text-zinc-800'>
+                    Total Investment
+                  </span>
+                  <span className='text-3xl font-bold text-[#E61C24]'>
+                    {!finalPrice || finalPrice === 0
+                      ? 'Free'
+                      : `৳${finalPrice.toLocaleString('en-BD')}`}
                   </span>
                 </div>
               </div>
             </div>
           </div>
-
-
         </div>
-
       </div>
     </div>
-  )
+  );
 }

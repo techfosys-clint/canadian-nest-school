@@ -110,6 +110,12 @@ export default function CourseFormClient({
   const [newModuleName, setNewModuleName] = useState('')
   const [editingModuleIndex, setEditingModuleIndex] = useState<number | null>(null)
   const [editingModuleName, setEditingModuleName] = useState<string>('')
+  // Renaming a module only changes the label in this `modules` list — the
+  // lessons already assigned to it still carry the old moduleName string.
+  // Track pending renames here so the save request can tell the server to
+  // relabel those lessons too, otherwise the public course page keeps
+  // showing the old module name.
+  const [moduleRenames, setModuleRenames] = useState<Array<{ from: string; to: string }>>([])
 
   const handleAddModule = () => {
     const trimmed = newModuleName.trim()
@@ -162,9 +168,18 @@ export default function CourseFormClient({
       })
       return
     }
+    const oldName = modules[editingModuleIndex]
     const updatedModules = [...modules]
     updatedModules[editingModuleIndex] = trimmed
     setModules(updatedModules)
+    if (trimmed !== oldName) {
+      setModuleRenames((prev) => [
+        // Collapse a chain of renames on the same module within one edit
+        // session (A -> B -> C) into a single A -> C mapping.
+        ...prev.filter((r) => r.to !== oldName),
+        { from: prev.find((r) => r.to === oldName)?.from || oldName, to: trimmed },
+      ])
+    }
     setEditingModuleIndex(null)
   }
 
@@ -692,6 +707,7 @@ export default function CourseFormClient({
     requirements: requirements.filter((item) => item.requirement.trim() !== ''),
     studyMaterials: studyMaterials.filter((item) => item.title.trim() !== '' && item.url.trim() !== ''),
     modules,
+    moduleRenames,
     seo: {
       metaTitle,
       metaDescription,
@@ -724,6 +740,9 @@ export default function CourseFormClient({
       // without a full page reload, so "Save" never creates a duplicate.
       router.replace(`/admin/courses/${newId}/edit`)
     }
+    // Renames were just applied server-side to the underlying lessons —
+    // clear the pending list so a later save doesn't try to re-apply them.
+    setModuleRenames([])
     return newId
   }
 

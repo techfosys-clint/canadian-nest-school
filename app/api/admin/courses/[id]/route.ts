@@ -314,6 +314,7 @@ export async function PUT(
       seo,
       studyMaterials,
       modules,
+      moduleRenames,
     } = body
 
     if (!title || !slug) {
@@ -396,6 +397,21 @@ export async function PUT(
     course.modules = modules || []
 
     await course.save()
+
+    // Renaming a module in the form only changes its label in course.modules
+    // — the lessons already assigned to it still carry the OLD moduleName
+    // string, which is what the public course page actually groups/displays
+    // by. Relabel those lessons now so the rename is reflected immediately.
+    if (Array.isArray(moduleRenames) && moduleRenames.length > 0) {
+      for (const rename of moduleRenames) {
+        if (rename?.from && rename?.to && rename.from !== rename.to) {
+          await Lesson.updateMany(
+            { course: id, moduleName: rename.from },
+            { $set: { moduleName: rename.to } }
+          )
+        }
+      }
+    }
 
     // Revalidate paths for the public frontend to ensure changes are immediately visible
     try {

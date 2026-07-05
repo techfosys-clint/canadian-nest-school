@@ -411,9 +411,14 @@ export default async function CourseDetailPage({ params }: Props) {
           )}
 
           {/* Section: Course Curriculum Accordion */}
-          {serializedLessons.length > 0 && (
+          {(serializedLessons.length > 0 || (course.modules && course.modules.length > 0)) && (
             <div className="pt-2">
-              <LessonsAccordion lessons={serializedLessons} isEnrolled={isAlreadyEnrolled} courseSlug={course.slug} />
+              <LessonsAccordion
+                lessons={serializedLessons}
+                isEnrolled={isAlreadyEnrolled}
+                courseSlug={course.slug}
+                courseModules={course.modules || []}
+              />
             </div>
           )}
 

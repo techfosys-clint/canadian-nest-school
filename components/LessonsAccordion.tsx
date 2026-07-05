@@ -43,10 +43,12 @@ export default function LessonsAccordion({
   lessons,
   isEnrolled = false,
   courseSlug,
+  courseModules = [],
 }: {
   lessons: LessonItem[]
   isEnrolled?: boolean
   courseSlug?: string
+  courseModules?: string[]
 }) {
   const [openModuleIndex, setOpenModuleIndex] = useState<number | null>(0)
   const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null)
@@ -72,24 +74,41 @@ export default function LessonsAccordion({
     grouped[mod].push(lesson)
   })
 
-  // Convert to array and sort modules by the minimum order of their lessons
+  // A module the admin has created but hasn't added any lessons to yet
+  // still has an entry in courseModules — give it an (empty) group so it
+  // shows up on the public page instead of silently disappearing.
+  courseModules.forEach((name) => {
+    if (!grouped[name]) grouped[name] = []
+  })
+
+  const declaredOrder = new Map(courseModules.map((name, idx) => [name, idx]))
+
+  // Convert to array and sort modules primarily by their declared position
+  // in the admin's module list (respects manual up/down reordering); modules
+  // not in that list (e.g. legacy lessons predating the modules feature)
+  // fall back to sorting by their lessons' minimum order.
   const moduleGroups = Object.keys(grouped).map((name) => {
     // Sort by position within the module when available, falling back to
     // the course-wide serial for older lessons without moduleOrder.
     const moduleLessons = [...grouped[name]].sort(
       (a, b) => (a.moduleOrder ?? a.order) - (b.moduleOrder ?? b.order)
     )
-    const minOrder = Math.min(...moduleLessons.map((l) => l.order))
+    const minOrder = moduleLessons.length > 0 ? Math.min(...moduleLessons.map((l) => l.order)) : Number.MAX_SAFE_INTEGER
     const totalDuration = moduleLessons.reduce((sum, l) => sum + l.duration, 0)
+    const declaredIndex = declaredOrder.has(name) ? declaredOrder.get(name)! : Number.MAX_SAFE_INTEGER
     return {
       name,
       lessons: moduleLessons,
       minOrder,
       totalDuration,
+      declaredIndex,
     }
   })
 
-  moduleGroups.sort((a, b) => a.minOrder - b.minOrder)
+  moduleGroups.sort((a, b) => {
+    if (a.declaredIndex !== b.declaredIndex) return a.declaredIndex - b.declaredIndex
+    return a.minOrder - b.minOrder
+  })
 
   return (
     <div className="space-y-4">
@@ -122,7 +141,9 @@ export default function LessonsAccordion({
                     {group.name}
                   </h3>
                   <p className="text-base font-semibold text-zinc-550">
-                    {lectureCount} {lectureCount === 1 ? 'lecture' : 'lectures'} • {totalMin} mins total duration
+                    {lectureCount === 0
+                      ? 'Coming soon — no lectures added yet'
+                      : `${lectureCount} ${lectureCount === 1 ? 'lecture' : 'lectures'} • ${totalMin} mins total duration`}
                   </p>
                 </div>
 
@@ -146,6 +167,13 @@ export default function LessonsAccordion({
                     className="overflow-hidden"
                   >
                     <div className="border-t border-[#E61C24]/20 divide-y divide-[#E61C24]/10 bg-white">
+                      {group.lessons.length === 0 && (
+                        <div className="px-6 py-6 text-center">
+                          <p className="text-base font-semibold text-zinc-450">
+                            No lessons have been added to this module yet. Check back soon!
+                          </p>
+                        </div>
+                      )}
                       {group.lessons.map((lesson) => {
                         const dateObj = lesson.liveDate ? new Date(lesson.liveDate) : null
                         const isLiveLocked = dateObj ? dateObj.getTime() > nowTs : false

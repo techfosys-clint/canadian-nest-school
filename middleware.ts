@@ -21,6 +21,7 @@ export const config = {
     '/dashboard/:path*',
     '/admin/:path*',
     '/checkout/:path*',
+    '/shop-checkout/:path*',
     '/courses/:slug/watch',
   ],
 }

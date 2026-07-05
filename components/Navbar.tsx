@@ -17,6 +17,7 @@ interface User {
 const NAV_LINKS = [
   { label: 'Home',        href: '/',            match: '/' },
   { label: 'Courses',     href: '/courses',     match: '/courses' },
+  { label: 'Shop',        href: '/shop',        match: '/shop' },
   { label: 'Instructors', href: '/instructors', match: '/instructors' },
   { label: 'About Us',    href: '/about',       match: '/about' },
   { label: 'Contact Us',  href: '/contact',     match: '/contact' },

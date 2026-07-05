@@ -18,6 +18,7 @@ import {
   FiStar,
   FiShield,
   FiRadio,
+  FiPackage,
 } from 'react-icons/fi'
 import Swal from 'sweetalert2'
 
@@ -111,6 +112,7 @@ export default function DashboardLayout({
     { label: 'Study Hub', href: '/dashboard/study-hub', icon: FiBook },
     { label: 'Live Classes', href: '/dashboard/live-classes', icon: FiRadio },
     { label: 'My Certificates', href: '/dashboard/certificates', icon: FiAward },
+    { label: 'My Orders', href: '/dashboard/orders', icon: FiPackage },
     { label: 'My Reviews', href: '/dashboard/reviews', icon: FiStar },
     { label: 'Profile Settings', href: '/dashboard/profile', icon: FiUser },
   ]

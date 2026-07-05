@@ -24,6 +24,8 @@ import {
   FiAward,
   FiChevronDown,
   FiChevronRight,
+  FiShoppingBag,
+  FiPackage,
 } from 'react-icons/fi'
 import Swal from 'sweetalert2'
 
@@ -88,6 +90,8 @@ const NAV_GROUPS: SidebarGroup[] = [
     groupIcon: FiTag,
     links: [
       { label: 'Coupons', href: '/admin/coupons', icon: FiTag, roles: ['admin', 'staff'], permission: 'coupons' },
+      { label: 'Shop Products', href: '/admin/products', icon: FiShoppingBag, roles: ['admin', 'staff'], permission: 'products' },
+      { label: 'Shop Orders', href: '/admin/orders', icon: FiPackage, roles: ['admin', 'staff'], permission: 'orders' },
     ],
   },
   {

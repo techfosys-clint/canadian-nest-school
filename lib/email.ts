@@ -135,6 +135,124 @@ export async function sendEnrollmentConfirmationEmail(
   }
 }
 
+export async function sendOrderConfirmationEmail(
+  toEmail: string,
+  customerName: string,
+  items: { title: string; price: number; quantity: number }[],
+  totalAmount: number,
+  paymentReference: string,
+  shippingAddress: string,
+  orderedAt: Date
+) {
+  const transporter = getGmailTransporter()
+  const fromEmail = process.env.GMAIL_USER
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const logoUrl = `${appUrl}/logo.png`
+
+  if (!transporter) {
+    return false
+  }
+
+  const formattedDate = new Date(orderedAt).toLocaleString('en-BD', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  })
+
+  const formatMoney = (amount: number) =>
+    new Intl.NumberFormat('en-BD', { style: 'currency', currency: 'BDT', minimumFractionDigits: 0 }).format(amount)
+
+  const itemRows = items
+    .map(
+      (item) => `
+        <tr class="invoice-row">
+          <td style="padding: 12px 20px; font-size: 15px; color: #6b7280; font-weight: 600; border-bottom: 1px solid #e5e7eb;">${item.title} &times; ${item.quantity}</td>
+          <td style="padding: 12px 20px; font-size: 15px; color: #111827; font-weight: bold; text-align: right; border-bottom: 1px solid #e5e7eb;">${formatMoney(item.price * item.quantity)}</td>
+        </tr>`
+    )
+    .join('')
+
+  const subject = `📦 Order Confirmed - Canadian Nest School Shop`
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1f2937; margin: 0; padding: 40px 20px; }
+        .container { max-width: 560px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e5e7eb; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .logo { display: block; margin-bottom: 24px; }
+        .logo img { height: 44px; width: auto; }
+        .title { font-size: 24px; font-weight: bold; color: #111827; margin-bottom: 16px; }
+        .text { font-size: 16px; line-height: 1.6; color: #4b5563; margin-bottom: 20px; }
+        .invoice { background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 4px 20px; margin: 24px 0; width: 100%; border-collapse: collapse; }
+        .invoice-row td { padding: 12px 0; font-size: 15px; border-bottom: 1px solid #e5e7eb; }
+        .invoice-total td { border-bottom: none; }
+        .invoice-total td:last-child { color: #E61C24 !important; font-size: 18px; }
+        .btn-container { text-align: center; margin: 32px 0; }
+        .btn { display: inline-block; background-color: #E61C24; color: #ffffff !important; padding: 14px 28px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 16px; }
+        .footer { font-size: 13px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 32px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="logo"><img src="${logoUrl}" alt="Canadian Nest School" /></div>
+        <h2 class="title">📦 Thank you, ${customerName}!</h2>
+        <p class="text">
+          Your order has been confirmed and payment received. We're preparing your items for shipment to the address below.
+        </p>
+
+        <table class="invoice" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%; background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; margin: 24px 0;">
+          ${itemRows}
+          <tr class="invoice-row">
+            <td style="padding: 12px 20px; font-size: 15px; color: #6b7280; font-weight: 600; border-bottom: 1px solid #e5e7eb;">Invoice Reference</td>
+            <td style="padding: 12px 20px; font-size: 15px; color: #111827; font-weight: bold; text-align: right; border-bottom: 1px solid #e5e7eb;">${paymentReference}</td>
+          </tr>
+          <tr class="invoice-row">
+            <td style="padding: 12px 20px; font-size: 15px; color: #6b7280; font-weight: 600; border-bottom: 1px solid #e5e7eb;">Date</td>
+            <td style="padding: 12px 20px; font-size: 15px; color: #111827; font-weight: bold; text-align: right; border-bottom: 1px solid #e5e7eb;">${formattedDate}</td>
+          </tr>
+          <tr class="invoice-row">
+            <td style="padding: 12px 20px; font-size: 15px; color: #6b7280; font-weight: 600; border-bottom: 1px solid #e5e7eb;">Shipping Address</td>
+            <td style="padding: 12px 20px; font-size: 15px; color: #111827; font-weight: bold; text-align: right; border-bottom: 1px solid #e5e7eb;">${shippingAddress}</td>
+          </tr>
+          <tr class="invoice-row invoice-total">
+            <td style="padding: 12px 20px; font-size: 15px; color: #6b7280; font-weight: 600;">Amount Paid</td>
+            <td style="padding: 12px 20px; font-size: 18px; color: #E61C24; font-weight: bold; text-align: right;">${formatMoney(totalAmount)}</td>
+          </tr>
+        </table>
+
+        <div class="btn-container">
+          <a href="${appUrl}/dashboard/orders" class="btn" style="color: #ffffff !important;">View My Orders</a>
+        </div>
+
+        <div class="footer">
+          <p>Keep this email as your receipt for this purchase.</p>
+          <p>&copy; 2026 Canadian Nest School Inc. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `
+
+  try {
+    await transporter.sendMail({
+      from: `Canadian Nest School <${fromEmail}>`,
+      to: toEmail,
+      subject,
+      html: htmlContent,
+    })
+    return true
+  } catch (error) {
+    console.error('Failed to send order confirmation email:', error)
+    return false
+  }
+}
+
 export async function sendStaffRegistrationEmail(toEmail: string, name: string, role: string, rawPassword: string) {
   const transporter = getGmailTransporter()
   const fromEmail = process.env.GMAIL_USER

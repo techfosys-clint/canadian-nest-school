@@ -97,6 +97,7 @@ export default function CourseFormClient({
   )
   const [uploadingImage, setUploadingImage] = useState(false)
   const [showMediaPicker, setShowMediaPicker] = useState(false)
+  const [showMediaPickerForMaterial, setShowMediaPickerForMaterial] = useState<number | null>(null)
   const thumbnailFileRef = useRef<HTMLInputElement>(null)
 
   // Outcomes & Prerequisites Lists
@@ -1099,18 +1100,28 @@ export default function CourseFormClient({
                           )}
                         </div>
 
-                        {/* Upload / Remove buttons */}
+                        {/* Upload / Library / Remove buttons */}
                         <div className="flex flex-col gap-2">
-                          <label className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#E61C24]/10 hover:bg-[#E61C24]/20 border border-[#E61C24]/20 text-[#E61C24] font-bold text-sm cursor-pointer transition-all ${uploadingCoverStates[idx] ? 'opacity-50 pointer-events-none' : ''}`}>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => handleStudyMaterialCoverUpload(idx, e)}
-                              className="hidden"
-                            />
-                            <FiUploadCloud className="h-4 w-4" />
-                            {uploadingCoverStates[idx] ? 'Uploading...' : item.coverImage ? 'Change Cover' : 'Upload Cover'}
-                          </label>
+                          <div className="flex items-center gap-2">
+                            <label className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#E61C24]/10 hover:bg-[#E61C24]/20 border border-[#E61C24]/20 text-[#E61C24] font-bold text-sm cursor-pointer transition-all ${uploadingCoverStates[idx] ? 'opacity-50 pointer-events-none' : ''}`}>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handleStudyMaterialCoverUpload(idx, e)}
+                                className="hidden"
+                              />
+                              <FiUploadCloud className="h-4 w-4" />
+                              {uploadingCoverStates[idx] ? 'Uploading...' : 'Upload New'}
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => setShowMediaPickerForMaterial(idx)}
+                              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 font-bold text-sm cursor-pointer transition-all"
+                            >
+                              <FiImage className="h-4 w-4" />
+                              Choose from Library
+                            </button>
+                          </div>
                           {item.coverImage && (
                             <button
                               type="button"
@@ -1760,6 +1771,21 @@ export default function CourseFormClient({
             onSelect={handleMediaPickerSelect}
             title="Pick Course Thumbnail"
           />
+
+          {/* Study Material Cover Media Picker Modal */}
+          {showMediaPickerForMaterial !== null && (
+            <MediaPickerModal
+              open={true}
+              onClose={() => setShowMediaPickerForMaterial(null)}
+              onSelect={(media: MediaItem) => {
+                const updated = [...studyMaterials]
+                updated[showMediaPickerForMaterial] = { ...updated[showMediaPickerForMaterial], coverImage: media.url }
+                setStudyMaterials(updated)
+                setShowMediaPickerForMaterial(null)
+              }}
+              title="Pick Study Material Cover Image"
+            />
+          )}
 
 
 

@@ -62,19 +62,35 @@ export async function GET(request: Request) {
       }
     }
 
-    // Fetch enrollments with populated student and course detail structures
-    const docs = await Enrollment.find(query)
-      .populate('student', 'name email')
-      .populate({
-        path: 'course',
-        populate: [
-          { path: 'thumbnail' },
-          { path: 'category' },
-          { path: 'instructor' }
-        ]
-      })
-      .sort({ createdAt: -1 })
-      .lean()
+    // Fetch enrollments with populated student and course detail structures.
+    // The nested course.thumbnail/category/instructor populate is "nice to
+    // have" — if it ever throws (e.g. a stale cached Course model missing a
+    // newly added ref field right after a deploy), we must not let that take
+    // down the whole enrollment list, since course.studyMaterials (an
+    // embedded field, not a ref) doesn't need any populate at all and
+    // should always come through regardless.
+    let docs: any[]
+    try {
+      docs = await Enrollment.find(query)
+        .populate('student', 'name email')
+        .populate({
+          path: 'course',
+          populate: [
+            { path: 'thumbnail' },
+            { path: 'category' },
+            { path: 'instructor' }
+          ]
+        })
+        .sort({ createdAt: -1 })
+        .lean()
+    } catch (populateError) {
+      console.error('Enrollments nested populate failed, falling back to base course fields:', populateError)
+      docs = await Enrollment.find(query)
+        .populate('student', 'name email')
+        .populate('course')
+        .sort({ createdAt: -1 })
+        .lean()
+    }
 
     // ═══════════════════════════════════════════════════════
     // Pre-fetch ALL lesson counts in ONE aggregation query
@@ -145,9 +161,6 @@ export async function GET(request: Request) {
 
   } catch (error: any) {
     console.error('API Enrollments Error:', error)
-    try {
-      require('fs').writeFileSync('enrollments-error.log', String(error.stack || error.message));
-    } catch (e) {}
     return NextResponse.json(
       { success: false, error: 'Failed to fetch enrollments.' },
       { status: 500 }

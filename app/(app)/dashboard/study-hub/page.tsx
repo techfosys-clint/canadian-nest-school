@@ -76,7 +76,7 @@ export default function StudyHubPage() {
         }
 
         // Fetch student's enrollments containing course study materials
-        const enrollmentsRes = await fetch('/api/enrollments?depth=2')
+        const enrollmentsRes = await fetch('/api/enrollments?depth=2', { cache: 'no-store' })
         if (enrollmentsRes.ok) {
           const enrollmentsData = await enrollmentsRes.json()
           if (enrollmentsData.docs) {

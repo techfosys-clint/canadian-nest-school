@@ -75,8 +75,13 @@ const CourseSchema = new Schema<ICourse>(
   { collection: 'courses', timestamps: true }
 )
 
-// Clear old model cache in development if modules field is not registered in compiled schema paths
-if (mongoose.models.Course && (!mongoose.models.Course.schema.paths.modules || !mongoose.models.Course.schema.paths.category)) {
+// Clear old model cache in development if newer fields are not registered in the compiled schema paths
+if (
+  mongoose.models.Course &&
+  (!mongoose.models.Course.schema.paths.modules ||
+    !mongoose.models.Course.schema.paths.category ||
+    !mongoose.models.Course.schema.paths['studyMaterials.coverImage'])
+) {
   delete mongoose.models.Course
 }
 

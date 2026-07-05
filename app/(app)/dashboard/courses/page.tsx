@@ -175,8 +175,8 @@ export default function MyCoursesPage() {
               No active courses
             </h3>
             <p className='text-zinc-500 text-base font-semibold max-w-sm mb-8 leading-relaxed'>
-              You haven't purchased any courses yet. Browse our premium list of
-              courses to get started!
+              You haven&apos;t purchased any courses yet. Browse our premium
+              list of courses to get started!
             </p>
             <Link
               href='/courses'

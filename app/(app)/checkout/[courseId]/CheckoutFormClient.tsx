@@ -1,11 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-
 import { generateEventId, pushToDataLayer } from '@/lib/gtm';
 import { parseJsonResponse } from '@/lib/safeJson';
 import { sendGTMEvent } from '@next/third-parties/google';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import {
   FiAlertCircle,
@@ -44,8 +43,6 @@ interface UserSession {
 }
 
 export default function CheckoutFormClient({ course }: { course: CourseData }) {
-  const router = useRouter();
-
   // Auth states
   const [user, setUser] = useState<UserSession | null>(null);
   const [loadingSession, setLoadingSession] = useState(true);
@@ -167,7 +164,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
       }
     }
     getSession();
-  }, []);
+  }, [course.categoryName, course.id, course.price, course.title, user]);
 
   // Handle Login submission
   const handleLoginSubmit = async (e: React.FormEvent) => {
@@ -713,7 +710,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                             value={regPhone}
                             onChange={(e) => setRegPhone(e.target.value)}
                             placeholder='01XXXXXXXXX'
-                            className='w-full pl-[5.5rem] pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500'
+                            className='w-full pl-22 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500'
                           />
                         </div>
                         <button

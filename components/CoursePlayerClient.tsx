@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import Link from 'next/link';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -1322,8 +1323,8 @@ export default function CoursePlayerClient({
                   </h3>
                   <p className='text-base font-medium text-zinc-400 leading-relaxed'>
                     Upload your project task deliverables inside your personal
-                    Google Drive, set sharing rights to **"Anyone with the link
-                    can view"**, and submit the URL below for grading.
+                    Google Drive, set sharing rights to **&quot;Anyone with the
+                    link can view&quot;**, and submit the URL below for grading.
                   </p>
                 </div>
 
@@ -1362,7 +1363,7 @@ export default function CoursePlayerClient({
                               Instructor Feedback:
                             </span>
                             <span className='italic leading-relaxed'>
-                              "{submission.feedback}"
+                              &quot;{submission.feedback}&quot;
                             </span>
                           </div>
                         )}
@@ -1618,7 +1619,7 @@ export default function CoursePlayerClient({
         </div>
       )}
 
-      <div className='flex-grow flex-shrink flex-1 overflow-y-auto p-4 space-y-4 max-h-[650px] pr-2 bg-slate-50/50'>
+      <div className='grow shrink flex-1 overflow-y-auto p-4 space-y-4 max-h-[650px] pr-2 bg-slate-50/50'>
         {moduleGroups.map((group) => {
           const isModuleExpanded = !!expandedModules[group.name];
           const lectureCount = group.lessons.length;

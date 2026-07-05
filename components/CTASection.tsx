@@ -9,7 +9,7 @@ export default function CTASection() {
     <section className='relative bg-[#E61C24] overflow-hidden select-text py-20 md:py-28 w-full border-none'>
       {/* Subtle vertical glow columns on the sides */}
       <div className='absolute inset-y-0 left-0 w-24 bg-linear-to-r from-white/5 to-transparent pointer-events-none' />
-      <div className='absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white/5 to-transparent pointer-events-none' />
+      <div className='absolute inset-y-0 right-0 w-24 bg-linear-to-l from-white/5 to-transparent pointer-events-none' />
 
       {/* Dot Pattern Overlay */}
       <div

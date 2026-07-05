@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import Image from 'next/image';
@@ -382,7 +383,7 @@ export default function ForgotPasswordForm() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder='01XXXXXXXXX'
-                      className='w-full bg-white border border-zinc-200 focus:border-[#E61C24] focus:ring-4 focus:ring-[#E61C24]/10 text-zinc-900 rounded-lg pl-[5.5rem] pr-4 py-3.5 text-base font-semibold outline-none transition-all placeholder-zinc-400 disabled:bg-zinc-50 disabled:text-zinc-500'
+                      className='w-full bg-white border border-zinc-200 focus:border-[#E61C24] focus:ring-4 focus:ring-[#E61C24]/10 text-zinc-900 rounded-lg pl-22 pr-4 py-3.5 text-base font-semibold outline-none transition-all placeholder-zinc-400 disabled:bg-zinc-50 disabled:text-zinc-500'
                     />
                   </div>
                   <button

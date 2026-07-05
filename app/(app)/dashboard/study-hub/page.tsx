@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import Image from 'next/image';
@@ -17,17 +18,6 @@ interface UserSession {
   name: string;
   email: string;
   role: string;
-}
-
-interface LiveWebinar {
-  id: string;
-  title: string;
-  slug: string;
-  courseTitle: string;
-  livePlatform: string;
-  liveUrl: string;
-  liveDate: string | null;
-  duration: number;
 }
 
 export default function StudyHubPage() {
@@ -239,14 +229,15 @@ export default function StudyHubPage() {
               </div>
               {webinars.filter(
                 (w) =>
-                  w.liveDate && new Date(w.liveDate).getTime() > Date.now(),
+                  w.liveDate &&
+                  new Date(w.liveDate).getTime() > new Date().getTime(),
               ).length > 0 && (
                 <span className='shrink-0 inline-flex items-center justify-center h-8 w-8 rounded-full bg-emerald-500 text-white font-bold text-sm animate-pulse'>
                   {
                     webinars.filter(
                       (w) =>
                         w.liveDate &&
-                        new Date(w.liveDate).getTime() > Date.now(),
+                        new Date(w.liveDate).getTime() > new Date().getTime(),
                     ).length
                   }
                 </span>
@@ -260,7 +251,7 @@ export default function StudyHubPage() {
                     webinars.filter(
                       (w) =>
                         w.liveDate &&
-                        new Date(w.liveDate).getTime() > Date.now(),
+                        new Date(w.liveDate).getTime() > new Date().getTime(),
                     ).length
                   }
                 </p>

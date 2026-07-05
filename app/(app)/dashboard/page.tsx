@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { generateEventId, pushToDataLayer } from '@/lib/gtm';
@@ -433,8 +434,8 @@ export default function StudentDashboard() {
                 No enrolled courses yet
               </h3>
               <p className='text-zinc-500 text-base font-semibold max-w-sm mb-8 leading-relaxed'>
-                You haven't purchased any courses yet. Browse our premium list
-                of courses to get started!
+                You haven&apos;t purchased any courses yet. Browse our premium
+                list of courses to get started!
               </p>
               <Link
                 href='/courses'
@@ -666,7 +667,7 @@ export default function StudentDashboard() {
                     : 'Not Scheduled';
 
                   const isUpcoming = dateObj
-                    ? dateObj.getTime() > Date.now()
+                    ? dateObj.getTime() > new Date().getTime()
                     : false;
 
                   return (

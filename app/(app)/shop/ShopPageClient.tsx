@@ -1,8 +1,9 @@
 'use client'
 
+import PageHeroSection from '@/components/PageHeroSection'
 import React, { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { FiSearch, FiShoppingBag, FiBookOpen, FiX } from 'react-icons/fi'
+import { FiSearch, FiBookOpen, FiX } from 'react-icons/fi'
 
 interface ShopProduct {
   id: string
@@ -44,21 +45,19 @@ export default function ShopPageClient({
   }, [products, search, activeCategory])
 
   return (
-    <div className="min-h-screen">
-      {/* Hero band */}
-      <section className="w-full bg-[#0A163A] pt-32 pb-16">
-        <div className="container mx-auto px-6">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-[#E61C24]/20 border border-[#E61C24]/30 text-base font-bold text-[#E61C24] uppercase tracking-wider mb-5">
-            <FiShoppingBag className="h-4 w-4" /> Canadian Nest Shop
-          </span>
-          <h1 className="text-3xl md:text-4xl font-bold font-display text-white mb-3 leading-tight">
-            Books &amp; Learning <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF4D55] to-white">Materials</span>
-          </h1>
-          <p className="text-zinc-400 text-base md:text-lg font-semibold leading-relaxed max-w-2xl">
-            Physical books, guides, and other learning materials to support your study journey — delivered right to your door.
-          </p>
-        </div>
-      </section>
+    <div className="min-h-screen pt-22">
+      <PageHeroSection
+        tag="Canadian Nest Shop"
+        title="Books & Learning Materials"
+        description={
+          <>
+            Physical books, guides, and other learning materials to support your{' '}
+            <span className="text-[#E61C24] font-bold">study journey</span>
+            {' '}— delivered right to your{' '}
+            <span className="text-[#E61C24] font-bold">door</span>.
+          </>
+        }
+      />
 
       {/* Filters + Grid */}
       <section className="w-full bg-[#f8fafc] py-12">

@@ -1,27 +1,28 @@
-import mongoose, { Schema, Document } from 'mongoose'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IProduct extends Document {
-  title: string
-  slug: string
-  shortDescription?: string
-  description?: any // Lexical RichText JSON
-  price: number
-  comparePrice?: number
-  thumbnail?: string
-  images?: string[]
-  productType: 'book' | 'merchandise' | 'other'
-  author?: string
-  sku?: string
-  category?: string
-  stock?: number | null // null/undefined = unlimited stock
-  status: 'draft' | 'published'
+  title: string;
+  slug: string;
+  shortDescription?: string;
+  description?: any;
+  price: number;
+  comparePrice?: number;
+  thumbnail?: string;
+  images?: string[];
+  productType: 'book' | 'merchandise' | 'other';
+  author?: string;
+  sku?: string;
+  category?: string;
+  stock?: number | null;
+  status: 'draft' | 'published';
   seo?: {
-    metaTitle?: string
-    metaDescription?: string
-    keywords?: string
-  }
-  createdAt: Date
-  updatedAt: Date
+    metaTitle?: string;
+    metaDescription?: string;
+    keywords?: string;
+  };
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const ProductSchema = new Schema<IProduct>(
@@ -34,7 +35,12 @@ const ProductSchema = new Schema<IProduct>(
     comparePrice: { type: Number, min: 0 },
     thumbnail: { type: String, default: '' },
     images: { type: [String], default: [] },
-    productType: { type: String, enum: ['book', 'merchandise', 'other'], default: 'book', required: true },
+    productType: {
+      type: String,
+      enum: ['book', 'merchandise', 'other'],
+      default: 'book',
+      required: true,
+    },
     author: { type: String },
     sku: { type: String },
     category: { type: String },
@@ -46,11 +52,15 @@ const ProductSchema = new Schema<IProduct>(
       keywords: String,
     },
   },
-  { collection: 'products', timestamps: true }
-)
+  { collection: 'products', timestamps: true },
+);
 
-if (mongoose.models.Product && !mongoose.models.Product.schema.paths.productType) {
-  delete mongoose.models.Product
+if (
+  mongoose.models.Product &&
+  !mongoose.models.Product.schema.paths.productType
+) {
+  delete mongoose.models.Product;
 }
 
-export const Product = mongoose.models.Product || mongoose.model<IProduct>('Product', ProductSchema)
+export const Product =
+  mongoose.models.Product || mongoose.model<IProduct>('Product', ProductSchema);

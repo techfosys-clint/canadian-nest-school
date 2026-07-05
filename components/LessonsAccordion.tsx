@@ -64,40 +64,61 @@ export default function LessonsAccordion({
     setOpenModuleIndex(openModuleIndex === index ? null : index)
   }
 
-  // Group lessons by moduleName
+  // Group lessons by moduleName. Grouping is normalized (trimmed + lowercased)
+  // so a module name that differs from course.modules only by case or stray
+  // whitespace (e.g. "Module 1" vs "module 1 ") doesn't create a second,
+  // visually-identical group — that previously produced two array entries
+  // with the same displayed name and the same React `key`, which made one
+  // of them (often the one that actually had lessons) fail to render.
+  const normalize = (s: string) => s.trim().toLowerCase()
+
   const grouped: Record<string, LessonItem[]> = {}
+  const displayName: Record<string, string> = {}
+
+  // course.modules is the admin's canonical, most recently renamed list —
+  // prefer its casing/spacing as the display name whenever a lesson's
+  // moduleName normalizes to the same key.
+  courseModules.forEach((name) => {
+    const key = normalize(name)
+    displayName[key] = name
+  })
+
   lessons.forEach((lesson) => {
-    const mod = lesson.moduleName || 'General Module'
-    if (!grouped[mod]) {
-      grouped[mod] = []
+    const raw = lesson.moduleName || 'General Module'
+    const key = normalize(raw)
+    if (!grouped[key]) {
+      grouped[key] = []
+      if (!displayName[key]) displayName[key] = raw
     }
-    grouped[mod].push(lesson)
+    grouped[key].push(lesson)
   })
 
   // A module the admin has created but hasn't added any lessons to yet
   // still has an entry in courseModules — give it an (empty) group so it
   // shows up on the public page instead of silently disappearing.
   courseModules.forEach((name) => {
-    if (!grouped[name]) grouped[name] = []
+    const key = normalize(name)
+    if (!grouped[key]) grouped[key] = []
   })
 
-  const declaredOrder = new Map(courseModules.map((name, idx) => [name, idx]))
+  const declaredOrder = new Map(courseModules.map((name, idx) => [normalize(name), idx]))
 
   // Convert to array and sort modules primarily by their declared position
   // in the admin's module list (respects manual up/down reordering); modules
   // not in that list (e.g. legacy lessons predating the modules feature)
   // fall back to sorting by their lessons' minimum order.
-  const moduleGroups = Object.keys(grouped).map((name) => {
+  const moduleGroups = Object.keys(grouped).map((key) => {
     // Sort by position within the module when available, falling back to
     // the course-wide serial for older lessons without moduleOrder.
-    const moduleLessons = [...grouped[name]].sort(
+    const moduleLessons = [...grouped[key]].sort(
       (a, b) => (a.moduleOrder ?? a.order) - (b.moduleOrder ?? b.order)
     )
     const minOrder = moduleLessons.length > 0 ? Math.min(...moduleLessons.map((l) => l.order)) : Number.MAX_SAFE_INTEGER
     const totalDuration = moduleLessons.reduce((sum, l) => sum + l.duration, 0)
-    const declaredIndex = declaredOrder.has(name) ? declaredOrder.get(name)! : Number.MAX_SAFE_INTEGER
+    const declaredIndex = declaredOrder.has(key) ? declaredOrder.get(key)! : Number.MAX_SAFE_INTEGER
     return {
-      name,
+      key,
+      name: displayName[key] || key,
       lessons: moduleLessons,
       minOrder,
       totalDuration,
@@ -127,7 +148,7 @@ export default function LessonsAccordion({
 
           return (
             <div 
-              key={group.name} 
+              key={group.key} 
               className="bg-white rounded-lg overflow-hidden border border-zinc-200/80 hover:border-[#E61C24]/30 shadow-[0_4px_16px_rgba(0,0,0,0.01)] hover:shadow-[0_8px_24px_rgba(230,28,36,0.03)] transition-all duration-300 select-text"
             >
               {/* Accordion Header (Module Title) */}

@@ -64,23 +64,22 @@ export default function LessonsAccordion({
     setOpenModuleIndex(openModuleIndex === index ? null : index)
   }
 
-  // Group lessons by moduleName. Grouping is normalized (trimmed + lowercased)
-  // so a module name that differs from course.modules only by case or stray
-  // whitespace (e.g. "Module 1" vs "module 1 ") doesn't create a second,
-  // visually-identical group — that previously produced two array entries
-  // with the same displayed name and the same React `key`, which made one
-  // of them (often the one that actually had lessons) fail to render.
-  const normalize = (s: string) => s.trim().toLowerCase()
+  // Group lessons by moduleName. The key is normalized (trim, collapse
+  // internal whitespace, lowercase) so names differing only by case/spacing
+  // merge into one group with one React key — previously a near-duplicate
+  // produced two array entries sharing the same displayed name and key,
+  // which made one of them (often the one with the actual lessons) fail to
+  // render, i.e. "same module shows twice / lessons vanish".
+  const normalize = (s: string) => s.trim().replace(/\s+/g, ' ').toLowerCase()
+  const hasLessons = lessons.length > 0
 
   const grouped: Record<string, LessonItem[]> = {}
   const displayName: Record<string, string> = {}
 
-  // course.modules is the admin's canonical, most recently renamed list —
-  // prefer its casing/spacing as the display name whenever a lesson's
-  // moduleName normalizes to the same key.
+  // Prefer the admin's canonical (course.modules) casing/spacing as the
+  // display label whenever a lesson's moduleName normalizes to the same key.
   courseModules.forEach((name) => {
-    const key = normalize(name)
-    displayName[key] = name
+    displayName[normalize(name)] = name
   })
 
   lessons.forEach((lesson) => {
@@ -93,20 +92,22 @@ export default function LessonsAccordion({
     grouped[key].push(lesson)
   })
 
-  // A module the admin has created but hasn't added any lessons to yet
-  // still has an entry in courseModules — give it an (empty) group so it
-  // shows up on the public page instead of silently disappearing.
-  courseModules.forEach((name) => {
-    const key = normalize(name)
-    if (!grouped[key]) grouped[key] = []
-  })
+  // Only surface empty declared modules when the course has NO lessons at
+  // all (the planning stage — this is the "show my modules before I add any
+  // lessons" case). Once real lessons exist, the curriculum is driven purely
+  // by the lessons' own module names: this avoids a confusing second block
+  // of empty placeholder modules when the declared module names and the
+  // lesson module names have diverged (e.g. a module was renamed in the list
+  // but the lessons still carry the old name).
+  if (!hasLessons) {
+    courseModules.forEach((name) => {
+      const key = normalize(name)
+      if (!grouped[key]) grouped[key] = []
+    })
+  }
 
   const declaredOrder = new Map(courseModules.map((name, idx) => [normalize(name), idx]))
 
-  // Convert to array and sort modules primarily by their declared position
-  // in the admin's module list (respects manual up/down reordering); modules
-  // not in that list (e.g. legacy lessons predating the modules feature)
-  // fall back to sorting by their lessons' minimum order.
   const moduleGroups = Object.keys(grouped).map((key) => {
     // Sort by position within the module when available, falling back to
     // the course-wide serial for older lessons without moduleOrder.
@@ -127,8 +128,14 @@ export default function LessonsAccordion({
   })
 
   moduleGroups.sort((a, b) => {
-    if (a.declaredIndex !== b.declaredIndex) return a.declaredIndex - b.declaredIndex
-    return a.minOrder - b.minOrder
+    if (hasLessons) {
+      // With real content, follow the actual lesson sequence; use the
+      // declared list position only to break ties.
+      if (a.minOrder !== b.minOrder) return a.minOrder - b.minOrder
+      return a.declaredIndex - b.declaredIndex
+    }
+    // Planning stage (all empty): follow the admin's declared module order.
+    return a.declaredIndex - b.declaredIndex
   })
 
   return (

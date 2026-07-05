@@ -3,7 +3,8 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { FiChevronLeft, FiBookOpen, FiMinus, FiPlus, FiShoppingBag, FiTruck, FiShield } from 'react-icons/fi'
+import { useCart } from '@/context/CartContext'
+import { FiChevronLeft, FiBookOpen, FiMinus, FiPlus, FiShoppingBag, FiShoppingCart, FiTruck, FiShield, FiCheckCircle } from 'react-icons/fi'
 
 interface ProductData {
   id: string
@@ -29,14 +30,41 @@ function formatPrice(price: number): string {
 
 export default function ProductDetailClient({ product }: { product: ProductData }) {
   const router = useRouter()
+  const { addItem, replaceCart, requireLogin } = useCart()
   const [quantity, setQuantity] = useState(1)
   const [activeImage, setActiveImage] = useState(product.thumbnail)
+  const [cartMessage, setCartMessage] = useState<string | null>(null)
 
   const maxQty = product.stock === null ? 99 : Math.max(1, product.stock)
   const gallery = [product.thumbnail, ...product.images].filter(Boolean)
 
+  const toCartLine = () => ({
+    productId: product.id,
+    title: product.title,
+    slug: product.slug,
+    price: product.price,
+    thumbnail: product.thumbnail,
+    maxQty,
+    inStock: product.inStock,
+    quantity,
+  })
+
+  const handleAddToCart = () => {
+    if (!requireLogin(`/shop/${product.slug}`)) return
+    addItem(toCartLine())
+    setCartMessage('Added to cart!')
+    setTimeout(() => setCartMessage(null), 2500)
+  }
+
   const handleBuyNow = () => {
-    router.push(`/shop-checkout/${product.id}?quantity=${quantity}`)
+    if (!requireLogin(`/shop/${product.slug}`)) return
+    replaceCart([
+      {
+        ...toCartLine(),
+        quantity: Math.min(quantity, maxQty),
+      },
+    ])
+    router.push('/shop-checkout')
   }
 
   return (
@@ -132,14 +160,30 @@ export default function ProductDetailClient({ product }: { product: ProductData 
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleBuyNow}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#c5141b] text-white font-bold text-base shadow-lg shadow-[#E61C24]/15 hover:shadow-[#E61C24]/25 transition-all duration-300 cursor-pointer transform hover:-translate-y-0.5"
-                >
-                  <FiShoppingBag className="h-5 w-5" />
-                  <span>Buy Now — {formatPrice(product.price * quantity)}</span>
-                </button>
+                <div className='flex flex-col sm:flex-row gap-3'>
+                  <button
+                    type='button'
+                    onClick={handleAddToCart}
+                    className='flex-1 flex items-center justify-center gap-2 py-3.5 rounded-lg bg-white border border-[#E61C24]/40 hover:border-[#E61C24] text-[#E61C24] font-bold text-base transition-all duration-300 cursor-pointer'
+                  >
+                    <FiShoppingCart className='h-5 w-5' />
+                    <span>Add to Cart</span>
+                  </button>
+                  <button
+                    type='button'
+                    onClick={handleBuyNow}
+                    className='flex-1 flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#c5141b] text-white font-bold text-base shadow-lg shadow-[#E61C24]/15 hover:shadow-[#E61C24]/25 transition-all duration-300 cursor-pointer transform hover:-translate-y-0.5'
+                  >
+                    <FiShoppingBag className='h-5 w-5' />
+                    <span>Buy Now — {formatPrice(product.price * quantity)}</span>
+                  </button>
+                </div>
+                {cartMessage && (
+                  <div className='flex items-center gap-2 px-4 py-3 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-700 font-bold text-base'>
+                    <FiCheckCircle className='h-5 w-5 shrink-0' />
+                    {cartMessage}
+                  </div>
+                )}
               </>
             )}
 

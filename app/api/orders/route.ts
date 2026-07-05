@@ -10,24 +10,49 @@ import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
+type OrderLineInput = { productId: string; quantity: number };
+
+async function resolveUserId(): Promise<string | null> {
+  const cookieStore = await cookies();
+  const studentToken = cookieStore.get('student-token')?.value;
+  const payloadToken = cookieStore.get('payload-token')?.value;
+
+  if (studentToken) {
+    const decoded = verifyToken(studentToken);
+    if (decoded?.id) return decoded.id;
+  }
+  if (payloadToken) {
+    const decoded = verifyToken(payloadToken);
+    if (decoded?.id) return decoded.id;
+  }
+  return null;
+}
+
+function normalizeOrderLines(body: any): OrderLineInput[] | null {
+  if (Array.isArray(body.items) && body.items.length > 0) {
+    return body.items.map((line: any) => ({
+      productId: String(line.productId),
+      quantity: Math.max(1, Number(line.quantity) || 1),
+    }));
+  }
+
+  if (body.productId) {
+    return [
+      {
+        productId: String(body.productId),
+        quantity: Math.max(1, Number(body.quantity) || 1),
+      },
+    ];
+  }
+
+  return null;
+}
+
 export async function GET() {
   try {
     await connectToDatabase();
 
-    const cookieStore = await cookies();
-    const studentToken = cookieStore.get('student-token')?.value;
-    const payloadToken = cookieStore.get('payload-token')?.value;
-
-    let userId: string | null = null;
-    if (studentToken) {
-      const decoded = verifyToken(studentToken);
-      if (decoded?.id) userId = decoded.id;
-    }
-    if (!userId && payloadToken) {
-      const decoded = verifyToken(payloadToken);
-      if (decoded?.id) userId = decoded.id;
-    }
-
+    const userId = await resolveUserId();
     if (!userId) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized.' },
@@ -72,20 +97,7 @@ export async function POST(request: Request) {
   try {
     await connectToDatabase();
 
-    const cookieStore = await cookies();
-    const studentToken = cookieStore.get('student-token')?.value;
-    const payloadToken = cookieStore.get('payload-token')?.value;
-
-    let userId: string | null = null;
-    if (studentToken) {
-      const decoded = verifyToken(studentToken);
-      if (decoded?.id) userId = decoded.id;
-    }
-    if (!userId && payloadToken) {
-      const decoded = verifyToken(payloadToken);
-      if (decoded?.id) userId = decoded.id;
-    }
-
+    const userId = await resolveUserId();
     if (!userId) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized. Please login to order.' },
@@ -94,46 +106,62 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const {
-      productId,
-      quantity,
-      shippingName,
-      shippingPhone,
-      shippingAddress,
-    } = body;
+    const { shippingName, shippingPhone, shippingAddress } = body;
+    const lines = normalizeOrderLines(body);
 
-    if (!productId || !shippingName || !shippingPhone || !shippingAddress) {
+    if (!lines?.length || !shippingName || !shippingPhone || !shippingAddress) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Product, name, phone, and shipping address are required.',
+          error:
+            'Cart items, name, phone, and shipping address are required.',
         },
         { status: 400 },
       );
     }
 
-    const qty = Math.max(1, Number(quantity) || 1);
+    const orderItems: {
+      product: any;
+      title: string;
+      price: number;
+      quantity: number;
+    }[] = [];
+    let totalAmount = 0;
 
-    const product = await Product.findById(productId);
-    if (!product || product.status !== 'published') {
-      return NextResponse.json(
-        { success: false, error: 'Product not found or unavailable.' },
-        { status: 404 },
-      );
+    for (const line of lines) {
+      const product = await Product.findById(line.productId);
+      if (!product || product.status !== 'published') {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `"${line.productId}" is not available.`,
+          },
+          { status: 404 },
+        );
+      }
+
+      if (
+        product.stock !== null &&
+        product.stock !== undefined &&
+        product.stock < line.quantity
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Not enough stock for "${product.title}".`,
+          },
+          { status: 400 },
+        );
+      }
+
+      orderItems.push({
+        product: product._id,
+        title: product.title,
+        price: product.price,
+        quantity: line.quantity,
+      });
+      totalAmount += product.price * line.quantity;
     }
-
-    if (
-      product.stock !== null &&
-      product.stock !== undefined &&
-      product.stock < qty
-    ) {
-      return NextResponse.json(
-        { success: false, error: 'Not enough stock available for this item.' },
-        { status: 400 },
-      );
-    }
-
-    const totalAmount = product.price * qty;
 
     let student = await Student.findById(userId).lean();
     if (!student) {
@@ -150,14 +178,7 @@ export async function POST(request: Request) {
 
     const pendingOrder = await Order.create({
       student: userId,
-      items: [
-        {
-          product: product._id,
-          title: product.title,
-          price: product.price,
-          quantity: qty,
-        },
-      ],
+      items: orderItems,
       totalAmount,
       paymentStatus: 'pending',
       merchantTransactionId,
@@ -167,6 +188,10 @@ export async function POST(request: Request) {
     });
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const productName =
+      orderItems.length === 1
+        ? orderItems[0].title
+        : `${orderItems[0].title} + ${orderItems.length - 1} more`;
 
     try {
       const { initializeEpsPayment } = await import('@/lib/eps');
@@ -181,7 +206,7 @@ export async function POST(request: Request) {
         customerEmail:
           (student as any).email || 'no-reply@canadiannestschool.com',
         customerPhone: shippingPhone,
-        productName: product.title,
+        productName,
       });
 
       return NextResponse.json({

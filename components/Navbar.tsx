@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiUser, FiLogOut, FiLayout, FiMenu, FiX, FiChevronDown } from 'react-icons/fi'
+import { FiUser, FiLogOut, FiLayout, FiMenu, FiX, FiChevronDown, FiShoppingCart } from 'react-icons/fi'
+import { useCart } from '@/context/CartContext'
 
 interface User {
   id: string
@@ -25,6 +26,7 @@ const NAV_LINKS = [
 
 export default function Navbar() {
   const pathname = usePathname()
+  const { itemCount } = useCart()
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
@@ -158,8 +160,23 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Right Side: User Icon & Mobile Toggle */}
+          {/* Right Side: Cart, User Icon & Mobile Toggle */}
           <div className="flex items-center gap-4">
+
+            <Link
+              href="/shop/cart"
+              className={`relative p-2 transition-colors duration-200 group cursor-pointer flex items-center justify-center ${
+                isScrolled ? 'text-zinc-500 hover:text-zinc-900' : 'text-[#0A163A]/70 hover:text-[#0A163A]'
+              }`}
+              aria-label={`Cart${itemCount > 0 ? `, ${itemCount} items` : ''}`}
+            >
+              <FiShoppingCart className="h-5 w-5 group-hover:scale-105 transition-transform" />
+              {itemCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[1.125rem] h-[1.125rem] px-1 flex items-center justify-center rounded-full bg-[#E61C24] text-white text-[11px] font-bold leading-none">
+                  {itemCount > 99 ? '99+' : itemCount}
+                </span>
+              )}
+            </Link>
             
             {/* Dashboard Button next to Profile Pic (Visible when logged in) */}
             {!loading && user && (
@@ -361,6 +378,22 @@ export default function Navbar() {
 
               {/* Navigation Links */}
               <nav className="flex flex-col gap-2 p-6 flex-grow overflow-y-auto">
+                <Link
+                  href="/shop/cart"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`py-3 px-4 transition-all rounded-lg text-base font-semibold flex items-center justify-between ${
+                    isActive('/shop/cart')
+                      ? 'text-[#E61C24] bg-[#E61C24]/8 font-bold'
+                      : 'text-zinc-650 hover:text-[#0A163A] hover:bg-[#E61C24]/5'
+                  }`}
+                >
+                  <span>Cart</span>
+                  {itemCount > 0 && (
+                    <span className="min-w-[1.25rem] h-5 px-1.5 flex items-center justify-center rounded-lg bg-[#E61C24] text-white text-sm font-bold">
+                      {itemCount > 99 ? '99+' : itemCount}
+                    </span>
+                  )}
+                </Link>
                 {NAV_LINKS.map((link) => {
                   const active = isActive(link.match)
                   return (

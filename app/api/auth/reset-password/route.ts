@@ -104,7 +104,7 @@ export async function POST(request: Request) {
       path: '/',
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax' as const,
-      maxAge: 7200, // 2 hours
+      maxAge: 60 * 60 * 24 * 365, // 365 days, matching the JWT's own expiry
     }
 
     response.cookies.set(cookieOptions)

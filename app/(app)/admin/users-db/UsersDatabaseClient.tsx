@@ -1,10 +1,12 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { FiUsers, FiSearch, FiTrash2, FiShield, FiUser, FiMoreVertical, FiLock, FiUnlock } from 'react-icons/fi'
+import { useRouter } from 'next/navigation'
+import { FiUsers, FiSearch, FiTrash2, FiShield, FiUser, FiMoreVertical, FiLock, FiUnlock, FiChevronRight } from 'react-icons/fi'
 import Swal from 'sweetalert2'
 
 export default function UsersDatabaseClient() {
+  const router = useRouter()
   const [users, setUsers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -84,6 +86,10 @@ export default function UsersDatabaseClient() {
         Swal.fire('Error', err.message, 'error')
       }
     }
+  }
+
+  const openUserDetail = (user: any) => {
+    router.push(`/admin/users-db/${user._id}?type=${user.type}`)
   }
 
   const filteredUsers = users.filter((u) => {
@@ -175,7 +181,12 @@ export default function UsersDatabaseClient() {
                 </tr>
               ) : (
                 filteredUsers.map((user) => (
-                  <tr key={user._id} className="hover:bg-slate-50/80 transition-colors group">
+                  <tr
+                    key={user._id}
+                    onClick={() => openUserDetail(user)}
+                    className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
+                    title="View user details"
+                  >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
                         <div className="h-10 w-10 rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center overflow-hidden shrink-0">
@@ -215,26 +226,30 @@ export default function UsersDatabaseClient() {
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
                         <button
-                          onClick={() => handleToggleStatus(user._id, user.type, user.status)}
+                          onClick={(e) => { e.stopPropagation(); handleToggleStatus(user._id, user.type, user.status) }}
                           className={`p-2 rounded-lg transition-colors border ${
-                            user.status === 'active' 
-                            ? 'text-rose-600 hover:bg-rose-50 border-transparent hover:border-rose-200' 
+                            user.status === 'active'
+                            ? 'text-rose-600 hover:bg-rose-50 border-transparent hover:border-rose-200'
                             : 'text-emerald-600 hover:bg-emerald-50 border-transparent hover:border-emerald-200'
                           }`}
                           title={user.status === 'active' ? 'Suspend Account' : 'Activate Account'}
                         >
                           {user.status === 'active' ? <FiLock className="h-4 w-4" /> : <FiUnlock className="h-4 w-4" />}
                         </button>
-                        
+
                         {!user.isSuperAdmin && (
                           <button
-                            onClick={() => handleDelete(user._id, user.type)}
+                            onClick={(e) => { e.stopPropagation(); handleDelete(user._id, user.type) }}
                             className="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-colors"
                             title="Delete Account"
                           >
                             <FiTrash2 className="h-4 w-4" />
                           </button>
                         )}
+
+                        <span className="p-2 text-slate-300 group-hover:text-[#E61C24] transition-colors" title="View details">
+                          <FiChevronRight className="h-4 w-4" />
+                        </span>
                       </div>
                     </td>
                   </tr>

@@ -134,7 +134,7 @@ export default function CartPageClient() {
                         </button>
                       </div>
 
-                      <p className='text-base font-bold text-zinc-800 min-w-[5rem] text-right'>
+                      <p className='text-base font-bold text-zinc-800 min-w-20 text-right'>
                         {formatPrice(item.price * item.quantity)}
                       </p>
 

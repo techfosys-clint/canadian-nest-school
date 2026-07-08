@@ -6,6 +6,8 @@ import { User } from '@/lib/db/models/User'
 import {
   calculateCourseProgressPercent,
   getLessonCountsByCourse,
+  getLessonIdsByCourse,
+  sanitizeCompletedLessons,
 } from '@/lib/progress/getCourseProgress'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
@@ -52,6 +54,7 @@ export async function GET() {
     ]
 
     const lessonCounts = await getLessonCountsByCourse(courseIds)
+    const lessonIdsByCourse = await getLessonIdsByCourse(courseIds)
 
     const enrollmentProgress = new Map<string, string[]>()
     if (requests.length > 0) {
@@ -84,8 +87,15 @@ export async function GET() {
           ? enrollmentProgress.get(enrollmentKey(studentId, courseId)) || []
           : []
       const totalLessons = courseId ? lessonCounts.get(courseId) || 0 : 0
-      const progress = calculateCourseProgressPercent(
+      const validLessonIds = courseId
+        ? lessonIdsByCourse.get(courseId) || new Set<string>()
+        : new Set<string>()
+      const sanitizedCompletedLessons = sanitizeCompletedLessons(
         completedLessons,
+        validLessonIds,
+      )
+      const progress = calculateCourseProgressPercent(
+        sanitizedCompletedLessons,
         totalLessons,
       )
 

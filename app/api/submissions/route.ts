@@ -4,6 +4,10 @@ import { Submission } from '@/lib/db/models/Submission'
 import { Lesson } from '@/lib/db/models/Lesson'
 import { Enrollment } from '@/lib/db/models/Enrollment'
 import { syncEnrollmentProgressSideEffects } from '@/lib/progress/syncEnrollmentProgress'
+import {
+  getValidatedCompletedLessons,
+  isLessonInCourse,
+} from '@/lib/progress/getCourseProgress'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
 
@@ -73,6 +77,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Lesson not found.' }, { status: 404 })
     }
 
+    const lessonBelongsToCourse = await isLessonInCourse(courseId, lessonId)
+    if (!lessonBelongsToCourse) {
+      return NextResponse.json(
+        { success: false, error: 'Lesson does not belong to this course.' },
+        { status: 400 },
+      )
+    }
+
     const totalMarks = lesson.totalMarks || 100
 
     let marksObtained = 0
@@ -125,11 +137,16 @@ export async function POST(request: Request) {
       }
       if (!enrollment.completedLessons.includes(lessonId)) {
         enrollment.completedLessons.push(lessonId)
+        const sanitizedCompletedLessons = await getValidatedCompletedLessons(
+          courseId,
+          enrollment.completedLessons,
+        )
+        enrollment.completedLessons = sanitizedCompletedLessons
         await enrollment.save()
         await syncEnrollmentProgressSideEffects(
           userId,
           courseId,
-          enrollment.completedLessons,
+          sanitizedCompletedLessons,
         )
       }
     }

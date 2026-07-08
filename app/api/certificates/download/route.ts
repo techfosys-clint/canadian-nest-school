@@ -9,7 +9,7 @@ import { connectToDatabase } from '@/lib/db/mongodb'
 import { CertificateRequest } from '@/lib/db/models/CertificateRequest'
 import { Course } from '@/lib/db/models/Course'
 import { Enrollment } from '@/lib/db/models/Enrollment'
-import { Lesson } from '@/lib/db/models/Lesson'
+import { getCourseProgressPercent } from '@/lib/progress/getCourseProgress'
 import '@/lib/db/models/Student'
 import '@/lib/db/models/User'
 import '@/lib/db/models/Category'
@@ -63,12 +63,10 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const totalLessons = await Lesson.countDocuments({ course: courseId })
-    const completedLessonsCount = enrollment.completedLessons?.length || 0
-    const progress =
-      totalLessons > 0
-        ? Math.round((completedLessonsCount / totalLessons) * 100)
-        : 0
+    const progress = await getCourseProgressPercent(
+      courseId,
+      enrollment.completedLessons,
+    )
 
     if (progress < 100) {
       return NextResponse.json(

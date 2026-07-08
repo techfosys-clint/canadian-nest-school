@@ -5,7 +5,10 @@ import { Course } from '@/lib/db/models/Course'
 import { CertificateRequest } from '@/lib/db/models/CertificateRequest'
 import {
   calculateCourseProgressPercent,
+  getCourseProgressPercent,
   getLessonCountsByCourse,
+  getLessonIdsByCourse,
+  sanitizeCompletedLessons,
 } from '@/lib/progress/getCourseProgress'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
@@ -48,6 +51,7 @@ export async function GET() {
       ),
     ]
     const lessonCounts = await getLessonCountsByCourse(courseIds)
+    const lessonIdsByCourse = await getLessonIdsByCourse(courseIds)
 
     const enrollments = await Enrollment.find({
       student: userId,
@@ -70,8 +74,15 @@ export async function GET() {
         ? enrollmentProgress.get(courseId) || []
         : []
       const totalLessons = courseId ? lessonCounts.get(courseId) || 0 : 0
-      const progress = calculateCourseProgressPercent(
+      const validLessonIds = courseId
+        ? lessonIdsByCourse.get(courseId) || new Set<string>()
+        : new Set<string>()
+      const sanitizedCompletedLessons = sanitizeCompletedLessons(
         completedLessons,
+        validLessonIds,
+      )
+      const progress = calculateCourseProgressPercent(
+        sanitizedCompletedLessons,
         totalLessons,
       )
 

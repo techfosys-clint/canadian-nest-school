@@ -10,8 +10,9 @@ import { Blog } from '@/lib/db/models/Blog'
 import { FAQ } from '@/lib/db/models/FAQ'
 import {
   calculateCourseProgressPercent,
-  getCourseProgressPercent,
   getLessonCountsByCourse,
+  getLessonIdsByCourse,
+  sanitizeCompletedLessons,
 } from '@/lib/progress/getCourseProgress'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
@@ -208,12 +209,21 @@ export async function GET() {
       const lessonCounts = await getLessonCountsByCourse(
         courseIds.map((id) => id.toString()),
       )
+      const lessonIdsByCourse = await getLessonIdsByCourse(
+        courseIds.map((id) => id.toString()),
+      )
 
       const studentProgress = enrollments.map((enrollment) => {
         const courseId = enrollment.course?._id?.toString() || ''
         const totalCourseLessons = lessonCounts.get(courseId) || 0
-        const progress = calculateCourseProgressPercent(
+        const validLessonIds =
+          lessonIdsByCourse.get(courseId) || new Set<string>()
+        const sanitizedCompletedLessons = sanitizeCompletedLessons(
           enrollment.completedLessons,
+          validLessonIds,
+        )
+        const progress = calculateCourseProgressPercent(
+          sanitizedCompletedLessons,
           totalCourseLessons,
         )
 
@@ -232,7 +242,7 @@ export async function GET() {
               ? enrollment.course.title
               : 'Unknown Course',
           progress,
-          completedLessons: enrollment.completedLessons?.length || 0,
+          completedLessons: sanitizedCompletedLessons.length,
           totalLessons: totalCourseLessons,
           updatedAt: enrollment.updatedAt,
         }

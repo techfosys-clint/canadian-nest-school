@@ -32,7 +32,7 @@ interface Props {
   userRole: string;
 }
 
-function formatCurrency(amount: number) {
+function formatCurrency(amount: number = 0) {
   return new Intl.NumberFormat('en-BD', {
     style: 'currency',
     currency: 'BDT',

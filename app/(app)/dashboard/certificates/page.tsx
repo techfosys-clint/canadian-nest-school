@@ -30,6 +30,39 @@ export default function MyCertificatesPage() {
   const [certificates, setCertificates] = useState<CertificateItem[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [downloadingId, setDownloadingId] = useState<string | null>(null)
+
+  async function handleDownloadCertificate(cert: CertificateItem) {
+    setDownloadingId(cert.id)
+    try {
+      const res = await fetch(`/api/certificates/download?courseId=${cert.courseId}`)
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Unable to download certificate.')
+      }
+
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${cert.courseTitle.replace(/[^a-zA-Z0-9-_]+/g, '-')}-certificate.pdf`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(url)
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Download Failed',
+        text: err.message || 'Could not generate your certificate PDF.',
+        background: '#ffffff',
+        color: '#1e293b',
+        confirmButtonColor: '#E61C24',
+      })
+    } finally {
+      setDownloadingId(null)
+    }
+  }
 
   async function fetchCertificates() {
     setLoading(true)
@@ -193,15 +226,16 @@ export default function MyCertificatesPage() {
 
                     {/* Download button */}
                     <td className="px-6 py-4 text-center">
-                      {cert.status === 'approved' && cert.certificateUrl ? (
-                        <a
-                          href={cert.certificateUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-base font-bold transition-all shadow-md shadow-emerald-600/15 cursor-pointer"
+                      {cert.status === 'approved' ? (
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadCertificate(cert)}
+                          disabled={downloadingId === cert.id}
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-70 disabled:cursor-not-allowed text-white rounded-lg text-base font-bold transition-all shadow-md shadow-emerald-600/15 cursor-pointer"
                         >
-                          <FiDownload className="h-4.5 w-4.5" /> Download PDF
-                        </a>
+                          <FiDownload className="h-4.5 w-4.5" />
+                          {downloadingId === cert.id ? 'Generating...' : 'Download PDF'}
+                        </button>
                       ) : cert.status === 'rejected' ? (
                         <div className="inline-flex flex-col items-center">
                           <span className="text-base text-rose-500 font-bold">Verification Rejected</span>

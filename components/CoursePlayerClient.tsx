@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   FiArrowLeft,
   FiAward,
@@ -145,6 +143,7 @@ export default function CoursePlayerClient({
     certificateUrl: string | null;
   } | null>(null);
   const [loadingCert, setLoadingCert] = useState(false);
+  const [downloadingCert, setDownloadingCert] = useState(false);
 
   // Student Evaluation Submissions
   const [submissionsMap, setSubmissionsMap] = useState<Record<string, any>>({});
@@ -160,7 +159,7 @@ export default function CoursePlayerClient({
 
   // Combined fetch for course data (progress, submissions, certificates)
   // Eliminates 3 separate API calls and consolidates into 1
-  const loadCourseData = async () => {
+  const loadCourseData = useCallback(async () => {
     try {
       const res = await fetch(`/api/course-data?courseId=${course.id}`);
       if (res.ok) {
@@ -182,9 +181,9 @@ export default function CoursePlayerClient({
     } catch (err) {
       console.error('Failed to load course data from combined API', err);
     }
-  };
+  }, [course.id]);
 
-  const handleRequestCertificate = async () => {
+  const handleRequestCertificate = useCallback(async () => {
     setLoadingCert(true);
     try {
       const res = await fetch('/api/certificates', {
@@ -205,12 +204,44 @@ export default function CoursePlayerClient({
     } finally {
       setLoadingCert(false);
     }
+  }, [course.id, loadCourseData]);
+
+  const handleDownloadCertificate = async () => {
+    setDownloadingCert(true);
+    try {
+      const res = await fetch(
+        `/api/certificates/download?courseId=${course.id}`,
+      );
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Unable to download certificate.');
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${course.title.replace(/[^a-zA-Z0-9-_]+/g, '-')}-certificate.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Download Failed',
+        text: err.message || 'Could not generate your certificate PDF.',
+        confirmButtonColor: '#E61C24',
+      });
+    } finally {
+      setDownloadingCert(false);
+    }
   };
 
   // Load all course data on component mount
   useEffect(() => {
     loadCourseData();
-  }, [course.id]);
+  }, [course.id, loadCourseData]);
 
   // Reset quiz states when active lesson changes
   useEffect(() => {
@@ -221,36 +252,36 @@ export default function CoursePlayerClient({
     setRetakeQuiz(false);
   }, [activeLesson?.id]);
 
-  // Group lessons by moduleName
-  const grouped: Record<string, typeof lessons> = {};
-  lessons.forEach((lesson) => {
-    const mod = lesson.moduleName || 'General Module';
-    if (!grouped[mod]) {
-      grouped[mod] = [];
-    }
-    grouped[mod].push(lesson);
-  });
+  // Group lessons by moduleName (memoized so downstream effects stay stable)
+  const { moduleGroups, sortedLessons } = useMemo(() => {
+    const grouped: Record<string, typeof lessons> = {};
+    lessons.forEach((lesson) => {
+      const mod = lesson.moduleName || 'General Module';
+      if (!grouped[mod]) {
+        grouped[mod] = [];
+      }
+      grouped[mod].push(lesson);
+    });
 
-  // Convert to array and sort modules by the minimum order of their lessons
-  const moduleGroups = Object.keys(grouped).map((name) => {
-    // Sort by position within the module when available, falling back to
-    // the course-wide serial for older lessons without moduleOrder.
-    const moduleLessons = [...grouped[name]].sort(
-      (a, b) => (a.moduleOrder ?? a.order) - (b.moduleOrder ?? b.order),
-    );
-    const minOrder = Math.min(...moduleLessons.map((l) => l.order));
+    const groups = Object.keys(grouped).map((name) => {
+      const moduleLessons = [...grouped[name]].sort(
+        (a, b) => (a.moduleOrder ?? a.order) - (b.moduleOrder ?? b.order),
+      );
+      const minOrder = Math.min(...moduleLessons.map((l) => l.order));
+      return {
+        name,
+        lessons: moduleLessons,
+        minOrder,
+      };
+    });
+
+    groups.sort((a, b) => a.minOrder - b.minOrder);
+
     return {
-      name,
-      lessons: moduleLessons,
-      minOrder,
+      moduleGroups: groups,
+      sortedLessons: groups.flatMap((mg) => mg.lessons),
     };
-  });
-
-  moduleGroups.sort((a, b) => a.minOrder - b.minOrder);
-
-  // Now create the true sortedLessons by flattening moduleGroups
-  // This prevents the bug where clicking "Next" jumps to another module if orders are interleaved.
-  const sortedLessons = moduleGroups.flatMap((mg) => mg.lessons);
+  }, [lessons]);
 
   // Sidebar expanded modules state
   const [expandedModules, setExpandedModules] = useState<
@@ -259,30 +290,33 @@ export default function CoursePlayerClient({
 
   // Expand the module of the current active lesson automatically
   useEffect(() => {
-    const activeL = activeLesson || sortedLessons[0];
-    if (activeL) {
-      const activeModule = activeL.moduleName || 'General Module';
-      setExpandedModules((prev) => ({
-        ...prev,
-        [activeModule]: true,
-      }));
-    }
-  }, [activeLesson?.id, sortedLessons.length]);
+    const activeL = activeLesson ?? sortedLessons[0];
+    if (!activeL) return;
+
+    const activeModule = activeL.moduleName || 'General Module';
+    setExpandedModules((prev) => {
+      if (prev[activeModule]) return prev;
+      return { ...prev, [activeModule]: true };
+    });
+  }, [activeLesson?.id, sortedLessons]);
 
   // Initialize active lesson from query search params or default to first lesson
   useEffect(() => {
-    if (sortedLessons.length > 0) {
-      const lessonIdFromUrl = searchParams.get('lesson');
-      if (lessonIdFromUrl) {
-        const found = sortedLessons.find((l) => l.id === lessonIdFromUrl);
-        if (found) {
-          setActiveLesson(found);
-          return;
-        }
+    if (sortedLessons.length === 0) return;
+
+    const lessonIdFromUrl = searchParams.get('lesson');
+    if (lessonIdFromUrl) {
+      const found = sortedLessons.find((l) => l.id === lessonIdFromUrl);
+      if (found) {
+        setActiveLesson((current) =>
+          current?.id === found.id ? current : found,
+        );
+        return;
       }
-      setActiveLesson(sortedLessons[0]);
     }
-  }, [searchParams, lessons]);
+
+    setActiveLesson((current) => current ?? sortedLessons[0]);
+  }, [searchParams, sortedLessons]);
 
   // Fullscreen toggle handler
   const toggleFullscreen = () => {
@@ -564,6 +598,30 @@ export default function CoursePlayerClient({
     }
   };
 
+  const completedCount = completedLessonIds.length;
+  const progressPercentage =
+    sortedLessons.length > 0
+      ? Math.round((completedCount / sortedLessons.length) * 100)
+      : 0;
+
+  // Auto-request certificate when 100% progress is reached and there is no request logged yet
+  useEffect(() => {
+    if (
+      progressPercentage === 100 &&
+      !certRequest &&
+      !loadingCert &&
+      sortedLessons.length > 0
+    ) {
+      handleRequestCertificate();
+    }
+  }, [
+    progressPercentage,
+    certRequest,
+    loadingCert,
+    sortedLessons.length,
+    handleRequestCertificate,
+  ]);
+
   if (sortedLessons.length === 0) {
     return (
       <div className='container mx-auto px-6 py-12 text-center max-w-xl bg-white border border-zinc-200 rounded-lg shadow-sm'>
@@ -587,22 +645,6 @@ export default function CoursePlayerClient({
   }
 
   const currentLesson = activeLesson || sortedLessons[0];
-  const completedCount = completedLessonIds.length;
-  const progressPercentage = Math.round(
-    (completedCount / sortedLessons.length) * 100,
-  );
-
-  // Auto-request certificate when 100% progress is reached and there is no request logged yet
-  useEffect(() => {
-    if (
-      progressPercentage === 100 &&
-      !certRequest &&
-      !loadingCert &&
-      sortedLessons.length > 0
-    ) {
-      handleRequestCertificate();
-    }
-  }, [progressPercentage, certRequest, loadingCert, sortedLessons.length]);
 
   // Date parsing for live classes
   const liveDateObj = currentLesson.liveDate
@@ -1583,8 +1625,7 @@ export default function CoursePlayerClient({
                 lecture progress and publish the PDF shortly.
               </p>
             </div>
-          ) : certRequest.status === 'approved' &&
-            certRequest.certificateUrl ? (
+          ) : certRequest.status === 'approved' ? (
             <div className='space-y-3'>
               <div className='inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 rounded-lg text-xs font-bold uppercase tracking-wider'>
                 <FiCheckCircle className='h-3.5 w-3.5' />
@@ -1594,15 +1635,19 @@ export default function CoursePlayerClient({
                 Your official verified student completion certificate is
                 available for download below!
               </p>
-              <a
-                href={certRequest.certificateUrl}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold shadow-md shadow-emerald-600/15 hover:scale-[1.01] transition-all cursor-pointer border-none text-center flex items-center justify-center gap-1.5'
+              <button
+                type='button'
+                onClick={handleDownloadCertificate}
+                disabled={downloadingCert}
+                className='w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-70 disabled:cursor-not-allowed text-white text-sm font-bold shadow-md shadow-emerald-600/15 hover:scale-[1.01] transition-all cursor-pointer border-none text-center flex items-center justify-center gap-1.5'
               >
-                <span>Download Certificate (PDF)</span>
+                <span>
+                  {downloadingCert
+                    ? 'Generating Certificate...'
+                    : 'Download Certificate (PDF)'}
+                </span>
                 <FiExternalLink className='h-4 w-4' />
-              </a>
+              </button>
             </div>
           ) : (
             <div className='space-y-2'>

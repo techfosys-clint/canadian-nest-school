@@ -81,6 +81,16 @@ interface DashboardData {
     duration: number;
     autoGenerateZoom: boolean;
   }>;
+  studentProgress?: Array<{
+    id: string;
+    studentName: string;
+    studentEmail: string;
+    courseTitle: string;
+    progress: number;
+    completedLessons: number;
+    totalLessons: number;
+    updatedAt: string;
+  }>;
 }
 
 function formatCurrency(amount: number) {
@@ -1124,6 +1134,82 @@ export default function AdminDashboardPage() {
                 )}
               </div>
             </div>
+          </div>
+
+          <div className='bg-white border border-slate-200 rounded-lg p-6 shadow-sm space-y-4'>
+            <div>
+              <h2 className='text-lg font-bold text-slate-800'>
+                Student Course Progress
+              </h2>
+              <p className='text-base font-semibold text-slate-500 mt-0.5'>
+                Live syllabus completion across your assigned courses
+              </p>
+            </div>
+
+            {!data.studentProgress || data.studentProgress.length === 0 ? (
+              <div className='text-center py-8 text-slate-400 font-semibold text-base'>
+                No enrolled students found for your courses yet.
+              </div>
+            ) : (
+              <div className='overflow-x-auto'>
+                <table className='w-full text-left border-collapse text-base'>
+                  <thead>
+                    <tr className='bg-slate-50 border-b border-slate-200 text-slate-500 font-bold text-sm uppercase tracking-wider'>
+                      <th className='px-6 py-3.5'>Student</th>
+                      <th className='px-6 py-3.5'>Course</th>
+                      <th className='px-6 py-3.5 text-center'>Lessons</th>
+                      <th className='px-6 py-3.5 text-center'>Progress</th>
+                    </tr>
+                  </thead>
+                  <tbody className='divide-y divide-slate-100 font-semibold text-slate-700'>
+                    {data.studentProgress.map((row) => (
+                      <tr
+                        key={row.id}
+                        className='hover:bg-slate-50 transition-colors'
+                      >
+                        <td className='px-6 py-4'>
+                          <p className='font-bold text-slate-800'>
+                            {row.studentName}
+                          </p>
+                          <p className='text-sm font-semibold text-slate-400 mt-0.5'>
+                            {row.studentEmail}
+                          </p>
+                        </td>
+                        <td className='px-6 py-4 font-bold text-slate-800'>
+                          {row.courseTitle}
+                        </td>
+                        <td className='px-6 py-4 text-center text-slate-600'>
+                          {row.completedLessons}/{row.totalLessons}
+                        </td>
+                        <td className='px-6 py-4'>
+                          <div className='flex flex-col items-center gap-1.5'>
+                            <span
+                              className={`inline-flex h-9 w-14 rounded-lg items-center justify-center font-bold text-sm border ${
+                                row.progress === 100
+                                  ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
+                                  : 'bg-[#E61C24]/10 border-[#E61C24]/20 text-[#E61C24]'
+                              }`}
+                            >
+                              {row.progress}%
+                            </span>
+                            <div className='w-24 bg-slate-100 h-1.5 rounded-full overflow-hidden'>
+                              <div
+                                className={`h-full rounded-full transition-all duration-300 ${
+                                  row.progress === 100
+                                    ? 'bg-emerald-500'
+                                    : 'bg-[#E61C24]'
+                                }`}
+                                style={{ width: `${row.progress}%` }}
+                              />
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       )}

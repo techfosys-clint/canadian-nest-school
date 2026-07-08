@@ -3,6 +3,7 @@ import { connectToDatabase } from '@/lib/db/mongodb'
 import { Submission } from '@/lib/db/models/Submission'
 import { Lesson } from '@/lib/db/models/Lesson'
 import { Enrollment } from '@/lib/db/models/Enrollment'
+import { syncEnrollmentProgressSideEffects } from '@/lib/progress/syncEnrollmentProgress'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
 
@@ -119,9 +120,17 @@ export async function POST(request: Request) {
     })
 
     if (enrollment) {
+      if (!Array.isArray(enrollment.completedLessons)) {
+        enrollment.completedLessons = []
+      }
       if (!enrollment.completedLessons.includes(lessonId)) {
         enrollment.completedLessons.push(lessonId)
         await enrollment.save()
+        await syncEnrollmentProgressSideEffects(
+          userId,
+          courseId,
+          enrollment.completedLessons,
+        )
       }
     }
 

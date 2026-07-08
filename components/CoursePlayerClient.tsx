@@ -2,7 +2,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   FiArrowLeft,
   FiAward,
@@ -142,7 +148,6 @@ export default function CoursePlayerClient({
     status: string;
     certificateUrl: string | null;
   } | null>(null);
-  const [loadingCert, setLoadingCert] = useState(false);
   const [downloadingCert, setDownloadingCert] = useState(false);
 
   // Student Evaluation Submissions
@@ -182,29 +187,6 @@ export default function CoursePlayerClient({
       console.error('Failed to load course data from combined API', err);
     }
   }, [course.id]);
-
-  const handleRequestCertificate = useCallback(async () => {
-    setLoadingCert(true);
-    try {
-      const res = await fetch('/api/certificates', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ courseId: course.id }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        loadCourseData();
-      } else {
-        throw new Error(
-          data.error || 'Unable to request certificate. Please try again.',
-        );
-      }
-    } catch (err: any) {
-      console.error('Auto-request certificate failed:', err);
-    } finally {
-      setLoadingCert(false);
-    }
-  }, [course.id, loadCourseData]);
 
   const handleDownloadCertificate = async () => {
     setDownloadingCert(true);
@@ -298,7 +280,7 @@ export default function CoursePlayerClient({
       if (prev[activeModule]) return prev;
       return { ...prev, [activeModule]: true };
     });
-  }, [activeLesson?.id, sortedLessons]);
+  }, [activeLesson, activeLesson?.id, sortedLessons]);
 
   // Initialize active lesson from query search params or default to first lesson
   useEffect(() => {
@@ -546,7 +528,7 @@ export default function CoursePlayerClient({
 
     // Persist to DB
     try {
-      await fetch('/api/progress', {
+      const res = await fetch('/api/progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -555,10 +537,26 @@ export default function CoursePlayerClient({
           completed: willBeCompleted,
         }),
       });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to save lesson progress.');
+      }
+
+      await loadCourseData();
     } catch (err) {
       console.error('Failed to save progress to API', err);
-      // Revert optimistic update on error
       setCompletedLessonIds(completedLessonIds);
+      Swal.fire({
+        icon: 'error',
+        title: 'Progress Not Saved',
+        text:
+          err instanceof Error
+            ? err.message
+            : 'Could not save your lesson completion. Please try again.',
+        confirmButtonColor: '#E61C24',
+      });
+      return;
     }
 
     if (willBeCompleted) {
@@ -603,24 +601,6 @@ export default function CoursePlayerClient({
     sortedLessons.length > 0
       ? Math.round((completedCount / sortedLessons.length) * 100)
       : 0;
-
-  // Auto-request certificate when 100% progress is reached and there is no request logged yet
-  useEffect(() => {
-    if (
-      progressPercentage === 100 &&
-      !certRequest &&
-      !loadingCert &&
-      sortedLessons.length > 0
-    ) {
-      handleRequestCertificate();
-    }
-  }, [
-    progressPercentage,
-    certRequest,
-    loadingCert,
-    sortedLessons.length,
-    handleRequestCertificate,
-  ]);
 
   if (sortedLessons.length === 0) {
     return (

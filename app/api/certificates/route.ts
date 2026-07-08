@@ -2,8 +2,11 @@ import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Enrollment } from '@/lib/db/models/Enrollment'
 import { Course } from '@/lib/db/models/Course'
-import { Lesson } from '@/lib/db/models/Lesson'
 import { CertificateRequest } from '@/lib/db/models/CertificateRequest'
+import {
+  calculateCourseProgressPercent,
+  getLessonCountsByCourse,
+} from '@/lib/progress/getCourseProgress'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
 
@@ -37,17 +40,53 @@ export async function GET() {
       .sort({ createdAt: -1 })
       .lean()
 
-    const formatted = requests.map((r: any) => ({
-      id: r._id.toString(),
-      courseId: r.course?._id?.toString(),
-      courseTitle: r.course?.title || 'Unknown Course',
-      courseSlug: r.course?.slug || '',
-      status: r.status,
-      progress: r.progress,
-      certificateUrl: r.certificateUrl || null,
-      adminNotes: r.adminNotes || '',
-      createdAt: r.createdAt,
-    }))
+    const courseIds = [
+      ...new Set(
+        requests
+          .map((r) => r.course?._id?.toString())
+          .filter((id): id is string => Boolean(id)),
+      ),
+    ]
+    const lessonCounts = await getLessonCountsByCourse(courseIds)
+
+    const enrollments = await Enrollment.find({
+      student: userId,
+      paymentStatus: 'completed',
+      course: { $in: courseIds },
+    })
+      .select('course completedLessons')
+      .lean()
+
+    const enrollmentProgress = new Map<string, string[]>()
+    for (const enrollment of enrollments) {
+      const courseId = enrollment.course?.toString()
+      if (!courseId) continue
+      enrollmentProgress.set(courseId, enrollment.completedLessons || [])
+    }
+
+    const formatted = requests.map((r) => {
+      const courseId = r.course?._id?.toString()
+      const completedLessons = courseId
+        ? enrollmentProgress.get(courseId) || []
+        : []
+      const totalLessons = courseId ? lessonCounts.get(courseId) || 0 : 0
+      const progress = calculateCourseProgressPercent(
+        completedLessons,
+        totalLessons,
+      )
+
+      return {
+        id: r._id.toString(),
+        courseId,
+        courseTitle: r.course?.title || 'Unknown Course',
+        courseSlug: r.course?.slug || '',
+        status: r.status,
+        progress,
+        certificateUrl: r.certificateUrl || null,
+        adminNotes: r.adminNotes || '',
+        createdAt: r.createdAt,
+      }
+    })
 
     return NextResponse.json({ success: true, requests: formatted })
   } catch (error: any) {
@@ -107,10 +146,10 @@ export async function POST(request: Request) {
       })
     }
 
-    // Calculate current progress
-    const totalLessons = await Lesson.countDocuments({ course: courseId })
-    const completedLessonsCount = enrollment.completedLessons?.length || 0
-    const progress = totalLessons > 0 ? Math.round((completedLessonsCount / totalLessons) * 100) : 0
+    const progress = await getCourseProgressPercent(
+      courseId,
+      enrollment.completedLessons,
+    )
 
     // Create certificate request
     const newRequest = await CertificateRequest.create({

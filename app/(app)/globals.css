@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "sweetalert2/dist/sweetalert2.min.css";
 
 :root {
   --background: #ffffff;
@@ -234,4 +235,272 @@ nav ::-webkit-scrollbar-thumb:hover {
   font-size: inherit;
 }
 
+/* ==========================================
+   🍁 BRANDED SWEETALERT2 (Canadian Nest School)
+   ========================================== */
+
+.swal2-container {
+  z-index: 20000 !important;
+}
+
+body.swal2-shown:not(.swal2-no-backdrop) .swal2-container {
+  background: rgba(15, 23, 42, 0.55) !important;
+}
+
+/* Popup card only — opaque tinted fill so the backdrop stays separate */
+.swal2-popup.swal2-modal,
+.swal2-popup.cns-swal-popup {
+  width: min(92vw, 28rem) !important;
+  padding: 1.5rem 1.5rem 1.25rem !important;
+  border-radius: 8px !important;
+  border-width: 2px !important;
+  border-style: solid !important;
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+  font-family: var(--font-nunito), sans-serif !important;
+  background-color: color-mix(in srgb, #E61C24 8%, white) !important;
+  border-color: #E61C24 !important;
+  color: #52525b !important;
+}
+
+.swal2-popup.swal2-modal:has(.swal2-success),
+.swal2-popup.cns-swal-popup-success {
+  background-color: color-mix(in srgb, #059669 8%, white) !important;
+  border-color: #059669 !important;
+}
+
+.swal2-popup.swal2-modal:has(.swal2-error),
+.swal2-popup.cns-swal-popup-error {
+  background-color: color-mix(in srgb, #ef4444 8%, white) !important;
+  border-color: #ef4444 !important;
+}
+
+.swal2-popup.swal2-modal:has(.swal2-warning),
+.swal2-popup.cns-swal-popup-warning {
+  background-color: color-mix(in srgb, #f59e0b 8%, white) !important;
+  border-color: #f59e0b !important;
+}
+
+.swal2-popup.swal2-modal:has(.swal2-question),
+.swal2-popup.cns-swal-popup-question {
+  background-color: color-mix(in srgb, #6366f1 8%, white) !important;
+  border-color: #6366f1 !important;
+}
+
+.swal2-popup.swal2-modal:has(.swal2-info),
+.swal2-popup.cns-swal-popup-info,
+.swal2-popup.cns-swal-popup-brand {
+  background-color: color-mix(in srgb, #E61C24 8%, white) !important;
+  border-color: #E61C24 !important;
+}
+
+.swal2-title,
+.cns-swal-title {
+  padding: 0 !important;
+  margin: 0 0 0.5rem !important;
+  font-family: var(--font-plus-jakarta), sans-serif !important;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+  color: #0A163A !important;
+}
+
+.swal2-html-container,
+.cns-swal-text {
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  line-height: 1.6 !important;
+  color: #52525b !important;
+}
+
+.swal2-popup.swal2-toast,
+.cns-swal-popup.cns-swal-toast {
+  width: auto !important;
+  min-width: 18rem !important;
+  max-width: min(92vw, 24rem) !important;
+  padding: 0.875rem 1rem !important;
+  border-width: 2px !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+}
+
+.swal2-popup.swal2-toast:has(.swal2-success),
+.cns-swal-toast-success {
+  background-color: color-mix(in srgb, #059669 8%, white) !important;
+  border-color: #059669 !important;
+}
+
+.swal2-popup.swal2-toast:has(.swal2-error),
+.cns-swal-toast-error {
+  background-color: color-mix(in srgb, #ef4444 8%, white) !important;
+  border-color: #ef4444 !important;
+}
+
+.swal2-popup.swal2-toast:has(.swal2-warning),
+.cns-swal-toast-warning {
+  background-color: color-mix(in srgb, #f59e0b 8%, white) !important;
+  border-color: #f59e0b !important;
+}
+
+.swal2-popup.swal2-toast:has(.swal2-question),
+.cns-swal-toast-question {
+  background-color: color-mix(in srgb, #6366f1 8%, white) !important;
+  border-color: #6366f1 !important;
+}
+
+.swal2-popup.swal2-toast:has(.swal2-info),
+.swal2-popup.swal2-toast:not(:has([class*='swal2-icon'])),
+.cns-swal-toast-brand,
+.cns-swal-toast-info {
+  background-color: color-mix(in srgb, #E61C24 8%, white) !important;
+  border-color: #E61C24 !important;
+}
+
+.cns-swal-popup.cns-swal-toast .cns-swal-title,
+.swal2-popup.swal2-toast .swal2-title {
+  margin: 0 !important;
+  font-size: 1rem !important;
+}
+
+.cns-swal-actions {
+  gap: 0.75rem !important;
+  margin: 1.25rem 0 0 !important;
+  width: 100% !important;
+}
+
+.cns-swal-confirm,
+.cns-swal-cancel {
+  margin: 0 !important;
+  min-height: 2.75rem !important;
+  padding: 0.625rem 1.25rem !important;
+  border-radius: 8px !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease !important;
+}
+
+.cns-swal-confirm {
+  background: var(--brand) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(230, 28, 36, 0.85) !important;
+  box-shadow: 0 8px 18px -10px rgba(230, 28, 36, 0.65) !important;
+}
+
+.cns-swal-confirm:hover {
+  background: #cc181f !important;
+}
+
+.cns-swal-confirm-success {
+  background: #059669 !important;
+  border-color: #059669 !important;
+  box-shadow: 0 8px 18px -10px rgba(5, 150, 105, 0.55) !important;
+}
+
+.cns-swal-confirm-success:hover {
+  background: #047857 !important;
+}
+
+.cns-swal-confirm-danger {
+  background: #e11d48 !important;
+  border-color: #e11d48 !important;
+  box-shadow: 0 8px 18px -10px rgba(225, 29, 72, 0.55) !important;
+}
+
+.cns-swal-confirm-danger:hover {
+  background: #be123c !important;
+}
+
+.cns-swal-confirm-neutral {
+  background: #3f3f46 !important;
+  border-color: #3f3f46 !important;
+  box-shadow: 0 8px 18px -10px rgba(63, 63, 70, 0.45) !important;
+}
+
+.cns-swal-confirm-neutral:hover {
+  background: #27272a !important;
+}
+
+.cns-swal-cancel {
+  background: #f8fafc !important;
+  color: #3f3f46 !important;
+  border: 1px solid #e4e4e7 !important;
+}
+
+.cns-swal-cancel:hover {
+  background: #f4f4f5 !important;
+  border-color: #d4d4d8 !important;
+}
+
+.cns-swal-icon {
+  margin: 0 auto 1rem !important;
+  transform: scale(0.9);
+}
+
+.cns-swal-popup.cns-swal-toast .cns-swal-icon {
+  margin: 0 0.75rem 0 0 !important;
+  transform: scale(0.78);
+}
+
+.cns-swal-close {
+  color: #a1a1aa !important;
+  transition: color 0.2s ease !important;
+}
+
+.cns-swal-close:hover {
+  color: #52525b !important;
+}
+
+.cns-swal-timer {
+  background: rgba(230, 28, 36, 0.75) !important;
+}
+
+.swal2-icon.swal2-success {
+  border-color: #10b981 !important;
+  color: #10b981 !important;
+}
+
+.swal2-icon.swal2-success [class^='swal2-success-line'] {
+  background-color: #10b981 !important;
+}
+
+.swal2-icon.swal2-success .swal2-success-ring {
+  border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+.swal2-icon.swal2-error {
+  border-color: #f43f5e !important;
+  color: #f43f5e !important;
+}
+
+.swal2-icon.swal2-warning {
+  border-color: #f59e0b !important;
+  color: #f59e0b !important;
+}
+
+.swal2-icon.swal2-info {
+  border-color: var(--brand) !important;
+  color: var(--brand) !important;
+}
+
+.swal2-icon.swal2-question {
+  border-color: #6366f1 !important;
+  color: #6366f1 !important;
+}
+
+@media (max-width: 640px) {
+  .cns-swal-actions {
+    flex-direction: column-reverse !important;
+  }
+
+  .cns-swal-confirm,
+  .cns-swal-cancel {
+    width: 100% !important;
+  }
+}
 

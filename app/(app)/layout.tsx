@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Nunito, Plus_Jakarta_Sans } from "next/font/google";
 import { GoogleTagManager } from '@next/third-parties/google';
+import SwalBrandInit from "@/components/SwalBrandInit";
 import "./globals.css";
 import ClientNavbarFooterWrapper from "@/components/ClientNavbarFooterWrapper";
 
@@ -35,6 +36,7 @@ export default function RootLayout({
     >
       <GoogleTagManager gtmId="GTM-WSM4637P" />
       <body className="min-h-full flex flex-col">
+        <SwalBrandInit />
         <ClientNavbarFooterWrapper>{children}</ClientNavbarFooterWrapper>
       </body>
     </html>

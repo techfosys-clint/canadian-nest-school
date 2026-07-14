@@ -1,5 +1,4 @@
-﻿/* eslint-disable @typescript-eslint/no-explicit-any */
-'use client';
+﻿'use client';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -249,7 +248,6 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchStats();
   }, []);
 
@@ -963,8 +961,8 @@ export default function AdminDashboardPage() {
                   Student Reviews About You
                 </h2>
                 <p className='text-base font-semibold text-slate-500 mt-0.5'>
-                  View ratings students left for your teaching. Approval is handled by
-                  admins and staff only.
+                  View ratings students left for your teaching. Approval is
+                  handled by admins and staff only.
                 </p>
               </div>
             </div>

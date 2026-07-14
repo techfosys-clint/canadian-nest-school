@@ -78,7 +78,8 @@ export async function GET(request: Request) {
           populate: [
             { path: 'thumbnail' },
             { path: 'category' },
-            { path: 'instructor' }
+            { path: 'instructor' },
+            { path: 'instructors' },
           ]
         })
         .sort({ createdAt: -1 })
@@ -142,10 +143,24 @@ export async function GET(request: Request) {
             id: doc.course.instructor._id.toString(),
             ...doc.course.instructor
           } : null,
-          instructors: doc.course.instructor ? [{
-            id: doc.course.instructor._id.toString(),
-            ...doc.course.instructor
-          }] : [],
+          instructors: (() => {
+            const fromArray = Array.isArray(doc.course.instructors)
+              ? doc.course.instructors
+                  .filter((i: any) => i && typeof i === 'object' && i._id)
+                  .map((i: any) => ({
+                    id: i._id.toString(),
+                    ...i,
+                  }))
+              : []
+            if (fromArray.length > 0) return fromArray
+            if (doc.course.instructor) {
+              return [{
+                id: doc.course.instructor._id.toString(),
+                ...doc.course.instructor,
+              }]
+            }
+            return []
+          })(),
           thumbnail: doc.course.thumbnail ? {
             id: doc.course.thumbnail._id.toString(),
             ...doc.course.thumbnail

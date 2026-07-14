@@ -161,7 +161,10 @@ export default function DashboardLayout({
             LMS Menu
           </p>
           {sidebarLinks.map((link) => {
-            const isActive = pathname === link.href;
+            const isActive =
+              link.href === '/dashboard'
+                ? pathname === '/dashboard'
+                : pathname === link.href || pathname.startsWith(`${link.href}/`);
             const Icon = link.icon;
             return (
               <Link
@@ -258,7 +261,11 @@ export default function DashboardLayout({
               LMS Menu
             </p>
             {sidebarLinks.map((link) => {
-              const isActive = pathname === link.href;
+              const isActive =
+                link.href === '/dashboard'
+                  ? pathname === '/dashboard'
+                  : pathname === link.href ||
+                    pathname.startsWith(`${link.href}/`);
               const Icon = link.icon;
               return (
                 <Link

@@ -951,6 +951,31 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
+          {/* Student reviews shortcut */}
+          <div className='bg-white border border-slate-200 rounded-lg p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
+            <div className='flex items-start gap-4'>
+              <div className='h-11 w-11 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shrink-0'>
+                <FiStar className='h-5 w-5' />
+              </div>
+              <div>
+                <h2 className='text-lg font-bold text-slate-800'>
+                  Student Reviews About You
+                </h2>
+                <p className='text-base font-semibold text-slate-500 mt-0.5'>
+                  View ratings students left for your teaching. Approval is handled by
+                  admins and staff only.
+                </p>
+              </div>
+            </div>
+            <Link
+              href='/admin/my-reviews'
+              className='inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shrink-0'
+            >
+              View My Reviews
+              <FiChevronRight className='h-4.5 w-4.5' />
+            </Link>
+          </div>
+
           {/* Grid Layout: Your Syllabus + Live Classes Sidebar */}
           <div className='grid grid-cols-1 lg:grid-cols-12 gap-6'>
             {/* Left side: Your Syllabus */}

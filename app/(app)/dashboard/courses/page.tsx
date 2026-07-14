@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { FiArrowRight, FiBook, FiBookOpen } from 'react-icons/fi';
+import { FiArrowRight, FiAward, FiBook, FiBookOpen } from 'react-icons/fi';
 
 interface UserSession {
   id: string;
@@ -295,15 +295,38 @@ export default function MyCoursesPage() {
                       </div>
                     </div>
 
-                    <button
-                      onClick={() =>
-                        handleResumeLearning(course.id, course.slug)
-                      }
-                      className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all duration-200 cursor-pointer border-none active:scale-[0.99]'
-                    >
-                      <span>Resume Learning</span>
-                      <FiArrowRight className='h-5 w-5 group-hover:translate-x-0.5 transition-transform' />
-                    </button>
+                    {progress === 100 ? (
+                      <div className='space-y-3'>
+                        <Link
+                          href={`/dashboard/courses/${course.id}/complete`}
+                          className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all duration-200 border-none'
+                        >
+                          <FiAward className='h-5 w-5' />
+                          <span>Reviews & Certificate</span>
+                        </Link>
+                        <button
+                          type='button'
+                          onClick={() =>
+                            handleResumeLearning(course.id, course.slug)
+                          }
+                          className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-white border border-zinc-200/80 hover:border-[#E61C24]/40 text-zinc-700 hover:text-[#E61C24] font-bold text-base transition-all duration-200 cursor-pointer active:scale-[0.99]'
+                        >
+                          <span>Open Course</span>
+                          <FiArrowRight className='h-5 w-5' />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type='button'
+                        onClick={() =>
+                          handleResumeLearning(course.id, course.slug)
+                        }
+                        className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all duration-200 cursor-pointer border-none active:scale-[0.99]'
+                      >
+                        <span>Resume Learning</span>
+                        <FiArrowRight className='h-5 w-5 group-hover:translate-x-0.5 transition-transform' />
+                      </button>
+                    )}
                   </div>
                 </div>
               );

@@ -28,7 +28,6 @@ import {
   FiRadio,
   FiVideo,
   FiX,
-  FiXCircle,
 } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 import SecureVideoPlayer from './SecureVideoPlayer';
@@ -143,13 +142,6 @@ export default function CoursePlayerClient({
   const [quizScore, setQuizScore] = useState(0);
   const [retakeQuiz, setRetakeQuiz] = useState(false);
 
-  // Certificate states
-  const [certRequest, setCertRequest] = useState<{
-    status: string;
-    certificateUrl: string | null;
-  } | null>(null);
-  const [downloadingCert, setDownloadingCert] = useState(false);
-
   // Student Evaluation Submissions
   const [submissionsMap, setSubmissionsMap] = useState<Record<string, any>>({});
   const [driveLinkInput, setDriveLinkInput] = useState('');
@@ -176,9 +168,6 @@ export default function CoursePlayerClient({
 
           // Set submissions
           setSubmissionsMap(data.data.submissions || {});
-
-          // Set certificate status
-          setCertRequest(data.data.certificates);
         }
       } else {
         console.error('Failed to load course data:', res.statusText);
@@ -187,38 +176,6 @@ export default function CoursePlayerClient({
       console.error('Failed to load course data from combined API', err);
     }
   }, [course.id]);
-
-  const handleDownloadCertificate = async () => {
-    setDownloadingCert(true);
-    try {
-      const res = await fetch(
-        `/api/certificates/download?courseId=${course.id}`,
-      );
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'Unable to download certificate.');
-      }
-
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${course.title.replace(/[^a-zA-Z0-9-_]+/g, '-')}-certificate.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-    } catch (err: any) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Download Failed',
-        text: err.message || 'Could not generate your certificate PDF.',
-        confirmButtonColor: '#E61C24',
-      });
-    } finally {
-      setDownloadingCert(false);
-    }
-  };
 
   // Load all course data on component mount
   useEffect(() => {
@@ -1571,76 +1528,29 @@ export default function CoursePlayerClient({
         </p>
       </div>
 
-      {/* Dynamic Certificate widget */}
+      {/* Dynamic Certificate + Reviews widget */}
       {progressPercentage === 100 && (
         <div className='mx-4 mt-4 p-4 bg-slate-50 border border-zinc-200 rounded-lg flex flex-col gap-3 shadow-sm select-none animate-fadeIn'>
           <div className='flex items-center gap-2'>
             <FiAward className='h-6 w-6 text-[#E61C24]' />
             <h3 className='text-base font-bold text-zinc-900 leading-tight'>
-              Course Completed! 🎓
+              Course Completed!
             </h3>
           </div>
 
-          {!certRequest ? (
-            <div className='space-y-3'>
-              <p className='text-sm font-semibold text-zinc-500 leading-relaxed animate-pulse'>
-                Congratulations on completing the course! Creating your
-                completion certificate request...
-              </p>
-              <div className='w-full h-1.5 bg-slate-200 rounded-lg overflow-hidden'>
-                <div
-                  className='h-full bg-[#E61C24] rounded-lg animate-pulse'
-                  style={{ width: '60%' }}
-                />
-              </div>
-            </div>
-          ) : certRequest.status === 'pending' ? (
-            <div className='space-y-2'>
-              <div className='inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-600 rounded-lg text-xs font-bold uppercase tracking-wider'>
-                <FiClock className='h-3.5 w-3.5 animate-pulse' />
-                Pending Admin Review
-              </div>
-              <p className='text-sm font-semibold text-zinc-500 leading-relaxed mt-1'>
-                Your certificate request is received. The admin will verify your
-                lecture progress and publish the PDF shortly.
-              </p>
-            </div>
-          ) : certRequest.status === 'approved' ? (
-            <div className='space-y-3'>
-              <div className='inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 rounded-lg text-xs font-bold uppercase tracking-wider'>
-                <FiCheckCircle className='h-3.5 w-3.5' />
-                Released
-              </div>
-              <p className='text-sm font-semibold text-zinc-500 leading-relaxed'>
-                Your official verified student completion certificate is
-                available for download below!
-              </p>
-              <button
-                type='button'
-                onClick={handleDownloadCertificate}
-                disabled={downloadingCert}
-                className='w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-70 disabled:cursor-not-allowed text-white text-sm font-bold shadow-md shadow-emerald-600/15 hover:scale-[1.01] transition-all cursor-pointer border-none text-center flex items-center justify-center gap-1.5'
-              >
-                <span>
-                  {downloadingCert
-                    ? 'Generating Certificate...'
-                    : 'Download Certificate (PDF)'}
-                </span>
-                <FiExternalLink className='h-4 w-4' />
-              </button>
-            </div>
-          ) : (
-            <div className='space-y-2'>
-              <div className='inline-flex items-center gap-1.5 px-3 py-1 bg-rose-500/10 border border-rose-500/20 text-rose-600 rounded-lg text-xs font-bold uppercase tracking-wider'>
-                <FiXCircle className='h-3.5 w-3.5' />
-                Rejected
-              </div>
-              <p className='text-sm font-semibold text-zinc-500 leading-relaxed mt-1'>
-                Your certificate request was rejected. Please review admin
-                annotations or contact support.
-              </p>
-            </div>
-          )}
+          <p className='text-sm font-semibold text-zinc-500 leading-relaxed'>
+            Certificate download is locked until you submit reviews for this
+            course and every assigned teacher. After both are accepted, your
+            credential unlocks automatically.
+          </p>
+
+          <Link
+            href={`/dashboard/courses/${course.id}/complete`}
+            className='w-full py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white text-sm font-bold transition-all cursor-pointer border-none text-center flex items-center justify-center gap-1.5'
+          >
+            <span>Leave Reviews to Unlock Certificate</span>
+            <FiExternalLink className='h-4 w-4' />
+          </Link>
         </div>
       )}
 

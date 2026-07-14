@@ -102,6 +102,13 @@ const NAV_GROUPS: SidebarGroup[] = [
         roles: ['admin', 'instructor'],
         permission: 'attendance',
       },
+      {
+        label: 'My Reviews',
+        href: '/admin/my-reviews',
+        icon: FiStar,
+        roles: ['admin', 'instructor'],
+        permission: 'courses',
+      },
     ],
   },
   {

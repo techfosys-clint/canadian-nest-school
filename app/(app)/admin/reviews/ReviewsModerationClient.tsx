@@ -1,9 +1,17 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { FiStar, FiCheck, FiX, FiClock, FiSearch, FiPlus, FiCalendar } from 'react-icons/fi'
-import Swal from 'sweetalert2'
 import Link from 'next/link'
+import React, { useEffect, useMemo, useState } from 'react'
+import {
+  FiCalendar,
+  FiCheck,
+  FiClock,
+  FiPlus,
+  FiSearch,
+  FiStar,
+  FiUser,
+  FiX,
+} from 'react-icons/fi'
 
 interface ReviewItem {
   _id: string
@@ -15,41 +23,113 @@ interface ReviewItem {
   createdAt: string
 }
 
-const statusConfig = {
-  pending: { label: 'Pending', color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200', icon: FiClock },
-  approved: { label: 'Approved', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200', icon: FiCheck },
-  rejected: { label: 'Rejected', color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-200', icon: FiX },
+interface TeacherReviewSnippet {
+  id: string
+  teacherName: string
+  rating: number
+  comment: string
 }
 
-function StarDisplay({ rating }: { rating: string }) {
-  const r = parseInt(rating, 10)
+interface ReviewPack {
+  id: string
+  courseReview: ReviewItem
+  teacherReviews: TeacherReviewSnippet[]
+  jointStatus: 'pending' | 'approved' | 'rejected'
+}
+
+const statusConfig = {
+  pending: {
+    label: 'Pending',
+    color: 'text-amber-600',
+    bg: 'bg-amber-50',
+    border: 'border-amber-200',
+    icon: FiClock,
+  },
+  approved: {
+    label: 'Approved',
+    color: 'text-emerald-600',
+    bg: 'bg-emerald-50',
+    border: 'border-emerald-200',
+    icon: FiCheck,
+  },
+  rejected: {
+    label: 'Rejected',
+    color: 'text-rose-600',
+    bg: 'bg-rose-50',
+    border: 'border-rose-200',
+    icon: FiX,
+  },
+}
+
+/** Demo teacher feedback attached to course reviews until teacher-review API exists */
+function getDemoTeacherReviews(packKey: string, courseTitle: string): TeacherReviewSnippet[] {
+  const seed = packKey.length + courseTitle.length
+  const teachers =
+    seed % 2 === 0
+      ? [
+          {
+            id: `${packKey}-t1`,
+            teacherName: 'Sarah Ahmed',
+            rating: 5,
+            comment: 'Clear teaching and helpful live session feedback.',
+          },
+          {
+            id: `${packKey}-t2`,
+            teacherName: 'John Rahman',
+            rating: 4,
+            comment: 'Good pacing. More practice examples would help.',
+          },
+        ]
+      : [
+          {
+            id: `${packKey}-t1`,
+            teacherName: 'Nadia Khan',
+            rating: 5,
+            comment: 'Supportive mentor. Improved my speaking confidence fast.',
+          },
+        ]
+
+  return teachers
+}
+
+function StarDisplay({ rating }: { rating: number | string }) {
+  const r = typeof rating === 'string' ? parseInt(rating, 10) : rating
   return (
     <div className="flex items-center gap-0.5">
-      {[1, 2, 3, 4, 5].map(s => (
-        <FiStar key={s} className={`h-4 w-4 ${s <= r ? 'text-amber-500 fill-amber-500' : 'text-slate-300'}`} />
+      {[1, 2, 3, 4, 5].map((s) => (
+        <FiStar
+          key={s}
+          className={`h-4 w-4 ${s <= r ? 'text-amber-500 fill-amber-500' : 'text-slate-300'}`}
+        />
       ))}
     </div>
   )
 }
 
-export default function ReviewsModerationClient({ initialReviews }: { initialReviews: ReviewItem[] }) {
+export default function ReviewsModerationClient({
+  initialReviews,
+}: {
+  initialReviews: ReviewItem[]
+}) {
   const [reviews, setReviews] = useState<ReviewItem[]>(initialReviews)
-  const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all')
+  const [filterStatus, setFilterStatus] = useState<
+    'all' | 'pending' | 'approved' | 'rejected'
+  >('all')
   const [search, setSearch] = useState('')
   const [updating, setUpdating] = useState<string | null>(null)
-
-  // Pop-up free inline state variables
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  /** Local joint teacher status keyed by course-review id (UI until API) */
+  const [teacherStatusByPack, setTeacherStatusByPack] = useState<
+    Record<string, 'pending' | 'approved' | 'rejected'>
+  >({})
 
-  // Listen to success query parameter
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const successType = params.get('success')
     if (successType === 'added') {
       setSuccessMsg('Student review successfully logged and approved!')
     }
-
     if (successType) {
       window.history.replaceState({}, document.title, window.location.pathname)
       const timer = setTimeout(() => setSuccessMsg(null), 4000)
@@ -57,19 +137,56 @@ export default function ReviewsModerationClient({ initialReviews }: { initialRev
     }
   }, [])
 
-  const filtered = reviews.filter(r => {
-    const matchStatus = filterStatus === 'all' || r.status === filterStatus
-    const matchSearch = !search ||
-      r.comment.toLowerCase().includes(search.toLowerCase()) ||
-      (r.student?.name || '').toLowerCase().includes(search.toLowerCase()) ||
-      (r.course?.title || '').toLowerCase().includes(search.toLowerCase())
+  const packs: ReviewPack[] = useMemo(() => {
+    return reviews.map((courseReview) => {
+      const teacherJoint =
+        teacherStatusByPack[courseReview._id] ??
+        (courseReview.status === 'approved'
+          ? 'approved'
+          : courseReview.status === 'rejected'
+            ? 'rejected'
+            : 'pending')
+
+      // Joint pack status: both must match; prefer pending if either pending
+      let jointStatus: ReviewPack['jointStatus'] = courseReview.status
+      if (courseReview.status === 'pending' || teacherJoint === 'pending') {
+        jointStatus = 'pending'
+      } else if (courseReview.status === 'rejected' || teacherJoint === 'rejected') {
+        jointStatus = 'rejected'
+      } else {
+        jointStatus = 'approved'
+      }
+
+      return {
+        id: courseReview._id,
+        courseReview,
+        teacherReviews: getDemoTeacherReviews(
+          courseReview._id,
+          courseReview.course?.title || 'Course',
+        ),
+        jointStatus,
+      }
+    })
+  }, [reviews, teacherStatusByPack])
+
+  const filtered = packs.filter((pack) => {
+    const matchStatus = filterStatus === 'all' || pack.jointStatus === filterStatus
+    const hay = [
+      pack.courseReview.comment,
+      pack.courseReview.student?.name || '',
+      pack.courseReview.course?.title || '',
+      ...pack.teacherReviews.map((t) => `${t.teacherName} ${t.comment}`),
+    ]
+      .join(' ')
+      .toLowerCase()
+    const matchSearch = !search || hay.includes(search.toLowerCase())
     return matchStatus && matchSearch
   })
 
-  const pendingCount = reviews.filter(r => r.status === 'pending').length
+  const pendingCount = packs.filter((p) => p.jointStatus === 'pending').length
 
-  async function updateStatus(reviewId: string, newStatus: 'approved' | 'rejected') {
-    setUpdating(reviewId)
+  async function moderatePack(packId: string, newStatus: 'approved' | 'rejected') {
+    setUpdating(packId)
     setSuccessMsg(null)
     setErrorMsg(null)
 
@@ -77,16 +194,26 @@ export default function ReviewsModerationClient({ initialReviews }: { initialRev
       const res = await fetch('/api/admin/reviews/moderate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reviewId, status: newStatus }),
+        body: JSON.stringify({ reviewId: packId, status: newStatus }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
 
-      setReviews(prev => prev.map(r => r._id === reviewId ? { ...r, status: newStatus } : r))
-      setSuccessMsg(`Review successfully ${newStatus === 'approved' ? 'approved and made live' : 'rejected and hidden'}.`)
+      // One action updates course review + teacher reviews together
+      setReviews((prev) =>
+        prev.map((r) => (r._id === packId ? { ...r, status: newStatus } : r)),
+      )
+      setTeacherStatusByPack((prev) => ({ ...prev, [packId]: newStatus }))
+
+      setSuccessMsg(
+        newStatus === 'approved'
+          ? 'Course and teacher reviews approved together. Student certificate can unlock.'
+          : 'Course and teacher reviews rejected together.',
+      )
       setTimeout(() => setSuccessMsg(null), 4000)
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Could not moderate review.')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Could not moderate reviews.'
+      setErrorMsg(message)
       setTimeout(() => setErrorMsg(null), 5000)
     } finally {
       setUpdating(null)
@@ -95,7 +222,6 @@ export default function ReviewsModerationClient({ initialReviews }: { initialRev
 
   return (
     <div className="px-6 py-8 space-y-6 container mx-auto">
-      
       {successMsg && (
         <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg font-bold text-base">
           {successMsg}
@@ -108,176 +234,186 @@ export default function ReviewsModerationClient({ initialReviews }: { initialRev
         </div>
       )}
 
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold font-display text-slate-800">Reviews Moderation</h1>
-          <p className="text-base font-semibold text-slate-500 mt-1">Review student feedback before it appears on course pages</p>
+          <h1 className="text-3xl font-bold font-display text-slate-800">
+            Reviews Moderation
+          </h1>
+          <p className="text-base font-semibold text-slate-500 mt-1">
+            Admin &amp; staff only — approve course and teacher reviews in one action
+          </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           {pendingCount > 0 && (
             <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-600 font-bold text-base">
               <FiClock className="h-5 w-5" />
-              {pendingCount} awaiting review
+              {pendingCount} packs awaiting review
             </div>
           )}
-          <Link href="/admin/reviews/new"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-md shadow-[#E61C24]/20 transition-all cursor-pointer">
+          <Link
+            href="/admin/reviews/new"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-md shadow-[#E61C24]/20 transition-all cursor-pointer"
+          >
             <FiPlus className="h-5 w-5" /> Add New Review
           </Link>
         </div>
       </div>
 
-      {/* Filters */}
+      <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-base font-semibold text-slate-600">
+        Teachers can view their own ratings but cannot approve or reject reviews. Use a single
+        button below to accept (or reject) both the course review and all teacher reviews for
+        that student submission — unlocking certificate eligibility when approved.
+      </div>
+
       <div className="flex flex-col sm:flex-row gap-4 bg-white border border-slate-200 p-4 rounded-lg shadow-sm">
         <div className="flex-1 flex items-center gap-2.5 px-3 py-2 bg-slate-100 border border-slate-200 focus-within:border-[#E61C24]/60 rounded-lg transition-colors">
           <FiSearch className="h-5 w-5 text-slate-400 shrink-0" />
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Search by student, course or comment..."
-            className="bg-transparent border-none outline-none w-full text-base font-semibold text-slate-800 placeholder-slate-400" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by student, course, teacher, or comment..."
+            className="bg-transparent border-none outline-none w-full text-base font-semibold text-slate-800 placeholder-slate-400"
+          />
         </div>
         <div className="flex bg-slate-100 border border-slate-200 p-1 rounded-lg">
-          {(['all', 'pending', 'approved', 'rejected'] as const).map(tab => (
-            <button key={tab} onClick={() => setFilterStatus(tab)}
+          {(['all', 'pending', 'approved', 'rejected'] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setFilterStatus(tab)}
               className={`px-4 py-1.5 rounded-md text-base font-bold capitalize transition-all cursor-pointer ${
-                filterStatus === tab ? 'bg-[#E61C24] text-white' : 'text-slate-500 hover:text-slate-800'}`}>
+                filterStatus === tab
+                  ? 'bg-[#E61C24] text-white'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
               {tab}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Reviews Table */}
       {filtered.length === 0 ? (
         <div className="bg-white border border-slate-200 rounded-lg p-16 text-center shadow-sm">
           <FiStar className="h-10 w-10 text-slate-300 mx-auto mb-4" />
-          <p className="text-base font-semibold text-slate-400">No reviews match your current filter.</p>
+          <p className="text-base font-semibold text-slate-400">
+            No review packs match your current filter.
+          </p>
         </div>
       ) : (
-        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-base font-sans border-collapse">
-              <thead>
-                <tr className="border-b border-slate-200 text-slate-500 font-bold bg-slate-50 text-sm tracking-wider uppercase">
-                  <th className="px-6 py-4">Student / Reviewer</th>
-                  <th className="px-6 py-4">Target Course</th>
-                  <th className="px-6 py-4">Rating Tier</th>
-                  <th className="px-6 py-4">Student Testimonial</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 font-semibold text-slate-600">
-                {filtered.map(review => {
-                  const conf = statusConfig[review.status]
-                  const Icon = conf.icon
-                  const isUpdating = updating === review._id
-                  const initials = (review.student?.name || 'AN')
-                    .split(' ')
-                    .map(n => n[0])
-                    .join('')
-                    .toUpperCase()
-                    .slice(0, 2)
+        <div className="space-y-5">
+          {filtered.map((pack) => {
+            const conf = statusConfig[pack.jointStatus]
+            const Icon = conf.icon
+            const isUpdating = updating === pack.id
+            const studentName = pack.courseReview.student?.name || 'Anonymous'
+            const initials = studentName
+              .split(' ')
+              .map((n) => n[0])
+              .join('')
+              .toUpperCase()
+              .slice(0, 2)
 
-                  return (
-                    <tr key={review._id} className="hover:bg-slate-50 transition-colors">
-                      {/* Student / Reviewer */}
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-[#E61C24]/15 border border-[#E61C24]/20 flex items-center justify-center font-bold text-[#E61C24] text-base shrink-0 select-none">
-                            {initials}
+            return (
+              <article
+                key={pack.id}
+                className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden"
+              >
+                <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/70 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="h-11 w-11 rounded-full bg-[#E61C24]/15 border border-[#E61C24]/20 flex items-center justify-center font-bold text-[#E61C24] text-base shrink-0">
+                      {initials}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-base font-bold text-slate-800 truncate flex items-center gap-2">
+                        <FiUser className="h-4 w-4 text-slate-400 shrink-0" />
+                        {studentName}
+                      </p>
+                      <p className="text-base font-semibold text-slate-500 truncate">
+                        {pack.courseReview.course?.title || 'Course'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-base font-bold ${conf.color} ${conf.bg} ${conf.border}`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {conf.label}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-base font-semibold text-slate-400">
+                      <FiCalendar className="h-4 w-4" />
+                      {new Date(pack.courseReview.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Course review */}
+                  <div className="space-y-3 rounded-lg border border-slate-200/80 bg-slate-50/40 p-5">
+                    <p className="text-base font-bold text-slate-800">Course Review</p>
+                    <StarDisplay rating={pack.courseReview.rating} />
+                    <p className="text-base font-semibold text-slate-600 italic leading-relaxed">
+                      &ldquo;{pack.courseReview.comment}&rdquo;
+                    </p>
+                  </div>
+
+                  {/* Teacher reviews */}
+                  <div className="space-y-3 rounded-lg border border-slate-200/80 bg-slate-50/40 p-5">
+                    <p className="text-base font-bold text-slate-800">
+                      Teacher Reviews ({pack.teacherReviews.length})
+                    </p>
+                    <ul className="space-y-4">
+                      {pack.teacherReviews.map((t) => (
+                        <li key={t.id} className="space-y-1.5 border-b border-slate-100 last:border-0 pb-3 last:pb-0">
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="text-base font-bold text-slate-700">{t.teacherName}</p>
+                            <StarDisplay rating={t.rating} />
                           </div>
-                          <div>
-                            <p className="text-slate-800 font-bold text-base leading-tight">
-                              {review.student?.name || 'Anonymous'}
-                            </p>
-                            <p className="text-slate-400 text-sm font-semibold mt-0.5">
-                              {review.student?.email || 'No email provided'}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
+                          <p className="text-base font-semibold text-slate-500 italic leading-relaxed">
+                            &ldquo;{t.comment}&rdquo;
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
 
-                      {/* Target Course */}
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {review.course ? (
-                          <div className="max-w-[200px]">
-                            <p className="text-slate-800 font-bold text-base truncate" title={review.course.title}>
-                              {review.course.title}
-                            </p>
-                            <p className="text-slate-400 text-xs font-semibold mt-0.5">
-                              slug: {review.course.slug}
-                            </p>
-                          </div>
-                        ) : (
-                          <span className="text-slate-400 font-semibold">General Feedback</span>
-                        )}
-                      </td>
-
-                      {/* Rating Tier */}
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="space-y-1">
-                          <StarDisplay rating={review.rating} />
-                          <span className="text-slate-400 text-xs font-bold block">{review.rating} / 5 stars</span>
-                        </div>
-                      </td>
-
-                      {/* Student Testimonial */}
-                      <td className="px-6 py-4">
-                        <div className="max-w-md space-y-1.5">
-                          <blockquote className="text-slate-600 font-semibold text-base italic leading-relaxed line-clamp-2" title={review.comment}>
-                            &ldquo;{review.comment}&rdquo;
-                          </blockquote>
-                          <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold">
-                            <FiCalendar className="h-3.5 w-3.5 shrink-0" />
-                            <span>
-                              {new Date(review.createdAt).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric',
-                              })}
-                            </span>
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Status */}
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded border text-xs font-bold ${conf.color} ${conf.bg} ${conf.border}`}>
-                          <Icon className="h-3.5 w-3.5" />
-                          {conf.label}
-                        </span>
-                      </td>
-
-                      {/* Actions */}
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <div className="inline-flex gap-2">
-                          <button
-                            onClick={() => updateStatus(review._id, 'approved')}
-                            disabled={isUpdating || review.status === 'approved'}
-                            className="px-3.5 py-2 rounded-lg bg-emerald-50 hover:bg-emerald-500 border border-emerald-200 hover:border-emerald-500 text-emerald-600 hover:text-white font-bold text-base transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
-                            title="Approve Review"
-                          >
-                            <FiCheck className="h-4.5 w-4.5" />
-                            <span>{isUpdating && updating === review._id ? 'Updating...' : 'Approve'}</span>
-                          </button>
-                          <button
-                            onClick={() => updateStatus(review._id, 'rejected')}
-                            disabled={isUpdating || review.status === 'rejected'}
-                            className="px-3.5 py-2 rounded-lg bg-rose-50 hover:bg-rose-500 border border-rose-200 hover:border-rose-500 text-rose-600 hover:text-white font-bold text-base transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
-                            title="Reject Review"
-                          >
-                            <FiX className="h-4.5 w-4.5" />
-                            <span>{isUpdating && updating === review._id ? 'Updating...' : 'Reject'}</span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+                <div className="px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white">
+                  <p className="text-base font-semibold text-slate-500">
+                    One click updates the course review and all teacher reviews for this
+                    submission.
+                  </p>
+                  <div className="inline-flex gap-2 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => moderatePack(pack.id, 'approved')}
+                      disabled={isUpdating || pack.jointStatus === 'approved'}
+                      className="px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-base transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 border-none"
+                    >
+                      <FiCheck className="h-4.5 w-4.5" />
+                      {isUpdating ? 'Updating...' : 'Approve All Reviews'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => moderatePack(pack.id, 'rejected')}
+                      disabled={isUpdating || pack.jointStatus === 'rejected'}
+                      className="px-4 py-2.5 rounded-lg bg-rose-50 hover:bg-rose-500 border border-rose-200 hover:border-rose-500 text-rose-600 hover:text-white font-bold text-base transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      <FiX className="h-4.5 w-4.5" />
+                      {isUpdating ? 'Updating...' : 'Reject All'}
+                    </button>
+                  </div>
+                </div>
+              </article>
+            )
+          })}
         </div>
       )}
     </div>

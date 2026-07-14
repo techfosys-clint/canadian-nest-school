@@ -5,7 +5,11 @@ import { Course } from '@/lib/db/models/Course'
 import { InstructorReview } from '@/lib/db/models/InstructorReview'
 import { Review } from '@/lib/db/models/Review'
 import { revalidatePath } from 'next/cache'
-import { moderateReviewPack } from '@/lib/reviews/reviewPack'
+import {
+  computeJointPackStatus,
+  getCourseInstructorIds,
+  moderateReviewPack,
+} from '@/lib/reviews/reviewPack'
 import '@/lib/db/models/Student'
 import '@/lib/db/models/User'
 
@@ -58,28 +62,40 @@ export async function GET() {
       teacherMap.set(key, list)
     }
 
+    const courseIds = [
+      ...new Set(
+        courseReviews
+          .map((r: any) => r.course?._id?.toString())
+          .filter(Boolean) as string[],
+      ),
+    ]
+    const coursesLean = await Course.find({ _id: { $in: courseIds } })
+      .select('instructor instructors')
+      .lean()
+    const courseInstructorCount = new Map<string, number>()
+    for (const c of coursesLean as any[]) {
+      courseInstructorCount.set(c._id.toString(), getCourseInstructorIds(c).length)
+    }
+
     const packs = courseReviews.map((r: any) => {
       const studentId = r.student?._id?.toString() || ''
       const courseId = r.course?._id?.toString() || ''
       const teacherReviews = teacherMap.get(`${studentId}:${courseId}`) || []
+      const expectedInstructorCount = courseInstructorCount.get(courseId) || 0
 
-      const teacherStatuses = teacherReviews.map((t) => t.status as string)
-      let jointStatus: 'pending' | 'approved' | 'rejected' = r.status
-      if (r.status === 'rejected' || teacherStatuses.includes('rejected')) {
-        jointStatus = 'rejected'
-      } else if (
-        r.status === 'approved' &&
-        (teacherReviews.length === 0 ||
-          teacherStatuses.every((s) => s === 'approved'))
-      ) {
-        jointStatus = 'approved'
-      } else {
-        jointStatus = 'pending'
-      }
+      const jointStatus = computeJointPackStatus({
+        courseStatus: r.status,
+        teacherReviews,
+        expectedInstructorCount,
+      })
 
       return {
         id: r._id.toString(),
         jointStatus,
+        expectedInstructorCount,
+        teachersIncomplete:
+          expectedInstructorCount > 0 &&
+          teacherReviews.length < expectedInstructorCount,
         courseReview: {
           _id: r._id.toString(),
           rating: r.rating,
@@ -155,7 +171,7 @@ export async function POST(request: Request) {
     console.error('POST /api/admin/reviews/packs error:', error)
     return NextResponse.json(
       { error: error.message || 'Failed to moderate review pack.' },
-      { status: 500 },
+      { status: error?.status || 500 },
     )
   }
 }

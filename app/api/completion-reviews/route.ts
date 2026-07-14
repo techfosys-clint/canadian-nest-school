@@ -3,10 +3,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { verifyToken } from '@/lib/auth/auth'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Course } from '@/lib/db/models/Course'
-import { Enrollment } from '@/lib/db/models/Enrollment'
 import { InstructorReview } from '@/lib/db/models/InstructorReview'
 import { Review } from '@/lib/db/models/Review'
 import {
+  assertStudentCanReviewCourse,
   canDownloadCertificate,
   getCourseInstructorIds,
   getStudentCourseReviewGate,
@@ -138,15 +138,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const enrollment = await Enrollment.findOne({
-      student: studentId,
-      course: courseId,
-      paymentStatus: 'completed',
-    }).lean()
-    if (!enrollment) {
+    try {
+      await assertStudentCanReviewCourse(studentId, courseId)
+    } catch (gateErr: any) {
       return NextResponse.json(
-        { error: 'You must be enrolled in this course to submit teacher reviews.' },
-        { status: 403 },
+        { error: gateErr.message || 'Not allowed to review this course.' },
+        { status: gateErr.status || 403 },
       )
     }
 

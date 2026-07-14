@@ -4,10 +4,14 @@ import { cookies } from 'next/headers'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Review } from '@/lib/db/models/Review'
 import { InstructorReview } from '@/lib/db/models/InstructorReview'
+import { Course } from '@/lib/db/models/Course'
 import { User } from '@/lib/db/models/User'
 import { verifyToken } from '@/lib/auth/auth'
 import ReviewsModerationClient from './ReviewsModerationClient'
-import '@/lib/db/models/Course'
+import {
+  computeJointPackStatus,
+  getCourseInstructorIds,
+} from '@/lib/reviews/reviewPack'
 import '@/lib/db/models/Student'
 
 export const metadata = {
@@ -31,7 +35,7 @@ export default async function ReviewsPage() {
   if (!sessionUser || !['admin', 'staff'].includes(sessionUser.role)) redirect('/login')
 
   const courseReviews = await Review.find()
-    .populate({ path: 'course', select: 'title slug' })
+    .populate({ path: 'course', select: 'title slug instructor instructors' })
     .populate({ path: 'student', select: 'name email' })
     .sort({ createdAt: -1 })
     .lean()
@@ -49,6 +53,19 @@ export default async function ReviewsPage() {
       : await InstructorReview.find({ $or: pairFilters })
           .populate({ path: 'instructor', select: 'name designation' })
           .lean()
+
+  // Also load instructor counts for courses that weren't fully populated
+  const courseIdsNeedingInstructors = courseReviews
+    .map((r: any) => r.course?._id?.toString())
+    .filter(Boolean) as string[]
+
+  const coursesLean = await Course.find({ _id: { $in: courseIdsNeedingInstructors } })
+    .select('instructor instructors')
+    .lean()
+  const courseInstructorCount = new Map<string, number>()
+  for (const c of coursesLean as any[]) {
+    courseInstructorCount.set(c._id.toString(), getCourseInstructorIds(c).length)
+  }
 
   const teacherMap = new Map<string, any[]>()
   for (const ir of instructorReviews as any[]) {
@@ -68,23 +85,22 @@ export default async function ReviewsPage() {
     const studentId = r.student?._id?.toString() || ''
     const courseId = r.course?._id?.toString() || ''
     const teacherReviews = teacherMap.get(`${studentId}:${courseId}`) || []
-    const teacherStatuses = teacherReviews.map((t) => t.status as string)
+    const expectedInstructorCount = courseInstructorCount.get(courseId) || 0
 
-    let jointStatus: 'pending' | 'approved' | 'rejected' = r.status
-    if (r.status === 'rejected' || teacherStatuses.includes('rejected')) {
-      jointStatus = 'rejected'
-    } else if (
-      r.status === 'approved' &&
-      (teacherReviews.length === 0 || teacherStatuses.every((s) => s === 'approved'))
-    ) {
-      jointStatus = 'approved'
-    } else {
-      jointStatus = 'pending'
-    }
+    const jointStatus = computeJointPackStatus({
+      courseStatus: r.status,
+      teacherReviews,
+      expectedInstructorCount,
+    })
+
+    const teachersIncomplete =
+      expectedInstructorCount > 0 && teacherReviews.length < expectedInstructorCount
 
     return {
       id: r._id.toString(),
       jointStatus,
+      expectedInstructorCount,
+      teachersIncomplete,
       courseReview: {
         _id: r._id.toString(),
         rating: r.rating,

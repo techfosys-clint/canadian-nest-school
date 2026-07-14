@@ -36,6 +36,8 @@ interface ReviewPack {
   courseReview: CourseReviewItem
   teacherReviews: TeacherReviewSnippet[]
   jointStatus: 'pending' | 'approved' | 'rejected'
+  expectedInstructorCount?: number
+  teachersIncomplete?: boolean
 }
 
 const statusConfig = {
@@ -340,15 +342,29 @@ export default function ReviewsModerationClient({
                 </div>
 
                 <div className="px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white">
-                  <p className="text-base font-semibold text-slate-500">
-                    One click updates the course review and all teacher reviews for this
-                    submission.
-                  </p>
+                  <div className="space-y-1">
+                    <p className="text-base font-semibold text-slate-500">
+                      One click updates the course review and all teacher reviews for this
+                      submission.
+                    </p>
+                    {pack.teachersIncomplete && (
+                      <p className="text-base font-semibold text-amber-600">
+                        Waiting for teacher reviews (
+                        {pack.teacherReviews.length}/
+                        {pack.expectedInstructorCount || 0} submitted). Approve unlocks after
+                        the student finishes rating every assigned teacher.
+                      </p>
+                    )}
+                  </div>
                   <div className="inline-flex gap-2 flex-wrap">
                     <button
                       type="button"
                       onClick={() => moderatePack(pack.id, 'approved')}
-                      disabled={isUpdating || pack.jointStatus === 'approved'}
+                      disabled={
+                        isUpdating ||
+                        pack.jointStatus === 'approved' ||
+                        !!pack.teachersIncomplete
+                      }
                       className="px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-base transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 border-none"
                     >
                       <FiCheck className="h-4.5 w-4.5" />

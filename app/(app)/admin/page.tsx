@@ -270,7 +270,8 @@ export default function AdminDashboardPage() {
       });
 
       if (!res.ok) {
-        throw new Error('Failed to update testimonial status.');
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to update testimonial status.');
       }
 
       Swal.fire({

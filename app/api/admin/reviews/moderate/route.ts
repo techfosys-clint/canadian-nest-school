@@ -54,6 +54,10 @@ export async function POST(request: Request) {
 
   } catch (error: any) {
     console.error('Moderation API Error:', error)
-    return NextResponse.json({ error: error.message || 'Failed to update review status.' }, { status: 500 })
+    const statusCode = error?.status || 500
+    return NextResponse.json(
+      { error: error.message || 'Failed to update review status.' },
+      { status: statusCode },
+    )
   }
 }

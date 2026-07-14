@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   FiBookOpen,
   FiClock,
@@ -22,64 +22,7 @@ interface TeacherReviewItem {
   createdAt: string
 }
 
-/** Static demo data until teacher-review API is wired */
-const STATIC_REVIEWS: TeacherReviewItem[] = [
-  {
-    id: 'tr-1',
-    studentName: 'Ayesha Rahman',
-    courseTitle: 'Spoken English Mastery',
-    rating: 5,
-    comment:
-      'Very clear explanations and patient during live sessions. I improved my confidence in speaking within a few weeks.',
-    status: 'approved',
-    createdAt: '2026-07-10T09:30:00.000Z',
-  },
-  {
-    id: 'tr-2',
-    studentName: 'Md. Karim Hossain',
-    courseTitle: 'IELTS Preparation Intensive',
-    rating: 4,
-    comment:
-      'Great feedback on my writing tasks. Would love more practice speaking drills in class.',
-    status: 'approved',
-    createdAt: '2026-07-08T14:15:00.000Z',
-  },
-  {
-    id: 'tr-3',
-    studentName: 'Nusrat Jahan',
-    courseTitle: 'Spoken English Mastery',
-    rating: 5,
-    comment:
-      'The teaching style is engaging and supportive. Assignments were practical and helpful.',
-    status: 'pending',
-    createdAt: '2026-07-12T11:00:00.000Z',
-  },
-  {
-    id: 'tr-4',
-    studentName: 'Fahim Ahmed',
-    courseTitle: 'Business Communication',
-    rating: 3,
-    comment:
-      'Content was solid, but I needed more examples for professional email writing.',
-    status: 'approved',
-    createdAt: '2026-07-02T16:45:00.000Z',
-  },
-  {
-    id: 'tr-5',
-    studentName: 'Sadia Islam',
-    courseTitle: 'IELTS Preparation Intensive',
-    rating: 5,
-    comment:
-      'Outstanding mentor. Helped me structure my speaking answers and correct pronunciation.',
-    status: 'pending',
-    createdAt: '2026-07-14T08:20:00.000Z',
-  },
-]
-
-const statusStyles: Record<
-  ReviewStatus,
-  { label: string; classes: string }
-> = {
+const statusStyles: Record<ReviewStatus, { label: string; classes: string }> = {
   pending: {
     label: 'Pending',
     classes: 'bg-amber-50 text-amber-600 border border-amber-200',
@@ -119,16 +62,35 @@ function getInitials(name: string) {
 }
 
 export default function TeacherMyReviewsPage() {
+  const [reviews, setReviews] = useState<TeacherReviewItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | ReviewStatus>('all')
   const [courseFilter, setCourseFilter] = useState('all')
 
-  const courses = useMemo(() => {
-    return Array.from(new Set(STATIC_REVIEWS.map((r) => r.courseTitle))).sort()
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch('/api/instructor/reviews', { cache: 'no-store' })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error || 'Failed to load reviews.')
+        setReviews(data.docs || [])
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to load reviews.')
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
   }, [])
 
+  const courses = useMemo(() => {
+    return Array.from(new Set(reviews.map((r) => r.courseTitle))).sort()
+  }, [reviews])
+
   const filtered = useMemo(() => {
-    return STATIC_REVIEWS.filter((r) => {
+    return reviews.filter((r) => {
       const matchStatus = statusFilter === 'all' || r.status === statusFilter
       const matchCourse = courseFilter === 'all' || r.courseTitle === courseFilter
       const q = search.trim().toLowerCase()
@@ -139,15 +101,15 @@ export default function TeacherMyReviewsPage() {
         r.comment.toLowerCase().includes(q)
       return matchStatus && matchCourse && matchSearch
     })
-  }, [search, statusFilter, courseFilter])
+  }, [reviews, search, statusFilter, courseFilter])
 
   const avgRating =
-    STATIC_REVIEWS.length === 0
+    reviews.length === 0
       ? 0
-      : STATIC_REVIEWS.reduce((sum, r) => sum + r.rating, 0) / STATIC_REVIEWS.length
+      : reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
 
-  const approvedCount = STATIC_REVIEWS.filter((r) => r.status === 'approved').length
-  const pendingCount = STATIC_REVIEWS.filter((r) => r.status === 'pending').length
+  const approvedCount = reviews.filter((r) => r.status === 'approved').length
+  const pendingCount = reviews.filter((r) => r.status === 'pending').length
 
   const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleDateString('en-BD', {
@@ -156,9 +118,19 @@ export default function TeacherMyReviewsPage() {
       year: 'numeric',
     })
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
+          <p className="text-base font-bold text-slate-600">Loading your reviews...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="px-6 py-8 space-y-6 container mx-auto">
-      {/* Header */}
       <div className="border-b border-slate-200 pb-5">
         <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2 select-none">
           <FiStar className="text-[#E61C24] h-7 w-7" />
@@ -170,7 +142,17 @@ export default function TeacherMyReviewsPage() {
         </p>
       </div>
 
-      {/* Summary cards */}
+      <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-base font-semibold text-slate-600">
+        This page is view-only. You cannot approve or reject reviews — admins and staff moderate
+        course and teacher feedback in one combined action.
+      </div>
+
+      {error && (
+        <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg font-bold text-base">
+          {error}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-sm flex items-center gap-4">
           <div className="h-11 w-11 rounded-lg bg-[#E61C24]/10 border border-[#E61C24]/20 flex items-center justify-center text-[#E61C24] shrink-0">
@@ -178,7 +160,7 @@ export default function TeacherMyReviewsPage() {
           </div>
           <div>
             <p className="text-base font-semibold text-slate-500">Total Reviews</p>
-            <p className="text-2xl font-bold text-slate-800">{STATIC_REVIEWS.length}</p>
+            <p className="text-2xl font-bold text-slate-800">{reviews.length}</p>
           </div>
         </div>
         <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-sm flex items-center gap-4">
@@ -207,12 +189,6 @@ export default function TeacherMyReviewsPage() {
         </div>
       </div>
 
-      <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-base font-semibold text-slate-600">
-        This page is view-only. You cannot approve or reject reviews — admins and staff moderate
-        course and teacher feedback in one combined action.
-      </div>
-
-      {/* Filters */}
       <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-sm flex flex-col lg:flex-row lg:items-center gap-4">
         <div className="relative flex-1 max-w-md">
           <FiSearch className="absolute left-3.5 top-3.5 text-slate-400 h-5 w-5" />
@@ -256,7 +232,6 @@ export default function TeacherMyReviewsPage() {
         </div>
       </div>
 
-      {/* Reviews list */}
       <div className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-200 bg-slate-50/80 flex items-center justify-between">
           <h2 className="text-lg font-bold text-slate-800">Incoming Feedback</h2>
@@ -270,8 +245,8 @@ export default function TeacherMyReviewsPage() {
             <FiMessageSquare className="mx-auto h-10 w-10 text-slate-300" />
             <p className="text-lg font-bold text-slate-800">No reviews found</p>
             <p className="text-base font-semibold text-slate-500 leading-relaxed">
-              Try changing filters, or check back after students complete your courses and
-              submit teacher reviews.
+              When students complete your courses and submit teacher reviews, they will appear
+              here.
             </p>
           </div>
         ) : (
@@ -279,7 +254,10 @@ export default function TeacherMyReviewsPage() {
             {filtered.map((review) => {
               const status = statusStyles[review.status]
               return (
-                <li key={review.id} className="p-6 space-y-4 hover:bg-slate-50/50 transition-colors">
+                <li
+                  key={review.id}
+                  className="p-6 space-y-4 hover:bg-slate-50/50 transition-colors"
+                >
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex items-start gap-3 min-w-0">
                       <div className="h-11 w-11 rounded-full bg-[#0A163A] text-white flex items-center justify-center text-sm font-bold shrink-0">
@@ -320,11 +298,6 @@ export default function TeacherMyReviewsPage() {
           </ul>
         )}
       </div>
-
-      <p className="text-base font-semibold text-slate-400 text-center">
-        Static preview UI — live student teacher reviews will appear here once the backend is
-        connected. Approval is handled only by admins and staff.
-      </p>
     </div>
   )
 }

@@ -16,7 +16,6 @@ import Swal from 'sweetalert2'
 import {
   canDownloadCertificate,
   hasSubmittedRequiredReviews,
-  readCompletionReviewState,
   type CompletionReviewState,
 } from '@/lib/reviews/completionGate'
 
@@ -30,6 +29,8 @@ interface CertificateItem {
   certificateUrl: string | null
   adminNotes: string
   createdAt: string
+  courseReviewStatus?: CompletionReviewState['courseReviewStatus']
+  teacherReviewStatus?: CompletionReviewState['teacherReviewStatus']
 }
 
 export default function MyCertificatesPage() {
@@ -37,12 +38,16 @@ export default function MyCertificatesPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
-  const [reviewGates, setReviewGates] = useState<
-    Record<string, CompletionReviewState | null>
-  >({})
+
+  function getGate(cert: CertificateItem): CompletionReviewState {
+    return {
+      courseReviewStatus: cert.courseReviewStatus || 'idle',
+      teacherReviewStatus: cert.teacherReviewStatus || 'idle',
+    }
+  }
 
   async function handleDownloadCertificate(cert: CertificateItem) {
-    const gate = reviewGates[cert.courseId] ?? null
+    const gate = getGate(cert)
     if (!hasSubmittedRequiredReviews(gate)) {
       Swal.fire({
         icon: 'info',
@@ -102,26 +107,10 @@ export default function MyCertificatesPage() {
   async function fetchCertificates() {
     setLoading(true)
     try {
-      const [sessionRes, certRes] = await Promise.all([
-        fetch('/api/auth/me'),
-        fetch('/api/certificates'),
-      ])
-
-      const sessionData = await sessionRes.json()
-      const uid = sessionData?.user?.id || null
-
-      const data = await certRes.json()
-      if (certRes.ok && data.success) {
-        const requests: CertificateItem[] = data.requests || []
-        setCertificates(requests)
-
-        if (uid) {
-          const gates: Record<string, CompletionReviewState | null> = {}
-          for (const cert of requests) {
-            gates[cert.courseId] = readCompletionReviewState(uid, cert.courseId)
-          }
-          setReviewGates(gates)
-        }
+      const res = await fetch('/api/certificates')
+      const data = await res.json()
+      if (res.ok && data.success) {
+        setCertificates(data.requests || [])
       } else {
         throw new Error(data.error || 'Failed to fetch certificates registry.')
       }
@@ -161,7 +150,7 @@ export default function MyCertificatesPage() {
   }
 
   const renderDownloadCell = (cert: CertificateItem) => {
-    const gate = reviewGates[cert.courseId] ?? null
+    const gate = getGate(cert)
     const reviewsDone = hasSubmittedRequiredReviews(gate)
     const reviewsAccepted = canDownloadCertificate(gate)
 

@@ -10,9 +10,15 @@ import { CertificateRequest } from '@/lib/db/models/CertificateRequest'
 import { Course } from '@/lib/db/models/Course'
 import { Enrollment } from '@/lib/db/models/Enrollment'
 import { getCourseProgressPercent } from '@/lib/progress/getCourseProgress'
+import {
+  canDownloadCertificate,
+  getStudentCourseReviewGate,
+} from '@/lib/reviews/reviewPack'
 import '@/lib/db/models/Student'
 import '@/lib/db/models/User'
 import '@/lib/db/models/Category'
+import '@/lib/db/models/InstructorReview'
+import '@/lib/db/models/Review'
 
 export const dynamic = 'force-dynamic'
 
@@ -71,6 +77,22 @@ export async function GET(request: NextRequest) {
     if (progress < 100) {
       return NextResponse.json(
         { error: 'Complete all lessons before downloading your certificate.' },
+        { status: 403 },
+      )
+    }
+
+    const reviewGate = await getStudentCourseReviewGate(userId, courseId)
+    if (
+      !canDownloadCertificate(
+        reviewGate.courseReviewStatus,
+        reviewGate.teacherReviewStatus,
+      )
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            'Submit course and teacher reviews, then wait for admin/staff approval before downloading your certificate.',
+        },
         { status: 403 },
       )
     }

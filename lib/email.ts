@@ -1,16 +1,19 @@
-import nodemailer from 'nodemailer'
+import nodemailer from 'nodemailer';
 
-let cachedTransporter: ReturnType<typeof nodemailer.createTransport> | null = null
+let cachedTransporter: ReturnType<typeof nodemailer.createTransport> | null =
+  null;
 
 export function getGmailTransporter() {
-  if (cachedTransporter) return cachedTransporter
+  if (cachedTransporter) return cachedTransporter;
 
-  const gmailUser = process.env.GMAIL_USER
-  const gmailAppPassword = process.env.GMAIL_APP_PASSWORD
+  const gmailUser = process.env.GMAIL_USER;
+  const gmailAppPassword = process.env.GMAIL_APP_PASSWORD;
 
   if (!gmailUser || !gmailAppPassword) {
-    console.error('GMAIL_USER or GMAIL_APP_PASSWORD is not defined in environment variables.')
-    return null
+    console.error(
+      'GMAIL_USER or GMAIL_APP_PASSWORD is not defined in environment variables.',
+    );
+    return null;
   }
 
   cachedTransporter = nodemailer.createTransport({
@@ -19,9 +22,9 @@ export function getGmailTransporter() {
       user: gmailUser,
       pass: gmailAppPassword,
     },
-  })
+  });
 
-  return cachedTransporter
+  return cachedTransporter;
 }
 
 export async function sendEnrollmentConfirmationEmail(
@@ -30,15 +33,15 @@ export async function sendEnrollmentConfirmationEmail(
   courseTitle: string,
   pricePaid: number,
   paymentReference: string,
-  enrolledAt: Date
+  enrolledAt: Date,
 ) {
-  const transporter = getGmailTransporter()
-  const fromEmail = process.env.GMAIL_USER
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-  const logoUrl = `${appUrl}/logo.png`
+  const transporter = getGmailTransporter();
+  const fromEmail = process.env.GMAIL_USER;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const logoUrl = `${appUrl}/logo.png`;
 
   if (!transporter) {
-    return false
+    return false;
   }
 
   const formattedDate = new Date(enrolledAt).toLocaleString('en-BD', {
@@ -48,15 +51,15 @@ export async function sendEnrollmentConfirmationEmail(
     hour: '2-digit',
     minute: '2-digit',
     hour12: true,
-  })
+  });
 
   const formattedPrice = new Intl.NumberFormat('en-BD', {
     style: 'currency',
     currency: 'BDT',
     minimumFractionDigits: 0,
-  }).format(pricePaid)
+  }).format(pricePaid);
 
-  const subject = `🎉 You're Enrolled! "${courseTitle}" - Canadian Nest School`
+  const subject = `🎉 You're Enrolled! "${courseTitle}" - Canadian Nest School`;
 
   const htmlContent = `
     <!DOCTYPE html>
@@ -119,7 +122,7 @@ export async function sendEnrollmentConfirmationEmail(
       </div>
     </body>
     </html>
-  `
+  `;
 
   try {
     await transporter.sendMail({
@@ -127,11 +130,11 @@ export async function sendEnrollmentConfirmationEmail(
       to: toEmail,
       subject,
       html: htmlContent,
-    })
-    return true
+    });
+    return true;
   } catch (error) {
-    console.error('Failed to send enrollment confirmation email:', error)
-    return false
+    console.error('Failed to send enrollment confirmation email:', error);
+    return false;
   }
 }
 
@@ -142,15 +145,15 @@ export async function sendOrderConfirmationEmail(
   totalAmount: number,
   paymentReference: string,
   shippingAddress: string,
-  orderedAt: Date
+  orderedAt: Date,
 ) {
-  const transporter = getGmailTransporter()
-  const fromEmail = process.env.GMAIL_USER
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-  const logoUrl = `${appUrl}/logo.png`
+  const transporter = getGmailTransporter();
+  const fromEmail = process.env.GMAIL_USER;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const logoUrl = `${appUrl}/logo.png`;
 
   if (!transporter) {
-    return false
+    return false;
   }
 
   const formattedDate = new Date(orderedAt).toLocaleString('en-BD', {
@@ -160,10 +163,14 @@ export async function sendOrderConfirmationEmail(
     hour: '2-digit',
     minute: '2-digit',
     hour12: true,
-  })
+  });
 
   const formatMoney = (amount: number) =>
-    new Intl.NumberFormat('en-BD', { style: 'currency', currency: 'BDT', minimumFractionDigits: 0 }).format(amount)
+    new Intl.NumberFormat('en-BD', {
+      style: 'currency',
+      currency: 'BDT',
+      minimumFractionDigits: 0,
+    }).format(amount);
 
   const itemRows = items
     .map(
@@ -171,11 +178,11 @@ export async function sendOrderConfirmationEmail(
         <tr class="invoice-row">
           <td style="padding: 12px 20px; font-size: 15px; color: #6b7280; font-weight: 600; border-bottom: 1px solid #e5e7eb;">${item.title} &times; ${item.quantity}</td>
           <td style="padding: 12px 20px; font-size: 15px; color: #111827; font-weight: bold; text-align: right; border-bottom: 1px solid #e5e7eb;">${formatMoney(item.price * item.quantity)}</td>
-        </tr>`
+        </tr>`,
     )
-    .join('')
+    .join('');
 
-  const subject = `📦 Order Confirmed - Canadian Nest School Shop`
+  const subject = `📦 Order Confirmed - Canadian Nest School Shop`;
 
   const htmlContent = `
     <!DOCTYPE html>
@@ -237,7 +244,7 @@ export async function sendOrderConfirmationEmail(
       </div>
     </body>
     </html>
-  `
+  `;
 
   try {
     await transporter.sendMail({
@@ -245,24 +252,29 @@ export async function sendOrderConfirmationEmail(
       to: toEmail,
       subject,
       html: htmlContent,
-    })
-    return true
+    });
+    return true;
   } catch (error) {
-    console.error('Failed to send order confirmation email:', error)
-    return false
+    console.error('Failed to send order confirmation email:', error);
+    return false;
   }
 }
 
-export async function sendStaffRegistrationEmail(toEmail: string, name: string, role: string, rawPassword: string) {
-  const transporter = getGmailTransporter()
-  const fromEmail = process.env.GMAIL_USER
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+export async function sendStaffRegistrationEmail(
+  toEmail: string,
+  name: string,
+  role: string,
+  rawPassword: string,
+) {
+  const transporter = getGmailTransporter();
+  const fromEmail = process.env.GMAIL_USER;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
   if (!transporter) {
-    return false
+    return false;
   }
 
-  const subject = `Welcome to Canadian Nest School - Your ${role.toUpperCase()} Account is Ready`
+  const subject = `Welcome to Canadian Nest School - Your ${role.toUpperCase()} Account is Ready`;
   const htmlContent = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e4e4e7; border-radius: 8px; background-color: #ffffff; color: #1f2937;">
       <h2 style="color: #615fff; margin-bottom: 20px; font-weight: bold;">Welcome to Canadian Nest School, ${name}!</h2>
@@ -281,7 +293,7 @@ export async function sendStaffRegistrationEmail(toEmail: string, name: string, 
         For security reasons, we highly recommend changing your password after your first login.
       </p>
     </div>
-  `
+  `;
 
   try {
     await transporter.sendMail({
@@ -289,12 +301,12 @@ export async function sendStaffRegistrationEmail(toEmail: string, name: string, 
       to: toEmail,
       subject: subject,
       html: htmlContent,
-    })
+    });
 
-    return true
+    return true;
   } catch (error) {
-    console.error('Failed to send registration email:', error)
-    return false
+    console.error('Failed to send registration email:', error);
+    return false;
   }
 }
 
@@ -305,14 +317,14 @@ export async function sendLiveClassReminderEmail(
   lessonTitle: string,
   liveDate: Date,
   livePlatform: string,
-  liveUrl: string
+  liveUrl: string,
 ) {
-  const transporter = getGmailTransporter()
-  const fromEmail = process.env.GMAIL_USER
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const transporter = getGmailTransporter();
+  const fromEmail = process.env.GMAIL_USER;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
   if (!transporter) {
-    return false
+    return false;
   }
 
   const formattedDate = new Date(liveDate).toLocaleString('en-BD', {
@@ -323,11 +335,11 @@ export async function sendLiveClassReminderEmail(
     hour: '2-digit',
     minute: '2-digit',
     hour12: true,
-    timeZone: 'Asia/Dhaka'
-  })
+    timeZone: 'Asia/Dhaka',
+  });
 
-  const subject = `⚠️ URGENT REMINDER: Your Live Class Starts Soon!`
-  const bannerUrl = `${appUrl}/media/live-class-reminder.png`
+  const subject = `⚠️ URGENT REMINDER: Your Live Class Starts Soon!`;
+  const bannerUrl = `${appUrl}/media/live-class-reminder.png`;
 
   const htmlContent = `
     <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; border: 1px solid #27272a; border-radius: 8px; background-color: #070b16; color: #ffffff; overflow: hidden;">
@@ -374,7 +386,7 @@ export async function sendLiveClassReminderEmail(
         </p>
       </div>
     </div>
-  `
+  `;
 
   try {
     await transporter.sendMail({
@@ -382,55 +394,50 @@ export async function sendLiveClassReminderEmail(
       to: toEmail,
       subject: subject,
       html: htmlContent,
-    })
+    });
 
-    return true
+    return true;
   } catch (error) {
-    console.error('Failed to send live class reminder email:', error)
-    return false
+    console.error('Failed to send live class reminder email:', error);
+    return false;
   }
 }
 
 export async function checkAndSendLiveClassReminders() {
   try {
-    const { connectToDatabase } = await import('@/lib/db/mongodb')
-    await connectToDatabase()
+    const { connectToDatabase } = await import('@/lib/db/mongodb');
+    await connectToDatabase();
 
-    const { Lesson } = await import('@/lib/db/models/Lesson')
-    const { Course } = await import('@/lib/db/models/Course')
-    const { User } = await import('@/lib/db/models/User')
+    const { Lesson } = await import('@/lib/db/models/Lesson');
+    const { Course } = await import('@/lib/db/models/Course');
+    const { User } = await import('@/lib/db/models/User');
 
     // Find live classes starting in the next 2 hours (or already started in the last 15 minutes) that haven't received a reminder yet
-    const now = new Date()
-    const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000)
-    const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000)
+    const now = new Date();
+    const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+    const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
 
     const upcomingLessons = await Lesson.find({
       lessonType: 'live',
       liveDate: { $gte: fifteenMinutesAgo, $lte: twoHoursLater },
       liveUrl: { $exists: true, $ne: '' },
-      $or: [
-        { reminderSent: { $exists: false } },
-        { reminderSent: false }
-      ]
-    }).populate('course')
+      $or: [{ reminderSent: { $exists: false } }, { reminderSent: false }],
+    }).populate('course');
 
-    if (upcomingLessons.length === 0) return
-
-    console.log(`Found ${upcomingLessons.length} upcoming live classes requiring reminders.`)
+    if (upcomingLessons.length === 0) return;
 
     for (const lesson of upcomingLessons) {
-      const course = lesson.course
-      if (!course) continue
+      const course = lesson.course;
+      if (!course) continue;
 
       // Fetch course details to get the instructor
-      const courseDoc = await Course.findById(course._id || course).populate('instructor')
-      if (!courseDoc || !courseDoc.instructor) continue
+      const courseDoc = await Course.findById(course._id || course).populate(
+        'instructor',
+      );
+      if (!courseDoc || !courseDoc.instructor) continue;
 
-      const instructor = courseDoc.instructor as any
-      if (!instructor.email) continue
-
-      console.log(`Sending live reminder for "${lesson.title}" to instructor "${instructor.name}" (${instructor.email})`)
+      const instructor = courseDoc.instructor as any;
+      if (!instructor.email) continue;
 
       const success = await sendLiveClassReminderEmail(
         instructor.email,
@@ -439,16 +446,15 @@ export async function checkAndSendLiveClassReminders() {
         lesson.title,
         lesson.liveDate,
         lesson.livePlatform || 'zoom',
-        lesson.liveUrl
-      )
+        lesson.liveUrl,
+      );
 
       if (success) {
-        lesson.reminderSent = true
-        await lesson.save()
-        console.log(`Successfully marked lesson "${lesson.title}" reminder as sent.`)
+        lesson.reminderSent = true;
+        await lesson.save();
       }
     }
   } catch (error) {
-    console.error('Error checking and sending live class reminders:', error)
+    console.error('Error checking and sending live class reminders:', error);
   }
 }

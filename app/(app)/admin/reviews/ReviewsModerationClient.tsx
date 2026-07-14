@@ -13,7 +13,7 @@ import {
   FiX,
 } from 'react-icons/fi'
 
-interface ReviewItem {
+interface CourseReviewItem {
   _id: string
   rating: string
   comment: string
@@ -28,11 +28,12 @@ interface TeacherReviewSnippet {
   teacherName: string
   rating: number
   comment: string
+  status?: string
 }
 
 interface ReviewPack {
   id: string
-  courseReview: ReviewItem
+  courseReview: CourseReviewItem
   teacherReviews: TeacherReviewSnippet[]
   jointStatus: 'pending' | 'approved' | 'rejected'
 }
@@ -61,37 +62,6 @@ const statusConfig = {
   },
 }
 
-/** Demo teacher feedback attached to course reviews until teacher-review API exists */
-function getDemoTeacherReviews(packKey: string, courseTitle: string): TeacherReviewSnippet[] {
-  const seed = packKey.length + courseTitle.length
-  const teachers =
-    seed % 2 === 0
-      ? [
-          {
-            id: `${packKey}-t1`,
-            teacherName: 'Sarah Ahmed',
-            rating: 5,
-            comment: 'Clear teaching and helpful live session feedback.',
-          },
-          {
-            id: `${packKey}-t2`,
-            teacherName: 'John Rahman',
-            rating: 4,
-            comment: 'Good pacing. More practice examples would help.',
-          },
-        ]
-      : [
-          {
-            id: `${packKey}-t1`,
-            teacherName: 'Nadia Khan',
-            rating: 5,
-            comment: 'Supportive mentor. Improved my speaking confidence fast.',
-          },
-        ]
-
-  return teachers
-}
-
 function StarDisplay({ rating }: { rating: number | string }) {
   const r = typeof rating === 'string' ? parseInt(rating, 10) : rating
   return (
@@ -107,11 +77,11 @@ function StarDisplay({ rating }: { rating: number | string }) {
 }
 
 export default function ReviewsModerationClient({
-  initialReviews,
+  initialPacks,
 }: {
-  initialReviews: ReviewItem[]
+  initialPacks: ReviewPack[]
 }) {
-  const [reviews, setReviews] = useState<ReviewItem[]>(initialReviews)
+  const [packs, setPacks] = useState<ReviewPack[]>(initialPacks)
   const [filterStatus, setFilterStatus] = useState<
     'all' | 'pending' | 'approved' | 'rejected'
   >('all')
@@ -119,10 +89,6 @@ export default function ReviewsModerationClient({
   const [updating, setUpdating] = useState<string | null>(null)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  /** Local joint teacher status keyed by course-review id (UI until API) */
-  const [teacherStatusByPack, setTeacherStatusByPack] = useState<
-    Record<string, 'pending' | 'approved' | 'rejected'>
-  >({})
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -137,51 +103,21 @@ export default function ReviewsModerationClient({
     }
   }, [])
 
-  const packs: ReviewPack[] = useMemo(() => {
-    return reviews.map((courseReview) => {
-      const teacherJoint =
-        teacherStatusByPack[courseReview._id] ??
-        (courseReview.status === 'approved'
-          ? 'approved'
-          : courseReview.status === 'rejected'
-            ? 'rejected'
-            : 'pending')
-
-      // Joint pack status: both must match; prefer pending if either pending
-      let jointStatus: ReviewPack['jointStatus'] = courseReview.status
-      if (courseReview.status === 'pending' || teacherJoint === 'pending') {
-        jointStatus = 'pending'
-      } else if (courseReview.status === 'rejected' || teacherJoint === 'rejected') {
-        jointStatus = 'rejected'
-      } else {
-        jointStatus = 'approved'
-      }
-
-      return {
-        id: courseReview._id,
-        courseReview,
-        teacherReviews: getDemoTeacherReviews(
-          courseReview._id,
-          courseReview.course?.title || 'Course',
-        ),
-        jointStatus,
-      }
+  const filtered = useMemo(() => {
+    return packs.filter((pack) => {
+      const matchStatus = filterStatus === 'all' || pack.jointStatus === filterStatus
+      const hay = [
+        pack.courseReview.comment,
+        pack.courseReview.student?.name || '',
+        pack.courseReview.course?.title || '',
+        ...pack.teacherReviews.map((t) => `${t.teacherName} ${t.comment}`),
+      ]
+        .join(' ')
+        .toLowerCase()
+      const matchSearch = !search || hay.includes(search.toLowerCase())
+      return matchStatus && matchSearch
     })
-  }, [reviews, teacherStatusByPack])
-
-  const filtered = packs.filter((pack) => {
-    const matchStatus = filterStatus === 'all' || pack.jointStatus === filterStatus
-    const hay = [
-      pack.courseReview.comment,
-      pack.courseReview.student?.name || '',
-      pack.courseReview.course?.title || '',
-      ...pack.teacherReviews.map((t) => `${t.teacherName} ${t.comment}`),
-    ]
-      .join(' ')
-      .toLowerCase()
-    const matchSearch = !search || hay.includes(search.toLowerCase())
-    return matchStatus && matchSearch
-  })
+  }, [packs, filterStatus, search])
 
   const pendingCount = packs.filter((p) => p.jointStatus === 'pending').length
 
@@ -199,15 +135,24 @@ export default function ReviewsModerationClient({
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
 
-      // One action updates course review + teacher reviews together
-      setReviews((prev) =>
-        prev.map((r) => (r._id === packId ? { ...r, status: newStatus } : r)),
+      setPacks((prev) =>
+        prev.map((pack) => {
+          if (pack.id !== packId) return pack
+          return {
+            ...pack,
+            jointStatus: newStatus,
+            courseReview: { ...pack.courseReview, status: newStatus },
+            teacherReviews: pack.teacherReviews.map((t) => ({
+              ...t,
+              status: newStatus,
+            })),
+          }
+        }),
       )
-      setTeacherStatusByPack((prev) => ({ ...prev, [packId]: newStatus }))
 
       setSuccessMsg(
         newStatus === 'approved'
-          ? 'Course and teacher reviews approved together. Student certificate can unlock.'
+          ? 'Course and teacher reviews approved together. Student certificate unlocked.'
           : 'Course and teacher reviews rejected together.',
       )
       setTimeout(() => setSuccessMsg(null), 4000)
@@ -355,7 +300,6 @@ export default function ReviewsModerationClient({
                 </div>
 
                 <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Course review */}
                   <div className="space-y-3 rounded-lg border border-slate-200/80 bg-slate-50/40 p-5">
                     <p className="text-base font-bold text-slate-800">Course Review</p>
                     <StarDisplay rating={pack.courseReview.rating} />
@@ -364,24 +308,34 @@ export default function ReviewsModerationClient({
                     </p>
                   </div>
 
-                  {/* Teacher reviews */}
                   <div className="space-y-3 rounded-lg border border-slate-200/80 bg-slate-50/40 p-5">
                     <p className="text-base font-bold text-slate-800">
                       Teacher Reviews ({pack.teacherReviews.length})
                     </p>
-                    <ul className="space-y-4">
-                      {pack.teacherReviews.map((t) => (
-                        <li key={t.id} className="space-y-1.5 border-b border-slate-100 last:border-0 pb-3 last:pb-0">
-                          <div className="flex items-center justify-between gap-3">
-                            <p className="text-base font-bold text-slate-700">{t.teacherName}</p>
-                            <StarDisplay rating={t.rating} />
-                          </div>
-                          <p className="text-base font-semibold text-slate-500 italic leading-relaxed">
-                            &ldquo;{t.comment}&rdquo;
-                          </p>
-                        </li>
-                      ))}
-                    </ul>
+                    {pack.teacherReviews.length === 0 ? (
+                      <p className="text-base font-semibold text-slate-400">
+                        No teacher reviews submitted yet for this pack.
+                      </p>
+                    ) : (
+                      <ul className="space-y-4">
+                        {pack.teacherReviews.map((t) => (
+                          <li
+                            key={t.id}
+                            className="space-y-1.5 border-b border-slate-100 last:border-0 pb-3 last:pb-0"
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <p className="text-base font-bold text-slate-700">
+                                {t.teacherName}
+                              </p>
+                              <StarDisplay rating={t.rating} />
+                            </div>
+                            <p className="text-base font-semibold text-slate-500 italic leading-relaxed">
+                              &ldquo;{t.comment}&rdquo;
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 </div>
 

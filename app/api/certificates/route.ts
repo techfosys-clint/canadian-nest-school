@@ -12,6 +12,9 @@ import {
 } from '@/lib/progress/getCourseProgress'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
+import { getStudentCourseReviewGate } from '@/lib/reviews/reviewPack'
+import '@/lib/db/models/InstructorReview'
+import '@/lib/db/models/Review'
 
 async function getUserId(): Promise<string | null> {
   const cookieStore = await cookies()
@@ -68,6 +71,20 @@ export async function GET() {
       enrollmentProgress.set(courseId, enrollment.completedLessons || [])
     }
 
+    const reviewGates = await Promise.all(
+      courseIds.map(async (courseId) => {
+        const gate = await getStudentCourseReviewGate(userId, courseId)
+        return [
+          courseId,
+          {
+            courseReviewStatus: gate.courseReviewStatus,
+            teacherReviewStatus: gate.teacherReviewStatus,
+          },
+        ] as const
+      }),
+    )
+    const reviewGateMap = new Map(reviewGates)
+
     const formatted = requests.map((r) => {
       const courseId = r.course?._id?.toString()
       const completedLessons = courseId
@@ -85,6 +102,9 @@ export async function GET() {
         sanitizedCompletedLessons,
         totalLessons,
       )
+      const reviewGate = courseId
+        ? reviewGateMap.get(courseId)
+        : undefined
 
       return {
         id: r._id.toString(),
@@ -96,6 +116,8 @@ export async function GET() {
         certificateUrl: r.certificateUrl || null,
         adminNotes: r.adminNotes || '',
         createdAt: r.createdAt,
+        courseReviewStatus: reviewGate?.courseReviewStatus || 'idle',
+        teacherReviewStatus: reviewGate?.teacherReviewStatus || 'idle',
       }
     })
 

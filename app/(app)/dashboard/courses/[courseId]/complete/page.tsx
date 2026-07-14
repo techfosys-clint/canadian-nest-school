@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   FiAlertCircle,
   FiArrowLeft,
@@ -22,7 +22,7 @@ import Swal from 'sweetalert2'
 interface InstructorItem {
   id: string
   name: string
-  designation?: string
+  designation?: string | null
   profilePic?: string | null
 }
 
@@ -125,41 +125,23 @@ export default function CourseCompleteReviewPage() {
 
   const [loading, setLoading] = useState(true)
   const [course, setCourse] = useState<CourseItem | null>(null)
+  const [instructors, setInstructors] = useState<InstructorItem[]>([])
   const [step, setStep] = useState<WizardStep>(1)
   const [errorMsg, setErrorMsg] = useState('')
 
-  // Course review
   const [courseRating, setCourseRating] = useState(0)
   const [courseComment, setCourseComment] = useState('')
   const [courseReviewStatus, setCourseReviewStatus] = useState<ReviewStatus>('idle')
   const [submittingCourse, setSubmittingCourse] = useState(false)
 
-  // Teacher reviews
   const [teacherRatings, setTeacherRatings] = useState<
     Record<string, { rating: number; comment: string }>
   >({})
   const [teacherReviewStatus, setTeacherReviewStatus] = useState<ReviewStatus>('idle')
   const [submittingTeachers, setSubmittingTeachers] = useState(false)
 
-  // Certificate (UI state — unlocked when both reviews are accepted)
   const [certStatus, setCertStatus] = useState<'locked' | 'pending' | 'ready'>('locked')
   const [downloadingCert, setDownloadingCert] = useState(false)
-
-  const instructors = useMemo(() => {
-    if (!course) return [] as InstructorItem[]
-    const list = course.instructors?.length
-      ? course.instructors
-      : course.instructor
-        ? [course.instructor]
-        : []
-    // Deduplicate by id
-    const seen = new Set<string>()
-    return list.filter((i) => {
-      if (!i?.id || seen.has(i.id)) return false
-      seen.add(i.id)
-      return true
-    })
-  }, [course])
 
   const bothReviewsAccepted =
     courseReviewStatus === 'approved' && teacherReviewStatus === 'approved'
@@ -167,7 +149,6 @@ export default function CourseCompleteReviewPage() {
   useEffect(() => {
     if (bothReviewsAccepted) {
       setCertStatus('ready')
-      setStep(3)
     } else if (
       courseReviewStatus === 'pending' ||
       teacherReviewStatus === 'pending' ||
@@ -195,9 +176,13 @@ export default function CourseCompleteReviewPage() {
           return
         }
 
-        const enrollRes = await fetch('/api/enrollments?depth=2&limit=100', {
-          cache: 'no-store',
-        })
+        const [enrollRes, completionRes] = await Promise.all([
+          fetch('/api/enrollments?depth=2&limit=100', { cache: 'no-store' }),
+          fetch(`/api/completion-reviews?courseId=${encodeURIComponent(courseId)}`, {
+            cache: 'no-store',
+          }),
+        ])
+
         if (!enrollRes.ok) throw new Error('Could not load your enrollments.')
 
         const enrollData = await enrollRes.json()
@@ -217,51 +202,56 @@ export default function CourseCompleteReviewPage() {
 
         setCourse(enrollment.course)
 
-        // Prefill teacher rating shells
-        const teachers: InstructorItem[] =
-          enrollment.course.instructors?.length > 0
-            ? enrollment.course.instructors
-            : enrollment.course.instructor
-              ? [enrollment.course.instructor]
-              : []
+        let teacherList: InstructorItem[] = []
+        if (completionRes.ok) {
+          const completionData = await completionRes.json()
+          teacherList = completionData.instructors || []
+          setInstructors(teacherList)
+          setCourseReviewStatus(completionData.courseReviewStatus || 'idle')
+          setTeacherReviewStatus(completionData.teacherReviewStatus || 'idle')
 
-        const ratingShell: Record<string, { rating: number; comment: string }> = {}
-        for (const t of teachers) {
-          if (t?.id) ratingShell[t.id] = { rating: 0, comment: '' }
-        }
-        setTeacherRatings(ratingShell)
-
-        // Restore UI draft state from localStorage (teacher reviews UI-only for now)
-        const storageKey = `cns-complete-flow-${sessionData.user.id}-${courseId}`
-        try {
-          const raw = localStorage.getItem(storageKey)
-          if (raw) {
-            const saved = JSON.parse(raw) as {
-              courseReviewStatus?: ReviewStatus
-              teacherReviewStatus?: ReviewStatus
-              step?: WizardStep
-            }
-            if (saved.courseReviewStatus) setCourseReviewStatus(saved.courseReviewStatus)
-            if (saved.teacherReviewStatus) setTeacherReviewStatus(saved.teacherReviewStatus)
-            if (saved.step) setStep(saved.step)
+          if (completionData.courseReview) {
+            setCourseRating(Number(completionData.courseReview.rating) || 0)
+            setCourseComment(completionData.courseReview.comment || '')
           }
-        } catch {
-          /* ignore corrupt local cache */
-        }
 
-        // Sync real course review status if one exists
-        const reviewRes = await fetch(
-          `/api/reviews?where[student][equals]=${encodeURIComponent(sessionData.user.id)}&depth=1&limit=50`,
-        )
-        if (reviewRes.ok) {
-          const reviewData = await reviewRes.json()
-          const existing = (reviewData.docs ?? []).find((r: { course?: string | { id: string }; status?: string }) => {
-            const cId = r.course && typeof r.course === 'object' ? r.course.id : r.course
-            return cId === courseId
-          })
-          if (existing?.status === 'approved') setCourseReviewStatus('approved')
-          else if (existing?.status === 'pending') setCourseReviewStatus('pending')
-          else if (existing?.status === 'rejected') setCourseReviewStatus('rejected')
+          const ratingShell: Record<string, { rating: number; comment: string }> = {}
+          for (const t of teacherList) {
+            ratingShell[t.id] = { rating: 0, comment: '' }
+          }
+          for (const ir of completionData.instructorReviews || []) {
+            if (ir.instructor) {
+              ratingShell[ir.instructor] = {
+                rating: Number(ir.rating) || 0,
+                comment: ir.comment || '',
+              }
+            }
+          }
+          setTeacherRatings(ratingShell)
+
+          if (completionData.canDownload) setStep(3)
+          else if (completionData.courseReviewStatus !== 'idle') {
+            if (completionData.teacherReviewStatus === 'idle' && teacherList.length > 0) {
+              setStep(2)
+            } else {
+              setStep(3)
+            }
+          }
+        } else {
+          // Fallback to enrollment instructors
+          const fromEnrollment =
+            enrollment.course.instructors?.length > 0
+              ? enrollment.course.instructors
+              : enrollment.course.instructor
+                ? [enrollment.course.instructor]
+                : []
+          teacherList = fromEnrollment
+          setInstructors(fromEnrollment)
+          const ratingShell: Record<string, { rating: number; comment: string }> = {}
+          for (const t of fromEnrollment) {
+            if (t?.id) ratingShell[t.id] = { rating: 0, comment: '' }
+          }
+          setTeacherRatings(ratingShell)
         }
       } catch (err) {
         console.error(err)
@@ -272,30 +262,6 @@ export default function CourseCompleteReviewPage() {
     }
     load()
   }, [courseId, router])
-
-  // Persist UI wizard state
-  useEffect(() => {
-    if (!courseId || loading) return
-    async function persist() {
-      try {
-        const sessionRes = await fetch('/api/auth/me')
-        const sessionData = await sessionRes.json()
-        if (!sessionData?.user?.id) return
-        const storageKey = `cns-complete-flow-${sessionData.user.id}-${courseId}`
-        localStorage.setItem(
-          storageKey,
-          JSON.stringify({
-            courseReviewStatus,
-            teacherReviewStatus,
-            step,
-          }),
-        )
-      } catch {
-        /* ignore */
-      }
-    }
-    persist()
-  }, [courseId, courseReviewStatus, teacherReviewStatus, step, loading])
 
   const handleSubmitCourseReview = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -320,8 +286,7 @@ export default function CourseCompleteReviewPage() {
         })
         if (!res.ok) {
           const err = await res.json().catch(() => ({}))
-          // If already submitted, treat as pending and continue
-          if (!String(err.message || err.error || '').toLowerCase().includes('already')) {
+          if (!err.already) {
             throw new Error(err.message || err.error || 'Failed to submit course review.')
           }
         }
@@ -367,8 +332,23 @@ export default function CourseCompleteReviewPage() {
 
     setSubmittingTeachers(true)
     try {
-      // UI-only for teacher reviews until the backend model is extended
-      await new Promise((r) => setTimeout(r, 600))
+      const res = await fetch('/api/completion-reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          courseId: course?.id,
+          reviews: instructors.map((t) => ({
+            instructor: t.id,
+            rating: String(teacherRatings[t.id].rating),
+            comment: teacherRatings[t.id].comment.trim(),
+          })),
+        }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to submit teacher reviews.')
+      }
+
       setTeacherReviewStatus('pending')
       await Swal.fire({
         icon: 'success',
@@ -379,8 +359,9 @@ export default function CourseCompleteReviewPage() {
         color: '#1e293b',
       })
       setStep(3)
-    } catch {
-      setErrorMsg('Could not submit teacher reviews.')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Could not submit teacher reviews.'
+      setErrorMsg(message)
     } finally {
       setSubmittingTeachers(false)
     }
@@ -403,7 +384,7 @@ export default function CourseCompleteReviewPage() {
         const data = await res.json().catch(() => ({}))
         throw new Error(
           data.error ||
-            'Certificate PDF is being prepared. Check My Certificates shortly, or ask admin to release it.',
+            'Certificate PDF is being prepared. Check My Certificates shortly.',
         )
       }
       const blob = await res.blob()
@@ -471,7 +452,6 @@ export default function CourseCompleteReviewPage() {
 
   return (
     <div className="container mx-auto px-6 py-8 pb-16 space-y-8">
-      {/* Celebration banner */}
       <div className="w-full bg-[#0A163A] rounded-lg p-8 md:p-10 relative overflow-hidden border border-zinc-800/20">
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#E61C24]/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-[#CC181F]/20 rounded-full blur-3xl pointer-events-none" />
@@ -509,7 +489,6 @@ export default function CourseCompleteReviewPage() {
         </div>
       </div>
 
-      {/* Requirement summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white border border-zinc-200/80 rounded-lg p-5 flex items-start gap-4">
           <div className="h-11 w-11 rounded-lg bg-[#E61C24]/10 flex items-center justify-center shrink-0">
@@ -552,7 +531,6 @@ export default function CourseCompleteReviewPage() {
         </div>
       </div>
 
-      {/* Stepper */}
       <div className="bg-white border border-zinc-200/80 rounded-lg p-5 sm:p-6">
         <ol className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-0">
           {steps.map((s, index) => {
@@ -603,7 +581,6 @@ export default function CourseCompleteReviewPage() {
         </div>
       )}
 
-      {/* Step panels */}
       {step === 1 && (
         <div className="bg-white border border-zinc-200/80 rounded-lg p-6 sm:p-8 space-y-6">
           <div className="space-y-1">
@@ -614,24 +591,22 @@ export default function CourseCompleteReviewPage() {
           </div>
 
           {courseReviewStatus === 'pending' || courseReviewStatus === 'approved' ? (
-            <div className="space-y-5">
-              <div className="p-5 rounded-lg bg-zinc-50 border border-zinc-200/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="space-y-2">
-                  <StatusBadge status={courseReviewStatus} />
-                  <p className="text-base font-semibold text-zinc-600">
-                    {courseReviewStatus === 'approved'
-                      ? 'Your course review was accepted.'
-                      : 'Your course review is waiting for staff moderation.'}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  className="px-5 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base cursor-pointer border-none"
-                >
-                  Continue to Teachers
-                </button>
+            <div className="p-5 rounded-lg bg-zinc-50 border border-zinc-200/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="space-y-2">
+                <StatusBadge status={courseReviewStatus} />
+                <p className="text-base font-semibold text-zinc-600">
+                  {courseReviewStatus === 'approved'
+                    ? 'Your course review was accepted.'
+                    : 'Your course review is waiting for staff moderation.'}
+                </p>
               </div>
+              <button
+                type="button"
+                onClick={() => setStep(2)}
+                className="px-5 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base cursor-pointer border-none"
+              >
+                Continue to Teachers
+              </button>
             </div>
           ) : (
             <form onSubmit={handleSubmitCourseReview} className="space-y-6">
@@ -713,7 +688,8 @@ export default function CourseCompleteReviewPage() {
             <div className="p-8 text-center space-y-4 border border-zinc-200/80 rounded-lg bg-zinc-50">
               <FiUser className="mx-auto h-8 w-8 text-zinc-400" />
               <p className="text-base font-semibold text-zinc-600">
-                No teachers are assigned to this course yet. You can continue to the certificate step.
+                No teachers are assigned to this course. Continue after your course review is
+                approved.
               </p>
               <button
                 type="button"

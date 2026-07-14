@@ -29,6 +29,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 })
     }
 
+    const existing = await Review.findOne({
+      course,
+      student: decoded.id,
+    }).lean()
+
+    if (existing) {
+      return NextResponse.json(
+        { error: 'You have already submitted a review for this course.', already: true },
+        { status: 409 },
+      )
+    }
+
     const review = await Review.create({
       course,
       student: decoded.id,

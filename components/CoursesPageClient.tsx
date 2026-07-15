@@ -451,10 +451,10 @@ export default function CoursesPageClient({
       <PageHeroSection
         tag={activeCategory === 'all' ? 'Our Courses' : 'Category'}
         title={
-          activeCategory === 'kids-english' ? 'Kids English' :
-          activeCategory === 'teens-english' ? 'Teens English' :
-          activeCategory === 'spoken-english-for-adults' ? 'Spoken English For Adults' :
-          activeCategory === 'ielts' ? 'IELTS' :
+          activeCategory === 'kids-english' ? 'English for Kids' :
+          activeCategory === 'teens-english' ? 'English for Teens' :
+          activeCategory === 'spoken-english-for-adults' ? 'English for Adults' :
+          activeCategory === 'ielts' ? 'IELTS Preparation' :
           activeCategory === 'teacher-training' ? 'Teacher Training' :
           activeCategory === 'educational-shop' ? 'Educational Shop' :
           activeCategory === 'all' ? 'Our Popular Courses' :

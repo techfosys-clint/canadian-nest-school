@@ -16,7 +16,7 @@ import {
 
 const CARDS_DATA = [
   {
-    title: 'Kids English',
+    title: 'English for Kids',
     description:
       'Game based phonics with grammar, Reading, Speaking, Writing .',
     icon: <FiBookOpen className='h-6 w-6 text-[#3b82f6]' />,
@@ -26,7 +26,7 @@ const CARDS_DATA = [
     href: '/courses?category=kids-english',
   },
   {
-    title: 'Teens English',
+    title: 'English for Teens',
     description: 'Academic English and communication skills.',
     icon: <FiLayers className='h-6 w-6 text-[#10b981]' />,
     iconColor: 'text-[#10b981]',
@@ -35,7 +35,7 @@ const CARDS_DATA = [
     href: '/courses?category=teens-english',
   },
   {
-    title: 'Spoken English For Adults',
+    title: 'English for Adults',
     description: 'Speak confidently in everyday situations.',
     icon: <FiMessageCircle className='h-6 w-6 text-[#f97316]' />,
     iconColor: 'text-[#f97316]',
@@ -44,7 +44,7 @@ const CARDS_DATA = [
     href: '/courses?category=spoken-english-for-adults',
   },
   {
-    title: 'IELTS',
+    title: 'IELTS Preparation',
     description: 'Achieve your target IELTS score.',
     icon: <FiAward className='h-6 w-6 text-[#ef4444]' />,
     iconColor: 'text-[#ef4444]',

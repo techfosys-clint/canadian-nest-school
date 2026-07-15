@@ -362,6 +362,40 @@ export default async function CourseDetailPage({ params }: Props) {
       <div className='container mx-auto px-6 py-14 grid grid-cols-1 lg:grid-cols-12 gap-12 relative z-10'>
         {/* Left Area: Detailed Content (8 cols) */}
         <div className='lg:col-span-8 space-y-12 order-2 lg:order-1'>
+          {/* Section: Lead Mentor Info */}
+          {resolvedInstructor && (
+            <div className='space-y-6'>
+              <h2 className='text-2xl font-bold text-[#0A163A] tracking-tight'>
+                Lead Mentor
+              </h2>
+              <div className='bg-white border border-zinc-200/80 rounded-lg p-6 flex flex-col sm:flex-row items-center sm:items-start gap-6 shadow-[0_4px_20px_rgba(230,28,36,0.02)]'>
+                {instructorPicUrl ? (
+                  <Image
+                    src={instructorPicUrl}
+                    alt={instructorName}
+                    className='h-24 w-24 sm:h-32 sm:w-32 rounded-full object-cover border-4 border-[#E61C24]/10 shrink-0'
+                    width={200}
+                    height={200}
+                  />
+                ) : (
+                  <div className='h-24 w-24 sm:h-32 sm:w-32 rounded-full bg-[#E61C24]/10 border-4 border-[#E61C24]/20 flex items-center justify-center font-bold text-[#E61C24] text-3xl shrink-0'>
+                    {initials}
+                  </div>
+                )}
+                <div className='text-center sm:text-left space-y-2 flex-1'>
+                  <h3 className='text-xl sm:text-2xl font-bold text-zinc-900'>
+                    {instructorName}
+                  </h3>
+                  {resolvedInstructor.designation && (
+                    <p className='text-base font-semibold text-[#E61C24]'>
+                      {resolvedInstructor.designation}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Section: What You'll Learn (Beautiful Lavender Accent Card) */}
           {course.whatYouWillLearn && course.whatYouWillLearn.length > 0 && (
             <div className='space-y-6'>

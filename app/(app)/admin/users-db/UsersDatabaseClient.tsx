@@ -57,9 +57,19 @@ export default function UsersDatabaseClient() {
     }
   }
 
+  const persistUserStatus = async (id: string, type: string, status: string) => {
+    const res = await fetch('/api/admin/users-db', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, type, status }),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error || 'Failed to update status')
+  }
+
   const handleToggleStatus = async (id: string, type: string, currentStatus: string) => {
     const newStatus = currentStatus === 'active' ? 'suspended' : 'active'
-    
+
     const result = await Swal.fire({
       title: `${newStatus === 'suspended' ? 'Block' : 'Unblock'} Account?`,
       text: newStatus === 'suspended' ? "The user will lose access to their account." : "The user's access will be restored.",
@@ -70,21 +80,40 @@ export default function UsersDatabaseClient() {
       confirmButtonText: `Yes, ${newStatus === 'suspended' ? 'block' : 'unblock'}!`
     })
 
-    if (result.isConfirmed) {
-      try {
-        const res = await fetch('/api/admin/users-db', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id, type, status: newStatus })
-        })
-        const data = await res.json()
-        if (!res.ok) throw new Error(data.error || 'Failed to update status')
+    if (!result.isConfirmed) return
 
-        Swal.fire('Updated!', `Account has been ${newStatus === 'suspended' ? 'blocked' : 'unblocked'}.`, 'success')
+    try {
+      await persistUserStatus(id, type, newStatus)
+      fetchUsers()
+
+      // A toast with an Undo action, in case the wrong row's button got
+      // clicked — cheaper than a second confirm dialog on every click.
+      const toastResult = await Swal.fire({
+        toast: true,
+        position: 'bottom-end',
+        icon: 'success',
+        title: `Account ${newStatus === 'suspended' ? 'blocked' : 'unblocked'}`,
+        showConfirmButton: true,
+        confirmButtonText: 'Undo',
+        confirmButtonColor: '#475569',
+        timer: 6000,
+        timerProgressBar: true,
+      })
+
+      if (toastResult.isConfirmed) {
+        await persistUserStatus(id, type, currentStatus)
         fetchUsers()
-      } catch (err: any) {
-        Swal.fire('Error', err.message, 'error')
+        Swal.fire({
+          toast: true,
+          position: 'bottom-end',
+          icon: 'info',
+          title: 'Status reverted',
+          timer: 2000,
+          showConfirmButton: false,
+        })
       }
+    } catch (err: any) {
+      Swal.fire('Error', err.message, 'error')
     }
   }
 

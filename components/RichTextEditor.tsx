@@ -1,63 +1,85 @@
-'use client'
+'use client';
 
-import React, { useCallback, useState } from 'react'
-import { useEditor, EditorContent } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
-import { Underline } from '@tiptap/extension-underline'
-import { Link } from '@tiptap/extension-link'
-import { Image } from '@tiptap/extension-image'
-import { Youtube } from '@tiptap/extension-youtube'
-import { Table } from '@tiptap/extension-table'
-import { TableRow } from '@tiptap/extension-table-row'
-import { TableHeader } from '@tiptap/extension-table-header'
-import { TableCell } from '@tiptap/extension-table-cell'
+import { Image } from '@tiptap/extension-image';
+import { Link } from '@tiptap/extension-link';
+import { Table } from '@tiptap/extension-table';
+import { TableCell } from '@tiptap/extension-table-cell';
+import { TableHeader } from '@tiptap/extension-table-header';
+import { TableRow } from '@tiptap/extension-table-row';
+import { Underline } from '@tiptap/extension-underline';
+import { Youtube } from '@tiptap/extension-youtube';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import React, { useCallback, useState } from 'react';
 import {
-  FiBold, FiItalic, FiUnderline, FiList, FiLink, FiImage,
-  FiRotateCcw, FiRotateCw, FiTrash2, FiYoutube, FiGrid,
-  FiMinus, FiCode,
-} from 'react-icons/fi'
-import { MdFormatListNumbered, MdFormatQuote, MdFormatClear } from 'react-icons/md'
+  FiBold,
+  FiCode,
+  FiGrid,
+  FiImage,
+  FiItalic,
+  FiLink,
+  FiList,
+  FiMinus,
+  FiRotateCcw,
+  FiRotateCw,
+  FiTrash2,
+  FiUnderline,
+  FiYoutube,
+} from 'react-icons/fi';
+import {
+  MdFormatClear,
+  MdFormatListNumbered,
+  MdFormatQuote,
+} from 'react-icons/md';
 
 interface RichTextEditorProps {
-  value: string
-  onChange: (val: string) => void
-  placeholder?: string
-  rows?: number
-  label?: string
-  required?: boolean
+  value: string;
+  onChange: (val: string) => void;
+  placeholder?: string;
+  rows?: number;
+  label?: string;
+  required?: boolean;
 }
 
 // ── Toolbar Button ────────────────────────────────────────────────────────────
 function ToolBtn({
-  onClick, active, title, disabled, children,
+  onClick,
+  active,
+  title,
+  disabled,
+  children,
 }: {
-  onClick: () => void
-  active?: boolean
-  title: string
-  disabled?: boolean
-  children: React.ReactNode
+  onClick: () => void;
+  active?: boolean;
+  title: string;
+  disabled?: boolean;
+  children: React.ReactNode;
 }) {
   return (
     <button
-      type="button"
-      onMouseDown={(e) => { e.preventDefault(); onClick() }}
+      type='button'
+      onMouseDown={(e) => {
+        e.preventDefault();
+        onClick();
+      }}
       disabled={disabled}
       title={title}
       className={`flex items-center justify-center w-8 h-8 rounded transition-all cursor-pointer select-none text-sm
-        ${active
-          ? 'bg-[#E61C24] text-white'
-          : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
+        ${
+          active
+            ? 'bg-[#E61C24] text-white'
+            : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
         }
         ${disabled ? 'opacity-30 cursor-not-allowed pointer-events-none' : ''}
       `}
     >
       {children}
     </button>
-  )
+  );
 }
 
 function Divider() {
-  return <span className="h-5 w-px bg-zinc-700/60 mx-0.5 flex-shrink-0" />
+  return <span className='h-5 w-px bg-zinc-700/60 mx-0.5 shrink-0' />;
 }
 
 // ── Main Component ────────────────────────────────────────────────────────────
@@ -69,12 +91,12 @@ export default function RichTextEditor({
   label,
   required = false,
 }: RichTextEditorProps) {
-  const [linkUrl, setLinkUrl] = useState('')
-  const [showLinkInput, setShowLinkInput] = useState(false)
-  const [imageUrl, setImageUrl] = useState('')
-  const [showImageInput, setShowImageInput] = useState(false)
-  const [youtubeUrl, setYoutubeUrl] = useState('')
-  const [showYoutubeInput, setShowYoutubeInput] = useState(false)
+  const [linkUrl, setLinkUrl] = useState('');
+  const [showLinkInput, setShowLinkInput] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
+  const [showImageInput, setShowImageInput] = useState(false);
+  const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [showYoutubeInput, setShowYoutubeInput] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -106,57 +128,69 @@ export default function RichTextEditor({
       },
     },
     onUpdate({ editor }) {
-      onChange(editor.getHTML())
+      onChange(editor.getHTML());
     },
     immediatelyRender: false,
-  })
+  });
 
   const applyLink = useCallback(() => {
-    if (!editor) return
+    if (!editor) return;
     if (!linkUrl) {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run()
+      editor.chain().focus().extendMarkRange('link').unsetLink().run();
     } else {
-      editor.chain().focus().setLink({ href: linkUrl.startsWith('http') ? linkUrl : `https://${linkUrl}` }).run()
+      editor
+        .chain()
+        .focus()
+        .setLink({
+          href: linkUrl.startsWith('http') ? linkUrl : `https://${linkUrl}`,
+        })
+        .run();
     }
-    setShowLinkInput(false)
-    setLinkUrl('')
-  }, [editor, linkUrl])
+    setShowLinkInput(false);
+    setLinkUrl('');
+  }, [editor, linkUrl]);
 
   const applyImage = useCallback(() => {
-    if (!editor || !imageUrl) return
-    editor.chain().focus().setImage({ src: imageUrl }).run()
-    setShowImageInput(false)
-    setImageUrl('')
-  }, [editor, imageUrl])
+    if (!editor || !imageUrl) return;
+    editor.chain().focus().setImage({ src: imageUrl }).run();
+    setShowImageInput(false);
+    setImageUrl('');
+  }, [editor, imageUrl]);
 
   const applyYoutube = useCallback(() => {
-    if (!editor || !youtubeUrl) return
-    editor.commands.setYoutubeVideo({ src: youtubeUrl })
-    setShowYoutubeInput(false)
-    setYoutubeUrl('')
-  }, [editor, youtubeUrl])
+    if (!editor || !youtubeUrl) return;
+    editor.commands.setYoutubeVideo({ src: youtubeUrl });
+    setShowYoutubeInput(false);
+    setYoutubeUrl('');
+  }, [editor, youtubeUrl]);
 
-  const minHeight = rows * 26 + 32
+  const minHeight = rows * 26 + 32;
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className='flex flex-col gap-2'>
       {label && (
-        <label className="text-base font-bold text-zinc-300 flex items-center gap-1.5">
+        <label className='text-base font-bold text-zinc-300 flex items-center gap-1.5'>
           <span>{label}</span>
-          {required && <span className="text-red-400">*</span>}
+          {required && <span className='text-red-400'>*</span>}
         </label>
       )}
 
-      <div className="border border-zinc-800 rounded-lg overflow-hidden bg-[#070b16] focus-within:border-[#E61C24]/60 transition-colors">
-
+      <div className='border border-zinc-800 rounded-lg overflow-hidden bg-[#070b16] focus-within:border-[#E61C24]/60 transition-colors'>
         {/* ── Toolbar ── */}
-        <div className="bg-[#0e1422] border-b border-zinc-800 px-3 py-2 flex flex-wrap items-center gap-1">
-
+        <div className='bg-[#0e1422] border-b border-zinc-800 px-3 py-2 flex flex-wrap items-center gap-1'>
           {/* History */}
-          <ToolBtn onClick={() => editor?.chain().focus().undo().run()} title="Undo" disabled={!editor?.can().undo()}>
+          <ToolBtn
+            onClick={() => editor?.chain().focus().undo().run()}
+            title='Undo'
+            disabled={!editor?.can().undo()}
+          >
             <FiRotateCcw size={14} />
           </ToolBtn>
-          <ToolBtn onClick={() => editor?.chain().focus().redo().run()} title="Redo" disabled={!editor?.can().redo()}>
+          <ToolBtn
+            onClick={() => editor?.chain().focus().redo().run()}
+            title='Redo'
+            disabled={!editor?.can().redo()}
+          >
             <FiRotateCw size={14} />
           </ToolBtn>
 
@@ -166,131 +200,206 @@ export default function RichTextEditor({
           {([1, 2, 3] as const).map((level) => (
             <ToolBtn
               key={level}
-              onClick={() => editor?.chain().focus().toggleHeading({ level }).run()}
+              onClick={() =>
+                editor?.chain().focus().toggleHeading({ level }).run()
+              }
               active={editor?.isActive('heading', { level })}
               title={`Heading ${level}`}
             >
-              <span className="font-bold text-xs leading-none">H{level}</span>
+              <span className='font-bold text-xs leading-none'>H{level}</span>
             </ToolBtn>
           ))}
 
           <Divider />
 
           {/* Inline marks */}
-          <ToolBtn onClick={() => editor?.chain().focus().toggleBold().run()} active={editor?.isActive('bold')} title="Bold">
+          <ToolBtn
+            onClick={() => editor?.chain().focus().toggleBold().run()}
+            active={editor?.isActive('bold')}
+            title='Bold'
+          >
             <FiBold size={14} />
           </ToolBtn>
-          <ToolBtn onClick={() => editor?.chain().focus().toggleItalic().run()} active={editor?.isActive('italic')} title="Italic">
+          <ToolBtn
+            onClick={() => editor?.chain().focus().toggleItalic().run()}
+            active={editor?.isActive('italic')}
+            title='Italic'
+          >
             <FiItalic size={14} />
           </ToolBtn>
-          <ToolBtn onClick={() => editor?.chain().focus().toggleUnderline().run()} active={editor?.isActive('underline')} title="Underline">
+          <ToolBtn
+            onClick={() => editor?.chain().focus().toggleUnderline().run()}
+            active={editor?.isActive('underline')}
+            title='Underline'
+          >
             <FiUnderline size={14} />
           </ToolBtn>
-          <ToolBtn onClick={() => editor?.chain().focus().toggleCode().run()} active={editor?.isActive('code')} title="Inline Code">
+          <ToolBtn
+            onClick={() => editor?.chain().focus().toggleCode().run()}
+            active={editor?.isActive('code')}
+            title='Inline Code'
+          >
             <FiCode size={14} />
           </ToolBtn>
 
           <Divider />
 
           {/* Lists */}
-          <ToolBtn onClick={() => editor?.chain().focus().toggleBulletList().run()} active={editor?.isActive('bulletList')} title="Bullet List">
+          <ToolBtn
+            onClick={() => editor?.chain().focus().toggleBulletList().run()}
+            active={editor?.isActive('bulletList')}
+            title='Bullet List'
+          >
             <FiList size={14} />
           </ToolBtn>
-          <ToolBtn onClick={() => editor?.chain().focus().toggleOrderedList().run()} active={editor?.isActive('orderedList')} title="Ordered List">
+          <ToolBtn
+            onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+            active={editor?.isActive('orderedList')}
+            title='Ordered List'
+          >
             <MdFormatListNumbered size={15} />
           </ToolBtn>
 
           <Divider />
 
           {/* Block elements */}
-          <ToolBtn onClick={() => editor?.chain().focus().toggleBlockquote().run()} active={editor?.isActive('blockquote')} title="Blockquote">
+          <ToolBtn
+            onClick={() => editor?.chain().focus().toggleBlockquote().run()}
+            active={editor?.isActive('blockquote')}
+            title='Blockquote'
+          >
             <MdFormatQuote size={16} />
           </ToolBtn>
-          <ToolBtn onClick={() => editor?.chain().focus().toggleCodeBlock().run()} active={editor?.isActive('codeBlock')} title="Code Block">
-            <span className="font-mono text-xs font-bold leading-none">{'<>'}</span>
+          <ToolBtn
+            onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
+            active={editor?.isActive('codeBlock')}
+            title='Code Block'
+          >
+            <span className='font-mono text-xs font-bold leading-none'>
+              {'<>'}
+            </span>
           </ToolBtn>
-          <ToolBtn onClick={() => editor?.chain().focus().setHorizontalRule().run()} title="Horizontal Divider">
+          <ToolBtn
+            onClick={() => editor?.chain().focus().setHorizontalRule().run()}
+            title='Horizontal Divider'
+          >
             <FiMinus size={14} />
           </ToolBtn>
 
           <Divider />
 
           {/* Link */}
-          <div className="relative">
+          <div className='relative'>
             <ToolBtn
-              onClick={() => { setShowLinkInput(v => !v); setShowImageInput(false); setShowYoutubeInput(false) }}
+              onClick={() => {
+                setShowLinkInput((v) => !v);
+                setShowImageInput(false);
+                setShowYoutubeInput(false);
+              }}
               active={editor?.isActive('link') || showLinkInput}
-              title="Insert Link"
+              title='Insert Link'
             >
               <FiLink size={14} />
             </ToolBtn>
             {showLinkInput && (
-              <div className="absolute top-10 left-0 z-50 bg-[#0e1422] border border-zinc-700 rounded-lg p-3 flex gap-2 shadow-xl min-w-64">
+              <div className='absolute top-10 left-0 z-50 bg-[#0e1422] border border-zinc-700 rounded-lg p-3 flex gap-2 shadow-xl min-w-64'>
                 <input
                   autoFocus
                   value={linkUrl}
-                  onChange={e => setLinkUrl(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && applyLink()}
-                  placeholder="https://example.com"
-                  className="flex-1 bg-zinc-900 border border-zinc-700 rounded px-3 py-1.5 text-base text-white outline-none focus:border-[#E61C24]/60 placeholder-zinc-600"
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && applyLink()}
+                  placeholder='https://example.com'
+                  className='flex-1 bg-zinc-900 border border-zinc-700 rounded px-3 py-1.5 text-base text-white outline-none focus:border-[#E61C24]/60 placeholder-zinc-600'
                 />
-                <button type="button" onClick={applyLink} className="px-3 py-1.5 bg-[#E61C24] text-white rounded text-sm font-bold hover:bg-[#4f4fdd] transition-colors cursor-pointer">Apply</button>
+                <button
+                  type='button'
+                  onClick={applyLink}
+                  className='px-3 py-1.5 bg-[#E61C24] text-white rounded text-sm font-bold hover:bg-[#4f4fdd] transition-colors cursor-pointer'
+                >
+                  Apply
+                </button>
               </div>
             )}
           </div>
 
           {/* Image URL */}
-          <div className="relative">
+          <div className='relative'>
             <ToolBtn
-              onClick={() => { setShowImageInput(v => !v); setShowLinkInput(false); setShowYoutubeInput(false) }}
+              onClick={() => {
+                setShowImageInput((v) => !v);
+                setShowLinkInput(false);
+                setShowYoutubeInput(false);
+              }}
               active={showImageInput}
-              title="Embed Image URL"
+              title='Embed Image URL'
             >
               <FiImage size={14} />
             </ToolBtn>
             {showImageInput && (
-              <div className="absolute top-10 left-0 z-50 bg-[#0e1422] border border-zinc-700 rounded-lg p-3 flex gap-2 shadow-xl min-w-72">
+              <div className='absolute top-10 left-0 z-50 bg-[#0e1422] border border-zinc-700 rounded-lg p-3 flex gap-2 shadow-xl min-w-72'>
                 <input
                   autoFocus
                   value={imageUrl}
-                  onChange={e => setImageUrl(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && applyImage()}
-                  placeholder="https://example.com/image.png"
-                  className="flex-1 bg-zinc-900 border border-zinc-700 rounded px-3 py-1.5 text-base text-white outline-none focus:border-[#E61C24]/60 placeholder-zinc-600"
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && applyImage()}
+                  placeholder='https://example.com/image.png'
+                  className='flex-1 bg-zinc-900 border border-zinc-700 rounded px-3 py-1.5 text-base text-white outline-none focus:border-[#E61C24]/60 placeholder-zinc-600'
                 />
-                <button type="button" onClick={applyImage} className="px-3 py-1.5 bg-[#E61C24] text-white rounded text-sm font-bold hover:bg-[#4f4fdd] transition-colors cursor-pointer">Insert</button>
+                <button
+                  type='button'
+                  onClick={applyImage}
+                  className='px-3 py-1.5 bg-[#E61C24] text-white rounded text-sm font-bold hover:bg-[#4f4fdd] transition-colors cursor-pointer'
+                >
+                  Insert
+                </button>
               </div>
             )}
           </div>
 
           {/* YouTube */}
-          <div className="relative">
+          <div className='relative'>
             <ToolBtn
-              onClick={() => { setShowYoutubeInput(v => !v); setShowLinkInput(false); setShowImageInput(false) }}
+              onClick={() => {
+                setShowYoutubeInput((v) => !v);
+                setShowLinkInput(false);
+                setShowImageInput(false);
+              }}
               active={showYoutubeInput}
-              title="Embed YouTube Video"
+              title='Embed YouTube Video'
             >
               <FiYoutube size={14} />
             </ToolBtn>
             {showYoutubeInput && (
-              <div className="absolute top-10 left-0 z-50 bg-[#0e1422] border border-zinc-700 rounded-lg p-3 flex gap-2 shadow-xl min-w-80">
+              <div className='absolute top-10 left-0 z-50 bg-[#0e1422] border border-zinc-700 rounded-lg p-3 flex gap-2 shadow-xl min-w-80'>
                 <input
                   autoFocus
                   value={youtubeUrl}
-                  onChange={e => setYoutubeUrl(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && applyYoutube()}
-                  placeholder="https://www.youtube.com/watch?v=..."
-                  className="flex-1 bg-zinc-900 border border-zinc-700 rounded px-3 py-1.5 text-base text-white outline-none focus:border-[#E61C24]/60 placeholder-zinc-600"
+                  onChange={(e) => setYoutubeUrl(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && applyYoutube()}
+                  placeholder='https://www.youtube.com/watch?v=...'
+                  className='flex-1 bg-zinc-900 border border-zinc-700 rounded px-3 py-1.5 text-base text-white outline-none focus:border-[#E61C24]/60 placeholder-zinc-600'
                 />
-                <button type="button" onClick={applyYoutube} className="px-3 py-1.5 bg-[#E61C24] text-white rounded text-sm font-bold hover:bg-[#4f4fdd] transition-colors cursor-pointer">Embed</button>
+                <button
+                  type='button'
+                  onClick={applyYoutube}
+                  className='px-3 py-1.5 bg-[#E61C24] text-white rounded text-sm font-bold hover:bg-[#4f4fdd] transition-colors cursor-pointer'
+                >
+                  Embed
+                </button>
               </div>
             )}
           </div>
 
           {/* Table */}
           <ToolBtn
-            onClick={() => editor?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
-            title="Insert Table (3×3)"
+            onClick={() =>
+              editor
+                ?.chain()
+                .focus()
+                .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+                .run()
+            }
+            title='Insert Table (3×3)'
           >
             <FiGrid size={14} />
           </ToolBtn>
@@ -299,14 +408,19 @@ export default function RichTextEditor({
 
           {/* Clear formatting */}
           <ToolBtn
-            onClick={() => editor?.chain().focus().clearNodes().unsetAllMarks().run()}
-            title="Clear Formatting"
+            onClick={() =>
+              editor?.chain().focus().clearNodes().unsetAllMarks().run()
+            }
+            title='Clear Formatting'
           >
             <MdFormatClear size={15} />
           </ToolBtn>
           <ToolBtn
-            onClick={() => { editor?.commands.clearContent(true); onChange('') }}
-            title="Clear All Content"
+            onClick={() => {
+              editor?.commands.clearContent(true);
+              onChange('');
+            }}
+            title='Clear All Content'
           >
             <FiTrash2 size={13} />
           </ToolBtn>
@@ -314,7 +428,7 @@ export default function RichTextEditor({
 
         {/* ── Editor Content ── */}
         <div
-          className="tiptap-wrapper px-4 py-3 text-base text-white leading-relaxed"
+          className='tiptap-wrapper px-4 py-3 text-base text-white leading-relaxed'
           style={{ minHeight }}
           onClick={() => editor?.commands.focus()}
         >
@@ -399,5 +513,5 @@ export default function RichTextEditor({
         .tiptap-editor .selectedCell { background: #E61C2422 !important; }
       `}</style>
     </div>
-  )
+  );
 }

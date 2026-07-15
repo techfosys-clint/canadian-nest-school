@@ -8,6 +8,12 @@ import { Enrollment } from '@/lib/db/models/Enrollment'
 import { Review } from '@/lib/db/models/Review'
 import { Blog } from '@/lib/db/models/Blog'
 import { FAQ } from '@/lib/db/models/FAQ'
+import {
+  calculateCourseProgressPercent,
+  getLessonCountsByCourse,
+  getLessonIdsByCourse,
+  sanitizeCompletedLessons,
+} from '@/lib/progress/getCourseProgress'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
 import { checkAndSendLiveClassReminders } from '@/lib/email'
@@ -178,14 +184,69 @@ export async function GET() {
         .lean()
       const courseIds = instructorCourses.map((c) => c._id)
 
-      const [totalLessons, totalStudentEnrollments, rawLiveLessons] = await Promise.all([
-        Lesson.countDocuments({ course: { $in: courseIds } }),
-        Enrollment.countDocuments({ course: { $in: courseIds }, paymentStatus: 'completed' }),
-        Lesson.find({ course: { $in: courseIds }, lessonType: 'live' })
-          .populate('course')
-          .sort({ liveDate: 1 })
-          .lean()
-      ])
+      const [totalLessons, totalStudentEnrollments, rawLiveLessons, enrollments] =
+        await Promise.all([
+          Lesson.countDocuments({ course: { $in: courseIds } }),
+          Enrollment.countDocuments({
+            course: { $in: courseIds },
+            paymentStatus: 'completed',
+          }),
+          Lesson.find({ course: { $in: courseIds }, lessonType: 'live' })
+            .populate('course')
+            .sort({ liveDate: 1 })
+            .lean(),
+          Enrollment.find({
+            course: { $in: courseIds },
+            paymentStatus: 'completed',
+          })
+            .populate('student', 'name email')
+            .populate('course', 'title')
+            .sort({ updatedAt: -1 })
+            .limit(25)
+            .lean(),
+        ])
+
+      const lessonCounts = await getLessonCountsByCourse(
+        courseIds.map((id) => id.toString()),
+      )
+      const lessonIdsByCourse = await getLessonIdsByCourse(
+        courseIds.map((id) => id.toString()),
+      )
+
+      const studentProgress = enrollments.map((enrollment) => {
+        const courseId = enrollment.course?._id?.toString() || ''
+        const totalCourseLessons = lessonCounts.get(courseId) || 0
+        const validLessonIds =
+          lessonIdsByCourse.get(courseId) || new Set<string>()
+        const sanitizedCompletedLessons = sanitizeCompletedLessons(
+          enrollment.completedLessons,
+          validLessonIds,
+        )
+        const progress = calculateCourseProgressPercent(
+          sanitizedCompletedLessons,
+          totalCourseLessons,
+        )
+
+        return {
+          id: enrollment._id.toString(),
+          studentName:
+            enrollment.student && typeof enrollment.student === 'object'
+              ? enrollment.student.name
+              : 'Unknown Student',
+          studentEmail:
+            enrollment.student && typeof enrollment.student === 'object'
+              ? enrollment.student.email
+              : '',
+          courseTitle:
+            enrollment.course && typeof enrollment.course === 'object'
+              ? enrollment.course.title
+              : 'Unknown Course',
+          progress,
+          completedLessons: sanitizedCompletedLessons.length,
+          totalLessons: totalCourseLessons,
+          updatedAt: enrollment.updatedAt,
+        }
+      })
 
       const serializedLiveLessons = (rawLiveLessons as any[]).map((l: any) => ({
         id: l._id.toString(),
@@ -223,6 +284,7 @@ export async function GET() {
           }
         }),
         liveLessons: serializedLiveLessons,
+        studentProgress,
       })
     }
 

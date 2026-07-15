@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Student } from '@/lib/db/models/Student';
 import { User } from '@/lib/db/models/User';
 import { connectToDatabase } from '@/lib/db/mongodb';

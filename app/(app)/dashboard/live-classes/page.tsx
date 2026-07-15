@@ -1,79 +1,93 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { FiCalendar, FiClock, FiRadio, FiExternalLink, FiVideo, FiLock } from 'react-icons/fi'
-import Swal from 'sweetalert2'
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import {
+  FiCalendar,
+  FiClock,
+  FiExternalLink,
+  FiLock,
+  FiRadio,
+  FiVideo,
+} from 'react-icons/fi';
+import Swal from 'sweetalert2';
 
 interface UserSession {
-  id: string
-  name: string
-  email: string
-  role: string
+  id: string;
+  name: string;
+  email: string;
+  role: string;
 }
 
 interface LiveWebinar {
-  id: string
-  title: string
-  slug: string
-  courseTitle: string
-  livePlatform: string
-  liveUrl: string
-  liveDate: string | null
-  duration: number
+  id: string;
+  title: string;
+  slug: string;
+  courseTitle: string;
+  livePlatform: string;
+  liveUrl: string;
+  liveDate: string | null;
+  duration: number;
 }
 
 export default function LiveClassesPage() {
-  const router = useRouter()
-  const [user, setUser] = useState<UserSession | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [webinars, setWebinars] = useState<LiveWebinar[]>([])
-  const [filter, setFilter] = useState<'all' | 'upcoming' | 'ended'>('all')
+  const router = useRouter();
+  const [user, setUser] = useState<UserSession | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [webinars, setWebinars] = useState<LiveWebinar[]>([]);
+  const [filter, setFilter] = useState<'all' | 'upcoming' | 'ended'>('all');
 
   // Ticking clock so countdowns update and join links unlock exactly on time
-  const [nowTs, setNowTs] = useState(() => Date.now())
+  const [nowTs, setNowTs] = useState(() => Date.now());
   useEffect(() => {
-    const timer = setInterval(() => setNowTs(Date.now()), 1000)
-    return () => clearInterval(timer)
-  }, [])
+    const timer = setInterval(() => setNowTs(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const formatCountdown = (targetTs: number) => {
-    let diff = Math.max(0, Math.floor((targetTs - nowTs) / 1000))
-    const days = Math.floor(diff / 86400); diff %= 86400
-    const hours = Math.floor(diff / 3600); diff %= 3600
-    const mins = Math.floor(diff / 60)
-    const secs = diff % 60
-    const pad = (n: number) => String(n).padStart(2, '0')
+    let diff = Math.max(0, Math.floor((targetTs - nowTs) / 1000));
+    const days = Math.floor(diff / 86400);
+    diff %= 86400;
+    const hours = Math.floor(diff / 3600);
+    diff %= 3600;
+    const mins = Math.floor(diff / 60);
+    const secs = diff % 60;
+    const pad = (n: number) => String(n).padStart(2, '0');
     return days > 0
       ? `${days}d ${pad(hours)}h ${pad(mins)}m ${pad(secs)}s`
-      : `${pad(hours)}h ${pad(mins)}m ${pad(secs)}s`
-  }
+      : `${pad(hours)}h ${pad(mins)}m ${pad(secs)}s`;
+  };
 
   useEffect(() => {
     async function init() {
       try {
-        const sessionRes = await fetch('/api/auth/me')
-        const sessionData = await sessionRes.json()
+        const sessionRes = await fetch('/api/auth/me');
+        const sessionData = await sessionRes.json();
 
-        if (!sessionRes.ok || !sessionData.authenticated || (sessionData.user.role !== 'student' && sessionData.user.role !== 'admin')) {
-          router.push('/login')
-          return
+        if (
+          !sessionRes.ok ||
+          !sessionData.authenticated ||
+          (sessionData.user.role !== 'student' &&
+            sessionData.user.role !== 'admin')
+        ) {
+          router.push('/login');
+          return;
         }
-        setUser(sessionData.user)
+        setUser(sessionData.user);
 
-        const webinarsRes = await fetch('/api/live-webinars')
+        const webinarsRes = await fetch('/api/live-webinars');
         if (webinarsRes.ok) {
-          const data = await webinarsRes.json()
-          if (data.liveLessons) setWebinars(data.liveLessons)
+          const data = await webinarsRes.json();
+          if (data.liveLessons) setWebinars(data.liveLessons);
         }
       } catch (err) {
-        console.error('Failed to load live classes:', err)
+        console.error('Failed to load live classes:', err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
-    init()
-  }, [router])
+    init();
+  }, [router]);
 
   const handleRegisterSeat = (webinarTitle: string) => {
     Swal.fire({
@@ -83,68 +97,79 @@ export default function LiveClassesPage() {
       confirmButtonColor: '#E61C24',
       background: '#121829',
       color: '#ffffff',
-    })
-  }
+    });
+  };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
-          <p className="text-base font-bold text-zinc-600">Loading Live Classes...</p>
+      <div className='flex items-center justify-center min-h-[60vh]'>
+        <div className='flex flex-col items-center gap-4'>
+          <div className='h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin' />
+          <p className='text-base font-bold text-zinc-600'>
+            Loading Live Classes...
+          </p>
         </div>
       </div>
-    )
+    );
   }
 
-  if (!user) return null
+  if (!user) return null;
 
-  const now = nowTs
-  const filtered = webinars.filter(w => {
-    if (filter === 'all') return true
-    const ts = w.liveDate ? new Date(w.liveDate).getTime() : 0
-    return filter === 'upcoming' ? ts > now : ts <= now
-  })
+  const now = nowTs;
+  const filtered = webinars.filter((w) => {
+    if (filter === 'all') return true;
+    const ts = w.liveDate ? new Date(w.liveDate).getTime() : 0;
+    return filter === 'upcoming' ? ts > now : ts <= now;
+  });
 
-  const upcomingCount = webinars.filter(w => w.liveDate && new Date(w.liveDate).getTime() > now).length
+  const upcomingCount = webinars.filter(
+    (w) => w.liveDate && new Date(w.liveDate).getTime() > now,
+  ).length;
 
   return (
-    <div className="container mx-auto px-6 py-8 pb-16 space-y-8">
-
+    <div className='container mx-auto px-6 py-8 pb-16 space-y-8'>
       {/* Hero Banner */}
-      <div className="w-full bg-[#0A163A] rounded-lg p-8 md:p-12 relative overflow-hidden border border-zinc-800/20">
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#E61C24]/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#CC181F]/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-          <div className="max-w-xl">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-[#E61C24]/20 border border-[#E61C24]/30 text-base font-bold text-[#E61C24] uppercase tracking-wider mb-4">
-              <FiRadio className="h-4 w-4 animate-pulse" /> Live Sessions
+      <div className='w-full bg-[#0A163A] rounded-lg p-8 md:p-12 relative overflow-hidden border border-zinc-800/20'>
+        <div className='absolute -top-32 -left-32 w-96 h-96 bg-[#E61C24]/15 rounded-full blur-3xl pointer-events-none' />
+        <div className='absolute -bottom-32 -right-32 w-96 h-96 bg-[#CC181F]/15 rounded-full blur-3xl pointer-events-none' />
+        <div className='relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6'>
+          <div className='max-w-xl'>
+            <span className='inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-[#E61C24]/20 border border-[#E61C24]/30 text-base font-bold text-[#E61C24] uppercase tracking-wider mb-4'>
+              <FiRadio className='h-4 w-4 animate-pulse' /> Live Sessions
             </span>
-            <h1 className="text-3xl md:text-4xl font-bold font-display text-white mb-3 leading-tight">
-              Live Class <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF4D55] to-white font-bold">Broadcasts</span>
+            <h1 className='text-3xl md:text-4xl font-bold font-display text-white mb-3 leading-tight'>
+              Live Class{' '}
+              <span className='text-transparent bg-clip-text bg-linear-to-r from-[#FF4D55] to-white font-bold'>
+                Broadcasts
+              </span>
             </h1>
-            <p className="text-zinc-400 text-base font-semibold leading-relaxed">
-              Join real-time webinar classrooms to ask live questions, interact with instructors, and submit assignments.
+            <p className='text-zinc-400 text-base font-semibold leading-relaxed'>
+              Join real-time webinar classrooms to ask live questions, interact
+              with instructors, and submit assignments.
             </p>
           </div>
 
           {/* Stats */}
-          <div className="flex gap-4 shrink-0">
-            <div className="bg-white/5 border border-white/10 rounded-lg px-5 py-4 text-center min-w-[90px]">
-              <p className="text-3xl font-bold text-white">{upcomingCount}</p>
-              <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mt-1">Upcoming</p>
+          <div className='flex gap-4 shrink-0'>
+            <div className='bg-white/5 border border-white/10 rounded-lg px-5 py-4 text-center min-w-[90px]'>
+              <p className='text-3xl font-bold text-white'>{upcomingCount}</p>
+              <p className='text-xs font-bold text-zinc-400 uppercase tracking-wider mt-1'>
+                Upcoming
+              </p>
             </div>
-            <div className="bg-white/5 border border-white/10 rounded-lg px-5 py-4 text-center min-w-[90px]">
-              <p className="text-3xl font-bold text-white">{webinars.length}</p>
-              <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mt-1">Total</p>
+            <div className='bg-white/5 border border-white/10 rounded-lg px-5 py-4 text-center min-w-[90px]'>
+              <p className='text-3xl font-bold text-white'>{webinars.length}</p>
+              <p className='text-xs font-bold text-zinc-400 uppercase tracking-wider mt-1'>
+                Total
+              </p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2 bg-white border border-zinc-200 rounded-lg p-1.5 w-fit shadow-sm">
-        {(['all', 'upcoming', 'ended'] as const).map(tab => (
+      <div className='flex items-center gap-2 bg-white border border-zinc-200 rounded-lg p-1.5 w-fit shadow-sm'>
+        {(['all', 'upcoming', 'ended'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setFilter(tab)}
@@ -154,28 +179,34 @@ export default function LiveClassesPage() {
                 : 'text-zinc-500 hover:text-zinc-800'
             }`}
           >
-            {tab === 'all' ? 'All Classes' : tab === 'upcoming' ? 'Upcoming' : 'Ended'}
+            {tab === 'all'
+              ? 'All Classes'
+              : tab === 'upcoming'
+                ? 'Upcoming'
+                : 'Ended'}
           </button>
         ))}
       </div>
 
       {/* Classes Grid */}
       {filtered.length === 0 ? (
-        <div className="bg-white border border-zinc-200 rounded-lg p-16 text-center shadow-sm">
-          <FiRadio className="h-12 w-12 text-zinc-300 mx-auto mb-4" />
-          <p className="text-base font-semibold text-zinc-400">
+        <div className='bg-white border border-zinc-200 rounded-lg p-16 text-center shadow-sm'>
+          <FiRadio className='h-12 w-12 text-zinc-300 mx-auto mb-4' />
+          <p className='text-base font-semibold text-zinc-400'>
             {filter === 'upcoming'
               ? 'No upcoming live classes scheduled for your enrolled courses.'
               : filter === 'ended'
-              ? 'No ended classes found.'
-              : 'No live classes are scheduled yet.'}
+                ? 'No ended classes found.'
+                : 'No live classes are scheduled yet.'}
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filtered.map(webinar => {
-            const dateObj = webinar.liveDate ? new Date(webinar.liveDate) : null
-            const isUpcoming = dateObj ? dateObj.getTime() > now : false
+        <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'>
+          {filtered.map((webinar) => {
+            const dateObj = webinar.liveDate
+              ? new Date(webinar.liveDate)
+              : null;
+            const isUpcoming = dateObj ? dateObj.getTime() > now : false;
 
             const formattedDate = dateObj
               ? dateObj.toLocaleString('en-BD', {
@@ -187,109 +218,125 @@ export default function LiveClassesPage() {
                   hour12: true,
                   timeZone: 'Asia/Dhaka',
                 })
-              : 'Date TBD'
+              : 'Date TBD';
 
             const platformColors: Record<string, string> = {
               zoom: 'bg-blue-50 text-blue-600 border-blue-200',
               meet: 'bg-emerald-50 text-emerald-600 border-emerald-200',
               teams: 'bg-violet-50 text-violet-600 border-violet-200',
               other: 'bg-zinc-100 text-zinc-600 border-zinc-200',
-            }
-            const platformColor = platformColors[webinar.livePlatform] || platformColors.other
+            };
+            const platformColor =
+              platformColors[webinar.livePlatform] || platformColors.other;
 
             return (
               <div
                 key={webinar.id}
                 className={`bg-white border rounded-lg overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md flex flex-col ${
-                  isUpcoming ? 'border-[#E61C24]/30 hover:border-[#E61C24]/60' : 'border-zinc-200'
+                  isUpcoming
+                    ? 'border-[#E61C24]/30 hover:border-[#E61C24]/60'
+                    : 'border-zinc-200'
                 }`}
               >
                 {/* Card Top Accent */}
-                <div className={`h-1.5 w-full ${isUpcoming ? 'bg-gradient-to-r from-[#E61C24] to-[#FF4D55]' : 'bg-zinc-200'}`} />
+                <div
+                  className={`h-1.5 w-full ${isUpcoming ? 'bg-linear-to-r from-[#E61C24] to-[#FF4D55]' : 'bg-zinc-200'}`}
+                />
 
-                <div className="p-5 flex flex-col flex-1 gap-4">
+                <div className='p-5 flex flex-col flex-1 gap-4'>
                   {/* Status & Platform badges */}
-                  <div className="flex items-center justify-between gap-2">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider border ${
-                      isUpcoming ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-zinc-100 text-zinc-500 border-zinc-200'
-                    }`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${isUpcoming ? 'bg-emerald-500 animate-pulse' : 'bg-zinc-400'}`} />
+                  <div className='flex items-center justify-between gap-2'>
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider border ${
+                        isUpcoming
+                          ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                          : 'bg-zinc-100 text-zinc-500 border-zinc-200'
+                      }`}
+                    >
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${isUpcoming ? 'bg-emerald-500 animate-pulse' : 'bg-zinc-400'}`}
+                      />
                       {isUpcoming ? 'Upcoming' : 'Ended'}
                     </span>
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider border ${platformColor}`}>
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider border ${platformColor}`}
+                    >
                       {webinar.livePlatform.toUpperCase()}
                     </span>
                   </div>
 
                   {/* Title & Course */}
-                  <div className="flex-1">
-                    <h3 className="text-base font-bold text-zinc-800 leading-snug line-clamp-2">
+                  <div className='flex-1'>
+                    <h3 className='text-base font-bold text-zinc-800 leading-snug line-clamp-2'>
                       {webinar.title}
                     </h3>
-                    <p className="text-sm font-semibold text-zinc-400 mt-1.5 truncate">
+                    <p className='text-sm font-semibold text-zinc-400 mt-1.5 truncate'>
                       {webinar.courseTitle}
                     </p>
                   </div>
 
                   {/* Date & Duration */}
-                  <div className="space-y-1.5 border-t border-zinc-100 pt-3">
-                    <div className="flex items-center gap-2 text-sm font-semibold text-zinc-500">
-                      <FiCalendar className="h-4 w-4 text-[#E61C24] shrink-0" />
+                  <div className='space-y-1.5 border-t border-zinc-100 pt-3'>
+                    <div className='flex items-center gap-2 text-sm font-semibold text-zinc-500'>
+                      <FiCalendar className='h-4 w-4 text-[#E61C24] shrink-0' />
                       <span>{formattedDate}</span>
                     </div>
                     {webinar.duration > 0 && (
-                      <div className="flex items-center gap-2 text-sm font-semibold text-zinc-500">
-                        <FiClock className="h-4 w-4 text-[#E61C24] shrink-0" />
+                      <div className='flex items-center gap-2 text-sm font-semibold text-zinc-500'>
+                        <FiClock className='h-4 w-4 text-[#E61C24] shrink-0' />
                         <span>{webinar.duration} minutes</span>
                       </div>
                     )}
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-2">
+                  <div className='flex gap-2'>
                     {isUpcoming && (
                       <button
                         onClick={() => handleRegisterSeat(webinar.title)}
-                        className="flex-1 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white text-base font-bold transition-all cursor-pointer border-none shadow-md shadow-[#E61C24]/20 flex items-center justify-center gap-1.5"
+                        className='flex-1 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white text-base font-bold transition-all cursor-pointer border-none shadow-md shadow-[#E61C24]/20 flex items-center justify-center gap-1.5'
                       >
-                        <FiRadio className="h-4 w-4" /> RSVP Seat
+                        <FiRadio className='h-4 w-4' /> RSVP Seat
                       </button>
                     )}
                     {webinar.liveUrl && isUpcoming && (
                       /* Link stays locked until class time; countdown shows when it unlocks */
                       <div
-                        className="flex-none px-4 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-base font-bold border bg-zinc-50 border-zinc-200 text-zinc-500 cursor-not-allowed select-none"
-                        title="The join link unlocks when the class starts"
+                        className='flex-none px-4 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-base font-bold border bg-zinc-50 border-zinc-200 text-zinc-500 cursor-not-allowed select-none'
+                        title='The join link unlocks when the class starts'
                       >
-                        <FiLock className="h-4 w-4 text-[#E61C24]" />
-                        <span className="tabular-nums">{dateObj ? formatCountdown(dateObj.getTime()) : 'Locked'}</span>
+                        <FiLock className='h-4 w-4 text-[#E61C24]' />
+                        <span className='tabular-nums'>
+                          {dateObj
+                            ? formatCountdown(dateObj.getTime())
+                            : 'Locked'}
+                        </span>
                       </div>
                     )}
                     {webinar.liveUrl && !isUpcoming && (
                       <a
                         href={webinar.liveUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-base font-bold transition-all border bg-zinc-50 hover:bg-zinc-100 border-zinc-200 text-zinc-600"
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-base font-bold transition-all border bg-zinc-50 hover:bg-zinc-100 border-zinc-200 text-zinc-600'
                       >
-                        <FiVideo className="h-4 w-4" />
+                        <FiVideo className='h-4 w-4' />
                         Join / Recording
-                        <FiExternalLink className="h-3.5 w-3.5" />
+                        <FiExternalLink className='h-3.5 w-3.5' />
                       </a>
                     )}
                     {!webinar.liveUrl && !isUpcoming && (
-                      <div className="flex-1 py-2.5 rounded-lg bg-zinc-50 border border-zinc-200 text-zinc-400 text-base font-bold text-center">
+                      <div className='flex-1 py-2.5 rounded-lg bg-zinc-50 border border-zinc-200 text-zinc-400 text-base font-bold text-center'>
                         Link Unavailable
                       </div>
                     )}
                   </div>
                 </div>
               </div>
-            )
+            );
           })}
         </div>
       )}
-
     </div>
-  )
+  );
 }

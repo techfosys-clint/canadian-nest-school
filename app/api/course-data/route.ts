@@ -3,6 +3,7 @@ import { connectToDatabase } from '@/lib/db/mongodb'
 import { Enrollment } from '@/lib/db/models/Enrollment'
 import { Submission } from '@/lib/db/models/Submission'
 import { CertificateRequest } from '@/lib/db/models/CertificateRequest'
+import { getValidatedCompletedLessons } from '@/lib/progress/getCourseProgress'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
 
@@ -78,11 +79,21 @@ export async function GET(request: Request) {
       student: userId,
       course: courseId,
       paymentStatus: 'completed',
-    })
-      .select('completedLessons')
-      .lean()
+    }).select('_id completedLessons')
 
-    const completedLessons = enrollment?.completedLessons || []
+    let completedLessons: string[] = []
+    if (enrollment) {
+      completedLessons = await getValidatedCompletedLessons(
+        courseId,
+        enrollment.completedLessons,
+      )
+
+      const raw = enrollment.completedLessons || []
+      if (raw.length !== completedLessons.length) {
+        enrollment.completedLessons = completedLessons
+        await enrollment.save()
+      }
+    }
 
     // 2. Fetch submissions (quiz & assignment)
     const submissions = await Submission.find({

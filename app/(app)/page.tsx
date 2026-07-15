@@ -161,8 +161,8 @@ export default async function Home() {
         <Marquee />
       </Hero>
 
-      {/* 2nd Section: Course Categories Grid - real DB data */}
-      <Categories categories={categories} />
+      {/* 2nd Section: Course Categories Grid */}
+      <Categories />
 
       {/* Features Section: Empower Your Learning Journey */}
       <Features />

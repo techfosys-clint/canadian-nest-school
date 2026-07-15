@@ -62,19 +62,36 @@ export async function GET(request: Request) {
       }
     }
 
-    // Fetch enrollments with populated student and course detail structures
-    const docs = await Enrollment.find(query)
-      .populate('student', 'name email')
-      .populate({
-        path: 'course',
-        populate: [
-          { path: 'thumbnail' },
-          { path: 'category' },
-          { path: 'instructor' }
-        ]
-      })
-      .sort({ createdAt: -1 })
-      .lean()
+    // Fetch enrollments with populated student and course detail structures.
+    // The nested course.thumbnail/category/instructor populate is "nice to
+    // have" — if it ever throws (e.g. a stale cached Course model missing a
+    // newly added ref field right after a deploy), we must not let that take
+    // down the whole enrollment list, since course.studyMaterials (an
+    // embedded field, not a ref) doesn't need any populate at all and
+    // should always come through regardless.
+    let docs: any[]
+    try {
+      docs = await Enrollment.find(query)
+        .populate('student', 'name email')
+        .populate({
+          path: 'course',
+          populate: [
+            { path: 'thumbnail' },
+            { path: 'category' },
+            { path: 'instructor' },
+            { path: 'instructors' },
+          ]
+        })
+        .sort({ createdAt: -1 })
+        .lean()
+    } catch (populateError) {
+      console.error('Enrollments nested populate failed, falling back to base course fields:', populateError)
+      docs = await Enrollment.find(query)
+        .populate('student', 'name email')
+        .populate('course')
+        .sort({ createdAt: -1 })
+        .lean()
+    }
 
     // ═══════════════════════════════════════════════════════
     // Pre-fetch ALL lesson counts in ONE aggregation query
@@ -126,10 +143,24 @@ export async function GET(request: Request) {
             id: doc.course.instructor._id.toString(),
             ...doc.course.instructor
           } : null,
-          instructors: doc.course.instructor ? [{
-            id: doc.course.instructor._id.toString(),
-            ...doc.course.instructor
-          }] : [],
+          instructors: (() => {
+            const fromArray = Array.isArray(doc.course.instructors)
+              ? doc.course.instructors
+                  .filter((i: any) => i && typeof i === 'object' && i._id)
+                  .map((i: any) => ({
+                    id: i._id.toString(),
+                    ...i,
+                  }))
+              : []
+            if (fromArray.length > 0) return fromArray
+            if (doc.course.instructor) {
+              return [{
+                id: doc.course.instructor._id.toString(),
+                ...doc.course.instructor,
+              }]
+            }
+            return []
+          })(),
           thumbnail: doc.course.thumbnail ? {
             id: doc.course.thumbnail._id.toString(),
             ...doc.course.thumbnail
@@ -145,9 +176,6 @@ export async function GET(request: Request) {
 
   } catch (error: any) {
     console.error('API Enrollments Error:', error)
-    try {
-      require('fs').writeFileSync('enrollments-error.log', String(error.stack || error.message));
-    } catch (e) {}
     return NextResponse.json(
       { success: false, error: 'Failed to fetch enrollments.' },
       { status: 500 }

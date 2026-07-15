@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Enrollment } from '@/lib/db/models/Enrollment'
 import { StudentProgress } from '@/lib/db/models/StudentProgress'
+import {
+  getValidatedCompletedLessons,
+  isLessonInCourse,
+} from '@/lib/progress/getCourseProgress'
+import { syncEnrollmentProgressSideEffects } from '@/lib/progress/syncEnrollmentProgress'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
 
@@ -39,10 +44,22 @@ export async function GET() {
       .lean()
 
     const completedLessons: Record<string, string[]> = {}
-    for (const enr of enrollments as any[]) {
+    for (const enr of enrollments) {
       const courseId = enr.course?.toString()
-      if (courseId) {
-        completedLessons[courseId] = enr.completedLessons || []
+      if (!courseId) continue
+
+      const sanitized = await getValidatedCompletedLessons(
+        courseId,
+        enr.completedLessons,
+      )
+      completedLessons[courseId] = sanitized
+
+      const raw = enr.completedLessons || []
+      if (raw.length !== sanitized.length) {
+        await Enrollment.updateOne(
+          { _id: enr._id },
+          { $set: { completedLessons: sanitized } },
+        )
       }
     }
 
@@ -102,22 +119,46 @@ export async function POST(request: Request) {
       )
     }
 
-    // Toggle completion
+    if (!Array.isArray(enrollment.completedLessons)) {
+      enrollment.completedLessons = []
+    }
+
     if (completed) {
-      // Add lessonId if not already present
+      const lessonBelongsToCourse = await isLessonInCourse(courseId, lessonId)
+      if (!lessonBelongsToCourse) {
+        return NextResponse.json(
+          { success: false, error: 'Lesson does not belong to this course.' },
+          { status: 400 },
+        )
+      }
+
       if (!enrollment.completedLessons.includes(lessonId)) {
         enrollment.completedLessons.push(lessonId)
       }
     } else {
-      // Remove lessonId
-      enrollment.completedLessons = enrollment.completedLessons.filter((id: string) => id !== lessonId)
+      enrollment.completedLessons = enrollment.completedLessons.filter(
+        (id: string) => id !== lessonId,
+      )
     }
+
+    const sanitizedCompletedLessons = await getValidatedCompletedLessons(
+      courseId,
+      enrollment.completedLessons,
+    )
+    enrollment.completedLessons = sanitizedCompletedLessons
 
     await enrollment.save()
 
+    const progress = await syncEnrollmentProgressSideEffects(
+      userId,
+      courseId,
+      sanitizedCompletedLessons,
+    )
+
     return NextResponse.json({
       success: true,
-      completedLessons: enrollment.completedLessons,
+      completedLessons: sanitizedCompletedLessons,
+      progress,
     })
   } catch (error: any) {
     console.error('POST /api/progress error:', error)

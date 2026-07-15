@@ -1,18 +1,23 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import React, { useEffect, useState } from 'react'
 import {
   FiAward,
-  FiClock,
   FiCheckCircle,
+  FiClock,
   FiDownload,
-  FiXCircle,
   FiExternalLink,
-  FiFileText,
+  FiLock,
   FiSearch,
+  FiXCircle,
 } from 'react-icons/fi'
 import Swal from 'sweetalert2'
+import {
+  canDownloadCertificate,
+  hasSubmittedRequiredReviews,
+  type CompletionReviewState,
+} from '@/lib/reviews/completionGate'
 
 interface CertificateItem {
   id: string
@@ -24,12 +29,80 @@ interface CertificateItem {
   certificateUrl: string | null
   adminNotes: string
   createdAt: string
+  courseReviewStatus?: CompletionReviewState['courseReviewStatus']
+  teacherReviewStatus?: CompletionReviewState['teacherReviewStatus']
 }
 
 export default function MyCertificatesPage() {
   const [certificates, setCertificates] = useState<CertificateItem[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [downloadingId, setDownloadingId] = useState<string | null>(null)
+
+  function getGate(cert: CertificateItem): CompletionReviewState {
+    return {
+      courseReviewStatus: cert.courseReviewStatus || 'idle',
+      teacherReviewStatus: cert.teacherReviewStatus || 'idle',
+    }
+  }
+
+  async function handleDownloadCertificate(cert: CertificateItem) {
+    const gate = getGate(cert)
+    if (!hasSubmittedRequiredReviews(gate)) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Reviews Required',
+        text: 'Submit your course review and teacher reviews before downloading the certificate.',
+        confirmButtonColor: '#E61C24',
+        background: '#ffffff',
+        color: '#1e293b',
+      })
+      return
+    }
+    if (!canDownloadCertificate(gate)) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Certificate Locked',
+        text: 'Your certificate unlocks after admin/staff approve your course and teacher reviews together.',
+        confirmButtonColor: '#E61C24',
+        background: '#ffffff',
+        color: '#1e293b',
+      })
+      return
+    }
+
+    setDownloadingId(cert.id)
+    try {
+      const res = await fetch(`/api/certificates/download?courseId=${cert.courseId}`)
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Unable to download certificate.')
+      }
+
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${cert.courseTitle.replace(/[^a-zA-Z0-9-_]+/g, '-')}-certificate.pdf`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(url)
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'Could not generate your certificate PDF.'
+      Swal.fire({
+        icon: 'error',
+        title: 'Download Failed',
+        text: message,
+        background: '#ffffff',
+        color: '#1e293b',
+        confirmButtonColor: '#E61C24',
+      })
+    } finally {
+      setDownloadingId(null)
+    }
+  }
 
   async function fetchCertificates() {
     setLoading(true)
@@ -41,11 +114,13 @@ export default function MyCertificatesPage() {
       } else {
         throw new Error(data.error || 'Failed to fetch certificates registry.')
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'Error occurred while loading certificates.'
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: err.message || 'Error occurred while loading certificates.',
+        text: message,
         background: '#ffffff',
         color: '#1e293b',
         confirmButtonColor: '#E61C24',
@@ -74,20 +149,97 @@ export default function MyCertificatesPage() {
     })
   }
 
+  const renderDownloadCell = (cert: CertificateItem) => {
+    const gate = getGate(cert)
+    const reviewsDone = hasSubmittedRequiredReviews(gate)
+    const reviewsAccepted = canDownloadCertificate(gate)
+
+    if (!reviewsDone) {
+      return (
+        <div className="inline-flex flex-col items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 text-zinc-500 text-base font-semibold">
+            <FiLock className="h-4.5 w-4.5" /> Reviews required
+          </span>
+          <Link
+            href={`/dashboard/courses/${cert.courseId}/complete`}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white text-base font-bold"
+          >
+            Leave Reviews <FiExternalLink className="h-4 w-4" />
+          </Link>
+        </div>
+      )
+    }
+
+    if (!reviewsAccepted) {
+      return (
+        <div className="inline-flex flex-col items-center gap-1 max-w-[200px] mx-auto">
+          <span className="inline-flex items-center gap-1.5 text-amber-600 text-base font-semibold">
+            <FiClock className="h-4.5 w-4.5" /> Awaiting staff approval
+          </span>
+          <Link
+            href={`/dashboard/courses/${cert.courseId}/complete`}
+            className="text-base font-bold text-[#E61C24] hover:underline"
+          >
+            Check status
+          </Link>
+        </div>
+      )
+    }
+
+    if (cert.status === 'approved') {
+      return (
+        <button
+          type="button"
+          onClick={() => handleDownloadCertificate(cert)}
+          disabled={downloadingId === cert.id}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-70 disabled:cursor-not-allowed text-white rounded-lg text-base font-bold transition-all shadow-md shadow-emerald-600/15 cursor-pointer"
+        >
+          <FiDownload className="h-4.5 w-4.5" />
+          {downloadingId === cert.id ? 'Generating...' : 'Download PDF'}
+        </button>
+      )
+    }
+
+    if (cert.status === 'rejected') {
+      return (
+        <div className="inline-flex flex-col items-center">
+          <span className="text-base text-rose-500 font-bold">Verification Rejected</span>
+          {cert.adminNotes && (
+            <span
+              className="text-sm text-zinc-400 font-semibold mt-0.5 truncate max-w-[180px]"
+              title={cert.adminNotes}
+            >
+              Notes: {cert.adminNotes}
+            </span>
+          )}
+        </div>
+      )
+    }
+
+    return (
+      <div className="inline-flex items-center gap-1.5 text-zinc-400 text-base font-semibold select-none">
+        <FiClock className="h-4.5 w-4.5 text-zinc-400" /> Awaiting Release
+      </div>
+    )
+  }
+
   return (
     <div className="container mx-auto px-6 py-8 space-y-6">
-      
-      {/* Heading Section */}
       <div className="border-b border-slate-200 pb-4">
         <h1 className="text-2xl font-bold text-zinc-900 flex items-center gap-2 select-none">
           <FiAward className="text-[#E61C24] h-7 w-7" /> My Verified Certificates
         </h1>
         <p className="text-base font-semibold text-zinc-500 mt-1 select-none">
-          View auto-generated course completion requests and download approved PDF credentials
+          Certificates unlock only after you submit and get approval for course and teacher
+          reviews
         </p>
       </div>
 
-      {/* Search Filter Bar */}
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-base font-semibold text-amber-800 select-none">
+        Download is disabled until you review the course and its teachers. Complete that flow
+        from each finished course.
+      </div>
+
       <div className="bg-white border border-slate-200 rounded-lg p-5 flex flex-col md:flex-row md:items-center gap-4 justify-between shadow-sm select-none">
         <div className="relative flex-1 max-w-md">
           <FiSearch className="absolute left-3.5 top-3.5 text-zinc-400 h-5 w-5" />
@@ -105,19 +257,21 @@ export default function MyCertificatesPage() {
         </div>
       </div>
 
-      {/* Main Table Panel */}
       <div className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-12 flex flex-col items-center justify-center gap-4">
             <div className="h-10 w-10 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
-            <p className="text-base font-semibold text-zinc-500 select-none">Loading credentials registry...</p>
+            <p className="text-base font-semibold text-zinc-500 select-none">
+              Loading credentials registry...
+            </p>
           </div>
         ) : filtered.length === 0 ? (
           <div className="p-12 text-center text-zinc-500 space-y-3 max-w-md mx-auto select-none">
             <FiAward className="mx-auto h-12 w-12 text-zinc-300" />
             <p className="text-lg font-bold text-zinc-800">No certificates found</p>
             <p className="text-base font-semibold text-zinc-500 leading-relaxed">
-              Complete 100% of your course syllabus lessons. The system will automatically create and submit certificate requests for you!
+              Complete your syllabus, then submit course and teacher reviews to unlock your
+              certificate.
             </p>
             <div className="pt-2">
               <Link
@@ -134,16 +288,21 @@ export default function MyCertificatesPage() {
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50/75 text-zinc-600 select-none">
                   <th className="px-6 py-4 text-base font-bold">Course Title</th>
-                  <th className="px-6 py-4 text-base font-bold text-center">Syllabus Progress</th>
-                  <th className="px-6 py-4 text-base font-bold text-center">Auto-Requested Date</th>
+                  <th className="px-6 py-4 text-base font-bold text-center">
+                    Syllabus Progress
+                  </th>
+                  <th className="px-6 py-4 text-base font-bold text-center">
+                    Auto-Requested Date
+                  </th>
                   <th className="px-6 py-4 text-base font-bold text-center">Status</th>
-                  <th className="px-6 py-4 text-base font-bold text-center">Certificate Download</th>
+                  <th className="px-6 py-4 text-base font-bold text-center">
+                    Certificate Download
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filtered.map((cert) => (
                   <tr key={cert.id} className="hover:bg-slate-50/45 transition-colors">
-                    {/* Course Title */}
                     <td className="px-6 py-4 max-w-xs">
                       <Link
                         href={`/courses/${cert.courseSlug}`}
@@ -153,10 +312,11 @@ export default function MyCertificatesPage() {
                       </Link>
                     </td>
 
-                    {/* Progress */}
                     <td className="px-6 py-4 text-center select-none">
                       <div className="inline-flex flex-col items-center">
-                        <span className="text-base font-bold text-zinc-800">{cert.progress}% Complete</span>
+                        <span className="text-base font-bold text-zinc-800">
+                          {cert.progress}% Complete
+                        </span>
                         <div className="w-24 bg-slate-100 h-1.5 rounded-lg overflow-hidden mt-1.5 border border-slate-200/40">
                           <div
                             className="bg-[#E61C24] h-full rounded-lg"
@@ -166,20 +326,20 @@ export default function MyCertificatesPage() {
                       </div>
                     </td>
 
-                    {/* Auto Requested Date */}
                     <td className="px-6 py-4 text-center text-base font-bold text-zinc-500 select-none">
                       {formatDate(cert.createdAt)}
                     </td>
 
-                    {/* Status Badge */}
                     <td className="px-6 py-4 text-center select-none">
-                      <span className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-base font-bold ${
-                        cert.status === 'approved'
-                          ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
-                          : cert.status === 'rejected'
-                          ? 'bg-rose-50 text-rose-600 border border-rose-100'
-                          : 'bg-amber-50 text-amber-600 border border-amber-100'
-                      }`}>
+                      <span
+                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-base font-bold ${
+                          cert.status === 'approved'
+                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                            : cert.status === 'rejected'
+                              ? 'bg-rose-50 text-rose-600 border border-rose-100'
+                              : 'bg-amber-50 text-amber-600 border border-amber-100'
+                        }`}
+                      >
                         {cert.status === 'approved' ? (
                           <FiCheckCircle className="h-4.5 w-4.5" />
                         ) : cert.status === 'rejected' ? (
@@ -187,36 +347,13 @@ export default function MyCertificatesPage() {
                         ) : (
                           <FiClock className="h-4.5 w-4.5" />
                         )}
-                        <span className="capitalize">{cert.status === 'approved' ? 'Released' : cert.status}</span>
+                        <span className="capitalize">
+                          {cert.status === 'approved' ? 'Released' : cert.status}
+                        </span>
                       </span>
                     </td>
 
-                    {/* Download button */}
-                    <td className="px-6 py-4 text-center">
-                      {cert.status === 'approved' && cert.certificateUrl ? (
-                        <a
-                          href={cert.certificateUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-base font-bold transition-all shadow-md shadow-emerald-600/15 cursor-pointer"
-                        >
-                          <FiDownload className="h-4.5 w-4.5" /> Download PDF
-                        </a>
-                      ) : cert.status === 'rejected' ? (
-                        <div className="inline-flex flex-col items-center">
-                          <span className="text-base text-rose-500 font-bold">Verification Rejected</span>
-                          {cert.adminNotes && (
-                            <span className="text-xs text-zinc-400 font-semibold mt-0.5 truncate max-w-[180px]" title={cert.adminNotes}>
-                              Notes: {cert.adminNotes}
-                            </span>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="inline-flex items-center gap-1.5 text-zinc-400 text-base font-semibold select-none">
-                          <FiClock className="h-4.5 w-4.5 text-zinc-400" /> Awaiting Release
-                        </div>
-                      )}
-                    </td>
+                    <td className="px-6 py-4 text-center">{renderDownloadCell(cert)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -224,7 +361,6 @@ export default function MyCertificatesPage() {
           </div>
         )}
       </div>
-
     </div>
   )
 }

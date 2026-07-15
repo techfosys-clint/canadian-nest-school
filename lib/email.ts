@@ -1,16 +1,19 @@
-import nodemailer from 'nodemailer'
+import nodemailer from 'nodemailer';
 
-let cachedTransporter: ReturnType<typeof nodemailer.createTransport> | null = null
+let cachedTransporter: ReturnType<typeof nodemailer.createTransport> | null =
+  null;
 
 export function getGmailTransporter() {
-  if (cachedTransporter) return cachedTransporter
+  if (cachedTransporter) return cachedTransporter;
 
-  const gmailUser = process.env.GMAIL_USER
-  const gmailAppPassword = process.env.GMAIL_APP_PASSWORD
+  const gmailUser = process.env.GMAIL_USER;
+  const gmailAppPassword = process.env.GMAIL_APP_PASSWORD;
 
   if (!gmailUser || !gmailAppPassword) {
-    console.error('GMAIL_USER or GMAIL_APP_PASSWORD is not defined in environment variables.')
-    return null
+    console.error(
+      'GMAIL_USER or GMAIL_APP_PASSWORD is not defined in environment variables.',
+    );
+    return null;
   }
 
   cachedTransporter = nodemailer.createTransport({
@@ -19,9 +22,9 @@ export function getGmailTransporter() {
       user: gmailUser,
       pass: gmailAppPassword,
     },
-  })
+  });
 
-  return cachedTransporter
+  return cachedTransporter;
 }
 
 export async function sendEnrollmentConfirmationEmail(
@@ -30,15 +33,15 @@ export async function sendEnrollmentConfirmationEmail(
   courseTitle: string,
   pricePaid: number,
   paymentReference: string,
-  enrolledAt: Date
+  enrolledAt: Date,
 ) {
-  const transporter = getGmailTransporter()
-  const fromEmail = process.env.GMAIL_USER
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-  const logoUrl = `${appUrl}/logo.png`
+  const transporter = getGmailTransporter();
+  const fromEmail = process.env.GMAIL_USER;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const logoUrl = `${appUrl}/logo.png`;
 
   if (!transporter) {
-    return false
+    return false;
   }
 
   const formattedDate = new Date(enrolledAt).toLocaleString('en-BD', {
@@ -48,15 +51,15 @@ export async function sendEnrollmentConfirmationEmail(
     hour: '2-digit',
     minute: '2-digit',
     hour12: true,
-  })
+  });
 
   const formattedPrice = new Intl.NumberFormat('en-BD', {
     style: 'currency',
     currency: 'BDT',
     minimumFractionDigits: 0,
-  }).format(pricePaid)
+  }).format(pricePaid);
 
-  const subject = `🎉 You're Enrolled! "${courseTitle}" - Canadian Nest School`
+  const subject = `🎉 You're Enrolled! "${courseTitle}" - Canadian Nest School`;
 
   const htmlContent = `
     <!DOCTYPE html>
@@ -119,7 +122,7 @@ export async function sendEnrollmentConfirmationEmail(
       </div>
     </body>
     </html>
-  `
+  `;
 
   try {
     await transporter.sendMail({
@@ -127,24 +130,151 @@ export async function sendEnrollmentConfirmationEmail(
       to: toEmail,
       subject,
       html: htmlContent,
-    })
-    return true
+    });
+    return true;
   } catch (error) {
-    console.error('Failed to send enrollment confirmation email:', error)
-    return false
+    console.error('Failed to send enrollment confirmation email:', error);
+    return false;
   }
 }
 
-export async function sendStaffRegistrationEmail(toEmail: string, name: string, role: string, rawPassword: string) {
-  const transporter = getGmailTransporter()
-  const fromEmail = process.env.GMAIL_USER
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+export async function sendOrderConfirmationEmail(
+  toEmail: string,
+  customerName: string,
+  items: { title: string; price: number; quantity: number }[],
+  totalAmount: number,
+  paymentReference: string,
+  shippingAddress: string,
+  orderedAt: Date,
+) {
+  const transporter = getGmailTransporter();
+  const fromEmail = process.env.GMAIL_USER;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const logoUrl = `${appUrl}/logo.png`;
 
   if (!transporter) {
-    return false
+    return false;
   }
 
-  const subject = `Welcome to Canadian Nest School - Your ${role.toUpperCase()} Account is Ready`
+  const formattedDate = new Date(orderedAt).toLocaleString('en-BD', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
+
+  const formatMoney = (amount: number) =>
+    new Intl.NumberFormat('en-BD', {
+      style: 'currency',
+      currency: 'BDT',
+      minimumFractionDigits: 0,
+    }).format(amount);
+
+  const itemRows = items
+    .map(
+      (item) => `
+        <tr class="invoice-row">
+          <td style="padding: 12px 20px; font-size: 15px; color: #6b7280; font-weight: 600; border-bottom: 1px solid #e5e7eb;">${item.title} &times; ${item.quantity}</td>
+          <td style="padding: 12px 20px; font-size: 15px; color: #111827; font-weight: bold; text-align: right; border-bottom: 1px solid #e5e7eb;">${formatMoney(item.price * item.quantity)}</td>
+        </tr>`,
+    )
+    .join('');
+
+  const subject = `📦 Order Confirmed - Canadian Nest School Shop`;
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1f2937; margin: 0; padding: 40px 20px; }
+        .container { max-width: 560px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e5e7eb; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .logo { display: block; margin-bottom: 24px; }
+        .logo img { height: 44px; width: auto; }
+        .title { font-size: 24px; font-weight: bold; color: #111827; margin-bottom: 16px; }
+        .text { font-size: 16px; line-height: 1.6; color: #4b5563; margin-bottom: 20px; }
+        .invoice { background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 4px 20px; margin: 24px 0; width: 100%; border-collapse: collapse; }
+        .invoice-row td { padding: 12px 0; font-size: 15px; border-bottom: 1px solid #e5e7eb; }
+        .invoice-total td { border-bottom: none; }
+        .invoice-total td:last-child { color: #E61C24 !important; font-size: 18px; }
+        .btn-container { text-align: center; margin: 32px 0; }
+        .btn { display: inline-block; background-color: #E61C24; color: #ffffff !important; padding: 14px 28px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 16px; }
+        .footer { font-size: 13px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 32px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="logo"><img src="${logoUrl}" alt="Canadian Nest School" /></div>
+        <h2 class="title">📦 Thank you, ${customerName}!</h2>
+        <p class="text">
+          Your order has been confirmed and payment received. We're preparing your items for shipment to the address below.
+        </p>
+
+        <table class="invoice" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%; background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; margin: 24px 0;">
+          ${itemRows}
+          <tr class="invoice-row">
+            <td style="padding: 12px 20px; font-size: 15px; color: #6b7280; font-weight: 600; border-bottom: 1px solid #e5e7eb;">Invoice Reference</td>
+            <td style="padding: 12px 20px; font-size: 15px; color: #111827; font-weight: bold; text-align: right; border-bottom: 1px solid #e5e7eb;">${paymentReference}</td>
+          </tr>
+          <tr class="invoice-row">
+            <td style="padding: 12px 20px; font-size: 15px; color: #6b7280; font-weight: 600; border-bottom: 1px solid #e5e7eb;">Date</td>
+            <td style="padding: 12px 20px; font-size: 15px; color: #111827; font-weight: bold; text-align: right; border-bottom: 1px solid #e5e7eb;">${formattedDate}</td>
+          </tr>
+          <tr class="invoice-row">
+            <td style="padding: 12px 20px; font-size: 15px; color: #6b7280; font-weight: 600; border-bottom: 1px solid #e5e7eb;">Shipping Address</td>
+            <td style="padding: 12px 20px; font-size: 15px; color: #111827; font-weight: bold; text-align: right; border-bottom: 1px solid #e5e7eb;">${shippingAddress}</td>
+          </tr>
+          <tr class="invoice-row invoice-total">
+            <td style="padding: 12px 20px; font-size: 15px; color: #6b7280; font-weight: 600;">Amount Paid</td>
+            <td style="padding: 12px 20px; font-size: 18px; color: #E61C24; font-weight: bold; text-align: right;">${formatMoney(totalAmount)}</td>
+          </tr>
+        </table>
+
+        <div class="btn-container">
+          <a href="${appUrl}/dashboard/orders" class="btn" style="color: #ffffff !important;">View My Orders</a>
+        </div>
+
+        <div class="footer">
+          <p>Keep this email as your receipt for this purchase.</p>
+          <p>&copy; 2026 Canadian Nest School Inc. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  try {
+    await transporter.sendMail({
+      from: `Canadian Nest School <${fromEmail}>`,
+      to: toEmail,
+      subject,
+      html: htmlContent,
+    });
+    return true;
+  } catch (error) {
+    console.error('Failed to send order confirmation email:', error);
+    return false;
+  }
+}
+
+export async function sendStaffRegistrationEmail(
+  toEmail: string,
+  name: string,
+  role: string,
+  rawPassword: string,
+) {
+  const transporter = getGmailTransporter();
+  const fromEmail = process.env.GMAIL_USER;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+  if (!transporter) {
+    return false;
+  }
+
+  const subject = `Welcome to Canadian Nest School - Your ${role.toUpperCase()} Account is Ready`;
   const htmlContent = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e4e4e7; border-radius: 8px; background-color: #ffffff; color: #1f2937;">
       <h2 style="color: #615fff; margin-bottom: 20px; font-weight: bold;">Welcome to Canadian Nest School, ${name}!</h2>
@@ -163,7 +293,7 @@ export async function sendStaffRegistrationEmail(toEmail: string, name: string, 
         For security reasons, we highly recommend changing your password after your first login.
       </p>
     </div>
-  `
+  `;
 
   try {
     await transporter.sendMail({
@@ -171,12 +301,12 @@ export async function sendStaffRegistrationEmail(toEmail: string, name: string, 
       to: toEmail,
       subject: subject,
       html: htmlContent,
-    })
+    });
 
-    return true
+    return true;
   } catch (error) {
-    console.error('Failed to send registration email:', error)
-    return false
+    console.error('Failed to send registration email:', error);
+    return false;
   }
 }
 
@@ -187,14 +317,14 @@ export async function sendLiveClassReminderEmail(
   lessonTitle: string,
   liveDate: Date,
   livePlatform: string,
-  liveUrl: string
+  liveUrl: string,
 ) {
-  const transporter = getGmailTransporter()
-  const fromEmail = process.env.GMAIL_USER
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const transporter = getGmailTransporter();
+  const fromEmail = process.env.GMAIL_USER;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
   if (!transporter) {
-    return false
+    return false;
   }
 
   const formattedDate = new Date(liveDate).toLocaleString('en-BD', {
@@ -205,11 +335,11 @@ export async function sendLiveClassReminderEmail(
     hour: '2-digit',
     minute: '2-digit',
     hour12: true,
-    timeZone: 'Asia/Dhaka'
-  })
+    timeZone: 'Asia/Dhaka',
+  });
 
-  const subject = `⚠️ URGENT REMINDER: Your Live Class Starts Soon!`
-  const bannerUrl = `${appUrl}/media/live-class-reminder.png`
+  const subject = `⚠️ URGENT REMINDER: Your Live Class Starts Soon!`;
+  const bannerUrl = `${appUrl}/media/live-class-reminder.png`;
 
   const htmlContent = `
     <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; border: 1px solid #27272a; border-radius: 8px; background-color: #070b16; color: #ffffff; overflow: hidden;">
@@ -256,7 +386,7 @@ export async function sendLiveClassReminderEmail(
         </p>
       </div>
     </div>
-  `
+  `;
 
   try {
     await transporter.sendMail({
@@ -264,55 +394,50 @@ export async function sendLiveClassReminderEmail(
       to: toEmail,
       subject: subject,
       html: htmlContent,
-    })
+    });
 
-    return true
+    return true;
   } catch (error) {
-    console.error('Failed to send live class reminder email:', error)
-    return false
+    console.error('Failed to send live class reminder email:', error);
+    return false;
   }
 }
 
 export async function checkAndSendLiveClassReminders() {
   try {
-    const { connectToDatabase } = await import('@/lib/db/mongodb')
-    await connectToDatabase()
+    const { connectToDatabase } = await import('@/lib/db/mongodb');
+    await connectToDatabase();
 
-    const { Lesson } = await import('@/lib/db/models/Lesson')
-    const { Course } = await import('@/lib/db/models/Course')
-    const { User } = await import('@/lib/db/models/User')
+    const { Lesson } = await import('@/lib/db/models/Lesson');
+    const { Course } = await import('@/lib/db/models/Course');
+    const { User } = await import('@/lib/db/models/User');
 
     // Find live classes starting in the next 2 hours (or already started in the last 15 minutes) that haven't received a reminder yet
-    const now = new Date()
-    const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000)
-    const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000)
+    const now = new Date();
+    const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+    const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
 
     const upcomingLessons = await Lesson.find({
       lessonType: 'live',
       liveDate: { $gte: fifteenMinutesAgo, $lte: twoHoursLater },
       liveUrl: { $exists: true, $ne: '' },
-      $or: [
-        { reminderSent: { $exists: false } },
-        { reminderSent: false }
-      ]
-    }).populate('course')
+      $or: [{ reminderSent: { $exists: false } }, { reminderSent: false }],
+    }).populate('course');
 
-    if (upcomingLessons.length === 0) return
-
-    console.log(`Found ${upcomingLessons.length} upcoming live classes requiring reminders.`)
+    if (upcomingLessons.length === 0) return;
 
     for (const lesson of upcomingLessons) {
-      const course = lesson.course
-      if (!course) continue
+      const course = lesson.course;
+      if (!course) continue;
 
       // Fetch course details to get the instructor
-      const courseDoc = await Course.findById(course._id || course).populate('instructor')
-      if (!courseDoc || !courseDoc.instructor) continue
+      const courseDoc = await Course.findById(course._id || course).populate(
+        'instructor',
+      );
+      if (!courseDoc || !courseDoc.instructor) continue;
 
-      const instructor = courseDoc.instructor as any
-      if (!instructor.email) continue
-
-      console.log(`Sending live reminder for "${lesson.title}" to instructor "${instructor.name}" (${instructor.email})`)
+      const instructor = courseDoc.instructor as any;
+      if (!instructor.email) continue;
 
       const success = await sendLiveClassReminderEmail(
         instructor.email,
@@ -321,16 +446,15 @@ export async function checkAndSendLiveClassReminders() {
         lesson.title,
         lesson.liveDate,
         lesson.livePlatform || 'zoom',
-        lesson.liveUrl
-      )
+        lesson.liveUrl,
+      );
 
       if (success) {
-        lesson.reminderSent = true
-        await lesson.save()
-        console.log(`Successfully marked lesson "${lesson.title}" reminder as sent.`)
+        lesson.reminderSent = true;
+        await lesson.save();
       }
     }
   } catch (error) {
-    console.error('Error checking and sending live class reminders:', error)
+    console.error('Error checking and sending live class reminders:', error);
   }
 }

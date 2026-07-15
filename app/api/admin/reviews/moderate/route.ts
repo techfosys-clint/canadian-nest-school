@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
-import { Review } from '@/lib/db/models/Review'
 import { Course } from '@/lib/db/models/Course'
 import { getAuthorizedUser } from '@/lib/auth/auth'
 import { revalidatePath } from 'next/cache'
+import { moderateReviewPack } from '@/lib/reviews/reviewPack'
+import '@/lib/db/models/InstructorReview'
+import '@/lib/db/models/CertificateRequest'
 
 export async function POST(request: Request) {
   try {
@@ -14,7 +16,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Forbidden: Insufficient permissions.' }, { status: 403 })
     }
 
-    // 2. Parse request parameters
     const body = await request.json()
     const { reviewId, status } = body
 
@@ -22,20 +23,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid parameters provided.' }, { status: 400 })
     }
 
-    // 3. Update review status in Mongoose
-    const review = await Review.findById(reviewId)
-    if (!review) {
-      return NextResponse.json({ error: 'Review document not found.' }, { status: 404 })
-    }
+    // Approves/rejects course review + all teacher reviews for that pack together
+    const { courseReview, courseId } = await moderateReviewPack(reviewId, status)
 
-    review.status = status
-    await review.save()
-
-    // Fetch the related course to get its slug for revalidation
-    const course = await Course.findById(review.course).lean()
+    const course = await Course.findById(courseId).lean()
     const slug = (course as any)?.slug
 
-    // Revalidate paths for the public frontend to ensure changes are immediately visible
     if (slug) {
       try {
         revalidatePath('/')
@@ -49,15 +42,22 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: `Review successfully updated to ${status}.`,
+      message:
+        status === 'approved'
+          ? 'Course and teacher reviews approved together. Certificate unlocked for the student.'
+          : `Review pack successfully updated to ${status}.`,
       review: {
-        id: review._id.toString(),
-        status: review.status,
+        id: courseReview._id.toString(),
+        status: courseReview.status,
       },
     })
 
   } catch (error: any) {
     console.error('Moderation API Error:', error)
-    return NextResponse.json({ error: error.message || 'Failed to update review status.' }, { status: 500 })
+    const statusCode = error?.status || 500
+    return NextResponse.json(
+      { error: error.message || 'Failed to update review status.' },
+      { status: statusCode },
+    )
   }
 }

@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
+import { CartProvider } from '@/context/CartContext'
 import Navbar from './Navbar'
 import Footer from './Footer'
 import { pushToDataLayer, generateEventId } from '@/lib/gtm'
@@ -14,7 +15,7 @@ export default function ClientNavbarFooterWrapper({ children }: { children: Reac
     let pageType = 'Other'
     if (pathname === '/') pageType = 'Home'
     else if (pathname.startsWith('/courses')) pageType = 'Course'
-    else if (pathname.startsWith('/checkout')) pageType = 'Checkout'
+    else if (pathname.startsWith('/checkout') || pathname.startsWith('/shop-checkout')) pageType = 'Checkout'
     else if (pathname.startsWith('/dashboard')) pageType = 'Dashboard'
     else if (pathname.startsWith('/admin')) pageType = 'Admin'
     else if (pathname === '/login' || pathname === '/register') pageType = 'Auth'
@@ -51,10 +52,12 @@ export default function ClientNavbarFooterWrapper({ children }: { children: Reac
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative">
-      <Navbar />
-      <main className="flex-1 flex flex-col">{children}</main>
-      <Footer />
-    </div>
+    <CartProvider>
+      <div className="min-h-screen flex flex-col relative">
+        <Navbar />
+        <main className="flex-1 flex flex-col">{children}</main>
+        <Footer />
+      </div>
+    </CartProvider>
   )
 }

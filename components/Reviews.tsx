@@ -1,45 +1,45 @@
-'use client'
+'use client';
 
-import React from 'react'
-import { FiStar } from 'react-icons/fi'
+import Image from 'next/image';
+import { FiStar } from 'react-icons/fi';
 
 // ─── Exported Types ──────────────────────────────────────────────────────────
 
 interface ProfilePicDoc {
-  url?: string | null
+  url?: string | null;
 }
 
 interface StudentDoc {
-  id: string
-  name: string
-  profilePic?: ProfilePicDoc | string | null
+  id: string;
+  name: string;
+  profilePic?: ProfilePicDoc | string | null;
 }
 
 export interface ReviewDoc {
-  id: string
-  rating: '1' | '2' | '3' | '4' | '5'
-  comment: string
-  status: 'pending' | 'approved' | 'rejected'
-  student: StudentDoc | string | null
-  course: { id: string; title: string } | string | null
+  id: string;
+  rating: '1' | '2' | '3' | '4' | '5';
+  comment: string;
+  status: 'pending' | 'approved' | 'rejected';
+  student: StudentDoc | string | null;
+  course: { id: string; title: string } | string | null;
 }
 
 interface ReviewsProps {
-  reviews: ReviewDoc[]
+  reviews: ReviewDoc[];
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getStudentName(student: ReviewDoc['student']): string {
-  if (!student || typeof student === 'string') return 'Anonymous'
-  return student.name
+  if (!student || typeof student === 'string') return 'Anonymous';
+  return student.name;
 }
 
 function getProfilePicUrl(student: ReviewDoc['student']): string | null {
-  if (!student || typeof student === 'string') return null
-  const pic = student.profilePic
-  if (!pic || typeof pic === 'string') return null
-  return pic.url ?? null
+  if (!student || typeof student === 'string') return null;
+  const pic = student.profilePic;
+  if (!pic || typeof pic === 'string') return null;
+  return pic.url ?? null;
 }
 
 function getInitials(name: string): string {
@@ -48,15 +48,15 @@ function getInitials(name: string): string {
     .map((n) => n[0])
     .join('')
     .toUpperCase()
-    .substring(0, 2)
+    .substring(0, 2);
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function StarDisplay({ rating }: { rating: string }) {
-  const count = parseInt(rating, 10)
+  const count = parseInt(rating, 10);
   return (
-    <div className="flex items-center gap-0.5">
+    <div className='flex items-center gap-0.5'>
       {[1, 2, 3, 4, 5].map((s) => (
         <FiStar
           key={s}
@@ -66,87 +66,91 @@ function StarDisplay({ rating }: { rating: string }) {
         />
       ))}
     </div>
-  )
+  );
 }
 
 function ReviewAvatar({ student }: { student: ReviewDoc['student'] }) {
-  const name = getStudentName(student)
-  const picUrl = getProfilePicUrl(student)
+  const name = getStudentName(student);
+  const picUrl = getProfilePicUrl(student);
   if (picUrl) {
     return (
-      <img
+      <Image
         src={picUrl}
         alt={name}
-        className="h-12 w-12 rounded-full object-cover border-2 border-white shadow-sm shrink-0"
+        width={48}
+        height={48}
+        className='h-12 w-12 rounded-full object-cover border-2 border-white shadow-sm shrink-0'
       />
-    )
+    );
   }
   return (
-    <div className="h-12 w-12 rounded-full bg-[#E61C24]/15 border-2 border-white shadow-sm flex items-center justify-center font-bold text-base text-[#E61C24] shrink-0 select-none">
+    <div className='h-12 w-12 rounded-full bg-[#E61C24]/15 border-2 border-white shadow-sm flex items-center justify-center font-bold text-base text-[#E61C24] shrink-0 select-none'>
       {getInitials(name)}
     </div>
-  )
+  );
 }
 
 function ReviewCard({ review }: { review: ReviewDoc }) {
   return (
-    <div className="relative bg-white border border-zinc-100 rounded-lg p-6 flex flex-col gap-4 shadow-sm hover:shadow-md hover:border-[#E61C24]/20 transition-all">
+    <div className='relative bg-white border border-zinc-100 rounded-lg p-6 flex flex-col gap-4 shadow-sm hover:shadow-md hover:border-[#E61C24]/20 transition-all'>
       {/* Star rating */}
       <StarDisplay rating={review.rating} />
 
       {/* Testimonial Quote */}
-      <p className="text-base font-semibold text-zinc-700 leading-relaxed flex-1 relative z-10">
+      <p className='text-base font-semibold text-zinc-700 leading-relaxed flex-1 relative z-10'>
         &ldquo;{review.comment}&rdquo;
       </p>
 
-      <div className="border-t border-zinc-100" />
+      <div className='border-t border-zinc-100' />
 
       {/* Reviewer Meta info */}
-      <div className="flex items-center gap-3">
+      <div className='flex items-center gap-3'>
         <ReviewAvatar student={review.student} />
-        <div className="min-w-0">
-          <p className="text-base font-bold text-[#0A163A] leading-tight truncate">
+        <div className='min-w-0'>
+          <p className='text-base font-bold text-[#0A163A] leading-tight truncate'>
             {getStudentName(review.student)}
           </p>
-          <p className="text-sm font-semibold text-zinc-400 mt-0.5">Verified Student</p>
+          <p className='text-sm font-semibold text-zinc-400 mt-0.5'>
+            Verified Student
+          </p>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function Reviews({ reviews }: ReviewsProps) {
-  if (reviews.length === 0) return null
+  if (reviews.length === 0) return null;
 
   // Distribute reviews dynamically across columns.
   // We duplicate arrays dynamically to create seamless infinite scrolling.
   const getColumnItems = (colIndex: number) => {
-    let baseItems = [...reviews]
+    let baseItems = [...reviews];
     if (reviews.length >= 6) {
-      baseItems = reviews.filter((_, idx) => idx % 3 === colIndex)
+      baseItems = reviews.filter((_, idx) => idx % 3 === colIndex);
     } else {
       // Offset by colIndex to make each column unique
-      baseItems = [...reviews.slice(colIndex), ...reviews.slice(0, colIndex)]
+      baseItems = [...reviews.slice(colIndex), ...reviews.slice(0, colIndex)];
     }
 
     // Ensure there are enough items for smooth vertical marquee
-    let list = [...baseItems]
+    let list = [...baseItems];
     while (list.length < 5) {
-      list = [...list, ...baseItems]
+      list = [...list, ...baseItems];
     }
 
     // Duplicate list once to allow mathematically perfect loop
-    return [...list, ...list]
-  }
+    return [...list, ...list];
+  };
 
-  const col1 = getColumnItems(0)
-  const col2 = getColumnItems(1)
-  const col3 = getColumnItems(2)
+  const col1 = getColumnItems(0);
+  const col2 = getColumnItems(1);
+  const col3 = getColumnItems(2);
 
   return (
-    <section className="py-20 md:py-28 px-6 bg-white border-t border-zinc-100 relative overflow-hidden">
+    <section className='py-20 md:py-28 px-6 bg-white border-t border-zinc-100 relative overflow-hidden'>
       {/* CSS Keyframe injections for infinite continuous scroll */}
       <style
         dangerouslySetInnerHTML={{
@@ -174,54 +178,65 @@ export default function Reviews({ reviews }: ReviewsProps) {
       />
 
       {/* Ambient background glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#E61C24]/3 rounded-full blur-[120px] pointer-events-none" />
+      <div className='absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#E61C24]/3 rounded-full blur-[120px] pointer-events-none' />
 
-      <div className="container mx-auto relative z-10">
+      <div className='container mx-auto relative z-10'>
         {/* Title / Heading Section */}
-        <div className="text-center mb-16 space-y-4">
-          <p className="text-base font-bold text-[#E61C24] tracking-wide uppercase">
+        <div className='text-center mb-16 space-y-4'>
+          <p className='text-base font-bold text-[#E61C24] tracking-wide uppercase'>
             SUCCESS STORIES
           </p>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-sans text-[#0A163A] tracking-tight leading-[1.2] max-w-3xl mx-auto">
-            Hear From Our <span className="text-[#E61C24]">Happy Parents and Students</span>
+          <h2 className='text-2xl sm:text-3xl md:text-4xl font-bold font-sans text-[#0A163A] tracking-tight leading-[1.2] max-w-3xl mx-auto'>
+            Hear From Our{' '}
+            <span className='text-[#E61C24]'>Happy Parents and Students</span>
           </h2>
-          <p className="text-base md:text-lg font-semibold text-[#4F5B7C] max-w-3xl mx-auto leading-relaxed">
-            Discover how Canadian Nest School has transformed the English reading and speaking skills of the learners across the globe.
+          <p className='text-base md:text-lg font-semibold text-[#4F5B7C] max-w-3xl mx-auto leading-relaxed'>
+            Discover how Canadian Nest School has transformed the English
+            reading and speaking skills of the learners across the globe.
           </p>
         </div>
 
         {/* 3-Column Marquee Grid */}
-        <div className="relative h-[680px] overflow-hidden rounded-lg">
+        <div className='relative h-[680px] overflow-hidden rounded-lg'>
           {/* Top Fade Gradient */}
-          <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white to-transparent z-20 pointer-events-none" />
+          <div className='absolute top-0 left-0 right-0 h-32 bg-linear-to-b from-white to-transparent z-20 pointer-events-none' />
 
           {/* Bottom Fade Gradient */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent z-20 pointer-events-none" />
+          <div className='absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-white to-transparent z-20 pointer-events-none' />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-full">
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-full'>
             {/* Column 1: Scrolls Up */}
-            <div className="relative h-full overflow-hidden">
-              <div className="flex flex-col gap-6 animate-marquee-up">
+            <div className='relative h-full overflow-hidden'>
+              <div className='flex flex-col gap-6 animate-marquee-up'>
                 {col1.map((review, idx) => (
-                  <ReviewCard key={`col1-${review.id}-${idx}`} review={review} />
+                  <ReviewCard
+                    key={`col1-${review.id}-${idx}`}
+                    review={review}
+                  />
                 ))}
               </div>
             </div>
 
             {/* Column 2: Scrolls Down */}
-            <div className="relative h-full overflow-hidden hidden md:block">
-              <div className="flex flex-col gap-6 animate-marquee-down">
+            <div className='relative h-full overflow-hidden hidden md:block'>
+              <div className='flex flex-col gap-6 animate-marquee-down'>
                 {col2.map((review, idx) => (
-                  <ReviewCard key={`col2-${review.id}-${idx}`} review={review} />
+                  <ReviewCard
+                    key={`col2-${review.id}-${idx}`}
+                    review={review}
+                  />
                 ))}
               </div>
             </div>
 
             {/* Column 3: Scrolls Up */}
-            <div className="relative h-full overflow-hidden hidden lg:block">
-              <div className="flex flex-col gap-6 animate-marquee-up">
+            <div className='relative h-full overflow-hidden hidden lg:block'>
+              <div className='flex flex-col gap-6 animate-marquee-up'>
                 {col3.map((review, idx) => (
-                  <ReviewCard key={`col3-${review.id}-${idx}`} review={review} />
+                  <ReviewCard
+                    key={`col3-${review.id}-${idx}`}
+                    review={review}
+                  />
                 ))}
               </div>
             </div>
@@ -229,5 +244,5 @@ export default function Reviews({ reviews }: ReviewsProps) {
         </div>
       </div>
     </section>
-  )
+  );
 }

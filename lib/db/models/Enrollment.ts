@@ -33,4 +33,15 @@ const EnrollmentSchema = new Schema<IEnrollment>(
   { collection: 'enrollments', timestamps: true }
 )
 
+// Defense-in-depth: even though the enrollment API already checks for an
+// existing completed enrollment before charging, this DB-level partial
+// unique index blocks a second *completed* enrollment for the same
+// student+course from ever being written (e.g. two concurrent EPS
+// callbacks), so a student can never end up paying for the same course
+// twice.
+EnrollmentSchema.index(
+  { student: 1, course: 1 },
+  { unique: true, partialFilterExpression: { paymentStatus: 'completed' } }
+)
+
 export const Enrollment = mongoose.models.Enrollment || mongoose.model<IEnrollment>('Enrollment', EnrollmentSchema)

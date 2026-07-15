@@ -97,6 +97,8 @@ export default function UserDetailClient({ id }: { id: string }) {
     })
     if (!result.isConfirmed) return
 
+    const previousStatus = user.status
+
     try {
       const res = await fetch('/api/admin/users-db', {
         method: 'PATCH',
@@ -106,7 +108,38 @@ export default function UserDetailClient({ id }: { id: string }) {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to update status')
       setUser({ ...user, status: newStatus })
-      Swal.fire('Updated!', `Account has been ${newStatus === 'suspended' ? 'blocked' : 'unblocked'}.`, 'success')
+
+      // A toast with an Undo action, in case the wrong status got applied.
+      const toastResult = await Swal.fire({
+        toast: true,
+        position: 'bottom-end',
+        icon: 'success',
+        title: `Account ${newStatus === 'suspended' ? 'blocked' : 'unblocked'}`,
+        showConfirmButton: true,
+        confirmButtonText: 'Undo',
+        confirmButtonColor: '#475569',
+        timer: 6000,
+        timerProgressBar: true,
+      })
+
+      if (toastResult.isConfirmed) {
+        const revertRes = await fetch('/api/admin/users-db', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: user.id, type: user.type, status: previousStatus }),
+        })
+        const revertData = await revertRes.json()
+        if (!revertRes.ok) throw new Error(revertData.error || 'Failed to revert status')
+        setUser((prev) => (prev ? { ...prev, status: previousStatus } : prev))
+        Swal.fire({
+          toast: true,
+          position: 'bottom-end',
+          icon: 'info',
+          title: 'Status reverted',
+          timer: 2000,
+          showConfirmButton: false,
+        })
+      }
     } catch (err: any) {
       Swal.fire('Error', err.message, 'error')
     }

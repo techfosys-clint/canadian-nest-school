@@ -451,20 +451,22 @@ export default function CoursesPageClient({
       <PageHeroSection
         tag={activeCategory === 'all' ? 'Our Courses' : 'Category'}
         title={
-          activeCategory === 'kids' ? 'English for Kids' :
-          activeCategory === 'teens' ? 'English for Teens' :
-          activeCategory === 'adults' ? 'English for Adults' :
-          activeCategory === 'ielts' ? 'IELTS Preparation' :
+          activeCategory === 'kids-english' ? 'Kids English' :
+          activeCategory === 'teens-english' ? 'Teens English' :
+          activeCategory === 'spoken-english-for-adults' ? 'Spoken English For Adults' :
+          activeCategory === 'ielts' ? 'IELTS' :
           activeCategory === 'teacher-training' ? 'Teacher Training' :
+          activeCategory === 'educational-shop' ? 'Educational Shop' :
           activeCategory === 'all' ? 'Our Popular Courses' :
           (categories.find(c => c.slug === activeCategory)?.name || 'Courses')
         }
         description={
-          activeCategory === 'kids' ? 'Game based phonics with grammar, Reading, Speaking, Writing.' :
-          activeCategory === 'teens' ? 'Academic English and communication skills.' :
-          activeCategory === 'adults' ? 'Speak confidently in everyday situations.' :
+          activeCategory === 'kids-english' ? 'Game based phonics with grammar, Reading, Speaking, Writing.' :
+          activeCategory === 'teens-english' ? 'Academic English and communication skills.' :
+          activeCategory === 'spoken-english-for-adults' ? 'Speak confidently in everyday situations.' :
           activeCategory === 'ielts' ? 'Achieve your target IELTS score.' :
           activeCategory === 'teacher-training' ? 'International teaching methods and strategies.' :
+          activeCategory === 'educational-shop' ? 'Books, worksheets, courses, teaching resources.' :
           activeCategory === 'all' ? (
             <>
               Enhance your{' '}

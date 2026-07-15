@@ -16,35 +16,35 @@ import {
 
 const CARDS_DATA = [
   {
-    title: 'English for Kids',
+    title: 'Kids English',
     description:
       'Game based phonics with grammar, Reading, Speaking, Writing .',
     icon: <FiBookOpen className='h-6 w-6 text-[#3b82f6]' />,
     iconColor: 'text-[#3b82f6]',
     borderColor: 'border-[#3b82f6]',
     bgColor: 'bg-[#3b82f6]/8',
-    href: '/courses?category=kids',
+    href: '/courses?category=kids-english',
   },
   {
-    title: 'English for Teens',
+    title: 'Teens English',
     description: 'Academic English and communication skills.',
     icon: <FiLayers className='h-6 w-6 text-[#10b981]' />,
     iconColor: 'text-[#10b981]',
     borderColor: 'border-[#10b981]',
     bgColor: 'bg-[#10b981]/8',
-    href: '/courses?category=teens',
+    href: '/courses?category=teens-english',
   },
   {
-    title: 'English for Adults',
+    title: 'Spoken English For Adults',
     description: 'Speak confidently in everyday situations.',
     icon: <FiMessageCircle className='h-6 w-6 text-[#f97316]' />,
     iconColor: 'text-[#f97316]',
     borderColor: 'border-[#f97316]',
     bgColor: 'bg-[#f97316]/8',
-    href: '/courses?category=adults',
+    href: '/courses?category=spoken-english-for-adults',
   },
   {
-    title: 'IELTS Preparation',
+    title: 'IELTS',
     description: 'Achieve your target IELTS score.',
     icon: <FiAward className='h-6 w-6 text-[#ef4444]' />,
     iconColor: 'text-[#ef4444]',
@@ -68,7 +68,7 @@ const CARDS_DATA = [
     iconColor: 'text-[#eab308]',
     borderColor: 'border-[#eab308]',
     bgColor: 'bg-[#eab308]/8',
-    href: '/courses',
+    href: '/courses?category=educational-shop',
   },
   {
     title: 'Explore Courses',

@@ -368,21 +368,21 @@ export default async function CourseDetailPage({ params }: Props) {
               <h2 className='text-2xl font-bold text-[#0A163A] tracking-tight'>
                 Lead Mentor
               </h2>
-              <div className='bg-white border border-zinc-200/80 rounded-lg p-6 flex flex-col sm:flex-row items-center sm:items-start gap-6 shadow-[0_4px_20px_rgba(230,28,36,0.02)]'>
+              <div className='bg-white border border-zinc-200/80 rounded-lg p-6 flex flex-col gap-4 shadow-[0_4px_20px_rgba(230,28,36,0.02)]'>
                 {instructorPicUrl ? (
                   <Image
                     src={instructorPicUrl}
                     alt={instructorName}
-                    className='h-24 w-24 sm:h-32 sm:w-32 rounded-full object-cover border-4 border-[#E61C24]/10 shrink-0'
+                    className='h-32 w-32 rounded-lg object-cover border-4 border-[#E61C24]/10 shrink-0'
                     width={200}
                     height={200}
                   />
                 ) : (
-                  <div className='h-24 w-24 sm:h-32 sm:w-32 rounded-full bg-[#E61C24]/10 border-4 border-[#E61C24]/20 flex items-center justify-center font-bold text-[#E61C24] text-3xl shrink-0'>
+                  <div className='h-32 w-32 rounded-lg bg-[#E61C24]/10 border-4 border-[#E61C24]/20 flex items-center justify-center font-bold text-[#E61C24] text-3xl shrink-0'>
                     {initials}
                   </div>
                 )}
-                <div className='text-center sm:text-left space-y-2 flex-1'>
+                <div className='space-y-1.5 mt-2'>
                   <h3 className='text-xl sm:text-2xl font-bold text-zinc-900'>
                     {instructorName}
                   </h3>

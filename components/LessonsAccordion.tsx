@@ -43,10 +43,12 @@ export default function LessonsAccordion({
   lessons,
   isEnrolled = false,
   courseSlug,
+  courseModules = [],
 }: {
   lessons: LessonItem[]
   isEnrolled?: boolean
   courseSlug?: string
+  courseModules?: string[]
 }) {
   const [openModuleIndex, setOpenModuleIndex] = useState<number | null>(0)
   const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null)
@@ -62,34 +64,79 @@ export default function LessonsAccordion({
     setOpenModuleIndex(openModuleIndex === index ? null : index)
   }
 
-  // Group lessons by moduleName
+  // Group lessons by moduleName. The key is normalized (trim, collapse
+  // internal whitespace, lowercase) so names differing only by case/spacing
+  // merge into one group with one React key — previously a near-duplicate
+  // produced two array entries sharing the same displayed name and key,
+  // which made one of them (often the one with the actual lessons) fail to
+  // render, i.e. "same module shows twice / lessons vanish".
+  const normalize = (s: string) => s.trim().replace(/\s+/g, ' ').toLowerCase()
+  const hasLessons = lessons.length > 0
+
   const grouped: Record<string, LessonItem[]> = {}
-  lessons.forEach((lesson) => {
-    const mod = lesson.moduleName || 'General Module'
-    if (!grouped[mod]) {
-      grouped[mod] = []
-    }
-    grouped[mod].push(lesson)
+  const displayName: Record<string, string> = {}
+
+  // Prefer the admin's canonical (course.modules) casing/spacing as the
+  // display label whenever a lesson's moduleName normalizes to the same key.
+  courseModules.forEach((name) => {
+    displayName[normalize(name)] = name
   })
 
-  // Convert to array and sort modules by the minimum order of their lessons
-  const moduleGroups = Object.keys(grouped).map((name) => {
+  lessons.forEach((lesson) => {
+    const raw = lesson.moduleName || 'General Module'
+    const key = normalize(raw)
+    if (!grouped[key]) {
+      grouped[key] = []
+      if (!displayName[key]) displayName[key] = raw
+    }
+    grouped[key].push(lesson)
+  })
+
+  // Only surface empty declared modules when the course has NO lessons at
+  // all (the planning stage — this is the "show my modules before I add any
+  // lessons" case). Once real lessons exist, the curriculum is driven purely
+  // by the lessons' own module names: this avoids a confusing second block
+  // of empty placeholder modules when the declared module names and the
+  // lesson module names have diverged (e.g. a module was renamed in the list
+  // but the lessons still carry the old name).
+  if (!hasLessons) {
+    courseModules.forEach((name) => {
+      const key = normalize(name)
+      if (!grouped[key]) grouped[key] = []
+    })
+  }
+
+  const declaredOrder = new Map(courseModules.map((name, idx) => [normalize(name), idx]))
+
+  const moduleGroups = Object.keys(grouped).map((key) => {
     // Sort by position within the module when available, falling back to
     // the course-wide serial for older lessons without moduleOrder.
-    const moduleLessons = [...grouped[name]].sort(
+    const moduleLessons = [...grouped[key]].sort(
       (a, b) => (a.moduleOrder ?? a.order) - (b.moduleOrder ?? b.order)
     )
-    const minOrder = Math.min(...moduleLessons.map((l) => l.order))
+    const minOrder = moduleLessons.length > 0 ? Math.min(...moduleLessons.map((l) => l.order)) : Number.MAX_SAFE_INTEGER
     const totalDuration = moduleLessons.reduce((sum, l) => sum + l.duration, 0)
+    const declaredIndex = declaredOrder.has(key) ? declaredOrder.get(key)! : Number.MAX_SAFE_INTEGER
     return {
-      name,
+      key,
+      name: displayName[key] || key,
       lessons: moduleLessons,
       minOrder,
       totalDuration,
+      declaredIndex,
     }
   })
 
-  moduleGroups.sort((a, b) => a.minOrder - b.minOrder)
+  moduleGroups.sort((a, b) => {
+    if (hasLessons) {
+      // With real content, follow the actual lesson sequence; use the
+      // declared list position only to break ties.
+      if (a.minOrder !== b.minOrder) return a.minOrder - b.minOrder
+      return a.declaredIndex - b.declaredIndex
+    }
+    // Planning stage (all empty): follow the admin's declared module order.
+    return a.declaredIndex - b.declaredIndex
+  })
 
   return (
     <div className="space-y-4">
@@ -108,7 +155,7 @@ export default function LessonsAccordion({
 
           return (
             <div 
-              key={group.name} 
+              key={group.key} 
               className="bg-white rounded-lg overflow-hidden border border-zinc-200/80 hover:border-[#E61C24]/30 shadow-[0_4px_16px_rgba(0,0,0,0.01)] hover:shadow-[0_8px_24px_rgba(230,28,36,0.03)] transition-all duration-300 select-text"
             >
               {/* Accordion Header (Module Title) */}
@@ -122,7 +169,9 @@ export default function LessonsAccordion({
                     {group.name}
                   </h3>
                   <p className="text-base font-semibold text-zinc-550">
-                    {lectureCount} {lectureCount === 1 ? 'lecture' : 'lectures'} • {totalMin} mins total duration
+                    {lectureCount === 0
+                      ? 'Coming soon — no lectures added yet'
+                      : `${lectureCount} ${lectureCount === 1 ? 'lecture' : 'lectures'} • ${totalMin} mins total duration`}
                   </p>
                 </div>
 
@@ -146,6 +195,13 @@ export default function LessonsAccordion({
                     className="overflow-hidden"
                   >
                     <div className="border-t border-[#E61C24]/20 divide-y divide-[#E61C24]/10 bg-white">
+                      {group.lessons.length === 0 && (
+                        <div className="px-6 py-6 text-center">
+                          <p className="text-base font-semibold text-zinc-450">
+                            No lessons have been added to this module yet. Check back soon!
+                          </p>
+                        </div>
+                      )}
                       {group.lessons.map((lesson) => {
                         const dateObj = lesson.liveDate ? new Date(lesson.liveDate) : null
                         const isLiveLocked = dateObj ? dateObj.getTime() > nowTs : false

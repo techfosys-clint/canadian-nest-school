@@ -126,7 +126,10 @@ export async function POST(request: Request) {
       token: token,
     })
 
-    // Set standard JWT cookie
+    // Set standard JWT cookie. maxAge must match signToken's 365d expiry —
+    // a shorter cookie lifetime silently expires the session cookie while
+    // the JWT itself is still valid, causing spurious 401s on actions like
+    // saving a course after a couple of hours of active use.
     const cookieOptions = {
       name: collectionSlug === 'students' ? 'student-token' : 'payload-token',
       value: token,
@@ -134,7 +137,7 @@ export async function POST(request: Request) {
       path: '/',
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax' as const,
-      maxAge: 7200, // 2 hours
+      maxAge: 60 * 60 * 24 * 365, // 365 days, matching the JWT's own expiry
     }
 
     response.cookies.set(cookieOptions)

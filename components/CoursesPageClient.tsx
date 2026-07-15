@@ -5,7 +5,7 @@ import PageHeroSection from '@/components/PageHeroSection';
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   FiArrowRight,
   FiChevronDown,
@@ -325,12 +325,18 @@ function SidebarSection({
 export default function CoursesPageClient({
   courses,
   categories,
+  initialCategory = 'all',
 }: {
   courses: CourseDoc[];
   categories: CategoryDoc[];
+  initialCategory?: string;
 }) {
   const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
+
+  useEffect(() => {
+    setActiveCategory(initialCategory);
+  }, [initialCategory]);
   const [activeLevels, setActiveLevels] = useState<string[]>([]);
   const [priceTier, setPriceTier] = useState('all');
   const [activeLanguages, setActiveLanguages] = useState<string[]>([]);
@@ -443,18 +449,33 @@ export default function CoursesPageClient({
       </div>
 
       <PageHeroSection
-        tag='Our Courses'
-        title='Our Popular Courses'
+        tag={activeCategory === 'all' ? 'Our Courses' : 'Category'}
+        title={
+          activeCategory === 'kids' ? 'English for Kids' :
+          activeCategory === 'teens' ? 'English for Teens' :
+          activeCategory === 'adults' ? 'English for Adults' :
+          activeCategory === 'ielts' ? 'IELTS Preparation' :
+          activeCategory === 'teacher-training' ? 'Teacher Training' :
+          activeCategory === 'all' ? 'Our Popular Courses' :
+          (categories.find(c => c.slug === activeCategory)?.name || 'Courses')
+        }
         description={
-          <>
-            Enhance your{' '}
-            <span className='text-[#E61C24] font-bold'>English fluency</span>{' '}
-            and communication skills with our specialized courses designed for{' '}
-            <span className='text-[#E61C24] font-bold'>
-              kids, teens, adults, and educators
-            </span>
-            .
-          </>
+          activeCategory === 'kids' ? 'Game based phonics with grammar, Reading, Speaking, Writing.' :
+          activeCategory === 'teens' ? 'Academic English and communication skills.' :
+          activeCategory === 'adults' ? 'Speak confidently in everyday situations.' :
+          activeCategory === 'ielts' ? 'Achieve your target IELTS score.' :
+          activeCategory === 'teacher-training' ? 'International teaching methods and strategies.' :
+          activeCategory === 'all' ? (
+            <>
+              Enhance your{' '}
+              <span className='text-[#E61C24] font-bold'>English fluency</span>{' '}
+              and communication skills with our specialized courses designed for{' '}
+              <span className='text-[#E61C24] font-bold'>
+                kids, teens, adults, and educators
+              </span>
+              .
+            </>
+          ) : `Browse our specialized courses for ${categories.find(c => c.slug === activeCategory)?.name || 'this category'}.`
         }
       />
 
@@ -747,8 +768,8 @@ export default function CoursesPageClient({
             {/* Title / Counter Row */}
             <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2'>
               <div>
-                <h1 className='text-2xl font-bold font-display text-[#0A163A]'>
-                  All Courses
+                <h1 className='text-2xl font-bold font-display text-[#0A163A] capitalize'>
+                  {activeCategory === 'all' ? 'All Courses' : categories.find(c => c.slug === activeCategory)?.name || 'Category Courses'}
                 </h1>
                 <p className='text-base text-zinc-550 font-semibold mt-1'>
                   Showing{' '}

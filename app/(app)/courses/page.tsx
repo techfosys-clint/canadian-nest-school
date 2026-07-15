@@ -14,7 +14,14 @@ export const metadata = {
 
 export const dynamic = 'force-dynamic'
 
-export default async function CoursesPage() {
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export default async function CoursesPage({ searchParams }: Props) {
+  const resolvedParams = await searchParams
+  const categoryParam = typeof resolvedParams?.category === 'string' ? resolvedParams.category : 'all'
+
   await connectToDatabase()
 
   const [coursesDocs, categoriesDocs] = await Promise.all([
@@ -84,5 +91,5 @@ export default async function CoursesPage() {
     slug: doc.slug,
   }))
 
-  return <CoursesPageClient courses={courses} categories={categories} />
+  return <CoursesPageClient courses={courses} categories={categories} initialCategory={categoryParam} />
 }

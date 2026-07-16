@@ -24,64 +24,6 @@ interface InstructorsPageClientProps {
   reviews: ReviewDoc[];
 }
 
-const MOCK_MENTORS = [
-  {
-    name: 'Robert David',
-    role: 'UI/UX Designer',
-    bg: 'bg-[#FDE2CA]', // Pastel peach
-    profilePicUrl:
-      '/media/vxlpbiket9vqph7spwyngltvsmg-1779840199862-554434273.png',
-  },
-  {
-    name: 'Ethan Samuel',
-    role: 'Developer',
-    bg: 'bg-[#C1F2E2]', // Pastel teal
-    profilePicUrl:
-      '/media/rrppejy37or3c1ehg8dislrjny-1779840200159-103378770.png',
-  },
-  {
-    name: 'Alexander Paul',
-    role: 'Project Manager',
-    bg: 'bg-[#FDF0BE]', // Pastel yellow
-    profilePicUrl:
-      '/media/qqxygfrpzzveslnttt8tbpyyty-1779840200418-636067296.png',
-  },
-  {
-    name: 'William Henry',
-    role: 'Digital Marketer',
-    bg: 'bg-[#FDCFDF]', // Pastel pink
-    profilePicUrl:
-      '/media/qz82hvtiuti1iiqemr8rcled0y-1779840200650-803315217.png',
-  },
-  {
-    name: 'James Robert',
-    role: 'Project Manager',
-    bg: 'bg-[#FDE2CA]', // Pastel peach
-    profilePicUrl:
-      '/media/gxxhfh6uqztk5gqswsdcczhwpb0-1779840200885-780441840.png',
-  },
-  {
-    name: 'Brandon Michael',
-    role: 'Digital Marketer',
-    bg: 'bg-[#C1F2E2]', // Pastel teal
-    profilePicUrl:
-      '/media/wlfcozjetqkfmzn9ctbaqxom-1779840201125-910407530.png',
-  },
-  {
-    name: 'Matthew John',
-    role: 'Software Engineer',
-    bg: 'bg-[#FDF0BE]', // Pastel yellow
-    profilePicUrl:
-      '/media/3ul2gmpwxkjvp1r96k9qy7uvjk-1779840201353-176576378.png',
-  },
-  {
-    name: 'Joseph Andrew',
-    role: 'UI/UX Designer',
-    bg: 'bg-[#FDCFDF]', // Pastel pink
-    profilePicUrl:
-      '/media/erlxh9zrrws3wckh39cxektsqag-1779840201569-732309520.png',
-  },
-];
 
 export default function InstructorsPageClient({
   realInstructors,
@@ -89,24 +31,15 @@ export default function InstructorsPageClient({
   categories,
   reviews,
 }: InstructorsPageClientProps) {
-  // Combine real database instructors with mock mentors to create a full premium list of at least 8 profiles
-  const combined = [
-    ...realInstructors.map((ins, i) => ({
-      name: ins.name,
-      role: ins.designation || 'Expert Mentor',
-      bg: ['bg-[#FDE2CA]', 'bg-[#C1F2E2]', 'bg-[#FDF0BE]', 'bg-[#FDCFDF]'][
-        i % 4
-      ],
-      profilePicUrl: ins.profilePicUrl || '/media/learning-journey.png',
-    })),
-    ...MOCK_MENTORS,
-  ];
-
-  // Slice to guarantee at least 8 elements, or more if DB has more
-  const finalInstructors = combined.slice(
-    0,
-    Math.max(8, realInstructors.length),
-  );
+  // Format real database instructors
+  const finalInstructors = realInstructors.map((ins, i) => ({
+    name: ins.name,
+    role: ins.designation || 'Expert Mentor',
+    bg: ['bg-[#FDE2CA]', 'bg-[#C1F2E2]', 'bg-[#FDF0BE]', 'bg-[#FDCFDF]'][
+      i % 4
+    ],
+    profilePicUrl: ins.profilePicUrl || '/media/learning-journey.png',
+  }));
 
   const cardsContainer = {
     hidden: { opacity: 0 },

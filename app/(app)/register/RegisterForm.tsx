@@ -39,6 +39,7 @@ export default function RegisterForm() {
   const [sendingOtp, setSendingOtp] = useState(false);
   const [verifyingOtp, setVerifyingOtp] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
+  const [showOtpScreen, setShowOtpScreen] = useState(false);
 
   React.useEffect(() => {
     let interval: any;
@@ -74,6 +75,7 @@ export default function RegisterForm() {
       if (res.ok) {
         setOtpSent(true);
         setResendTimer(60);
+        setShowOtpScreen(true);
         Swal.fire({
           icon: 'success',
           title: 'OTP Sent',
@@ -118,6 +120,7 @@ export default function RegisterForm() {
 
       if (res.ok) {
         setOtpVerified(true);
+        setStep(2);
         Swal.fire({
           icon: 'success',
           title: 'Phone Verified!',
@@ -150,13 +153,11 @@ export default function RegisterForm() {
         });
         return;
       }
-      if (!otpVerified) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Phone Not Verified',
-          text: 'Please verify your mobile number with the OTP code first.',
-          confirmButtonColor: '#E61C24',
-        });
+      if (!showOtpScreen) {
+        handleSendOtp();
+        return;
+      } else {
+        handleVerifyOtp();
         return;
       }
     }
@@ -397,129 +398,148 @@ export default function RegisterForm() {
                   transition={{ duration: 0.3 }}
                   className='space-y-5'
                 >
-                  {/* Name */}
-                  <div className='space-y-1.5'>
-                    <label
-                      htmlFor='name'
-                      className='text-base font-bold text-zinc-700'
-                    >
-                      Full Name
-                    </label>
-                    <div className='relative'>
-                      <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
-                        <FiUser className='h-5 w-5' />
-                      </span>
-                      <input
-                        id='name'
-                        type='text'
-                        required
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder='John Doe'
-                        className='w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white'
-                      />
-                    </div>
-                  </div>
-
-                  {/* Phone Number (Primary identifier, OTP-verified) */}
-                  <div className='space-y-1.5'>
-                    <label
-                      htmlFor='phone'
-                      className='text-base font-bold text-zinc-700'
-                    >
-                      Mobile Number
-                    </label>
-                    <div className='flex gap-2'>
-                      <div className='relative flex-1'>
-                        <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
-                          <FiPhone className='h-5 w-5' />
-                          <span className='ml-2 text-zinc-800 font-bold border-r border-zinc-200 pr-2'>
-                            +880
+                  {!showOtpScreen ? (
+                    <>
+                      {/* Name */}
+                      <div className='space-y-1.5'>
+                        <label
+                          htmlFor='name'
+                          className='text-base font-bold text-zinc-700'
+                        >
+                          Full Name
+                        </label>
+                        <div className='relative'>
+                          <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
+                            <FiUser className='h-5 w-5' />
                           </span>
-                        </span>
-                        <input
-                          id='phone'
-                          type='tel'
-                          required
-                          disabled={otpVerified}
-                          value={phone}
-                          onChange={(e) => {
-                            let val = e.target.value.replace(/[^0-9]/g, '');
-                            if (val.startsWith('880')) val = val.substring(3);
-                            if (val.startsWith('0')) val = val.substring(1);
-                            setPhone(val);
-                          }}
-                          placeholder='1XXXXXXXXX'
-                          className='w-full pl-[95px] pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500'
-                        />
+                          <input
+                            id='name'
+                            type='text'
+                            required
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder='John Doe'
+                            className='w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white'
+                          />
+                        </div>
                       </div>
+
+                      {/* Phone Number */}
+                      <div className='space-y-1.5'>
+                        <label
+                          htmlFor='phone'
+                          className='text-base font-bold text-zinc-700'
+                        >
+                          Mobile Number
+                        </label>
+                        <div className='relative'>
+                          <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
+                            <FiPhone className='h-5 w-5' />
+                            <span className='ml-2 text-zinc-800 font-bold border-r border-zinc-200 pr-2'>
+                              +880
+                            </span>
+                          </span>
+                          <input
+                            id='phone'
+                            type='tel'
+                            required
+                            disabled={otpVerified}
+                            value={phone}
+                            onChange={(e) => {
+                              let val = e.target.value.replace(/[^0-9]/g, '');
+                              if (val.startsWith('880')) val = val.substring(3);
+                              if (val.startsWith('0')) val = val.substring(1);
+                              setPhone(val);
+                            }}
+                            placeholder='1XXXXXXXXX'
+                            className='w-full pl-[95px] pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500'
+                          />
+                        </div>
+                      </div>
+
+                      {/* Next Button */}
                       <button
                         type='button'
-                        onClick={handleSendOtp}
-                        disabled={sendingOtp || otpVerified || resendTimer > 0}
-                        className='min-w-[120px] flex items-center justify-center px-4 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
+                        onClick={handleNextStep}
+                        disabled={!name || !phone || sendingOtp}
+                        className='w-full flex items-center justify-center gap-2 py-3.5 mt-4 rounded-lg bg-[#E61C24] hover:bg-[#E61C24]/95 text-white font-bold text-base shadow-lg shadow-[#E61C24]/15 hover:shadow-[#E61C24]/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
                       >
                         {sendingOtp ? (
                           <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
-                        ) : otpVerified ? (
-                          <FiCheck className='h-5 w-5' />
-                        ) : resendTimer > 0 ? (
-                          `Wait ${resendTimer}s`
-                        ) : otpSent ? (
-                          'Resend'
                         ) : (
-                          'Send OTP'
+                          <>
+                            Continue
+                            <FiArrowRight className='h-5 w-5' />
+                          </>
                         )}
                       </button>
-                    </div>
-                  </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* OTP Verification */}
+                      <div className='space-y-6 mt-4'>
+                        <div className='text-center space-y-2'>
+                          <h3 className='text-xl font-bold text-zinc-900 font-display'>Verify your number</h3>
+                          <p className='text-sm text-zinc-500'>We sent a verification code to <strong className='text-zinc-800'>+880{phone}</strong></p>
+                        </div>
+                        
+                        <div className='space-y-1.5'>
+                          <label
+                            htmlFor='otp'
+                            className='text-base font-bold text-zinc-700'
+                          >
+                            Verification Code
+                          </label>
+                          <input
+                            id='otp'
+                            type='text'
+                            inputMode='numeric'
+                            value={otp}
+                            onChange={(e) => setOtp(e.target.value)}
+                            placeholder='6-digit code'
+                            className='w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-bold text-zinc-800 text-center tracking-[0.5em] placeholder-zinc-300 bg-white disabled:bg-zinc-50 disabled:text-zinc-500'
+                            disabled={otpVerified}
+                          />
+                        </div>
 
-                  {/* OTP Verification */}
-                  <div className='space-y-1.5'>
-                    <label
-                      htmlFor='otp'
-                      className='text-base font-bold text-zinc-700'
-                    >
-                      Verification Code
-                    </label>
-                    <div className='flex gap-2'>
-                      <input
-                        id='otp'
-                        type='text'
-                        inputMode='numeric'
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                        placeholder='6-digit code'
-                        className='flex-1 px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white disabled:bg-zinc-50 disabled:text-zinc-500'
-                        disabled={otpVerified}
-                      />
-                      <button
-                        type='button'
-                        onClick={handleVerifyOtp}
-                        disabled={verifyingOtp || otpVerified || !otp}
-                        className='min-w-[120px] flex items-center justify-center px-4 rounded-lg bg-[#E61C24] hover:bg-[#E61C24]/95 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
-                      >
-                        {verifyingOtp ? (
-                          <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
-                        ) : otpVerified ? (
-                          <FiCheck className='h-5 w-5' />
-                        ) : (
-                          'Verify'
-                        )}
-                      </button>
-                    </div>
-                  </div>
+                        <div className='flex justify-center'>
+                          <button
+                            type='button'
+                            onClick={handleSendOtp}
+                            disabled={sendingOtp || resendTimer > 0}
+                            className='text-sm font-bold text-[#E61C24] hover:text-[#CC181F] transition-colors disabled:text-zinc-400 disabled:cursor-not-allowed'
+                          >
+                            {resendTimer > 0 ? `Resend Code in ${resendTimer}s` : 'Resend Code'}
+                          </button>
+                        </div>
 
-                  {/* Next Button */}
-                  <button
-                    type='button'
-                    onClick={handleNextStep}
-                    disabled={!name || !phone || !otpVerified}
-                    className='w-full flex items-center justify-center gap-2 py-3.5 mt-4 rounded-lg bg-[#E61C24] hover:bg-[#E61C24]/95 text-white font-bold text-base shadow-lg shadow-[#E61C24]/15 hover:shadow-[#E61C24]/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
-                  >
-                    Continue
-                    <FiArrowRight className='h-5 w-5' />
-                  </button>
+                        <div className='flex gap-4 pt-2'>
+                          <button
+                            type='button'
+                            onClick={() => setShowOtpScreen(false)}
+                            className='flex-1 py-3.5 rounded-lg border border-zinc-200 hover:border-zinc-300 text-zinc-700 font-bold text-base hover:bg-zinc-50 transition-all cursor-pointer'
+                          >
+                            Back
+                          </button>
+                          <button
+                            type='button'
+                            onClick={handleNextStep}
+                            disabled={!otp || verifyingOtp}
+                            className='flex-1 flex items-center justify-center gap-2 py-3.5 rounded-lg bg-[#E61C24] hover:bg-[#E61C24]/95 text-white font-bold text-base shadow-lg shadow-[#E61C24]/15 hover:shadow-[#E61C24]/25 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
+                          >
+                            {verifyingOtp ? (
+                              <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
+                            ) : (
+                              <>
+                                Verify
+                                <FiArrowRight className='h-5 w-5' />
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </motion.div>
               )}
 

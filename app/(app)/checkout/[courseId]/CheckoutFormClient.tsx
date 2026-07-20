@@ -391,6 +391,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
 
       if (res.ok && data.success) {
         setAppliedCoupon(data.coupon);
+        setCouponCode(data.coupon.code);
         setCouponSuccess(`Coupon "${data.coupon.code}" applied successfully!`);
       } else {
         throw new Error(data.error || 'Invalid coupon.');
@@ -403,6 +404,13 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
     }
   };
 
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+    setCouponError('');
+    setCouponSuccess('');
+  };
+
   // Recalculate prices
   const basePrice = course.price;
   let discountAmount = 0;
@@ -413,6 +421,8 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
       discountAmount = appliedCoupon.discountValue;
     }
   }
+  // Never show a discount larger than the course price
+  discountAmount = Math.min(discountAmount, basePrice);
   const finalPrice = Math.max(0, basePrice - discountAmount);
 
   // Complete course purchase / checkout
@@ -844,34 +854,58 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                     type='text'
                     placeholder='e.g. SAVE20'
                     value={couponCode}
-                    onChange={(e) =>
-                      setCouponCode(e.target.value.toUpperCase())
-                    }
+                    onChange={(e) => {
+                      const next = e.target.value.toUpperCase();
+                      setCouponCode(next);
+                      // If the typed code no longer matches the applied one,
+                      // drop the discount so checkout can't use a stale coupon.
+                      if (appliedCoupon && next.trim() !== appliedCoupon.code) {
+                        setAppliedCoupon(null);
+                        setCouponSuccess('');
+                      }
+                      setCouponError('');
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleApplyCoupon();
+                      }
+                    }}
                     className='flex-1 px-3.5 py-2.5 rounded-lg border border-zinc-200 focus:border-[#E61C24] outline-none text-base transition-all font-mono font-bold text-zinc-800'
                   />
-                  <button
-                    type='button'
-                    onClick={handleApplyCoupon}
-                    disabled={couponLoading}
-                    className='px-5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base transition-all cursor-pointer flex items-center justify-center select-none'
-                  >
-                    {couponLoading ? (
-                      <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
-                    ) : (
-                      'Apply'
-                    )}
-                  </button>
+                  {appliedCoupon ? (
+                    <button
+                      type='button'
+                      onClick={handleRemoveCoupon}
+                      className='px-5 rounded-lg border border-zinc-200 hover:border-rose-300 hover:bg-rose-50 text-rose-600 font-bold text-base transition-all cursor-pointer select-none'
+                    >
+                      Remove
+                    </button>
+                  ) : (
+                    <button
+                      type='button'
+                      onClick={handleApplyCoupon}
+                      disabled={couponLoading}
+                      className='px-5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base transition-all cursor-pointer flex items-center justify-center select-none'
+                    >
+                      {couponLoading ? (
+                        <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
+                      ) : (
+                        'Apply'
+                      )}
+                    </button>
+                  )}
                 </div>
 
                 {couponError && (
-                  <div className='flex items-center gap-1.5 text-rose-500 text-sm font-semibold'>
+                  <div className='flex items-center gap-1.5 text-rose-500 text-base font-semibold'>
                     <FiAlertCircle className='h-4.5 w-4.5 shrink-0' />
                     <span>{couponError}</span>
                   </div>
                 )}
 
-                {couponSuccess && (
-                  <div className='flex items-center gap-1.5 text-emerald-600 text-sm font-semibold'>
+                {couponSuccess && appliedCoupon && (
+                  <div className='flex items-center gap-1.5 text-emerald-600 text-base font-semibold'>
                     <FiCheck className='h-4.5 w-4.5 shrink-0' />
                     <span>{couponSuccess}</span>
                   </div>

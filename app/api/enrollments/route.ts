@@ -7,6 +7,7 @@ import { Course } from '@/lib/db/models/Course'
 import { Coupon } from '@/lib/db/models/Coupon'
 import { Lesson } from '@/lib/db/models/Lesson'
 import { verifyToken } from '@/lib/auth/auth'
+import { isCouponExpired } from '@/lib/coupons'
 import { cookies } from 'next/headers'
 
 export const dynamic = 'force-dynamic'
@@ -266,7 +267,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: false, error: 'This coupon is no longer active.' }, { status: 400 })
       }
 
-      if (coupon.expirationDate && new Date() > new Date(coupon.expirationDate)) {
+      if (isCouponExpired(coupon.expirationDate)) {
         return NextResponse.json({ success: false, error: 'This coupon has expired.' }, { status: 400 })
       }
 

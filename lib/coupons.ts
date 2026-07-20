@@ -8,6 +8,18 @@ import { completePaidEnrollment } from '@/lib/payments/completePaidEnrollment'
 const STALE_PENDING_MINUTES = 30
 
 /**
+ * Date pickers usually store midnight UTC for the chosen calendar day.
+ * Treat that day as still valid through 23:59:59.999 UTC.
+ */
+export function isCouponExpired(expirationDate?: Date | string | null): boolean {
+  if (!expirationDate) return false
+  const end = new Date(expirationDate)
+  if (Number.isNaN(end.getTime())) return false
+  end.setUTCHours(23, 59, 59, 999)
+  return Date.now() > end.getTime()
+}
+
+/**
  * Expires pending enrollments for a given coupon that have been sitting
  * unpaid past STALE_PENDING_MINUTES, releasing their reserved usedCount
  * slot. Always asks EPS first — if the customer actually paid, we complete

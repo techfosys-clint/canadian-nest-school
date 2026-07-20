@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Coupon } from '@/lib/db/models/Coupon'
-import { releaseStalePendingCouponUses } from '@/lib/coupons'
+import { releaseStalePendingCouponUses, isCouponExpired } from '@/lib/coupons'
 
 export async function POST(request: Request) {
   try {
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'This coupon is no longer active.' }, { status: 400 })
     }
 
-    if (coupon.expirationDate && new Date() > new Date(coupon.expirationDate)) {
+    if (isCouponExpired(coupon.expirationDate)) {
       return NextResponse.json({ success: false, error: 'This coupon has expired.' }, { status: 400 })
     }
 

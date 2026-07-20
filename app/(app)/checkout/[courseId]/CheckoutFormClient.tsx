@@ -842,191 +842,193 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
           ) : (
             /* USER IS AUTHENTICATED: SHOW BILLING FORM & COUPONS */
             <div className='space-y-6'>
-              {/* Promo Code section */}
-              <div className='bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-4'>
-                <label className='text-base font-bold text-zinc-800 flex items-center gap-2'>
-                  <FiTag className='text-[#E61C24]' />
-                  Apply Coupon / Promo Code
-                </label>
+              <form onSubmit={handleCompletePurchase} className='space-y-6'>
+                {/* Billing Info — first so mobile users see it before coupon */}
+                <div className='bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-6'>
+                  <div>
+                    <h3 className='text-xl font-bold text-zinc-800 flex items-center gap-2'>
+                      <FiMapPin className='text-[#E61C24]' />
+                      Billing Information
+                    </h3>
+                    <p className='text-base font-semibold text-zinc-450 mt-1'>
+                      Provide billing address credentials to verify this
+                      transaction.
+                    </p>
+                  </div>
 
-                <div className='flex gap-2'>
-                  <input
-                    type='text'
-                    placeholder='e.g. SAVE20'
-                    value={couponCode}
-                    onChange={(e) => {
-                      const next = e.target.value.toUpperCase();
-                      setCouponCode(next);
-                      // If the typed code no longer matches the applied one,
-                      // drop the discount so checkout can't use a stale coupon.
-                      if (appliedCoupon && next.trim() !== appliedCoupon.code) {
-                        setAppliedCoupon(null);
-                        setCouponSuccess('');
-                      }
-                      setCouponError('');
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleApplyCoupon();
-                      }
-                    }}
-                    className='flex-1 px-3.5 py-2.5 rounded-lg border border-zinc-200 focus:border-[#E61C24] outline-none text-base transition-all font-mono font-bold text-zinc-800'
-                  />
-                  {appliedCoupon ? (
-                    <button
-                      type='button'
-                      onClick={handleRemoveCoupon}
-                      className='px-5 rounded-lg border border-zinc-200 hover:border-rose-300 hover:bg-rose-50 text-rose-600 font-bold text-base transition-all cursor-pointer select-none'
-                    >
-                      Remove
-                    </button>
-                  ) : (
-                    <button
-                      type='button'
-                      onClick={handleApplyCoupon}
-                      disabled={couponLoading}
-                      className='px-5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base transition-all cursor-pointer flex items-center justify-center select-none'
-                    >
-                      {couponLoading ? (
-                        <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
-                      ) : (
-                        'Apply'
-                      )}
-                    </button>
-                  )}
+                  <div className='space-y-4'>
+                    {checkoutError && (
+                      <div className='p-3.5 bg-rose-50 border border-rose-105 rounded-lg text-rose-650 font-semibold text-base'>
+                        {checkoutError}
+                      </div>
+                    )}
+
+                    {checkoutSuccess && (
+                      <div className='p-4 bg-emerald-50 border border-emerald-150 rounded-lg text-emerald-800 text-center flex flex-col items-center gap-2'>
+                        <FiCheckCircle className='h-7 w-7 text-emerald-500 animate-bounce' />
+                        <span className='font-bold text-lg leading-tight'>
+                          Purchase Confirmed!
+                        </span>
+                        <span className='text-base font-semibold text-emerald-700 leading-relaxed'>
+                          {checkoutSuccess}
+                        </span>
+                        <span className='text-zinc-500 text-base font-semibold mt-1 animate-pulse'>
+                          Redirecting you to active learning space...
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Name */}
+                    <div className='space-y-1.5'>
+                      <label className='text-base font-bold text-zinc-700'>
+                        Full Billing Name
+                      </label>
+                      <input
+                        type='text'
+                        required
+                        value={billingName}
+                        onChange={(e) => setBillingName(e.target.value)}
+                        placeholder='Enter full name'
+                        className='w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800'
+                      />
+                    </div>
+
+                    {/* Email */}
+                    <div className='space-y-1.5'>
+                      <label className='text-base font-bold text-zinc-700'>
+                        Email Address (Account Reference)
+                      </label>
+                      <input
+                        type='email'
+                        disabled
+                        value={user.email}
+                        className='w-full px-4 py-3 rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-500 font-semibold text-base outline-none cursor-not-allowed'
+                      />
+                    </div>
+
+                    {/* Phone */}
+                    <div className='space-y-1.5'>
+                      <label className='text-base font-bold text-zinc-700'>
+                        Contact Phone Number
+                      </label>
+                      <input
+                        type='tel'
+                        required
+                        value={billingPhone}
+                        onChange={(e) => setBillingPhone(e.target.value)}
+                        placeholder='e.g. +1 555-0199'
+                        className='w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800'
+                      />
+                    </div>
+
+                    {/* Billing Address */}
+                    <div className='space-y-1.5'>
+                      <label className='text-base font-bold text-zinc-700'>
+                        Billing Address
+                      </label>
+                      <textarea
+                        required
+                        rows={3}
+                        value={billingAddress}
+                        onChange={(e) => setBillingAddress(e.target.value)}
+                        placeholder='Street address, City, State, ZIP code, Country'
+                        className='w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800'
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                {couponError && (
-                  <div className='flex items-center gap-1.5 text-rose-500 text-base font-semibold'>
-                    <FiAlertCircle className='h-4.5 w-4.5 shrink-0' />
-                    <span>{couponError}</span>
-                  </div>
-                )}
+                {/* Promo Code — below billing */}
+                <div className='bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-4'>
+                  <label className='text-base font-bold text-zinc-800 flex items-center gap-2'>
+                    <FiTag className='text-[#E61C24]' />
+                    Apply Coupon / Promo Code
+                  </label>
 
-                {couponSuccess && appliedCoupon && (
-                  <div className='flex items-center gap-1.5 text-emerald-600 text-base font-semibold'>
-                    <FiCheck className='h-4.5 w-4.5 shrink-0' />
-                    <span>{couponSuccess}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Billing Info Form */}
-              <div className='bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-6'>
-                <div>
-                  <h3 className='text-xl font-bold text-zinc-800 flex items-center gap-2'>
-                    <FiMapPin className='text-[#E61C24]' />
-                    Billing Information
-                  </h3>
-                  <p className='text-sm font-semibold text-zinc-450 mt-1'>
-                    Provide billing address credentials to verify this
-                    transaction.
-                  </p>
-                </div>
-
-                <form onSubmit={handleCompletePurchase} className='space-y-4'>
-                  {checkoutError && (
-                    <div className='p-3.5 bg-rose-50 border border-rose-105 rounded-lg text-rose-650 font-semibold text-base'>
-                      {checkoutError}
-                    </div>
-                  )}
-
-                  {checkoutSuccess && (
-                    <div className='p-4 bg-emerald-50 border border-emerald-150 rounded-lg text-emerald-800 text-center flex flex-col items-center gap-2'>
-                      <FiCheckCircle className='h-7 w-7 text-emerald-500 animate-bounce' />
-                      <span className='font-bold text-lg leading-tight'>
-                        Purchase Confirmed!
-                      </span>
-                      <span className='text-sm font-semibold text-emerald-700 leading-relaxed'>
-                        {checkoutSuccess}
-                      </span>
-                      <span className='text-zinc-500 text-xs font-semibold mt-1 animate-pulse'>
-                        Redirecting you to active learning space...
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Name */}
-                  <div className='space-y-1.5'>
-                    <label className='text-base font-bold text-zinc-700'>
-                      Full Billing Name
-                    </label>
+                  <div className='flex gap-2'>
                     <input
                       type='text'
-                      required
-                      value={billingName}
-                      onChange={(e) => setBillingName(e.target.value)}
-                      placeholder='Enter full name'
-                      className='w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800'
+                      placeholder='e.g. SAVE20'
+                      value={couponCode}
+                      onChange={(e) => {
+                        const next = e.target.value.toUpperCase();
+                        setCouponCode(next);
+                        // If the typed code no longer matches the applied one,
+                        // drop the discount so checkout can't use a stale coupon.
+                        if (appliedCoupon && next.trim() !== appliedCoupon.code) {
+                          setAppliedCoupon(null);
+                          setCouponSuccess('');
+                        }
+                        setCouponError('');
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleApplyCoupon();
+                        }
+                      }}
+                      className='flex-1 px-3.5 py-2.5 rounded-lg border border-zinc-200 focus:border-[#E61C24] outline-none text-base transition-all font-mono font-bold text-zinc-800'
                     />
-                  </div>
-
-                  {/* Email */}
-                  <div className='space-y-1.5'>
-                    <label className='text-base font-bold text-zinc-700'>
-                      Email Address (Account Reference)
-                    </label>
-                    <input
-                      type='email'
-                      disabled
-                      value={user.email}
-                      className='w-full px-4 py-3 rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-500 font-semibold text-base outline-none cursor-not-allowed'
-                    />
-                  </div>
-
-                  {/* Phone */}
-                  <div className='space-y-1.5'>
-                    <label className='text-base font-bold text-zinc-700'>
-                      Contact Phone Number
-                    </label>
-                    <input
-                      type='tel'
-                      required
-                      value={billingPhone}
-                      onChange={(e) => setBillingPhone(e.target.value)}
-                      placeholder='e.g. +1 555-0199'
-                      className='w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800'
-                    />
-                  </div>
-
-                  {/* Billing Address */}
-                  <div className='space-y-1.5'>
-                    <label className='text-base font-bold text-zinc-700'>
-                      Billing Address
-                    </label>
-                    <textarea
-                      required
-                      rows={3}
-                      value={billingAddress}
-                      onChange={(e) => setBillingAddress(e.target.value)}
-                      placeholder='Street address, City, State, ZIP code, Country'
-                      className='w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800'
-                    />
-                  </div>
-
-                  <button
-                    type='submit'
-                    disabled={purchaseLoading}
-                    className='w-full flex items-center justify-center gap-2 py-4 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all select-none cursor-pointer mt-6'
-                  >
-                    {purchaseLoading ? (
-                      <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
+                    {appliedCoupon ? (
+                      <button
+                        type='button'
+                        onClick={handleRemoveCoupon}
+                        className='px-5 rounded-lg border border-zinc-200 hover:border-rose-300 hover:bg-rose-50 text-rose-600 font-bold text-base transition-all cursor-pointer select-none'
+                      >
+                        Remove
+                      </button>
                     ) : (
-                      <>
-                        <FiZap className='h-5 w-5 fill-white' />
-                        <span>
-                          Complete Course Purchase (
-                          {!finalPrice || finalPrice === 0
-                            ? 'Free'
-                            : `৳${finalPrice.toLocaleString('en-BD')}`}
-                          )
-                        </span>
-                      </>
+                      <button
+                        type='button'
+                        onClick={handleApplyCoupon}
+                        disabled={couponLoading}
+                        className='px-5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base transition-all cursor-pointer flex items-center justify-center select-none'
+                      >
+                        {couponLoading ? (
+                          <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
+                        ) : (
+                          'Apply'
+                        )}
+                      </button>
                     )}
-                  </button>
-                </form>
-              </div>
+                  </div>
+
+                  {couponError && (
+                    <div className='flex items-center gap-1.5 text-rose-500 text-base font-semibold'>
+                      <FiAlertCircle className='h-4.5 w-4.5 shrink-0' />
+                      <span>{couponError}</span>
+                    </div>
+                  )}
+
+                  {couponSuccess && appliedCoupon && (
+                    <div className='flex items-center gap-1.5 text-emerald-600 text-base font-semibold'>
+                      <FiCheck className='h-4.5 w-4.5 shrink-0' />
+                      <span>{couponSuccess}</span>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type='submit'
+                  disabled={purchaseLoading}
+                  className='w-full flex items-center justify-center gap-2 py-4 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all select-none cursor-pointer'
+                >
+                  {purchaseLoading ? (
+                    <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
+                  ) : (
+                    <>
+                      <FiZap className='h-5 w-5 fill-white' />
+                      <span>
+                        Complete Course Purchase (
+                        {!finalPrice || finalPrice === 0
+                          ? 'Free'
+                          : `৳${finalPrice.toLocaleString('en-BD')}`}
+                        )
+                      </span>
+                    </>
+                  )}
+                </button>
+              </form>
             </div>
           )}
         </div>

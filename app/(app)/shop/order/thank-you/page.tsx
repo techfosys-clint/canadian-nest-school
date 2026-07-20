@@ -67,18 +67,16 @@ export default async function OrderThankYouPage({ searchParams }: Props) {
     notFound()
   }
 
-  if (order.paymentStatus === 'pending') {
+  // Finalize or recover payment if the API callback somehow missed it.
+  if (order.paymentStatus === 'pending' || order.paymentStatus === 'failed') {
     const result = await completePaidOrder(order)
     if (result === 'failed') {
       redirect('/shop?order=failed')
     }
     if (result === 'pending') {
-      redirect('/shop?order=error')
+      // Still settling at EPS — show a soft pending page via shop query.
+      redirect(`/shop?order=pending&orderId=${orderId}`)
     }
-  }
-
-  if (order.paymentStatus === 'failed') {
-    redirect('/shop?order=failed')
   }
 
   if (order.paymentStatus !== 'completed') {

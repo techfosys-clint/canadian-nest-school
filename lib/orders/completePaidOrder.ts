@@ -3,6 +3,7 @@ import { Student } from '@/lib/db/models/Student'
 import { User } from '@/lib/db/models/User'
 import { verifyEpsTransaction } from '@/lib/eps'
 import type { IOrder } from '@/lib/db/models/Order'
+import { normalizeEpsStatus } from '@/lib/payments/epsStatus'
 
 export type CompletePaidOrderResult =
   | 'completed'
@@ -12,7 +13,8 @@ export type CompletePaidOrderResult =
 
 /**
  * Verifies an EPS transaction and marks the order completed when paid.
- * Safe to call on refresh — already-completed orders are left unchanged.
+ * Safe to call on refresh. Recovers wrongly marked "failed" orders when
+ * EPS later reports Success. Leaves status pending when EPS is still pending.
  */
 export async function completePaidOrder(
   order: IOrder,
@@ -20,19 +22,24 @@ export async function completePaidOrder(
   if (order.paymentStatus === 'completed') {
     return 'already_completed'
   }
-  if (order.paymentStatus === 'failed') {
-    return 'failed'
-  }
+
   if (!order.merchantTransactionId) {
     return 'pending'
   }
 
+  const previousStatus = order.paymentStatus
   const result = await verifyEpsTransaction(order.merchantTransactionId)
+  const status = normalizeEpsStatus(result.status)
 
-  if (result.status?.toLowerCase() === 'success') {
+  if (status === 'success') {
     order.paymentStatus = 'completed'
+    if (!order.paymentReference) {
+      order.paymentReference = order.merchantTransactionId
+    }
     await order.save()
 
+    // Stock + confirmation email only when newly completing (not already completed —
+    // that path returns earlier). Recovering from failed never decremented stock.
     for (const item of order.items) {
       await Product.updateOne(
         { _id: item.product, stock: { $ne: null } },
@@ -67,7 +74,13 @@ export async function completePaidOrder(
     return 'completed'
   }
 
-  order.paymentStatus = 'failed'
-  await order.save()
-  return 'failed'
+  if (status === 'failed') {
+    if (order.paymentStatus !== 'failed') {
+      order.paymentStatus = 'failed'
+      await order.save()
+    }
+    return 'failed'
+  }
+
+  return 'pending'
 }

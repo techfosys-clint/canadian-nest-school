@@ -199,7 +199,10 @@ export async function POST(request: Request) {
         merchantTransactionId,
         customerOrderId: pendingOrder._id.toString(),
         totalAmount,
-        successUrl: `${appUrl}/shop/order/thank-you?orderId=${pendingOrder._id}&outcome=success`,
+        // Complete payment on the API callback (no login required), then redirect
+        // to thank-you. Relying on thank-you alone dropped paid orders when the
+        // session cookie was lost after EPS.
+        successUrl: `${appUrl}/api/payments/eps/order-callback?orderId=${pendingOrder._id}&outcome=success`,
         failUrl: `${appUrl}/api/payments/eps/order-callback?orderId=${pendingOrder._id}&outcome=fail`,
         cancelUrl: `${appUrl}/api/payments/eps/order-callback?orderId=${pendingOrder._id}&outcome=cancel`,
         customerName: shippingName,

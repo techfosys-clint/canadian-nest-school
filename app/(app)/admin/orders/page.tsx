@@ -28,7 +28,9 @@ export default async function AdminOrdersPage() {
   const sessionUser = await User.findById(decoded.id).lean()
   if (!sessionUser || !['admin', 'staff'].includes(sessionUser.role)) redirect('/login')
 
-  const orderDocs = await Order.find({ paymentStatus: 'completed' })
+  const orderDocs = await Order.find({
+    paymentStatus: { $in: ['completed', 'pending', 'failed'] },
+  })
     .populate('student', 'name email phone')
     .populate('items.product', 'title thumbnail slug')
     .sort({ createdAt: -1 })
@@ -44,10 +46,12 @@ export default async function AdminOrdersPage() {
       quantity: i.quantity,
     })),
     totalAmount: o.totalAmount,
+    paymentStatus: o.paymentStatus,
     orderStatus: o.orderStatus,
     shippingName: o.shippingName,
     shippingPhone: o.shippingPhone,
     shippingAddress: o.shippingAddress,
+    merchantTransactionId: o.merchantTransactionId || '',
     createdAt: o.createdAt ? o.createdAt.toISOString() : '',
   }))
 

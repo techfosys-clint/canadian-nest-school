@@ -11,10 +11,7 @@ import {
   FiCheckCircle, 
   FiClock, 
   FiX, 
-  FiTrendingUp, 
-  FiDollarSign, 
   FiArrowLeft,
-  FiBookOpen
 } from 'react-icons/fi'
 import Swal from 'sweetalert2'
 
@@ -24,13 +21,14 @@ interface Enrollment {
   studentEmail: string
   courseTitle: string
   pricePaid: number
-  paymentStatus: 'completed' | 'pending' | 'refunded'
+  paymentStatus: 'completed' | 'pending' | 'failed' | 'refunded'
   createdAt: string
 }
 
 const statusColors: Record<string, string> = {
   completed: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
   pending: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
+  failed: 'bg-rose-500/10 text-rose-400 border border-rose-500/20',
   refunded: 'bg-rose-500/10 text-rose-400 border border-rose-500/20',
 }
 
@@ -70,7 +68,7 @@ export default function ManageEnrollmentsPage() {
       }
       const json = await res.json()
       if (json.success) {
-        setEnrollments(json.enrollments || [])
+        setEnrollments(json.data?.enrollments || json.enrollments || [])
       } else {
         throw new Error(json.error || 'Failed to fetch enrollments.')
       }
@@ -89,6 +87,77 @@ export default function ManageEnrollmentsPage() {
   const handleRefresh = () => {
     setRefreshing(true)
     fetchEnrollments()
+  }
+
+  const handleSyncEpsPayments = async () => {
+    try {
+      Swal.fire({
+        title: 'Syncing EPS…',
+        text: 'Checking pending and recently failed payments with the gateway.',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+        background: '#ffffff',
+        color: '#1a1a1a',
+      })
+
+      const res = await fetch('/api/payments/eps/reconcile', { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to sync EPS payments.')
+      }
+
+      const s = data.summary
+      await Swal.fire({
+        icon: 'success',
+        title: 'EPS Sync Complete',
+        html: `<p class="text-left">Enrollments completed: <b>${s.enrollmentsCompleted}</b><br/>Orders completed: <b>${s.ordersCompleted}</b><br/>Still pending: <b>${s.enrollmentsPending + s.ordersPending}</b></p>`,
+        background: '#ffffff',
+        color: '#1a1a1a',
+      })
+      fetchEnrollments()
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Sync Failed',
+        text: err.message || 'Could not sync EPS payments.',
+        background: '#ffffff',
+        color: '#1a1a1a',
+      })
+    }
+  }
+
+  const handleVerifyEnrollment = async (enrollmentId: string) => {
+    try {
+      const res = await fetch('/api/admin/payments/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'enrollment', id: enrollmentId }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Verification failed.')
+      }
+
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: data.result === 'completed' || data.result === 'already_completed' ? 'success' : 'info',
+        title: `Payment ${data.paymentStatus}`,
+        showConfirmButton: false,
+        timer: 2500,
+        background: '#ffffff',
+        color: '#1a1a1a',
+      })
+      fetchEnrollments()
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Verify Failed',
+        text: err.message,
+        background: '#ffffff',
+        color: '#1a1a1a',
+      })
+    }
   }
 
   const handleRemoveEnrollment = async (enrollmentId: string, studentName: string, courseTitle: string) => {
@@ -219,14 +288,22 @@ export default function ManageEnrollmentsPage() {
             Search, filter, and unenroll active students from dynamic course subscriptions.
           </p>
         </div>
-        <button
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-slate-200 hover:border-slate-300 text-slate-600 hover:text-slate-800 font-semibold text-base transition-all duration-200 cursor-pointer disabled:opacity-50"
-        >
-          <FiRefreshCw className={`h-4.5 w-4.5 ${refreshing ? 'animate-spin' : ''}`} />
-          Refresh Records
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleSyncEpsPayments}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-semibold text-base transition-all duration-200 cursor-pointer"
+          >
+            Sync EPS Payments
+          </button>
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-slate-200 hover:border-slate-300 text-slate-600 hover:text-slate-800 font-semibold text-base transition-all duration-200 cursor-pointer disabled:opacity-50"
+          >
+            <FiRefreshCw className={`h-4.5 w-4.5 ${refreshing ? 'animate-spin' : ''}`} />
+            Refresh Records
+          </button>
+        </div>
       </div>
 
       {/* ─── Metrics Section (Sleek Borderless Grid) ─── */}
@@ -318,6 +395,7 @@ export default function ManageEnrollmentsPage() {
               <option value="all">All Payment Statuses</option>
               <option value="completed">Active (Completed)</option>
               <option value="pending">Pending Orders</option>
+              <option value="failed">Failed / Incomplete</option>
               <option value="refunded">Refunded / Canceled</option>
             </select>
           </div>
@@ -426,14 +504,26 @@ export default function ManageEnrollmentsPage() {
 
                     {/* Actions */}
                     <td className="px-6 py-4 text-center">
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveEnrollment(e.id, e.studentName, e.courseTitle)}
-                        className="p-2 text-rose-450 hover:text-rose-600 hover:bg-rose-500/10 rounded-lg cursor-pointer transition-colors"
-                        title="Remove Course Enrollment (Unenroll)"
-                      >
-                        <FiTrash2 className="h-5 w-5" />
-                      </button>
+                      <div className="inline-flex items-center gap-1">
+                        {(e.paymentStatus === 'pending' || e.paymentStatus === 'failed') && (
+                          <button
+                            type="button"
+                            onClick={() => handleVerifyEnrollment(e.id)}
+                            className="p-2 text-slate-500 hover:text-[#E61C24] hover:bg-[#E61C24]/10 rounded-lg cursor-pointer transition-colors"
+                            title="Verify payment with EPS"
+                          >
+                            <FiRefreshCw className="h-5 w-5" />
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveEnrollment(e.id, e.studentName, e.courseTitle)}
+                          className="p-2 text-rose-450 hover:text-rose-600 hover:bg-rose-500/10 rounded-lg cursor-pointer transition-colors"
+                          title="Remove Course Enrollment (Unenroll)"
+                        >
+                          <FiTrash2 className="h-5 w-5" />
+                        </button>
+                      </div>
                     </td>
 
                   </tr>

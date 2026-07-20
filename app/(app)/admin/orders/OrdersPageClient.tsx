@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { FiPackage, FiMapPin, FiPhone, FiUser, FiPrinter, FiCheckSquare, FiSquare } from 'react-icons/fi'
+import { FiPackage, FiMapPin, FiPhone, FiUser, FiPrinter, FiCheckSquare, FiSquare, FiRefreshCw } from 'react-icons/fi'
 import Swal from 'sweetalert2'
 
 interface OrderItem {
@@ -16,10 +16,12 @@ interface OrderRow {
   studentEmail: string
   items: OrderItem[]
   totalAmount: number
+  paymentStatus: 'pending' | 'completed' | 'failed' | 'refunded'
   orderStatus: 'processing' | 'shipped' | 'delivered' | 'cancelled'
   shippingName: string
   shippingPhone: string
   shippingAddress: string
+  merchantTransactionId?: string
   createdAt: string
 }
 
@@ -30,9 +32,17 @@ const STATUS_STYLES: Record<string, string> = {
   cancelled: 'bg-rose-50 border-rose-200 text-rose-600',
 }
 
+const PAYMENT_STYLES: Record<string, string> = {
+  completed: 'bg-emerald-50 border-emerald-200 text-emerald-600',
+  pending: 'bg-amber-50 border-amber-200 text-amber-600',
+  failed: 'bg-rose-50 border-rose-200 text-rose-600',
+  refunded: 'bg-slate-50 border-slate-200 text-slate-600',
+}
+
 export default function OrdersPageClient({ initialOrders }: { initialOrders: OrderRow[] }) {
   const [orders, setOrders] = useState<OrderRow[]>(initialOrders)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [syncing, setSyncing] = useState(false)
 
   const persistStatus = async (orderId: string, newStatus: string) => {
     const res = await fetch(`/api/admin/orders/${orderId}`, {
@@ -46,10 +56,6 @@ export default function OrdersPageClient({ initialOrders }: { initialOrders: Ord
     }
   }
 
-  // Applies the new status immediately (a fulfillment status dropdown with
-  // no confirm step is easy to mis-click), then offers a few seconds to
-  // undo it back to the previous value via a toast instead of a blocking
-  // "are you sure?" dialog on every single change.
   const updateStatus = async (order: OrderRow, newStatus: string) => {
     const previousStatus = order.orderStatus
     if (previousStatus === newStatus) return
@@ -93,6 +99,80 @@ export default function OrdersPageClient({ initialOrders }: { initialOrders: Ord
     }
   }
 
+  const handleVerifyOrder = async (orderId: string) => {
+    try {
+      const res = await fetch('/api/admin/payments/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'order', id: orderId }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Verification failed.')
+      }
+
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.id === orderId
+            ? { ...o, paymentStatus: data.paymentStatus as OrderRow['paymentStatus'] }
+            : o,
+        ),
+      )
+
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon:
+          data.result === 'completed' || data.result === 'already_completed'
+            ? 'success'
+            : 'info',
+        title: `Payment ${data.paymentStatus}`,
+        showConfirmButton: false,
+        timer: 2500,
+        background: '#ffffff',
+        color: '#1a1a1a',
+      })
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Verify Failed',
+        text: err.message,
+        background: '#ffffff',
+        color: '#1a1a1a',
+      })
+    }
+  }
+
+  const handleSyncEps = async () => {
+    setSyncing(true)
+    try {
+      const res = await fetch('/api/payments/eps/reconcile', { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to sync EPS payments.')
+      }
+      const s = data.summary
+      await Swal.fire({
+        icon: 'success',
+        title: 'EPS Sync Complete',
+        html: `<p class="text-left">Orders completed: <b>${s.ordersCompleted}</b><br/>Enrollments completed: <b>${s.enrollmentsCompleted}</b><br/>Still pending: <b>${s.ordersPending + s.enrollmentsPending}</b></p>`,
+        background: '#ffffff',
+        color: '#1a1a1a',
+      })
+      window.location.reload()
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Sync Failed',
+        text: err.message,
+        background: '#ffffff',
+        color: '#1a1a1a',
+      })
+    } finally {
+      setSyncing(false)
+    }
+  }
+
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev)
@@ -102,22 +182,22 @@ export default function OrdersPageClient({ initialOrders }: { initialOrders: Ord
     })
   }
 
+  const paidOrders = orders.filter((o) => o.paymentStatus === 'completed')
+
   const toggleSelectAll = () => {
-    if (selectedIds.size === orders.length) {
+    if (selectedIds.size === paidOrders.length) {
       setSelectedIds(new Set())
     } else {
-      setSelectedIds(new Set(orders.map((o) => o.id)))
+      setSelectedIds(new Set(paidOrders.map((o) => o.id)))
     }
   }
 
   const handlePrintInvoices = () => {
     if (selectedIds.size === 0) return
-    // Rendered in a hidden #print-invoices block; print.css (below) hides
-    // everything else so only the selected invoices come out on paper.
     window.print()
   }
 
-  const selectedOrders = orders.filter((o) => selectedIds.has(o.id))
+  const selectedOrders = paidOrders.filter((o) => selectedIds.has(o.id))
 
   return (
     <div className="px-6 py-8 space-y-6 container mx-auto">
@@ -142,28 +222,39 @@ export default function OrdersPageClient({ initialOrders }: { initialOrders: Ord
         <div>
           <h1 className="text-3xl font-bold font-display text-slate-800">Shop Orders</h1>
           <p className="text-base font-semibold text-slate-500 mt-1">
-            View paid orders and update fulfillment status.
+            View orders, sync EPS payments, and update fulfillment status.
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={handlePrintInvoices}
-          disabled={selectedIds.size === 0}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-md shadow-[#E61C24]/15 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
-        >
-          <FiPrinter className="h-5 w-5" />
-          Print Invoices{selectedIds.size > 0 ? ` (${selectedIds.size})` : ''}
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={handleSyncEps}
+            disabled={syncing}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white border border-slate-200 hover:border-slate-300 text-slate-700 font-bold text-base transition-all cursor-pointer disabled:opacity-50"
+          >
+            <FiRefreshCw className={`h-5 w-5 ${syncing ? 'animate-spin' : ''}`} />
+            Sync EPS
+          </button>
+          <button
+            type="button"
+            onClick={handlePrintInvoices}
+            disabled={selectedIds.size === 0}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shadow-md shadow-[#E61C24]/15 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+          >
+            <FiPrinter className="h-5 w-5" />
+            Print Invoices{selectedIds.size > 0 ? ` (${selectedIds.size})` : ''}
+          </button>
+        </div>
       </div>
 
       <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
         {orders.length === 0 ? (
           <div className="p-16 text-center space-y-4">
             <FiPackage className="h-12 w-12 text-slate-300 mx-auto" />
-            <h3 className="text-lg font-bold text-slate-600">No paid orders yet</h3>
+            <h3 className="text-lg font-bold text-slate-600">No orders yet</h3>
             <p className="text-base font-semibold text-slate-400 max-w-sm mx-auto">
-              Completed shop orders will appear here once customers pay for products.
+              Shop orders will appear here once customers start checkout.
             </p>
           </div>
         ) : (
@@ -174,26 +265,28 @@ export default function OrdersPageClient({ initialOrders }: { initialOrders: Ord
                 onClick={toggleSelectAll}
                 className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 cursor-pointer"
               >
-                {selectedIds.size === orders.length ? (
+                {paidOrders.length > 0 && selectedIds.size === paidOrders.length ? (
                   <FiCheckSquare className="h-4.5 w-4.5 text-[#E61C24]" />
                 ) : (
                   <FiSquare className="h-4.5 w-4.5" />
                 )}
-                Select All
+                Select All Paid
               </button>
             </div>
 
             <div className="divide-y divide-slate-100">
               {orders.map((order) => {
                 const isSelected = selectedIds.has(order.id)
+                const isPaid = order.paymentStatus === 'completed'
                 return (
                   <div key={order.id} className={`p-6 space-y-4 transition-colors ${isSelected ? 'bg-[#E61C24]/5' : ''}`}>
                     <div className="flex items-start gap-4">
                       <button
                         type="button"
-                        onClick={() => toggleSelect(order.id)}
-                        className="mt-1 shrink-0 cursor-pointer"
-                        title="Select for printing"
+                        onClick={() => isPaid && toggleSelect(order.id)}
+                        disabled={!isPaid}
+                        className="mt-1 shrink-0 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                        title={isPaid ? 'Select for printing' : 'Only paid orders can be printed'}
                       >
                         {isSelected ? (
                           <FiCheckSquare className="h-5 w-5 text-[#E61C24]" />
@@ -207,17 +300,41 @@ export default function OrdersPageClient({ initialOrders }: { initialOrders: Ord
                           <div>
                             <p className="font-bold text-slate-800">{order.studentName}</p>
                             <p className="text-sm font-semibold text-slate-450">{order.studentEmail}</p>
+                            {order.merchantTransactionId && (
+                              <p className="text-sm font-semibold text-slate-400 mt-0.5 font-mono">
+                                {order.merchantTransactionId}
+                              </p>
+                            )}
                           </div>
-                          <select
-                            value={order.orderStatus}
-                            onChange={(e) => updateStatus(order, e.target.value)}
-                            className={`px-3 py-1.5 rounded-lg text-sm font-bold uppercase tracking-wide border cursor-pointer ${STATUS_STYLES[order.orderStatus]}`}
-                          >
-                            <option value="processing">Processing</option>
-                            <option value="shipped">Shipped</option>
-                            <option value="delivered">Delivered</option>
-                            <option value="cancelled">Cancelled</option>
-                          </select>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span
+                              className={`px-3 py-1.5 rounded-lg text-sm font-bold uppercase tracking-wide border ${PAYMENT_STYLES[order.paymentStatus] || ''}`}
+                            >
+                              {order.paymentStatus}
+                            </span>
+                            {(order.paymentStatus === 'pending' || order.paymentStatus === 'failed') && (
+                              <button
+                                type="button"
+                                onClick={() => handleVerifyOrder(order.id)}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-sm font-bold text-slate-600 hover:text-[#E61C24] hover:border-[#E61C24]/40 cursor-pointer"
+                              >
+                                <FiRefreshCw className="h-4 w-4" />
+                                Verify EPS
+                              </button>
+                            )}
+                            {isPaid && (
+                              <select
+                                value={order.orderStatus}
+                                onChange={(e) => updateStatus(order, e.target.value)}
+                                className={`px-3 py-1.5 rounded-lg text-sm font-bold uppercase tracking-wide border cursor-pointer ${STATUS_STYLES[order.orderStatus]}`}
+                              >
+                                <option value="processing">Processing</option>
+                                <option value="shipped">Shipped</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="cancelled">Cancelled</option>
+                              </select>
+                            )}
+                          </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -258,7 +375,6 @@ export default function OrdersPageClient({ initialOrders }: { initialOrders: Ord
         )}
       </div>
 
-      {/* Printable invoices — only visible to the print stylesheet above */}
       <div id="print-invoices" className="hidden">
         {selectedOrders.map((order) => (
           <div key={order.id} className="p-10" style={{ pageBreakAfter: 'always' }}>
@@ -315,11 +431,6 @@ export default function OrdersPageClient({ initialOrders }: { initialOrders: Ord
                   <span>৳{order.totalAmount.toLocaleString('en-BD')}</span>
                 </div>
               </div>
-            </div>
-
-            <div className="flex items-center justify-between text-sm font-semibold text-slate-500 border-t border-slate-200 pt-4">
-              <span>Status: <span className="uppercase font-bold text-slate-700">{order.orderStatus}</span></span>
-              <span>{order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-BD', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}</span>
             </div>
           </div>
         ))}

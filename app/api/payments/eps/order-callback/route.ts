@@ -6,14 +6,14 @@ import { NextResponse } from 'next/server'
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
 /**
- * Handles EPS failUrl/cancelUrl redirects for shop orders, and legacy successUrl
- * hits that still point at this route. Success landings should use
- * /shop/order/thank-you directly — that page finalizes pending payments too.
+ * Handles EPS redirects for shop orders (success/fail/cancel).
+ * Always re-verifies with EPS — never trusts `outcome` alone — so a paid
+ * transaction is completed even when EPS redirects with a fail/cancel URL,
+ * and completion does not require the customer to still be logged in.
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const orderId = searchParams.get('orderId')
-  const outcome = searchParams.get('outcome')
 
   try {
     await connectToDatabase()
@@ -27,14 +27,6 @@ export async function GET(request: Request) {
       return NextResponse.redirect(`${appUrl}/shop?order=error`)
     }
 
-    if (outcome === 'fail' || outcome === 'cancel') {
-      if (order.paymentStatus === 'pending') {
-        order.paymentStatus = 'failed'
-        await order.save()
-      }
-      return NextResponse.redirect(`${appUrl}/shop?order=failed`)
-    }
-
     if (order.paymentStatus === 'completed') {
       return NextResponse.redirect(
         `${appUrl}/shop/order/thank-you?orderId=${orderId}`,
@@ -46,6 +38,12 @@ export async function GET(request: Request) {
     if (result === 'completed' || result === 'already_completed') {
       return NextResponse.redirect(
         `${appUrl}/shop/order/thank-you?orderId=${orderId}`,
+      )
+    }
+
+    if (result === 'pending') {
+      return NextResponse.redirect(
+        `${appUrl}/shop/order/thank-you?orderId=${orderId}&outcome=pending`,
       )
     }
 

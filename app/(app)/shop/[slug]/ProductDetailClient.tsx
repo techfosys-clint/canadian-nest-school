@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useCart } from '@/context/CartContext';
@@ -106,8 +105,8 @@ export default function ProductDetailClient({
                 }
                 alt={product.title}
                 className='w-full h-full object-cover'
-                width={100}
-                height={100}
+                width={600}
+                height={800}
               />
             ) : (
               <FiBookOpen className='h-16 w-16 text-zinc-300' />

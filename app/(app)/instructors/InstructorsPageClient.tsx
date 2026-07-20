@@ -124,8 +124,8 @@ export default function InstructorsPageClient({
                   src={instructor.profilePicUrl}
                   alt={instructor.name}
                   className='w-full h-full object-cover object-bottom transition-transform duration-500 group-hover:scale-105'
-                  width={100}
-                  height={100}
+                  width={350}
+                  height={300}
                 />
               </div>
 

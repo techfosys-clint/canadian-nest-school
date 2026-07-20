@@ -149,8 +149,8 @@ export default function DashboardLayout({
               src='/logo.png'
               alt='Canadian Nest School'
               className='h-13 w-auto object-contain'
-              width={100}
-              height={100}
+              width={170}
+              height={60}
             />
           </Link>
         </div>
@@ -164,7 +164,8 @@ export default function DashboardLayout({
             const isActive =
               link.href === '/dashboard'
                 ? pathname === '/dashboard'
-                : pathname === link.href || pathname.startsWith(`${link.href}/`);
+                : pathname === link.href ||
+                  pathname.startsWith(`${link.href}/`);
             const Icon = link.icon;
             return (
               <Link

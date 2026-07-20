@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import Image from 'next/image';
@@ -214,6 +213,15 @@ const NAV_GROUPS: SidebarGroup[] = [
   },
 ];
 
+function getInitials(name: string) {
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .substring(0, 2);
+}
+
 // ── Collapsible Group Component ──
 function NavGroup({
   group,
@@ -236,8 +244,6 @@ function NavGroup({
     return link.roles.includes(user.role);
   });
 
-  if (visibleLinks.length === 0) return null;
-
   const isGroupActive = visibleLinks.some(
     (l) => pathname.startsWith(l.href) && l.href !== '/admin',
   );
@@ -248,6 +254,8 @@ function NavGroup({
   useEffect(() => {
     if (isGroupActive) setOpen(true);
   }, [pathname, isGroupActive]);
+
+  if (visibleLinks.length === 0) return null;
 
   return (
     <div className='space-y-0.5'>
@@ -310,6 +318,50 @@ function NavGroup({
           })}
         </div>
       </div>
+    </div>
+  );
+}
+
+// ── Sidebar Footer (shared between desktop & mobile) ──
+function SidebarFooter({
+  user,
+  onLogout,
+}: {
+  user: AdminSessionUser;
+  onLogout: () => void;
+}) {
+  return (
+    <div className='p-4 border-t border-slate-200 bg-slate-50 shrink-0'>
+      <div className='flex items-center gap-3'>
+        <div className='h-10 w-10 rounded-full border border-[#E61C24]/35 bg-slate-100 flex items-center justify-center text-base font-bold text-slate-700 overflow-hidden shrink-0'>
+          {user.profilePic ? (
+            <Image
+              src={user.profilePic}
+              alt={user.name}
+              className='h-full w-full object-cover'
+              width={100}
+              height={100}
+            />
+          ) : (
+            getInitials(user.name)
+          )}
+        </div>
+        <div className='min-w-0 flex-1'>
+          <p className='text-base font-bold text-slate-800 truncate leading-tight'>
+            {user.name}
+          </p>
+          <p className='text-base font-semibold text-[#E61C24] truncate mt-0.5 capitalize'>
+            {user.role}
+          </p>
+        </div>
+      </div>
+      <button
+        onClick={onLogout}
+        className='w-full mt-3 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-red-200 hover:border-red-400 bg-red-50 hover:bg-red-100 text-red-500 font-bold text-base transition-all duration-200 cursor-pointer'
+      >
+        <FiLogOut className='h-4 w-4' />
+        <span>Sign Out</span>
+      </button>
     </div>
   );
 }
@@ -475,51 +527,6 @@ export default function AdminLayout({
 
   if (!user) return null;
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .substring(0, 2);
-  };
-
-  // ── Sidebar Footer (shared) ──
-  const SidebarFooter = () => (
-    <div className='p-4 border-t border-slate-200 bg-slate-50 shrink-0'>
-      <div className='flex items-center gap-3'>
-        <div className='h-10 w-10 rounded-full border border-[#E61C24]/35 bg-slate-100 flex items-center justify-center text-base font-bold text-slate-700 overflow-hidden shrink-0'>
-          {user.profilePic ? (
-            <Image
-              src={user.profilePic}
-              alt={user.name}
-              className='h-full w-full object-cover'
-              width={100}
-              height={100}
-            />
-          ) : (
-            getInitials(user.name)
-          )}
-        </div>
-        <div className='min-w-0 flex-1'>
-          <p className='text-base font-bold text-slate-800 truncate leading-tight'>
-            {user.name}
-          </p>
-          <p className='text-base font-semibold text-[#E61C24] truncate mt-0.5 capitalize'>
-            {user.role}
-          </p>
-        </div>
-      </div>
-      <button
-        onClick={handleLogout}
-        className='w-full mt-3 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-red-200 hover:border-red-400 bg-red-50 hover:bg-red-100 text-red-500 font-bold text-base transition-all duration-200 cursor-pointer'
-      >
-        <FiLogOut className='h-4 w-4' />
-        <span>Sign Out</span>
-      </button>
-    </div>
-  );
-
   return (
     <div className='h-screen bg-slate-50 flex font-sans overflow-hidden text-slate-800'>
       {/* ── Desktop Sidebar ── */}
@@ -541,7 +548,7 @@ export default function AdminLayout({
         <SidebarNav user={user} pathname={pathname} />
 
         {/* Footer */}
-        <SidebarFooter />
+        <SidebarFooter user={user} onLogout={handleLogout} />
       </aside>
 
       {/* ── Mobile Overlay ── */}
@@ -585,7 +592,7 @@ export default function AdminLayout({
         />
 
         {/* Footer */}
-        <SidebarFooter />
+        <SidebarFooter user={user} onLogout={handleLogout} />
       </aside>
 
       {/* ── Main Content Area ── */}

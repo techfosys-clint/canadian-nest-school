@@ -372,9 +372,13 @@ export default function CourseCompleteReviewPage() {
       await Swal.fire({
         icon: 'info',
         title: 'Certificate Locked',
-        text: 'Submit reviews for the course and teachers first. Download unlocks after admin/staff approve them together.',
+        text: !courseReviewStatus || courseReviewStatus === 'idle' || teacherReviewStatus === 'idle'
+          ? 'Please submit course and teacher reviews first. Download unlocks after admin/staff approve them.'
+          : 'Submit reviews for the course and teachers first. Download unlocks after admin/staff approve them together.',
         confirmButtonColor: '#E61C24',
       })
+      if (courseReviewStatus === 'idle') setStep(1)
+      else if (teacherReviewStatus === 'idle') setStep(2)
       return
     }
     setDownloadingCert(true)
@@ -382,6 +386,13 @@ export default function CourseCompleteReviewPage() {
       const res = await fetch(`/api/certificates/download?courseId=${course.id}`)
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
+        if (data.code === 'REVIEWS_REQUIRED') {
+          setStep(1)
+          throw new Error(data.error || 'Please leave reviews before downloading.')
+        }
+        if (data.code === 'REVIEWS_PENDING_APPROVAL') {
+          throw new Error(data.error || 'Reviews are pending staff approval.')
+        }
         throw new Error(
           data.error ||
             'Certificate PDF is being prepared. Check My Certificates shortly.',

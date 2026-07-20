@@ -12,7 +12,12 @@ import {
 } from '@/lib/progress/getCourseProgress'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
-import { getStudentCourseReviewGate } from '@/lib/reviews/reviewPack'
+import {
+  canDownloadCertificate,
+  getStudentCourseReviewGate,
+  hasSubmittedRequiredReviews,
+  reconcileCertificateWithReviewGate,
+} from '@/lib/reviews/reviewPack'
 import '@/lib/db/models/InstructorReview'
 import '@/lib/db/models/Review'
 
@@ -71,40 +76,66 @@ export async function GET() {
       enrollmentProgress.set(courseId, enrollment.completedLessons || [])
     }
 
+    // Reconcile each cert with review gate (holds legacy approved downloads)
     const reviewGates = await Promise.all(
       courseIds.map(async (courseId) => {
-        const gate = await getStudentCourseReviewGate(userId, courseId)
+        const completedLessons = enrollmentProgress.get(courseId) || []
+        const totalLessons = lessonCounts.get(courseId) || 0
+        const validLessonIds = lessonIdsByCourse.get(courseId) || new Set<string>()
+        const progress = calculateCourseProgressPercent(
+          sanitizeCompletedLessons(completedLessons, validLessonIds),
+          totalLessons,
+        )
+
+        const reconciled = await reconcileCertificateWithReviewGate(
+          userId,
+          courseId,
+        )
+        const gate =
+          reconciled.gate || (await getStudentCourseReviewGate(userId, courseId))
         return [
           courseId,
           {
             courseReviewStatus: gate.courseReviewStatus,
             teacherReviewStatus: gate.teacherReviewStatus,
+            progress,
           },
         ] as const
       }),
     )
     const reviewGateMap = new Map(reviewGates)
 
-    const formatted = requests.map((r) => {
+    // Re-fetch after reconciliation so status reflects holds
+    const refreshed = await CertificateRequest.find({ student: userId })
+      .populate('course', 'title slug')
+      .sort({ createdAt: -1 })
+      .lean()
+
+    const formatted = refreshed.map((r) => {
       const courseId = r.course?._id?.toString()
-      const completedLessons = courseId
-        ? enrollmentProgress.get(courseId) || []
-        : []
-      const totalLessons = courseId ? lessonCounts.get(courseId) || 0 : 0
-      const validLessonIds = courseId
-        ? lessonIdsByCourse.get(courseId) || new Set<string>()
-        : new Set<string>()
-      const sanitizedCompletedLessons = sanitizeCompletedLessons(
-        completedLessons,
-        validLessonIds,
+      const reviewGate = courseId ? reviewGateMap.get(courseId) : undefined
+      const progress =
+        reviewGate?.progress ??
+        calculateCourseProgressPercent(
+          sanitizeCompletedLessons(
+            courseId ? enrollmentProgress.get(courseId) || [] : [],
+            courseId
+              ? lessonIdsByCourse.get(courseId) || new Set<string>()
+              : new Set<string>(),
+          ),
+          courseId ? lessonCounts.get(courseId) || 0 : 0,
+        )
+
+      const courseReviewStatus = reviewGate?.courseReviewStatus || 'idle'
+      const teacherReviewStatus = reviewGate?.teacherReviewStatus || 'idle'
+      const reviewsSubmitted = hasSubmittedRequiredReviews(
+        courseReviewStatus,
+        teacherReviewStatus,
       )
-      const progress = calculateCourseProgressPercent(
-        sanitizedCompletedLessons,
-        totalLessons,
+      const reviewsApproved = canDownloadCertificate(
+        courseReviewStatus,
+        teacherReviewStatus,
       )
-      const reviewGate = courseId
-        ? reviewGateMap.get(courseId)
-        : undefined
 
       return {
         id: r._id.toString(),
@@ -116,8 +147,11 @@ export async function GET() {
         certificateUrl: r.certificateUrl || null,
         adminNotes: r.adminNotes || '',
         createdAt: r.createdAt,
-        courseReviewStatus: reviewGate?.courseReviewStatus || 'idle',
-        teacherReviewStatus: reviewGate?.teacherReviewStatus || 'idle',
+        courseReviewStatus,
+        teacherReviewStatus,
+        reviewsSubmitted,
+        reviewsApproved,
+        requiresReviews: !reviewsSubmitted,
       }
     })
 

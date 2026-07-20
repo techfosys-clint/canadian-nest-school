@@ -9,7 +9,6 @@ import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import {
   FiArrowRight,
-  FiBookOpen,
   FiCheck,
   FiEye,
   FiEyeOff,
@@ -28,7 +27,6 @@ export default function RegisterForm() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [phone, setPhone] = useState('');
-  const [academicLevel, setAcademicLevel] = useState('College/University');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -574,47 +572,6 @@ export default function RegisterForm() {
                         placeholder='you@example.com'
                         className='w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white'
                       />
-                    </div>
-                  </div>
-
-                  {/* Academic Level */}
-                  <div className='space-y-1.5'>
-                    <label
-                      htmlFor='academic'
-                      className='text-base font-bold text-zinc-700'
-                    >
-                      Academic Level
-                    </label>
-                    <div className='relative'>
-                      <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400 pointer-events-none'>
-                        <FiBookOpen className='h-5 w-5' />
-                      </span>
-                      <select
-                        id='academic'
-                        value={academicLevel}
-                        onChange={(e) => setAcademicLevel(e.target.value)}
-                        className='w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-700 bg-white cursor-pointer appearance-none'
-                      >
-                        <option value='High School'>High School</option>
-                        <option value='College/University'>
-                          College / University
-                        </option>
-                        <option value='Graduate School'>Graduate School</option>
-                        <option value='Professional'>
-                          Professional / Working
-                        </option>
-                        <option value='Hobbyist'>
-                          Hobbyist / Lifelong Learner
-                        </option>
-                      </select>
-                      <div className='absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-zinc-400'>
-                        <svg
-                          className='h-4 w-4 fill-current'
-                          viewBox='0 0 20 20'
-                        >
-                          <path d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' />
-                        </svg>
-                      </div>
                     </div>
                   </div>
 

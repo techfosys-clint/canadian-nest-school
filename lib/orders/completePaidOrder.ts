@@ -1,8 +1,8 @@
+import type { IOrder } from '@/lib/db/models/Order'
 import { Product } from '@/lib/db/models/Product'
 import { Student } from '@/lib/db/models/Student'
 import { User } from '@/lib/db/models/User'
 import { verifyEpsTransaction } from '@/lib/eps'
-import type { IOrder } from '@/lib/db/models/Order'
 import { normalizeEpsStatus } from '@/lib/payments/epsStatus'
 
 export type CompletePaidOrderResult =

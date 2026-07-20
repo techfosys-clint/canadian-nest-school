@@ -13,13 +13,7 @@ import {
 import Swal from 'sweetalert2';
 
 // Nav link definitions — href is the "page" to match against
-const MAIN_PAGES = [
-  { label: 'Home', href: '/', match: '/' },
-  { label: 'Company', href: '/#company', match: null },
-  { label: 'Works', href: '/#courses', match: '/courses' },
-  { label: 'Services', href: '/#services', match: null },
-  { label: 'Pricing', href: '/#pricing', match: null },
-];
+const MAIN_PAGES = [{ label: 'Home', href: '/', match: '/' }];
 
 const QUICK_LINKS = [
   { label: 'Blogs', href: '/blogs', match: '/blogs' },

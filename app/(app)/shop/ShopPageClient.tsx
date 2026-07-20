@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import PageHeroSection from '@/components/PageHeroSection';
@@ -144,8 +143,8 @@ export default function ShopPageClient({
                         }
                         alt={product.title}
                         className='w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500'
-                        width={100}
-                        height={100}
+                        width={360}
+                        height={475}
                       />
                     ) : (
                       <div className='w-full h-full flex items-center justify-center'>

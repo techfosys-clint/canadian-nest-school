@@ -122,8 +122,8 @@ export default function InstructorsSection({
                   <Image
                     src={instructor.profilePicUrl}
                     alt={instructor.name}
-                    width={100}
-                    height={100}
+                    width={350}
+                    height={300}
                     className='w-full h-full object-cover object-top group-hover:scale-[1.03] transition-transform duration-500 ease-out'
                   />
                 ) : (

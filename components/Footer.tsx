@@ -84,8 +84,8 @@ export default function Footer() {
               <Image
                 src='/logo.png'
                 alt='Canadian Nest School'
-                width={150}
-                height={60}
+                width={200}
+                height={70}
                 className='h-15 w-auto object-contain transition-transform group-hover:scale-102 duration-300'
               />
             </Link>
@@ -211,7 +211,7 @@ export default function Footer() {
           <Image
             src='/EPS-PGW_Footer_Merchant_Website/Footer-Desktop-Light-Version.png.png'
             alt='Payment Methods'
-            width={1200}
+            width={1500}
             height={80}
             className='hidden md:block w-full h-auto object-contain'
           />

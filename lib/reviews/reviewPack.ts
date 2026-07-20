@@ -262,6 +262,70 @@ export async function moderateReviewPack(
   }
 }
 
+/**
+ * Hold legacy/previously-approved certificates until course + teacher reviews
+ * are submitted and approved. Safe to call on certificate list/download.
+ */
+export async function reconcileCertificateWithReviewGate(
+  studentId: string,
+  courseId: string,
+) {
+  const existing = await CertificateRequest.findOne({
+    student: studentId,
+    course: courseId,
+  })
+  if (!existing) {
+    return {
+      certificate: null,
+      gate: await getStudentCourseReviewGate(studentId, courseId),
+      heldForReviews: false,
+    }
+  }
+
+  const gate = await getStudentCourseReviewGate(studentId, courseId)
+  const reviewsApproved = canDownloadCertificate(
+    gate.courseReviewStatus,
+    gate.teacherReviewStatus,
+  )
+  const reviewsRejected =
+    gate.courseReviewStatus === 'rejected' ||
+    gate.teacherReviewStatus === 'rejected'
+  const reviewsSubmitted = hasSubmittedRequiredReviews(
+    gate.courseReviewStatus,
+    gate.teacherReviewStatus,
+  )
+
+  let heldForReviews = false
+
+  if (reviewsApproved) {
+    if (existing.status !== 'approved') {
+      existing.status = 'approved'
+      await existing.save()
+    }
+  } else if (reviewsRejected) {
+    if (existing.status !== 'rejected') {
+      existing.status = 'rejected'
+      await existing.save()
+    }
+  } else {
+    // Missing or pending reviews — never allow download, even if cert was
+    // approved before the review system existed.
+    if (existing.status === 'approved') {
+      existing.status = 'pending'
+      if (!existing.adminNotes) {
+        existing.adminNotes =
+          'Held until the student submits course and teacher reviews and staff approves them.'
+      }
+      await existing.save()
+      heldForReviews = true
+    } else if (!reviewsSubmitted) {
+      heldForReviews = true
+    }
+  }
+
+  return { certificate: existing, gate, heldForReviews }
+}
+
 /** When a student hits 100%, create/update certificate using current review gate */
 export async function syncCertificateRequestWithReviewGate(
   studentId: string,
@@ -296,14 +360,9 @@ export async function syncCertificateRequestWithReviewGate(
 
   if (existing) {
     existing.progress = progress
-    // Keep approved if already approved and reviews still OK; otherwise sync gate
-    if (reviewsApproved) {
-      existing.status = 'approved'
-    } else if (reviewsRejected) {
-      existing.status = 'rejected'
-    } else if (existing.status !== 'approved') {
-      existing.status = 'pending'
-    }
+    // Always mirror review gate — do not keep a legacy "approved" cert
+    // while reviews are still missing/pending.
+    existing.status = nextStatus
     await existing.save()
     return
   }

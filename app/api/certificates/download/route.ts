@@ -12,7 +12,8 @@ import { Enrollment } from '@/lib/db/models/Enrollment'
 import { getCourseProgressPercent } from '@/lib/progress/getCourseProgress'
 import {
   canDownloadCertificate,
-  getStudentCourseReviewGate,
+  hasSubmittedRequiredReviews,
+  reconcileCertificateWithReviewGate,
 } from '@/lib/reviews/reviewPack'
 import '@/lib/db/models/Student'
 import '@/lib/db/models/User'
@@ -81,30 +82,59 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const reviewGate = await getStudentCourseReviewGate(userId, courseId)
+    // Hold legacy approved certificates until reviews are done + approved
+    const { certificate, gate, heldForReviews } =
+      await reconcileCertificateWithReviewGate(userId, courseId)
+
     if (
-      !canDownloadCertificate(
-        reviewGate.courseReviewStatus,
-        reviewGate.teacherReviewStatus,
+      !hasSubmittedRequiredReviews(
+        gate.courseReviewStatus,
+        gate.teacherReviewStatus,
       )
     ) {
       return NextResponse.json(
         {
           error:
-            'Submit course and teacher reviews, then wait for admin/staff approval before downloading your certificate.',
+            'Please leave course and teacher reviews before downloading your certificate.',
+          code: 'REVIEWS_REQUIRED',
+          redirectTo: `/dashboard/courses/${courseId}/complete`,
+          heldForReviews,
         },
         { status: 403 },
       )
     }
 
-    const certificateRequest = await CertificateRequest.findOne({
-      student: userId,
-      course: courseId,
-    }).lean()
+    if (
+      !canDownloadCertificate(
+        gate.courseReviewStatus,
+        gate.teacherReviewStatus,
+      )
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            'Your reviews are pending admin/staff approval. The certificate unlocks once they are accepted.',
+          code: 'REVIEWS_PENDING_APPROVAL',
+          redirectTo: `/dashboard/courses/${courseId}/complete`,
+        },
+        { status: 403 },
+      )
+    }
+
+    const certificateRequest =
+      certificate ||
+      (await CertificateRequest.findOne({
+        student: userId,
+        course: courseId,
+      }))
 
     if (!certificateRequest || certificateRequest.status !== 'approved') {
       return NextResponse.json(
-        { error: 'Your certificate is not approved for download yet.' },
+        {
+          error: 'Your certificate is not approved for download yet.',
+          code: 'CERTIFICATE_NOT_APPROVED',
+          redirectTo: `/dashboard/courses/${courseId}/complete`,
+        },
         { status: 403 },
       )
     }

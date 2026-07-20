@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   FiAward,
   FiCheckCircle,
@@ -10,6 +11,7 @@ import {
   FiExternalLink,
   FiLock,
   FiSearch,
+  FiStar,
   FiXCircle,
 } from 'react-icons/fi'
 import Swal from 'sweetalert2'
@@ -31,9 +33,13 @@ interface CertificateItem {
   createdAt: string
   courseReviewStatus?: CompletionReviewState['courseReviewStatus']
   teacherReviewStatus?: CompletionReviewState['teacherReviewStatus']
+  reviewsSubmitted?: boolean
+  reviewsApproved?: boolean
+  requiresReviews?: boolean
 }
 
 export default function MyCertificatesPage() {
+  const router = useRouter()
   const [certificates, setCertificates] = useState<CertificateItem[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -46,24 +52,37 @@ export default function MyCertificatesPage() {
     }
   }
 
+  async function promptLeaveReviews(courseId: string, message: string) {
+    const result = await Swal.fire({
+      icon: 'info',
+      title: 'Reviews Required',
+      text: message,
+      showCancelButton: true,
+      confirmButtonText: 'Leave Reviews',
+      cancelButtonText: 'Later',
+      confirmButtonColor: '#E61C24',
+      background: '#ffffff',
+      color: '#1e293b',
+    })
+    if (result.isConfirmed) {
+      router.push(`/dashboard/courses/${courseId}/complete`)
+    }
+  }
+
   async function handleDownloadCertificate(cert: CertificateItem) {
     const gate = getGate(cert)
     if (!hasSubmittedRequiredReviews(gate)) {
-      Swal.fire({
-        icon: 'info',
-        title: 'Reviews Required',
-        text: 'Submit your course review and teacher reviews before downloading the certificate.',
-        confirmButtonColor: '#E61C24',
-        background: '#ffffff',
-        color: '#1e293b',
-      })
+      await promptLeaveReviews(
+        cert.courseId,
+        'You finished this course before reviews were required. Please rate the course and teachers to unlock your certificate download.',
+      )
       return
     }
     if (!canDownloadCertificate(gate)) {
       Swal.fire({
         icon: 'info',
         title: 'Certificate Locked',
-        text: 'Your certificate unlocks after admin/staff approve your course and teacher reviews together.',
+        text: 'Your reviews are submitted. Download unlocks after admin/staff approve them.',
         confirmButtonColor: '#E61C24',
         background: '#ffffff',
         color: '#1e293b',
@@ -76,6 +95,14 @@ export default function MyCertificatesPage() {
       const res = await fetch(`/api/certificates/download?courseId=${cert.courseId}`)
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
+        if (data.code === 'REVIEWS_REQUIRED' || data.redirectTo) {
+          await promptLeaveReviews(
+            cert.courseId,
+            data.error ||
+              'Please leave course and teacher reviews before downloading your certificate.',
+          )
+          return
+        }
         throw new Error(data.error || 'Unable to download certificate.')
       }
 
@@ -140,6 +167,15 @@ export default function MyCertificatesPage() {
     return title.includes(query)
   })
 
+  const needingReviewsCount = useMemo(
+    () =>
+      certificates.filter((c) => {
+        const gate = getGate(c)
+        return c.progress >= 100 && !hasSubmittedRequiredReviews(gate)
+      }).length,
+    [certificates],
+  )
+
   const formatDate = (dateStr: string) => {
     const dateObj = new Date(dateStr)
     return dateObj.toLocaleDateString('en-BD', {
@@ -147,6 +183,55 @@ export default function MyCertificatesPage() {
       month: 'short',
       year: 'numeric',
     })
+  }
+
+  function renderStatusBadge(cert: CertificateItem) {
+    const gate = getGate(cert)
+    const reviewsDone = hasSubmittedRequiredReviews(gate)
+    const reviewsAccepted = canDownloadCertificate(gate)
+
+    if (cert.progress >= 100 && !reviewsDone) {
+      return (
+        <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-base font-bold bg-[#E61C24]/10 text-[#E61C24] border border-[#E61C24]/20">
+          <FiStar className="h-4.5 w-4.5" />
+          Reviews required
+        </span>
+      )
+    }
+
+    if (reviewsDone && !reviewsAccepted) {
+      return (
+        <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-base font-bold bg-amber-50 text-amber-600 border border-amber-100">
+          <FiClock className="h-4.5 w-4.5" />
+          Awaiting review approval
+        </span>
+      )
+    }
+
+    if (cert.status === 'approved' && reviewsAccepted) {
+      return (
+        <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-base font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">
+          <FiCheckCircle className="h-4.5 w-4.5" />
+          Released
+        </span>
+      )
+    }
+
+    if (cert.status === 'rejected') {
+      return (
+        <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-base font-bold bg-rose-50 text-rose-600 border border-rose-100">
+          <FiXCircle className="h-4.5 w-4.5" />
+          Rejected
+        </span>
+      )
+    }
+
+    return (
+      <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-base font-bold bg-amber-50 text-amber-600 border border-amber-100">
+        <FiClock className="h-4.5 w-4.5" />
+        Pending
+      </span>
+    )
   }
 
   const renderDownloadCell = (cert: CertificateItem) => {
@@ -235,9 +320,17 @@ export default function MyCertificatesPage() {
         </p>
       </div>
 
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-base font-semibold text-amber-800 select-none">
-        Download is disabled until you review the course and its teachers. Complete that flow
-        from each finished course.
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-base font-semibold text-amber-800 select-none space-y-1">
+        <p>
+          If you completed a course before reviews were added, download stays locked until you
+          leave course and teacher reviews.
+        </p>
+        {needingReviewsCount > 0 && (
+          <p>
+            You currently have {needingReviewsCount} completed course
+            {needingReviewsCount === 1 ? '' : 's'} waiting for reviews.
+          </p>
+        )}
       </div>
 
       <div className="bg-white border border-slate-200 rounded-lg p-5 flex flex-col md:flex-row md:items-center gap-4 justify-between shadow-sm select-none">
@@ -331,26 +424,7 @@ export default function MyCertificatesPage() {
                     </td>
 
                     <td className="px-6 py-4 text-center select-none">
-                      <span
-                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-base font-bold ${
-                          cert.status === 'approved'
-                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
-                            : cert.status === 'rejected'
-                              ? 'bg-rose-50 text-rose-600 border border-rose-100'
-                              : 'bg-amber-50 text-amber-600 border border-amber-100'
-                        }`}
-                      >
-                        {cert.status === 'approved' ? (
-                          <FiCheckCircle className="h-4.5 w-4.5" />
-                        ) : cert.status === 'rejected' ? (
-                          <FiXCircle className="h-4.5 w-4.5" />
-                        ) : (
-                          <FiClock className="h-4.5 w-4.5" />
-                        )}
-                        <span className="capitalize">
-                          {cert.status === 'approved' ? 'Released' : cert.status}
-                        </span>
-                      </span>
+                      {renderStatusBadge(cert)}
                     </td>
 
                     <td className="px-6 py-4 text-center">{renderDownloadCell(cert)}</td>

@@ -117,8 +117,8 @@ export default function AboutClient() {
                 src='https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80'
                 alt='Students collaborating'
                 className='w-full h-full object-cover pointer-events-none'
-                width={100}
-                height={100}
+                width={1800}
+                height={1800}
               />
             </motion.div>
 
@@ -246,8 +246,8 @@ export default function AboutClient() {
                   src='https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80'
                   alt='Team collaboration'
                   className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]'
-                  width={100}
-                  height={100}
+                  width={700}
+                  height={500}
                 />
               </div>
 

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useCart } from '@/context/CartContext';
@@ -141,7 +140,7 @@ export default function Navbar() {
               src='/logo.png'
               alt='Canadian Nest School'
               className='h-15 w-auto object-contain transition-transform group-hover:scale-102 duration-300'
-              width={100}
+              width={200}
               height={100}
             />
           </Link>
@@ -416,7 +415,7 @@ export default function Navbar() {
                     src='/logo.png'
                     alt='Canadian Nest School'
                     className='h-13 w-auto object-contain'
-                    width={100}
+                    width={200}
                     height={100}
                   />
                 </Link>

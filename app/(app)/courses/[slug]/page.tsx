@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import EnrollButton from '@/components/EnrollButton';
 import GTMTracker from '@/components/GTMTracker';
 import LessonsAccordion from '@/components/LessonsAccordion';
@@ -583,8 +582,8 @@ export default async function CourseDetailPage({ params }: Props) {
                   src={imageUrl}
                   alt={course.title}
                   className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]'
-                  width={100}
-                  height={100}
+                  width={470}
+                  height={300}
                 />
               </div>
             ) : null}

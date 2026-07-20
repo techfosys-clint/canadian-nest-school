@@ -16,7 +16,6 @@ import {
   FiEyeOff,
   FiLock,
   FiMail,
-  FiMapPin,
   FiPhone,
   FiTag,
   FiUser,
@@ -75,9 +74,6 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
   }, [countdown]);
 
   // Checkout states
-  const [billingName, setBillingName] = useState('');
-  const [billingPhone, setBillingPhone] = useState('');
-  const [billingAddress, setBillingAddress] = useState('');
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<{
     code: string;
@@ -137,8 +133,6 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
         const data = await res.json();
         if (res.ok && data.authenticated) {
           setUser(data.user);
-          setBillingName(data.user.name || '');
-          setBillingPhone(data.user.phone || '');
 
           pushToDataLayer({
             event: 'user_data_ready',
@@ -187,10 +181,8 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
 
       if (res.ok && data.success) {
         setUser(data.user);
-        setBillingName(data.user.name || '');
-        setBillingPhone(data.user.phone || '');
         setAuthSuccess(
-          `Welcome back, ${data.user.name}! Continuing to billing...`,
+          `Welcome back, ${data.user.name}! Continue to complete your purchase.`,
         );
 
         pushToDataLayer({
@@ -335,8 +327,6 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
           method: 'checkout_inline',
         });
         setUser(loginData.user);
-        setBillingName(loginData.user.name || '');
-        setBillingPhone(loginData.user.phone || '');
         setAuthSuccess(
           `Account created successfully! Welcome, ${loginData.user.name}.`,
         );
@@ -430,12 +420,6 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
     e.preventDefault();
     setCheckoutError(null);
     setCheckoutSuccess(null);
-    if (!billingName.trim() || !billingPhone.trim() || !billingAddress.trim()) {
-      setCheckoutError(
-        'Please fill in your name, phone number, and billing address.',
-      );
-      return;
-    }
 
     setPurchaseLoading(true);
     try {
@@ -445,9 +429,6 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
         body: JSON.stringify({
           courseId: course.id,
           couponCode: appliedCoupon ? appliedCoupon.code : undefined,
-          billingName,
-          billingPhone,
-          billingAddress,
         }),
       });
       const data = await parseJsonResponse(response);
@@ -840,105 +821,31 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
               )}
             </div>
           ) : (
-            /* USER IS AUTHENTICATED: SHOW BILLING FORM & COUPONS */
+            /* USER IS AUTHENTICATED: COUPON + PURCHASE (no billing on course checkout) */
             <div className='space-y-6'>
               <form onSubmit={handleCompletePurchase} className='space-y-6'>
-                {/* Billing Info — first so mobile users see it before coupon */}
-                <div className='bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-6'>
-                  <div>
-                    <h3 className='text-xl font-bold text-zinc-800 flex items-center gap-2'>
-                      <FiMapPin className='text-[#E61C24]' />
-                      Billing Information
-                    </h3>
-                    <p className='text-base font-semibold text-zinc-450 mt-1'>
-                      Provide billing address credentials to verify this
-                      transaction.
-                    </p>
+                {checkoutError && (
+                  <div className='p-3.5 bg-rose-50 border border-rose-105 rounded-lg text-rose-650 font-semibold text-base'>
+                    {checkoutError}
                   </div>
+                )}
 
-                  <div className='space-y-4'>
-                    {checkoutError && (
-                      <div className='p-3.5 bg-rose-50 border border-rose-105 rounded-lg text-rose-650 font-semibold text-base'>
-                        {checkoutError}
-                      </div>
-                    )}
-
-                    {checkoutSuccess && (
-                      <div className='p-4 bg-emerald-50 border border-emerald-150 rounded-lg text-emerald-800 text-center flex flex-col items-center gap-2'>
-                        <FiCheckCircle className='h-7 w-7 text-emerald-500 animate-bounce' />
-                        <span className='font-bold text-lg leading-tight'>
-                          Purchase Confirmed!
-                        </span>
-                        <span className='text-base font-semibold text-emerald-700 leading-relaxed'>
-                          {checkoutSuccess}
-                        </span>
-                        <span className='text-zinc-500 text-base font-semibold mt-1 animate-pulse'>
-                          Redirecting you to active learning space...
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Name */}
-                    <div className='space-y-1.5'>
-                      <label className='text-base font-bold text-zinc-700'>
-                        Full Billing Name
-                      </label>
-                      <input
-                        type='text'
-                        required
-                        value={billingName}
-                        onChange={(e) => setBillingName(e.target.value)}
-                        placeholder='Enter full name'
-                        className='w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800'
-                      />
-                    </div>
-
-                    {/* Email */}
-                    <div className='space-y-1.5'>
-                      <label className='text-base font-bold text-zinc-700'>
-                        Email Address (Account Reference)
-                      </label>
-                      <input
-                        type='email'
-                        disabled
-                        value={user.email}
-                        className='w-full px-4 py-3 rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-500 font-semibold text-base outline-none cursor-not-allowed'
-                      />
-                    </div>
-
-                    {/* Phone */}
-                    <div className='space-y-1.5'>
-                      <label className='text-base font-bold text-zinc-700'>
-                        Contact Phone Number
-                      </label>
-                      <input
-                        type='tel'
-                        required
-                        value={billingPhone}
-                        onChange={(e) => setBillingPhone(e.target.value)}
-                        placeholder='e.g. +1 555-0199'
-                        className='w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800'
-                      />
-                    </div>
-
-                    {/* Billing Address */}
-                    <div className='space-y-1.5'>
-                      <label className='text-base font-bold text-zinc-700'>
-                        Billing Address
-                      </label>
-                      <textarea
-                        required
-                        rows={3}
-                        value={billingAddress}
-                        onChange={(e) => setBillingAddress(e.target.value)}
-                        placeholder='Street address, City, State, ZIP code, Country'
-                        className='w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-semibold text-zinc-800'
-                      />
-                    </div>
+                {checkoutSuccess && (
+                  <div className='p-4 bg-emerald-50 border border-emerald-150 rounded-lg text-emerald-800 text-center flex flex-col items-center gap-2'>
+                    <FiCheckCircle className='h-7 w-7 text-emerald-500 animate-bounce' />
+                    <span className='font-bold text-lg leading-tight'>
+                      Purchase Confirmed!
+                    </span>
+                    <span className='text-base font-semibold text-emerald-700 leading-relaxed'>
+                      {checkoutSuccess}
+                    </span>
+                    <span className='text-zinc-500 text-base font-semibold mt-1 animate-pulse'>
+                      Redirecting you to active learning space...
+                    </span>
                   </div>
-                </div>
+                )}
 
-                {/* Promo Code — below billing */}
+                {/* Promo Code */}
                 <div className='bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-4'>
                   <label className='text-base font-bold text-zinc-800 flex items-center gap-2'>
                     <FiTag className='text-[#E61C24]' />
@@ -953,8 +860,6 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                       onChange={(e) => {
                         const next = e.target.value.toUpperCase();
                         setCouponCode(next);
-                        // If the typed code no longer matches the applied one,
-                        // drop the discount so checkout can't use a stale coupon.
                         if (appliedCoupon && next.trim() !== appliedCoupon.code) {
                           setAppliedCoupon(null);
                           setCouponSuccess('');

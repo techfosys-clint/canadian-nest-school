@@ -236,6 +236,28 @@ export async function POST(request: Request) {
       )
     }
 
+    let student = await Student.findById(userId).lean()
+    if (!student) {
+      student = await User.findById(userId).lean()
+    }
+    if (!student) {
+      return NextResponse.json({ success: false, error: 'Student account not found.' }, { status: 404 })
+    }
+
+    // Course checkout no longer collects billing — use account profile.
+    // Shop checkout is separate and still collects shipping there.
+    const resolvedBillingName =
+      (typeof billingName === 'string' && billingName.trim()) ||
+      (student as { name?: string }).name ||
+      'Student'
+    const resolvedBillingPhone =
+      (typeof billingPhone === 'string' && billingPhone.trim()) ||
+      (student as { phone?: string }).phone ||
+      '01700000000'
+    const resolvedBillingAddress =
+      (typeof billingAddress === 'string' && billingAddress.trim()) ||
+      undefined
+
     // Check if already enrolled
     const existingEnrollment = await Enrollment.findOne({
       student: userId,
@@ -329,9 +351,9 @@ export async function POST(request: Request) {
           paymentStatus: 'completed',
           pricePaid,
           paymentReference: 'ENROLL-' + Math.random().toString(36).substring(2, 11).toUpperCase(),
-          billingName,
-          billingPhone,
-          billingAddress,
+          billingName: resolvedBillingName,
+          billingPhone: resolvedBillingPhone,
+          billingAddress: resolvedBillingAddress,
           couponCode: appliedCoupon ? appliedCoupon.code : undefined,
         })
       } catch (enrollError) {
@@ -341,16 +363,12 @@ export async function POST(request: Request) {
         throw enrollError
       }
 
-      let enrolledStudent = await Student.findById(userId).lean()
-      if (!enrolledStudent) {
-        enrolledStudent = await User.findById(userId).lean()
-      }
-      if (enrolledStudent?.email) {
+      if (student?.email) {
         const { sendEnrollmentConfirmationEmail } = await import('@/lib/email')
         sendEnrollmentConfirmationEmail(
-          enrolledStudent.email,
-          enrolledStudent.name,
-          (course as any).title,
+          student.email,
+          student.name,
+          (course as { title?: string }).title || 'Course',
           pricePaid,
           newEnrollment.paymentReference!,
           newEnrollment.createdAt
@@ -368,14 +386,6 @@ export async function POST(request: Request) {
     // session. The enrollment is only marked 'completed' once the EPS
     // callback verifies the transaction server-side (see
     // /api/payments/eps/callback) — never on the client's say-so.
-    let student = await Student.findById(userId).lean()
-    if (!student) {
-      student = await User.findById(userId).lean()
-    }
-    if (!student) {
-      return NextResponse.json({ success: false, error: 'Student account not found.' }, { status: 404 })
-    }
-
     // Base36 timestamp keeps this short while staying unique, unlike the
     // full decimal Date.now() which produced unreadably long invoice
     // references (e.g. "ENR17825344536719L9FLO").
@@ -389,9 +399,9 @@ export async function POST(request: Request) {
         paymentStatus: 'pending',
         pricePaid,
         merchantTransactionId,
-        billingName,
-        billingPhone,
-        billingAddress,
+        billingName: resolvedBillingName,
+        billingPhone: resolvedBillingPhone,
+        billingAddress: resolvedBillingAddress,
         couponCode: appliedCoupon ? appliedCoupon.code : undefined,
       })
     } catch (enrollError) {
@@ -412,10 +422,10 @@ export async function POST(request: Request) {
         successUrl: `${appUrl}/api/payments/eps/callback?enrollmentId=${pendingEnrollment._id}&outcome=success`,
         failUrl: `${appUrl}/api/payments/eps/callback?enrollmentId=${pendingEnrollment._id}&outcome=fail`,
         cancelUrl: `${appUrl}/api/payments/eps/callback?enrollmentId=${pendingEnrollment._id}&outcome=cancel`,
-        customerName: billingName || (student as any).name,
-        customerEmail: (student as any).email || 'no-reply@canadiannestschool.com',
-        customerPhone: billingPhone || (student as any).phone || '01700000000',
-        productName: (course as any).title,
+        customerName: resolvedBillingName,
+        customerEmail: (student as { email?: string }).email || 'no-reply@canadiannestschool.com',
+        customerPhone: resolvedBillingPhone,
+        productName: (course as { title?: string }).title || 'Course',
       })
 
       return NextResponse.json({

@@ -823,6 +823,16 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
           ) : (
             /* USER IS AUTHENTICATED: COUPON + PURCHASE (no billing on course checkout) */
             <div className='space-y-6'>
+              <div className='bg-white border border-zinc-200 rounded-lg p-5 sm:p-6 space-y-1'>
+                <p className='text-base font-bold text-zinc-800'>
+                  Signed in as {user.name}
+                </p>
+                <p className='text-base font-semibold text-zinc-500'>
+                  No billing form needed — after you confirm, you&apos;ll continue
+                  to the secure payment page (or enroll instantly if free).
+                </p>
+              </div>
+
               <form onSubmit={handleCompletePurchase} className='space-y-6'>
                 {checkoutError && (
                   <div className='p-3.5 bg-rose-50 border border-rose-105 rounded-lg text-rose-650 font-semibold text-base'>

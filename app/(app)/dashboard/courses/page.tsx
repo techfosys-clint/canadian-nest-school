@@ -4,7 +4,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { FiArrowRight, FiAward, FiBook, FiBookOpen } from 'react-icons/fi';
+import { FiArrowRight, FiBook, FiBookOpen } from 'react-icons/fi';
+import CompletedCourseActions from '@/components/CompletedCourseActions';
+import { fetchReviewGatesForCourses } from '@/lib/certificates/downloadClient';
+import type { CompletionReviewState } from '@/lib/reviews/completionGate';
 
 interface UserSession {
   id: string;
@@ -49,6 +52,10 @@ export default function MyCoursesPage() {
   const [courseProgress, setCourseProgress] = useState<Record<string, number>>(
     {},
   );
+  const [reviewGates, setReviewGates] = useState<
+    Record<string, CompletionReviewState>
+  >({});
+  const [gatesLoading, setGatesLoading] = useState(false);
 
   useEffect(() => {
     async function checkSessionAndFetchData() {
@@ -100,6 +107,16 @@ export default function MyCoursesPage() {
             }
           });
           setCourseProgress(progressMap);
+
+          const completedIds = Object.entries(progressMap)
+            .filter(([, pct]) => pct === 100)
+            .map(([id]) => id);
+          if (completedIds.length > 0) {
+            setGatesLoading(true);
+            fetchReviewGatesForCourses(completedIds)
+              .then(setReviewGates)
+              .finally(() => setGatesLoading(false));
+          }
         }
       } catch (error) {
         console.error('Error fetching course data:', error);
@@ -295,25 +312,13 @@ export default function MyCoursesPage() {
                     </div>
 
                     {progress === 100 ? (
-                      <div className='space-y-3'>
-                        <Link
-                          href={`/dashboard/courses/${course.id}/complete`}
-                          className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all duration-200 border-none'
-                        >
-                          <FiAward className='h-5 w-5' />
-                          <span>Reviews & Certificate</span>
-                        </Link>
-                        <button
-                          type='button'
-                          onClick={() =>
-                            handleResumeLearning(course.id, course.slug)
-                          }
-                          className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-white border border-zinc-200/80 hover:border-[#E61C24]/40 text-zinc-700 hover:text-[#E61C24] font-bold text-base transition-all duration-200 cursor-pointer active:scale-[0.99]'
-                        >
-                          <span>Open Course</span>
-                          <FiArrowRight className='h-5 w-5' />
-                        </button>
-                      </div>
+                      <CompletedCourseActions
+                        courseId={course.id}
+                        courseTitle={course.title}
+                        courseSlug={course.slug}
+                        gate={reviewGates[course.id]}
+                        gateLoading={gatesLoading && !reviewGates[course.id]}
+                      />
                     ) : (
                       <button
                         type='button'

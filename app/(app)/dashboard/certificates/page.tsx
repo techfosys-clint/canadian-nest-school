@@ -358,10 +358,10 @@ export default function MyCertificatesPage() {
               Loading credentials registry...
             </p>
           </div>
-        ) : filtered.length === 0 ? (
+        ) : certificates.length === 0 ? (
           <div className="p-12 text-center text-zinc-500 space-y-3 max-w-md mx-auto select-none">
             <FiAward className="mx-auto h-12 w-12 text-zinc-300" />
-            <p className="text-lg font-bold text-zinc-800">No certificates found</p>
+            <p className="text-lg font-bold text-zinc-800">No certificates yet</p>
             <p className="text-base font-semibold text-zinc-500 leading-relaxed">
               Complete your syllabus, then submit course and teacher reviews to unlock your
               certificate.
@@ -374,6 +374,21 @@ export default function MyCertificatesPage() {
                 Go to My Courses <FiExternalLink className="h-4 w-4" />
               </Link>
             </div>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="p-12 text-center text-zinc-500 space-y-3 max-w-md mx-auto select-none">
+            <FiSearch className="mx-auto h-12 w-12 text-zinc-300" />
+            <p className="text-lg font-bold text-zinc-800">No matching certificates</p>
+            <p className="text-base font-semibold text-zinc-500 leading-relaxed">
+              Nothing matches “{searchQuery}”. Try another course title.
+            </p>
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-zinc-200 hover:border-[#E61C24]/40 text-zinc-700 rounded-lg text-base font-bold transition-all cursor-pointer"
+            >
+              Clear search
+            </button>
           </div>
         ) : (
           <div className="overflow-x-auto">

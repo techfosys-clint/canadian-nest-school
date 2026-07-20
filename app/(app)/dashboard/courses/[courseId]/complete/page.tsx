@@ -834,9 +834,23 @@ export default function CourseCompleteReviewPage() {
                   </div>
                   <p className="text-lg font-bold text-zinc-800">Certificate Locked</p>
                   <p className="text-base font-semibold text-zinc-500 leading-relaxed">
-                    Finish your course and teacher reviews. Admin/staff approve them together
-                    to unlock your official completion certificate.
+                    {courseReviewStatus === 'idle' || teacherReviewStatus === 'idle'
+                      ? 'Submit your course and teacher reviews first. After admin/staff approve them, your certificate unlocks here.'
+                      : 'Your reviews are in. Admin/staff approve the course and teacher reviews together — then you can download your certificate.'}
                   </p>
+                  {(courseReviewStatus === 'idle' || teacherReviewStatus === 'idle') && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setStep(courseReviewStatus === 'idle' ? 1 : 2)
+                      }
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base cursor-pointer border-none"
+                    >
+                      {courseReviewStatus === 'idle'
+                        ? 'Go to Course Review'
+                        : 'Go to Teacher Reviews'}
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -845,7 +859,7 @@ export default function CourseCompleteReviewPage() {
               <div className="h-16 w-16 rounded-full bg-[#E61C24]/10 border border-[#E61C24]/20 flex items-center justify-center">
                 <FiAward className="h-8 w-8 text-[#E61C24]" />
               </div>
-              <p className="text-sm font-bold uppercase tracking-wider text-[#E61C24]">
+              <p className="text-base font-bold uppercase tracking-wider text-[#E61C24]">
                 Certificate of Completion
               </p>
               <h3 className="text-2xl sm:text-3xl font-bold font-display text-[#0A163A]">
@@ -867,7 +881,10 @@ export default function CourseCompleteReviewPage() {
                 </button>
               ) : (
                 <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-zinc-200/80 text-zinc-500 font-bold text-base">
-                  <FiLock className="h-4 w-4" /> Awaiting admin/staff approval
+                  <FiLock className="h-4 w-4" />
+                  {courseReviewStatus === 'idle' || teacherReviewStatus === 'idle'
+                    ? 'Reviews required'
+                    : 'Awaiting admin/staff approval'}
                 </div>
               )}
             </div>

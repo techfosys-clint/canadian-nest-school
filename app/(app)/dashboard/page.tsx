@@ -16,6 +16,9 @@ import {
   FiExternalLink,
 } from 'react-icons/fi';
 import Swal from 'sweetalert2';
+import CompletedCourseActions from '@/components/CompletedCourseActions';
+import { fetchReviewGatesForCourses } from '@/lib/certificates/downloadClient';
+import type { CompletionReviewState } from '@/lib/reviews/completionGate';
 
 interface UserSession {
   id: string;
@@ -78,6 +81,10 @@ export default function StudentDashboard() {
   const [courseProgress, setCourseProgress] = useState<Record<string, number>>(
     {},
   );
+  const [reviewGates, setReviewGates] = useState<
+    Record<string, CompletionReviewState>
+  >({});
+  const [gatesLoading, setGatesLoading] = useState(false);
 
   // Academic submissions and grading stats
   const [submissions, setSubmissions] = useState<any[]>([]);
@@ -203,6 +210,16 @@ export default function StudentDashboard() {
             }
           });
           setCourseProgress(progressMap);
+
+          const completedIds = Object.entries(progressMap)
+            .filter(([, pct]) => pct === 100)
+            .map(([id]) => id);
+          if (completedIds.length > 0) {
+            setGatesLoading(true);
+            fetchReviewGatesForCourses(completedIds)
+              .then(setReviewGates)
+              .finally(() => setGatesLoading(false));
+          }
 
           // Set login streak from DB
           setLoginDates(loginDatesFromAPI);
@@ -414,7 +431,7 @@ export default function StudentDashboard() {
             </h2>
             {enrollments.length > 0 && (
               <Link
-                href='/'
+                href='/courses'
                 className='text-[#E61C24] hover:text-[#CC181F] font-bold text-base flex items-center gap-1.5 transition-colors'
               >
                 Explore More
@@ -581,15 +598,26 @@ export default function StudentDashboard() {
                         </div>
                       </div>
 
-                      <button
-                        onClick={() =>
-                          handleResumeLearning(course.id, course.slug)
-                        }
-                        className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all duration-200 cursor-pointer border-none active:scale-[0.99]'
-                      >
-                        <span>Resume Learning</span>
-                        <FiArrowRight className='h-5 w-5 group-hover:translate-x-0.5 transition-transform' />
-                      </button>
+                      {progress === 100 ? (
+                        <CompletedCourseActions
+                          courseId={course.id}
+                          courseTitle={course.title}
+                          courseSlug={course.slug}
+                          gate={reviewGates[course.id]}
+                          gateLoading={gatesLoading && !reviewGates[course.id]}
+                        />
+                      ) : (
+                        <button
+                          type='button'
+                          onClick={() =>
+                            handleResumeLearning(course.id, course.slug)
+                          }
+                          className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all duration-200 cursor-pointer border-none active:scale-[0.99]'
+                        >
+                          <span>Resume Learning</span>
+                          <FiArrowRight className='h-5 w-5 group-hover:translate-x-0.5 transition-transform' />
+                        </button>
+                      )}
                     </div>
                   </div>
                 );

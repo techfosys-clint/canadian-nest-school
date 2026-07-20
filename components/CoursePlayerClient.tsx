@@ -19,6 +19,7 @@ import {
   FiChevronDown,
   FiChevronRight,
   FiClock,
+  FiDownload,
   FiExternalLink,
   FiFileText,
   FiHelpCircle,
@@ -31,6 +32,9 @@ import {
 } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 import SecureVideoPlayer from './SecureVideoPlayer';
+import { getCertCtaMode } from '@/lib/certificates/certCta';
+import { downloadCourseCertificate } from '@/lib/certificates/downloadClient';
+import type { CompletionReviewState } from '@/lib/reviews/completionGate';
 
 // Client-safe check: external embeds (YouTube/Vimeo) start with http(s);
 // anything else is treated as a private R2 object key streamed securely.
@@ -149,6 +153,10 @@ export default function CoursePlayerClient({
 
   // Ticking clock for the live class countdown / link gating
   const [nowTs, setNowTs] = useState(() => Date.now());
+  const [reviewGate, setReviewGate] = useState<CompletionReviewState | null>(
+    null,
+  );
+  const [downloadingCert, setDownloadingCert] = useState(false);
   useEffect(() => {
     const timer = setInterval(() => setNowTs(Date.now()), 1000);
     return () => clearInterval(timer);
@@ -558,6 +566,32 @@ export default function CoursePlayerClient({
     sortedLessons.length > 0
       ? Math.round((completedCount / sortedLessons.length) * 100)
       : 0;
+
+  useEffect(() => {
+    if (progressPercentage < 100) {
+      setReviewGate(null);
+      return;
+    }
+    let cancelled = false;
+    ;(async () => {
+      try {
+        const res = await fetch(
+          `/api/completion-reviews?courseId=${encodeURIComponent(course.id)}`,
+        );
+        const data = await res.json();
+        if (cancelled || !res.ok || !data.success) return;
+        setReviewGate({
+          courseReviewStatus: data.courseReviewStatus || 'idle',
+          teacherReviewStatus: data.teacherReviewStatus || 'idle',
+        });
+      } catch {
+        /* keep null — show generic cert link */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [course.id, progressPercentage]);
 
   if (sortedLessons.length === 0) {
     return (
@@ -1538,19 +1572,81 @@ export default function CoursePlayerClient({
             </h3>
           </div>
 
-          <p className='text-sm font-semibold text-zinc-500 leading-relaxed'>
-            Certificate download is locked until you submit reviews for this
-            course and every assigned teacher. After both are accepted, your
-            credential unlocks automatically.
-          </p>
+          {(() => {
+            const mode = getCertCtaMode(reviewGate);
+            const completeHref = `/dashboard/courses/${course.id}/complete`;
 
-          <Link
-            href={`/dashboard/courses/${course.id}/complete`}
-            className='w-full py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white text-sm font-bold transition-all cursor-pointer border-none text-center flex items-center justify-center gap-1.5'
-          >
-            <span>Leave Reviews to Unlock Certificate</span>
-            <FiExternalLink className='h-4 w-4' />
-          </Link>
+            if (mode === 'download') {
+              return (
+                <>
+                  <p className='text-base font-semibold text-zinc-500 leading-relaxed'>
+                    Your reviews are approved. You can download your official
+                    certificate now.
+                  </p>
+                  <button
+                    type='button'
+                    disabled={downloadingCert}
+                    onClick={async () => {
+                      setDownloadingCert(true);
+                      try {
+                        await downloadCourseCertificate({
+                          courseId: course.id,
+                          courseTitle: course.title,
+                          gate: reviewGate || undefined,
+                          onNeedReviews: () => router.push(completeHref),
+                          onViewStatus: () => router.push(completeHref),
+                        });
+                      } finally {
+                        setDownloadingCert(false);
+                      }
+                    }}
+                    className='w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-base font-bold transition-all cursor-pointer border-none text-center flex items-center justify-center gap-1.5 disabled:opacity-60'
+                  >
+                    <FiDownload className='h-4 w-4' />
+                    <span>
+                      {downloadingCert
+                        ? 'Preparing PDF...'
+                        : 'Download Certificate'}
+                    </span>
+                  </button>
+                </>
+              );
+            }
+
+            if (mode === 'awaiting_approval') {
+              return (
+                <>
+                  <p className='text-base font-semibold text-zinc-500 leading-relaxed'>
+                    Reviews submitted — waiting for admin/staff approval before
+                    your certificate unlocks.
+                  </p>
+                  <Link
+                    href={completeHref}
+                    className='w-full py-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-base font-bold transition-all cursor-pointer text-center flex items-center justify-center gap-1.5'
+                  >
+                    <FiLock className='h-4 w-4' />
+                    <span>Check Review Status</span>
+                  </Link>
+                </>
+              );
+            }
+
+            return (
+              <>
+                <p className='text-base font-semibold text-zinc-500 leading-relaxed'>
+                  Leave short reviews for this course and your teachers to unlock
+                  your certificate.
+                </p>
+                <Link
+                  href={completeHref}
+                  className='w-full py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white text-base font-bold transition-all cursor-pointer border-none text-center flex items-center justify-center gap-1.5'
+                >
+                  <span>Leave Reviews to Unlock Certificate</span>
+                  <FiExternalLink className='h-4 w-4' />
+                </Link>
+              </>
+            );
+          })()}
         </div>
       )}
 

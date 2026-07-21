@@ -4,12 +4,22 @@ import PDFDocument from 'pdfkit'
 import type PDFKit from 'pdfkit'
 import sharp from 'sharp'
 
-const CERTIFICATE_BACKGROUND = path.join(
-  process.cwd(),
-  'public',
-  'media',
-  'Certificate background.webp',
-)
+/** Prefer assets/ (not volume-mounted). Fallbacks cover local/legacy paths. */
+const CERTIFICATE_BACKGROUND_CANDIDATES = [
+  path.join(process.cwd(), 'assets', 'certificates', 'certificate-background.webp'),
+  path.join(
+    process.cwd(),
+    'public',
+    'media',
+    'certificate-background.webp',
+  ),
+  path.join(
+    process.cwd(),
+    'public',
+    'media',
+    'Certificate background.webp',
+  ),
+]
 
 const NAME_FONT = path.join(
   process.cwd(),
@@ -57,14 +67,26 @@ function fitFontSize(
   return minSize
 }
 
+async function resolveReadablePath(candidates: string[]): Promise<string | null> {
+  for (const candidate of candidates) {
+    try {
+      await fs.promises.access(candidate, fs.constants.R_OK)
+      return candidate
+    } catch {
+      /* try next */
+    }
+  }
+  return null
+}
+
 async function loadBackgroundBuffer(): Promise<Buffer> {
-  try {
-    await fs.promises.access(CERTIFICATE_BACKGROUND, fs.constants.R_OK)
-  } catch {
+  const backgroundPath = await resolveReadablePath(CERTIFICATE_BACKGROUND_CANDIDATES)
+  if (!backgroundPath) {
     throw new Error(
-      `Certificate background missing at: ${CERTIFICATE_BACKGROUND}`,
+      `Certificate background missing. Tried: ${CERTIFICATE_BACKGROUND_CANDIDATES.join(' | ')}`,
     )
   }
+
   try {
     await fs.promises.access(NAME_FONT, fs.constants.R_OK)
     await fs.promises.access(BODY_FONT, fs.constants.R_OK)
@@ -74,7 +96,7 @@ async function loadBackgroundBuffer(): Promise<Buffer> {
     )
   }
 
-  const source = await fs.promises.readFile(CERTIFICATE_BACKGROUND)
+  const source = await fs.promises.readFile(backgroundPath)
   return sharp(source).jpeg({ quality: 95 }).toBuffer()
 }
 

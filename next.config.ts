@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  serverExternalPackages: ['pdfkit'],
+  serverExternalPackages: ['pdfkit', 'sharp', 'dejavu-fonts-ttf'],
   allowedDevOrigins: ['app.shahriarfardows.com'],
   images: {
     formats: ['image/avif', 'image/webp'],

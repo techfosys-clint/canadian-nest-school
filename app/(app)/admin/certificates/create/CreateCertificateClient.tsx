@@ -93,7 +93,15 @@ export default function CreateCertificateClient({ courses }: Props) {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || 'Failed to generate certificate.')
+        const detail =
+          typeof data.detail === 'string' && data.detail.trim()
+            ? data.detail.trim()
+            : ''
+        throw new Error(
+          detail
+            ? `${data.error || 'Failed to generate certificate.'} (${detail})`
+            : data.error || 'Failed to generate certificate.',
+        )
       }
 
       const blob = await res.blob()

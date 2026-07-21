@@ -56,8 +56,9 @@ export async function POST(request: NextRequest) {
         .select('title level summary')
         .lean()
       if (course) {
-        level = course.level
-        summary = course.summary
+        level = typeof course.level === 'string' ? course.level : undefined
+        summary =
+          typeof course.summary === 'string' ? course.summary : undefined
       }
     }
 
@@ -79,8 +80,13 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('POST /api/admin/certificates/create error:', error)
+    const detail =
+      error instanceof Error ? error.message : 'Unknown server error'
     return NextResponse.json(
-      { error: 'Failed to generate certificate PDF.' },
+      {
+        error: 'Failed to generate certificate PDF.',
+        detail,
+      },
       { status: 500 },
     )
   }

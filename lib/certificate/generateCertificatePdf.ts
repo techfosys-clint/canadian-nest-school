@@ -58,6 +58,22 @@ function fitFontSize(
 }
 
 async function loadBackgroundBuffer(): Promise<Buffer> {
+  try {
+    await fs.promises.access(CERTIFICATE_BACKGROUND, fs.constants.R_OK)
+  } catch {
+    throw new Error(
+      `Certificate background missing at: ${CERTIFICATE_BACKGROUND}`,
+    )
+  }
+  try {
+    await fs.promises.access(NAME_FONT, fs.constants.R_OK)
+    await fs.promises.access(BODY_FONT, fs.constants.R_OK)
+  } catch {
+    throw new Error(
+      'Certificate fonts missing (dejavu-fonts-ttf). Run pnpm install.',
+    )
+  }
+
   const source = await fs.promises.readFile(CERTIFICATE_BACKGROUND)
   return sharp(source).jpeg({ quality: 95 }).toBuffer()
 }
@@ -65,9 +81,11 @@ async function loadBackgroundBuffer(): Promise<Buffer> {
 export function buildCertificateDescription(
   courseTitle: string,
   level?: string,
-  summary?: string,
+  summary?: string | null,
 ): string {
-  if (summary?.trim()) return summary.trim()
+  const summaryText =
+    typeof summary === 'string' ? summary.trim() : ''
+  if (summaryText) return summaryText
 
   const levelLabels: Record<string, string> = {
     all: 'All Levels',
@@ -77,7 +95,7 @@ export function buildCertificateDescription(
   }
 
   const levelLabel = levelLabels[level || 'all'] || 'All Levels'
-  const field = courseTitle.trim() || 'this program'
+  const field = (courseTitle || '').trim() || 'this program'
 
   return `He/ she has successfully completed ${levelLabel} in the field of ${field}, demonstrating strong communication skills, pronunciation, and fluency. He/ she is competent and confident in practical English conversation, presentations, and daily communication.`
 }

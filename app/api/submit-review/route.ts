@@ -3,7 +3,7 @@ import { connectToDatabase } from '@/lib/db/mongodb'
 import { Review } from '@/lib/db/models/Review'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
-import { assertStudentCanReviewCourse } from '@/lib/reviews/reviewPack'
+import { assertStudentCanReviewCourse, syncCertificateRequestWithReviewGate } from '@/lib/reviews/reviewPack'
 
 export async function POST(request: Request) {
   try {
@@ -58,6 +58,9 @@ export async function POST(request: Request) {
       comment: comment.trim(),
       status: 'pending',
     })
+
+    // If teacher reviews are already done (or none required), unlock the cert now.
+    await syncCertificateRequestWithReviewGate(decoded.id, course, 100)
 
     return NextResponse.json({ doc: review }, { status: 201 })
   } catch (err: any) {

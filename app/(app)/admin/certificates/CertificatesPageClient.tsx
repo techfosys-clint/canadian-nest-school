@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
   FiArrowLeft,
   FiAward,
@@ -8,6 +9,7 @@ import {
   FiClock,
   FiEdit3,
   FiInfo,
+  FiPlus,
   FiSearch,
   FiTrash2,
   FiXCircle,
@@ -633,6 +635,13 @@ export default function CertificatesPageClient() {
             certificate downloads
           </p>
         </div>
+        <Link
+          href='/admin/certificates/create'
+          className='inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shrink-0'
+        >
+          <FiPlus className='h-5 w-5' />
+          Create Certificate
+        </Link>
       </div>
 
       {/* Filters bar */}

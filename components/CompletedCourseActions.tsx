@@ -83,13 +83,13 @@ export default function CompletedCourseActions({
         </Link>
       )}
 
-      {mode === 'awaiting_approval' && (
+      {mode === 'resubmit_reviews' && (
         <Link
           href={completeHref}
           className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-amber-50 border border-amber-200/80 text-amber-800 hover:border-amber-300 font-bold text-base transition-all duration-200'
         >
           <FiLock className='h-5 w-5' />
-          <span>{certCtaLabel('awaiting_approval')}</span>
+          <span>{certCtaLabel('resubmit_reviews')}</span>
         </Link>
       )}
 

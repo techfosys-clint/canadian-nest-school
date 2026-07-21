@@ -1,4 +1,7 @@
 'use client';
+import { getCertCtaMode } from '@/lib/certificates/certCta';
+import { downloadCourseCertificate } from '@/lib/certificates/downloadClient';
+import type { CompletionReviewState } from '@/lib/reviews/completionGate';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -32,9 +35,6 @@ import {
 } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 import SecureVideoPlayer from './SecureVideoPlayer';
-import { getCertCtaMode } from '@/lib/certificates/certCta';
-import { downloadCourseCertificate } from '@/lib/certificates/downloadClient';
-import type { CompletionReviewState } from '@/lib/reviews/completionGate';
 
 // Client-safe check: external embeds (YouTube/Vimeo) start with http(s);
 // anything else is treated as a private R2 object key streamed securely.
@@ -573,7 +573,7 @@ export default function CoursePlayerClient({
       return;
     }
     let cancelled = false;
-    ;(async () => {
+    (async () => {
       try {
         const res = await fetch(
           `/api/completion-reviews?courseId=${encodeURIComponent(course.id)}`,
@@ -969,7 +969,7 @@ export default function CoursePlayerClient({
                     alt='Quiz Question'
                     width={600}
                     height={300}
-                    className='w-full h-auto object-contain max-h-[300px]'
+                    className='w-full h-auto object-contain max-h-75'
                   />
                 </div>
               )}
@@ -1391,7 +1391,7 @@ export default function CoursePlayerClient({
                         href={submission.googleDriveLink}
                         target='_blank'
                         rel='noopener noreferrer'
-                        className='text-[#FF4D55] font-bold hover:underline truncate inline-block max-w-[280px]'
+                        className='text-[#FF4D55] font-bold hover:underline truncate inline-block max-w-70'
                       >
                         {submission.googleDriveLink}
                       </a>
@@ -1554,7 +1554,7 @@ export default function CoursePlayerClient({
   );
 
   const renderSidebar = () => (
-    <div className='bg-white border border-slate-200 rounded-lg shadow-sm flex flex-col max-h-[750px]'>
+    <div className='bg-white border border-slate-200 rounded-lg shadow-sm flex flex-col max-h-187.5'>
       <div className='px-6 py-5 border-b border-slate-100 select-none'>
         <h2 className='text-lg font-bold text-zinc-900'>Syllabus Curriculum</h2>
         <p className='text-sm font-semibold text-zinc-450 mt-0.5'>
@@ -1580,7 +1580,7 @@ export default function CoursePlayerClient({
               return (
                 <>
                   <p className='text-base font-semibold text-zinc-500 leading-relaxed'>
-                    Your reviews are approved. You can download your official
+                    Your reviews are in. You can download your official
                     certificate now.
                   </p>
                   <button
@@ -1613,19 +1613,19 @@ export default function CoursePlayerClient({
               );
             }
 
-            if (mode === 'awaiting_approval') {
+            if (mode === 'resubmit_reviews') {
               return (
                 <>
                   <p className='text-base font-semibold text-zinc-500 leading-relaxed'>
-                    Reviews submitted — waiting for admin/staff approval before
-                    your certificate unlocks.
+                    Your previous reviews were rejected. Please resubmit them to
+                    unlock your certificate.
                   </p>
                   <Link
                     href={completeHref}
                     className='w-full py-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-base font-bold transition-all cursor-pointer text-center flex items-center justify-center gap-1.5'
                   >
                     <FiLock className='h-4 w-4' />
-                    <span>Check Review Status</span>
+                    <span>Resubmit Reviews</span>
                   </Link>
                 </>
               );
@@ -1634,8 +1634,8 @@ export default function CoursePlayerClient({
             return (
               <>
                 <p className='text-base font-semibold text-zinc-500 leading-relaxed'>
-                  Leave short reviews for this course and your teachers to unlock
-                  your certificate.
+                  Leave short reviews for this course and your teachers to
+                  unlock your certificate instantly.
                 </p>
                 <Link
                   href={completeHref}
@@ -1650,7 +1650,7 @@ export default function CoursePlayerClient({
         </div>
       )}
 
-      <div className='grow shrink flex-1 overflow-y-auto p-4 space-y-4 max-h-[650px] pr-2 bg-slate-50/50'>
+      <div className='grow shrink flex-1 overflow-y-auto p-4 space-y-4 max-h-162.5 pr-2 bg-slate-50/50'>
         {moduleGroups.map((group) => {
           const isModuleExpanded = !!expandedModules[group.name];
           const lectureCount = group.lessons.length;

@@ -16,12 +16,12 @@ type DownloadOpts = {
 }
 
 /**
- * Downloads a course certificate PDF, or guides the student when reviews
- * are still required / pending approval.
+ * Downloads a course certificate PDF once required reviews are submitted.
+ * Staff approval is not required for download.
  */
 export async function downloadCourseCertificate(
   opts: DownloadOpts,
-): Promise<'downloaded' | 'needs_reviews' | 'pending_approval' | 'error'> {
+): Promise<'downloaded' | 'needs_reviews' | 'rejected' | 'error'> {
   const { courseId, courseTitle, gate, onNeedReviews, onViewStatus } = opts
 
   if (gate && !hasSubmittedRequiredReviews(gate)) {
@@ -43,62 +43,60 @@ export async function downloadCourseCertificate(
   if (gate && !canDownloadCertificate(gate)) {
     const result = await Swal.fire({
       icon: 'info',
-      title: 'Certificate Locked',
-      text: 'Your reviews are submitted. Download unlocks after admin/staff approve them.',
+      title: 'Reviews Rejected',
+      text: 'Please resubmit your course and teacher reviews to unlock the certificate.',
       showCancelButton: true,
-      confirmButtonText: 'Check Status',
+      confirmButtonText: 'Resubmit Reviews',
       cancelButtonText: 'OK',
       confirmButtonColor: '#E61C24',
       background: '#ffffff',
       color: '#1e293b',
     })
-    if (result.isConfirmed) onViewStatus?.(courseId)
-    return 'pending_approval'
+    if (result.isConfirmed) {
+      onNeedReviews?.(courseId)
+      onViewStatus?.(courseId)
+    }
+    return 'rejected'
   }
 
   try {
     const res = await fetch(`/api/certificates/download?courseId=${courseId}`)
     if (!res.ok) {
       const data = await res.json().catch(() => ({}))
-      if (
-        data.code === 'REVIEWS_REQUIRED' ||
-        data.code === 'REVIEWS_PENDING_APPROVAL' ||
-        data.code === 'CERTIFICATE_NOT_APPROVED' ||
-        data.redirectTo
-      ) {
-        if (data.code === 'REVIEWS_REQUIRED' || (!data.code && data.redirectTo)) {
+      if (data.code === 'REVIEWS_REQUIRED' || data.redirectTo) {
+        if (data.code === 'REVIEWS_REJECTED') {
           const result = await Swal.fire({
             icon: 'info',
-            title: 'Reviews Required',
+            title: 'Reviews Rejected',
             text:
               data.error ||
-              'Please leave course and teacher reviews before downloading your certificate.',
+              'Please resubmit your reviews to unlock the certificate.',
             showCancelButton: true,
-            confirmButtonText: 'Leave Reviews',
-            cancelButtonText: 'Later',
+            confirmButtonText: 'Resubmit Reviews',
+            cancelButtonText: 'OK',
             confirmButtonColor: '#E61C24',
             background: '#ffffff',
             color: '#1e293b',
           })
           if (result.isConfirmed) onNeedReviews?.(courseId)
-          return 'needs_reviews'
+          return 'rejected'
         }
 
         const result = await Swal.fire({
           icon: 'info',
-          title: 'Certificate Locked',
+          title: 'Reviews Required',
           text:
             data.error ||
-            'Your certificate is not ready yet. Finish reviews and wait for admin/staff approval.',
+            'Please leave course and teacher reviews before downloading your certificate.',
           showCancelButton: true,
-          confirmButtonText: 'Check Status',
-          cancelButtonText: 'OK',
+          confirmButtonText: 'Leave Reviews',
+          cancelButtonText: 'Later',
           confirmButtonColor: '#E61C24',
           background: '#ffffff',
           color: '#1e293b',
         })
-        if (result.isConfirmed) onViewStatus?.(courseId)
-        return 'pending_approval'
+        if (result.isConfirmed) onNeedReviews?.(courseId)
+        return 'needs_reviews'
       }
       throw new Error(data.error || 'Unable to download certificate.')
     }

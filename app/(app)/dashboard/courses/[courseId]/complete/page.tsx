@@ -98,7 +98,7 @@ function StatusBadge({ status }: { status: ReviewStatus }) {
   if (status === 'pending') {
     return (
       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-50 text-amber-600 border border-amber-100 text-sm font-bold">
-        <FiClock className="h-4 w-4" /> Pending Approval
+        <FiClock className="h-4 w-4" /> Submitted
       </span>
     )
   }
@@ -143,23 +143,24 @@ export default function CourseCompleteReviewPage() {
   const [certStatus, setCertStatus] = useState<'locked' | 'pending' | 'ready'>('locked')
   const [downloadingCert, setDownloadingCert] = useState(false)
 
-  const bothReviewsAccepted =
-    courseReviewStatus === 'approved' && teacherReviewStatus === 'approved'
+  const bothReviewsSubmitted =
+    courseReviewStatus !== 'idle' &&
+    teacherReviewStatus !== 'idle' &&
+    courseReviewStatus !== 'rejected' &&
+    teacherReviewStatus !== 'rejected'
+
+  const reviewsRejected =
+    courseReviewStatus === 'rejected' || teacherReviewStatus === 'rejected'
 
   useEffect(() => {
-    if (bothReviewsAccepted) {
+    if (bothReviewsSubmitted) {
       setCertStatus('ready')
-    } else if (
-      courseReviewStatus === 'pending' ||
-      teacherReviewStatus === 'pending' ||
-      courseReviewStatus === 'approved' ||
-      teacherReviewStatus === 'approved'
-    ) {
-      setCertStatus('pending')
+    } else if (reviewsRejected) {
+      setCertStatus('locked')
     } else {
       setCertStatus('locked')
     }
-  }, [bothReviewsAccepted, courseReviewStatus, teacherReviewStatus])
+  }, [bothReviewsSubmitted, reviewsRejected])
 
   useEffect(() => {
     async function load() {
@@ -296,7 +297,7 @@ export default function CourseCompleteReviewPage() {
       await Swal.fire({
         icon: 'success',
         title: 'Course Review Submitted',
-        text: 'Thanks! Rate your teachers next. Certificate unlocks after admin/staff approve your reviews (course + teachers together).',
+        text: 'Thanks! Rate your teachers next. Your certificate unlocks as soon as both course and teacher reviews are submitted.',
         confirmButtonColor: '#E61C24',
         background: '#ffffff',
         color: '#1e293b',
@@ -353,7 +354,7 @@ export default function CourseCompleteReviewPage() {
       await Swal.fire({
         icon: 'success',
         title: 'Teacher Reviews Submitted',
-        text: 'Your teacher feedback is pending. Admins/staff approve the course and teacher reviews together — then your certificate generates automatically.',
+        text: 'All set — your certificate is ready to download now.',
         confirmButtonColor: '#E61C24',
         background: '#ffffff',
         color: '#1e293b',
@@ -368,17 +369,17 @@ export default function CourseCompleteReviewPage() {
   }
 
   const handleDownloadCertificate = async () => {
-    if (!course || !bothReviewsAccepted) {
+    if (!course || !bothReviewsSubmitted) {
       await Swal.fire({
         icon: 'info',
         title: 'Certificate Locked',
-        text: !courseReviewStatus || courseReviewStatus === 'idle' || teacherReviewStatus === 'idle'
-          ? 'Please submit course and teacher reviews first. Download unlocks after admin/staff approve them.'
-          : 'Submit reviews for the course and teachers first. Download unlocks after admin/staff approve them together.',
+        text: reviewsRejected
+          ? 'Your reviews were rejected. Please resubmit course and teacher reviews to unlock the certificate.'
+          : 'Please submit course and teacher reviews first. Your certificate unlocks as soon as both are submitted.',
         confirmButtonColor: '#E61C24',
       })
-      if (courseReviewStatus === 'idle') setStep(1)
-      else if (teacherReviewStatus === 'idle') setStep(2)
+      if (courseReviewStatus === 'idle' || courseReviewStatus === 'rejected') setStep(1)
+      else if (teacherReviewStatus === 'idle' || teacherReviewStatus === 'rejected') setStep(2)
       return
     }
     setDownloadingCert(true)
@@ -386,12 +387,9 @@ export default function CourseCompleteReviewPage() {
       const res = await fetch(`/api/certificates/download?courseId=${course.id}`)
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        if (data.code === 'REVIEWS_REQUIRED') {
+        if (data.code === 'REVIEWS_REQUIRED' || data.code === 'REVIEWS_REJECTED') {
           setStep(1)
           throw new Error(data.error || 'Please leave reviews before downloading.')
-        }
-        if (data.code === 'REVIEWS_PENDING_APPROVAL') {
-          throw new Error(data.error || 'Reviews are pending staff approval.')
         }
         throw new Error(
           data.error ||
@@ -484,8 +482,8 @@ export default function CourseCompleteReviewPage() {
             </h1>
             <p className="text-zinc-400 text-base font-semibold leading-relaxed max-w-2xl">
               Rate <span className="text-white">{course.title}</span> and the teachers
-              assigned to it. When admin or staff approve your submission, course and teacher
-              reviews are accepted together and your certificate unlocks.
+              assigned to it. As soon as both reviews are submitted, your
+              certificate unlocks for download.
             </p>
           </div>
 
@@ -526,15 +524,11 @@ export default function CourseCompleteReviewPage() {
           <div className="min-w-0 space-y-2">
             <p className="text-base font-bold text-zinc-800">Certificate</p>
             {certStatus === 'ready' ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 text-sm font-bold">
-                <FiCheckCircle className="h-4 w-4" /> Ready
-              </span>
-            ) : certStatus === 'pending' ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-50 text-amber-600 border border-amber-100 text-sm font-bold">
-                <FiClock className="h-4 w-4" /> Awaiting Review Approval
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 text-base font-bold">
+                <FiCheckCircle className="h-4 w-4" /> Ready to download
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-zinc-100 text-zinc-500 border border-zinc-200/80 text-sm font-bold">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-zinc-100 text-zinc-500 border border-zinc-200/80 text-base font-bold">
                 <FiLock className="h-4 w-4" /> Locked
               </span>
             )}
@@ -548,7 +542,7 @@ export default function CourseCompleteReviewPage() {
             const done =
               (s.id === 1 && courseReviewStatus !== 'idle') ||
               (s.id === 2 && teacherReviewStatus !== 'idle') ||
-              (s.id === 3 && bothReviewsAccepted)
+              (s.id === 3 && bothReviewsSubmitted)
             const active = step === s.id
             return (
               <li key={s.id} className="flex items-center flex-1 min-w-0">
@@ -608,7 +602,7 @@ export default function CourseCompleteReviewPage() {
                 <p className="text-base font-semibold text-zinc-600">
                   {courseReviewStatus === 'approved'
                     ? 'Your course review was accepted.'
-                    : 'Your course review is waiting for staff moderation.'}
+                    : 'Your course review is submitted. Continue to rate your teachers.'}
                 </p>
               </div>
               <button
@@ -684,7 +678,7 @@ export default function CourseCompleteReviewPage() {
                 <p className="text-base font-semibold text-zinc-600">
                   {teacherReviewStatus === 'approved'
                     ? 'Teacher reviews were accepted.'
-                    : 'Teacher reviews are pending staff approval.'}
+                    : 'Teacher reviews are submitted. Your certificate is ready.'}
                 </p>
               </div>
               <button
@@ -699,8 +693,8 @@ export default function CourseCompleteReviewPage() {
             <div className="p-8 text-center space-y-4 border border-zinc-200/80 rounded-lg bg-zinc-50">
               <FiUser className="mx-auto h-8 w-8 text-zinc-400" />
               <p className="text-base font-semibold text-zinc-600">
-                No teachers are assigned to this course. Continue after your course review is
-                approved.
+                No teachers are assigned to this course. After your course review
+                is submitted, your certificate unlocks.
               </p>
               <button
                 type="button"
@@ -710,7 +704,7 @@ export default function CourseCompleteReviewPage() {
                 }}
                 className="px-5 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base cursor-pointer border-none"
               >
-                Continue
+                Continue to Certificate
               </button>
             </div>
           ) : (
@@ -814,19 +808,19 @@ export default function CourseCompleteReviewPage() {
           <div className="space-y-1">
             <h2 className="text-2xl font-bold font-display text-zinc-800">Your certificate</h2>
             <p className="text-base font-semibold text-zinc-500">
-              Certificates unlock automatically after admin/staff approve your course and
-              teacher reviews together.
+              Once course and teacher reviews are submitted, your certificate is ready
+              to download right away.
             </p>
           </div>
 
           <div
             className={`relative overflow-hidden rounded-lg border p-8 sm:p-10 ${
-              bothReviewsAccepted
+              bothReviewsSubmitted
                 ? 'border-emerald-200 bg-linear-to-br from-emerald-50 to-white'
                 : 'border-zinc-200/80 bg-linear-to-br from-zinc-50 to-white'
             }`}
           >
-            {!bothReviewsAccepted && (
+            {!bothReviewsSubmitted && (
               <div className="absolute inset-0 bg-white/55 backdrop-blur-[2px] flex items-center justify-center z-10">
                 <div className="text-center space-y-3 px-6 max-w-md">
                   <div className="mx-auto h-14 w-14 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center">
@@ -834,23 +828,27 @@ export default function CourseCompleteReviewPage() {
                   </div>
                   <p className="text-lg font-bold text-zinc-800">Certificate Locked</p>
                   <p className="text-base font-semibold text-zinc-500 leading-relaxed">
-                    {courseReviewStatus === 'idle' || teacherReviewStatus === 'idle'
-                      ? 'Submit your course and teacher reviews first. After admin/staff approve them, your certificate unlocks here.'
-                      : 'Your reviews are in. Admin/staff approve the course and teacher reviews together — then you can download your certificate.'}
+                    {reviewsRejected
+                      ? 'Your reviews were rejected. Please resubmit course and teacher reviews to unlock your certificate.'
+                      : 'Submit your course and teacher reviews first. Your certificate unlocks as soon as both are submitted.'}
                   </p>
-                  {(courseReviewStatus === 'idle' || teacherReviewStatus === 'idle') && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setStep(courseReviewStatus === 'idle' ? 1 : 2)
-                      }
-                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base cursor-pointer border-none"
-                    >
-                      {courseReviewStatus === 'idle'
-                        ? 'Go to Course Review'
-                        : 'Go to Teacher Reviews'}
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setStep(
+                        courseReviewStatus === 'idle' ||
+                          courseReviewStatus === 'rejected'
+                          ? 1
+                          : 2,
+                      )
+                    }
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base cursor-pointer border-none"
+                  >
+                    {courseReviewStatus === 'idle' ||
+                    courseReviewStatus === 'rejected'
+                      ? 'Go to Course Review'
+                      : 'Go to Teacher Reviews'}
+                  </button>
                 </div>
               </div>
             )}
@@ -869,7 +867,7 @@ export default function CourseCompleteReviewPage() {
                 Canadian Nest School · Official verified credential
               </p>
               <div className="w-full max-w-sm h-px bg-zinc-200 my-2" />
-              {bothReviewsAccepted ? (
+              {bothReviewsSubmitted ? (
                 <button
                   type="button"
                   onClick={handleDownloadCertificate}
@@ -882,9 +880,7 @@ export default function CourseCompleteReviewPage() {
               ) : (
                 <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-zinc-200/80 text-zinc-500 font-bold text-base">
                   <FiLock className="h-4 w-4" />
-                  {courseReviewStatus === 'idle' || teacherReviewStatus === 'idle'
-                    ? 'Reviews required'
-                    : 'Awaiting admin/staff approval'}
+                  {reviewsRejected ? 'Resubmit reviews' : 'Reviews required'}
                 </div>
               )}
             </div>

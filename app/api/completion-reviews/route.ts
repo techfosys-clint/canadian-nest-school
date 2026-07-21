@@ -11,6 +11,7 @@ import {
   getCourseInstructorIds,
   getStudentCourseReviewGate,
   hasSubmittedRequiredReviews,
+  syncCertificateRequestWithReviewGate,
 } from '@/lib/reviews/reviewPack'
 import '@/lib/db/models/User'
 import '@/lib/db/models/Student'
@@ -215,6 +216,9 @@ export async function POST(request: NextRequest) {
         status: 'pending',
       })),
     )
+
+    // Both review tracks submitted → unlock certificate immediately.
+    await syncCertificateRequestWithReviewGate(studentId, courseId, 100)
 
     return NextResponse.json(
       {

@@ -6,7 +6,7 @@ import {
 
 export type CertCtaMode =
   | 'leave_reviews'
-  | 'awaiting_approval'
+  | 'resubmit_reviews'
   | 'download'
   | 'unknown'
 
@@ -14,9 +14,15 @@ export function getCertCtaMode(
   gate: CompletionReviewState | null | undefined,
 ): CertCtaMode {
   if (!gate) return 'unknown'
+  if (
+    gate.courseReviewStatus === 'rejected' ||
+    gate.teacherReviewStatus === 'rejected'
+  ) {
+    return 'resubmit_reviews'
+  }
   if (!hasSubmittedRequiredReviews(gate)) return 'leave_reviews'
-  if (!canDownloadCertificate(gate)) return 'awaiting_approval'
-  return 'download'
+  if (canDownloadCertificate(gate)) return 'download'
+  return 'unknown'
 }
 
 export function certCtaLabel(mode: CertCtaMode, downloading = false): string {
@@ -24,8 +30,8 @@ export function certCtaLabel(mode: CertCtaMode, downloading = false): string {
   switch (mode) {
     case 'leave_reviews':
       return 'Leave Reviews'
-    case 'awaiting_approval':
-      return 'Check Review Status'
+    case 'resubmit_reviews':
+      return 'Resubmit Reviews'
     case 'download':
       return 'Download Certificate'
     default:

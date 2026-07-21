@@ -127,8 +127,8 @@ export default function NewReviewPage() {
             </h1>
           </div>
           <p className="text-base font-semibold text-zinc-500 pl-13">
-            Course and teacher reviews are submitted together in the completion flow so your
-            certificate can unlock after admin/staff approval.
+            Course and teacher reviews are submitted together in the completion flow.
+            Your certificate unlocks as soon as both are submitted.
           </p>
         </div>
       </div>

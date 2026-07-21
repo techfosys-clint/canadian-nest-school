@@ -22,7 +22,7 @@ export async function syncEnrollmentProgressSideEffects(
     return progress
   }
 
-  // At 100%: create/update cert — auto-approved if review pack already approved
+  // At 100%: create/update cert — auto-approved once reviews are submitted
   await syncCertificateRequestWithReviewGate(userId, courseId, progress)
 
   return progress

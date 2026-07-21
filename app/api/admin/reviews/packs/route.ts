@@ -163,7 +163,7 @@ export async function POST(request: Request) {
       success: true,
       message:
         status === 'approved'
-          ? 'Course and teacher reviews approved together. Certificate unlocked for the student.'
+          ? 'Course and teacher reviews approved together.'
           : `Review pack updated to ${status}.`,
       review: { id: reviewId, status },
     })

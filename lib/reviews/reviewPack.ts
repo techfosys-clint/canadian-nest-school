@@ -70,11 +70,17 @@ export function hasSubmittedRequiredReviews(
   return courseStatus !== 'idle' && teacherStatus !== 'idle'
 }
 
+/**
+ * Certificate download unlocks once both review tracks are submitted
+ * (pending or approved). Staff approval is moderation-only and does not
+ * gate the PDF. Rejected reviews must be resubmitted.
+ */
 export function canDownloadCertificate(
   courseStatus: ReviewFlowStatus,
   teacherStatus: ReviewFlowStatus,
 ) {
-  return courseStatus === 'approved' && teacherStatus === 'approved'
+  if (courseStatus === 'rejected' || teacherStatus === 'rejected') return false
+  return courseStatus !== 'idle' && teacherStatus !== 'idle'
 }
 
 /** Joint admin-pack status — never "approved" while teacher reviews are still missing */
@@ -264,7 +270,7 @@ export async function moderateReviewPack(
 
 /**
  * Hold legacy/previously-approved certificates until course + teacher reviews
- * are submitted and approved. Safe to call on certificate list/download.
+ * are submitted. Safe to call on certificate list/download.
  */
 export async function reconcileCertificateWithReviewGate(
   studentId: string,
@@ -308,13 +314,12 @@ export async function reconcileCertificateWithReviewGate(
       await existing.save()
     }
   } else {
-    // Missing or pending reviews — never allow download, even if cert was
-    // approved before the review system existed.
+    // Reviews still missing — hold download until the student submits them.
     if (existing.status === 'approved') {
       existing.status = 'pending'
       if (!existing.adminNotes) {
         existing.adminNotes =
-          'Held until the student submits course and teacher reviews and staff approves them.'
+          'Held until the student submits course and teacher reviews.'
       }
       await existing.save()
       heldForReviews = true

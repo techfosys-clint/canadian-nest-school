@@ -3,7 +3,8 @@ import AboutClient from './AboutClient'
 
 export const metadata = {
   title: 'About Us - Canadian Nest School',
-  description: 'Learn more about Canadian Nest School, our story, mission, and learning ecosystem.',
+  description:
+    'Empowering learners of all ages to master authentic English, build confidence, and unlock global opportunities through international-standard education.',
 }
 
 export default function AboutPage() {

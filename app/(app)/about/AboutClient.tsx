@@ -49,7 +49,7 @@ export default function AboutClient() {
       {/* ── SECTION 1 & 2: ABOUT HEADER & STATS HERO ── */}
       <section className='pt-36 pb-24 px-6 relative overflow-hidden bg-white'>
         {/* Subtle background glow */}
-        <div className='absolute top-1/4 right-1/4 w-[600px] h-[400px] bg-[#E61C24]/5 rounded-full blur-[130px] pointer-events-none' />
+        <div className='absolute top-1/4 right-1/4 w-150 h-100 bg-[#E61C24]/5 rounded-full blur-[130px] pointer-events-none' />
 
         <div className='container mx-auto space-y-16'>
           {/* About Centered Header (Screenshot 1) - Staggered reveal */}
@@ -95,8 +95,9 @@ export default function AboutClient() {
               variants={fadeInUp}
               className='text-base sm:text-lg font-semibold text-[#4F5B7C] leading-relaxed max-w-2xl mx-auto'
             >
-              Our platform helps learners gain real-world skills from expert
-              instructors through engaging, hands-on lessons.
+              Empowering learners of all ages to master authentic English, build
+              unshakeable confidence, and unlock global opportunities through
+              International-standard education.
             </motion.p>
           </motion.div>
 
@@ -140,13 +141,14 @@ export default function AboutClient() {
                 className='p-5 bg-[#E61C24]/4 rounded-lg border border-[#E61C24]/15 flex flex-col gap-2 transition-all duration-300 hover:border-[#E61C24]/35 shadow-sm hover:shadow-md cursor-pointer'
               >
                 <span className='text-[#E61C24] text-4xl md:text-5xl font-bold'>
-                  12K+
+                  100%
                 </span>
                 <span className='text-[#0A163A] text-lg font-bold'>
-                  Courses
+                  Practical Learning
                 </span>
                 <p className='text-[#4F5B7C] text-base font-semibold leading-relaxed'>
-                  Covering design, business, tech, and more.
+                  Focus on real-life speaking, shadowing, and practical
+                  communication, not just textbook grammar rules.
                 </p>
               </motion.div>
 
@@ -160,13 +162,14 @@ export default function AboutClient() {
                 className='p-5 bg-[#E61C24]/4 rounded-lg border border-[#E61C24]/15 flex flex-col gap-2 transition-all duration-300 hover:border-[#E61C24]/35 shadow-sm hover:shadow-md cursor-pointer'
               >
                 <span className='text-[#E61C24] text-4xl md:text-5xl font-bold'>
-                  85K+
+                  Immersive
                 </span>
                 <span className='text-[#0A163A] text-lg font-bold'>
-                  Learners
+                  Interactive Classes
                 </span>
                 <p className='text-[#4F5B7C] text-base font-semibold leading-relaxed'>
-                  Growing global community of passionate students.
+                  Comprehensive live sessions for every program, ensuring
+                  personalized attention and maximum engagement.
                 </p>
               </motion.div>
 
@@ -180,13 +183,14 @@ export default function AboutClient() {
                 className='p-5 bg-[#E61C24]/4 rounded-lg border border-[#E61C24]/15 flex flex-col gap-2 transition-all duration-300 hover:border-[#E61C24]/35 shadow-sm hover:shadow-md cursor-pointer'
               >
                 <span className='text-[#E61C24] text-4xl md:text-5xl font-bold'>
-                  2K+
+                  Expert
                 </span>
                 <span className='text-[#0A163A] text-lg font-bold'>
                   Instructors
                 </span>
                 <p className='text-[#4F5B7C] text-base font-semibold leading-relaxed'>
-                  Learn from top industry professionals.
+                  Learn from certified professionals dedicated to maintaining
+                  the highest international teaching standards.
                 </p>
               </motion.div>
 
@@ -206,7 +210,8 @@ export default function AboutClient() {
                   Satisfaction
                 </span>
                 <p className='text-[#4F5B7C] text-base font-semibold leading-relaxed'>
-                  Learners love the results and experience.
+                  Our learners love the judgment-free environment, continuous
+                  support, and real-world results.
                 </p>
               </motion.div>
             </motion.div>
@@ -217,8 +222,8 @@ export default function AboutClient() {
       {/* ── SECTION 3: OUR PURPOSE & VALUES (Premium Redesigned Section) ── */}
       <section className='py-20 md:py-28 px-6 bg-linear-to-b from-[#F8FAFC] to-[#F1F5F9] border-t border-b border-slate-100 relative overflow-hidden'>
         {/* Decorative background gradients */}
-        <div className='absolute top-0 right-0 w-[450px] h-[450px] bg-[#E61C24]/3 rounded-full blur-[120px] pointer-events-none' />
-        <div className='absolute bottom-0 left-0 w-[450px] h-[450px] bg-sky-500/3 rounded-full blur-[120px] pointer-events-none' />
+        <div className='absolute top-0 right-0 w-112.5 h-112.5 bg-[#E61C24]/3 rounded-full blur-[120px] pointer-events-none' />
+        <div className='absolute bottom-0 left-0 w-112.5 h-112.5 bg-sky-500/3 rounded-full blur-[120px] pointer-events-none' />
 
         <div className='container mx-auto relative z-10'>
           <div className='grid grid-cols-1 lg:grid-cols-12 gap-12 items-center'>
@@ -228,7 +233,7 @@ export default function AboutClient() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className='lg:col-span-6 relative flex items-center justify-center min-h-[400px] md:min-h-[460px]'
+              className='lg:col-span-6 relative flex items-center justify-center min-h-100 md:min-h-115'
             >
               {/* Decorative dotted pattern overlay */}
               <div
@@ -254,7 +259,7 @@ export default function AboutClient() {
               {/* Overlapping Floating Card 1: Success Rate */}
               <motion.div
                 whileHover={{ y: -3 }}
-                className='absolute bottom-4 left-4 sm:left-10 bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-lg p-4 shadow-lg max-w-[200px]'
+                className='absolute bottom-4 left-4 sm:left-10 bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-lg p-4 shadow-lg max-w-50'
               >
                 <div className='flex items-center gap-3'>
                   <div className='h-10 w-10 rounded-lg bg-[#E61C24]/10 border border-[#E61C24]/20 flex items-center justify-center text-[#E61C24]'>
@@ -265,7 +270,7 @@ export default function AboutClient() {
                       Success Rate
                     </p>
                     <p className='text-lg font-bold text-[#0A163A]'>
-                      98% Approved
+                      98% Satisfaction
                     </p>
                   </div>
                 </div>
@@ -274,7 +279,7 @@ export default function AboutClient() {
               {/* Overlapping Floating Card 2: Interactive Class info */}
               <motion.div
                 whileHover={{ y: -3 }}
-                className='absolute top-4 right-4 sm:right-10 bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-lg p-4 shadow-lg max-w-[220px]'
+                className='absolute top-4 right-4 sm:right-10 bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-lg p-4 shadow-lg max-w-55'
               >
                 <div className='flex items-center gap-3'>
                   <div className='h-10 w-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600'>
@@ -305,8 +310,9 @@ export default function AboutClient() {
                   Empowering Learners to Shape the Future
                 </h2>
                 <p className='text-base sm:text-lg text-slate-500 font-semibold leading-relaxed'>
-                  We don&apos;t just teach lessons. We cultivate skills, connect
-                  global talent, and build paths to sustainable careers.
+                  We don&apos;t just teach English. We cultivate communication
+                  skills, break language barriers, and build paths to absolute
+                  fluency.
                 </p>
               </div>
 
@@ -322,10 +328,13 @@ export default function AboutClient() {
                       Our Story
                     </h3>
                     <p className='text-base text-slate-500 font-semibold leading-relaxed'>
-                      Canadian Nest School began with a simple mission: to
-                      simplify learning. We started with a handful of passionate
-                      educators and have grown into a global ecosystem where
-                      students master in-demand skills.
+                      Canadian Nest School was founded with a clear goal: to
+                      eliminate the fear of speaking English. We realized that
+                      traditional grammar-heavy methods were not helping people
+                      actually communicate. So, we built a platform focused on
+                      phonics, pronunciation, and practical speaking, bringing
+                      interactive international educational standards directly
+                      to your screen.
                     </p>
                   </div>
                 </div>
@@ -340,10 +349,11 @@ export default function AboutClient() {
                       Our Mission
                     </h3>
                     <p className='text-base text-slate-500 font-semibold leading-relaxed'>
-                      To bridge the gap between classroom theory and real-world
-                      implementation. We provide accessible, hands-on training
-                      tailored specifically for current industry needs and
-                      growth fields.
+                      To bridge the gap between simply understanding English and
+                      speaking it fluently. We provide accessible, interactive,
+                      and hands-on language training tailored for everyday life,
+                      academic success, and professional workplace
+                      communication.
                     </p>
                   </div>
                 </div>
@@ -359,9 +369,9 @@ export default function AboutClient() {
                     </h3>
                     <p className='text-base text-slate-500 font-semibold leading-relaxed'>
                       To build the world&apos;s most supportive and engaging
-                      learning network, where anyone can acquire high-value
-                      skills and transition their careers with absolute
-                      confidence.
+                      language learning network, where anyone, regardless of
+                      their age or background, can conquer their fear of English
+                      and speak to the world with absolute confidence.
                     </p>
                   </div>
                 </div>
@@ -374,7 +384,7 @@ export default function AboutClient() {
       {/* ── SECTION 4: WHAT WE OFFER (Screenshot 4) ── */}
       <section className='py-20 md:py-28 px-6 bg-white border-t border-zinc-100 relative overflow-hidden'>
         {/* Subtle background glow */}
-        <div className='absolute top-1/4 right-0 w-[550px] h-[380px] bg-[#E61C24]/4 rounded-full blur-[130px] pointer-events-none' />
+        <div className='absolute top-1/4 right-0 w-137.5 h-95 bg-[#E61C24]/4 rounded-full blur-[130px] pointer-events-none' />
 
         <div className='container mx-auto relative z-10 space-y-16'>
           {/* Header - Staggered reveal */}
@@ -395,9 +405,10 @@ export default function AboutClient() {
               variants={fadeInUp}
               className='text-base sm:text-lg font-semibold text-[#4F5B7C] leading-relaxed max-w-2xl mx-auto'
             >
-              Discover a platform built to make learning simple, interactive,
-              and effective — with real-world projects, flexible schedules, and
-              expert-led lessons designed to help you master new skills faster.
+              Discover a platform built to make English learning simple,
+              interactive, and highly effective — with real-world conversation
+              practice, immersive live sessions, and expert-led lessons designed
+              to help you communicate with absolute confidence.
             </motion.p>
           </motion.div>
 
@@ -422,11 +433,12 @@ export default function AboutClient() {
                 <FiBookOpen className='h-6 w-6' />
               </div>
               <h3 className='text-xl font-bold text-[#0A163A] mb-2.5'>
-                Expert-Led Courses
+                Expert-Led Live Classes
               </h3>
               <p className='text-base font-semibold text-[#4F5B7C] leading-relaxed'>
-                Learn from experienced instructors who bring real-world
-                knowledge into every lesson.
+                Learn directly from highly qualified instructors who bring
+                practical, real-world communication skills into every
+                interactive session.
               </p>
             </motion.div>
 
@@ -440,14 +452,14 @@ export default function AboutClient() {
               className='p-6 bg-linear-to-br from-[#E61C24]/4 to-[#E61C24]/8 border border-[#E61C24]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#E61C24]/30 transition-all duration-300 group cursor-pointer'
             >
               <div className='w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#E61C24] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300'>
-                <FiClock className='h-6 w-6' />
+                <FiLayers className='h-6 w-6' />
               </div>
               <h3 className='text-xl font-bold text-[#0A163A] mb-2.5'>
-                Flexible Learning
+                Interactive &amp; Practical Method
               </h3>
               <p className='text-base font-semibold text-[#4F5B7C] leading-relaxed'>
-                Study anytime, anywhere — pause, resume, and learn at your own
-                pace.
+                Forget boring textbook memorization. Engage in role-plays,
+                shadowing, and everyday conversation practice to speak fluently.
               </p>
             </motion.div>
 
@@ -461,14 +473,15 @@ export default function AboutClient() {
               className='p-6 bg-linear-to-br from-[#E61C24]/4 to-[#E61C24]/8 border border-[#E61C24]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#E61C24]/30 transition-all duration-300 group cursor-pointer'
             >
               <div className='w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#E61C24] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300'>
-                <FiLayers className='h-6 w-6' />
+                <FiClock className='h-6 w-6' />
               </div>
               <h3 className='text-xl font-bold text-[#0A163A] mb-2.5'>
-                Hands-On Projects
+                Programs for Every Age
               </h3>
               <p className='text-base font-semibold text-[#4F5B7C] leading-relaxed'>
-                Apply what you learn through real-world projects, quizzes, and
-                exercises.
+                From foundational Phonics for kids to professional Spoken
+                English for adults and advanced IELTS preparation, we have you
+                covered.
               </p>
             </motion.div>
 
@@ -488,8 +501,8 @@ export default function AboutClient() {
                 Verified Certificates
               </h3>
               <p className='text-base font-semibold text-[#4F5B7C] leading-relaxed'>
-                Earn recognized certificates to showcase your new skills and
-                boost your career.
+                Earn recognized certificates of completion to showcase your
+                English fluency and boost your career opportunities globally.
               </p>
             </motion.div>
 
@@ -506,11 +519,11 @@ export default function AboutClient() {
                 <FiGlobe className='h-6 w-6' />
               </div>
               <h3 className='text-xl font-bold text-[#0A163A] mb-2.5'>
-                Global Learning Community
+                Supportive Community
               </h3>
               <p className='text-base font-semibold text-[#4F5B7C] leading-relaxed'>
-                Connect, collaborate, and grow with learners and mentors from
-                around the world.
+                Connect, practice, and grow in a judgment-free environment with
+                passionate learners from around the world.
               </p>
             </motion.div>
 
@@ -527,11 +540,11 @@ export default function AboutClient() {
                 <FiSettings className='h-6 w-6' />
               </div>
               <h3 className='text-xl font-bold text-[#0A163A] mb-2.5'>
-                Personalized Progress Tracking
+                Personalized Feedback
               </h3>
               <p className='text-base font-semibold text-[#4F5B7C] leading-relaxed'>
-                Monitor your learning journey, track progress, and celebrate
-                milestones in your profile.
+                Receive direct, individual feedback from your mentors to
+                continuously improve your pronunciation and natural intonation.
               </p>
             </motion.div>
           </motion.div>

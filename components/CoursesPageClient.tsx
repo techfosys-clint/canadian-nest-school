@@ -449,8 +449,8 @@ export default function CoursesPageClient({
       <Image
         src={
           activeCategory === 'all'
-            ? '/media/categories/all-courses-hero.webp'
-            : `/media/categories/${activeCategory}-hero.webp`
+            ? '/images/categories/all-courses-hero.webp'
+            : `/images/categories/${activeCategory}-hero.webp`
         }
         alt='Courses Page Hero'
         width={1920}

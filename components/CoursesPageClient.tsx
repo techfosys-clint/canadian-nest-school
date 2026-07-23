@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import type { CategoryDoc, CourseDoc } from '@/components/Courses';
-import PageHeroSection from '@/components/PageHeroSection';
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   FiArrowRight,
   FiChevronDown,
@@ -181,7 +179,7 @@ function CourseCard({
     <div className='w-full flex justify-center sm:justify-start'>
       <Link
         href={`/courses/${course.slug}`}
-        className='bg-white rounded-lg overflow-hidden border border-[#E61C24]/20 hover:border-[#E61C24]/50 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(230,28,36,0.10)] hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full w-full max-w-[380px]'
+        className='bg-white rounded-lg overflow-hidden border border-[#E61C24]/20 hover:border-[#E61C24]/50 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(230,28,36,0.10)] hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full w-full max-w-95'
       >
         {/* Aspect-ratio constrained image wrapper */}
         <div className='relative aspect-16/10 bg-zinc-50 overflow-hidden rounded-t-lg'>
@@ -444,41 +442,20 @@ export default function CoursesPageClient({
     <div className='min-h-screen bg-linear-to-b from-white via-[#fafafa] to-[#f9fafb] font-sans pb-20 relative flex flex-col pt-22'>
       {/* Background glow accents (confined to absolute layer to prevent sticky scroll breaking) */}
       <div className='absolute inset-0 overflow-hidden pointer-events-none z-0'>
-        <div className='absolute top-[20%] right-[-10%] w-[500px] h-[500px] bg-[#E61C24]/3 rounded-full blur-[120px]' />
-        <div className='absolute bottom-[20%] left-[-10%] w-[500px] h-[500px] bg-[#FDBF2D]/3 rounded-full blur-[120px]' />
+        <div className='absolute top-[20%] right-[-10%] w-125 h-125 bg-[#E61C24]/3 rounded-full blur-[120px]' />
+        <div className='absolute bottom-[20%] left-[-10%] w-125 h-125 bg-[#FDBF2D]/3 rounded-full blur-[120px]' />
       </div>
 
-      <PageHeroSection
-        tag={activeCategory === 'all' ? 'Our Courses' : 'Category'}
-        title={
-          activeCategory === 'kids-english' ? 'English for Kids' :
-          activeCategory === 'teens-english' ? 'English for Teens' :
-          activeCategory === 'spoken-english-for-adults' ? 'English for Adults' :
-          activeCategory === 'ielts' ? 'IELTS Preparation' :
-          activeCategory === 'teacher-training' ? 'Teacher Training' :
-          activeCategory === 'educational-shop' ? 'Educational Shop' :
-          activeCategory === 'all' ? 'Our Popular Courses' :
-          (categories.find(c => c.slug === activeCategory)?.name || 'Courses')
+      <Image
+        src={
+          activeCategory === 'all'
+            ? '/media/categories/all-courses-hero.webp'
+            : `/media/categories/${activeCategory}-hero.webp`
         }
-        description={
-          activeCategory === 'kids-english' ? 'Game based phonics with grammar, Reading, Speaking, Writing.' :
-          activeCategory === 'teens-english' ? 'Academic English and communication skills.' :
-          activeCategory === 'spoken-english-for-adults' ? 'Speak confidently in everyday situations.' :
-          activeCategory === 'ielts' ? 'Achieve your target IELTS score.' :
-          activeCategory === 'teacher-training' ? 'International teaching methods and strategies.' :
-          activeCategory === 'educational-shop' ? 'Books, worksheets, courses, teaching resources.' :
-          activeCategory === 'all' ? (
-            <>
-              Enhance your{' '}
-              <span className='text-[#E61C24] font-bold'>English fluency</span>{' '}
-              and communication skills with our specialized courses designed for{' '}
-              <span className='text-[#E61C24] font-bold'>
-                kids, teens, adults, and educators
-              </span>
-              .
-            </>
-          ) : `Browse our specialized courses for ${categories.find(c => c.slug === activeCategory)?.name || 'this category'}.`
-        }
+        alt='Courses Page Hero'
+        width={1920}
+        height={1080}
+        className='w-full h-full object-cover'
       />
 
       {/* ── Page Layout Container ── */}
@@ -771,7 +748,10 @@ export default function CoursesPageClient({
             <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2'>
               <div>
                 <h1 className='text-2xl font-bold font-display text-[#0A163A] capitalize'>
-                  {activeCategory === 'all' ? 'All Courses' : categories.find(c => c.slug === activeCategory)?.name || 'Category Courses'}
+                  {activeCategory === 'all'
+                    ? 'All Courses'
+                    : categories.find((c) => c.slug === activeCategory)?.name ||
+                      'Category Courses'}
                 </h1>
                 <p className='text-base text-zinc-550 font-semibold mt-1'>
                   Showing{' '}
@@ -861,7 +841,7 @@ export default function CoursesPageClient({
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-              className='fixed inset-y-0 right-0 w-[300px] bg-white shadow-2xl z-100 flex flex-col lg:hidden border-l border-zinc-200'
+              className='fixed inset-y-0 right-0 w-75 bg-white shadow-2xl z-100 flex flex-col lg:hidden border-l border-zinc-200'
             >
               {/* Header inside the drawer */}
               <div className='flex items-center justify-between p-6 border-b border-zinc-100'>

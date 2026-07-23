@@ -5,7 +5,6 @@ import {
   generateCertificatePdf,
 } from '@/lib/certificate/generateCertificatePdf'
 import { connectToDatabase } from '@/lib/db/mongodb'
-import { Course } from '@/lib/db/models/Course'
 
 export const dynamic = 'force-dynamic'
 
@@ -32,8 +31,6 @@ export async function POST(request: NextRequest) {
       typeof body.studentName === 'string' ? body.studentName.trim() : ''
     const courseTitle =
       typeof body.courseTitle === 'string' ? body.courseTitle.trim() : ''
-    const courseId =
-      typeof body.courseId === 'string' ? body.courseId.trim() : ''
 
     if (!studentName) {
       return NextResponse.json(
@@ -48,21 +45,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    let level: string | undefined
-    let summary: string | undefined
-
-    if (courseId) {
-      const course = await Course.findById(courseId)
-        .select('title level summary')
-        .lean()
-      if (course) {
-        level = typeof course.level === 'string' ? course.level : undefined
-        summary =
-          typeof course.summary === 'string' ? course.summary : undefined
-      }
-    }
-
-    const description = buildCertificateDescription(courseTitle, level, summary)
+    const description = buildCertificateDescription(courseTitle, new Date())
     const pdfBuffer = await generateCertificatePdf({
       studentName,
       description,

@@ -154,10 +154,13 @@ export async function GET(request: NextRequest) {
     }
 
     const studentName = student?.name?.trim() || 'Student'
+    const completionDate =
+      certificateRequest.updatedAt ||
+      certificateRequest.createdAt ||
+      new Date()
     const description = buildCertificateDescription(
       course.title,
-      course.level,
-      course.summary,
+      completionDate,
     )
 
     const pdfBuffer = await generateCertificatePdf({

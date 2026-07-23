@@ -100,26 +100,33 @@ async function loadBackgroundBuffer(): Promise<Buffer> {
   return sharp(source).jpeg({ quality: 95 }).toBuffer()
 }
 
+export function formatCertificateDate(date: Date = new Date()): string {
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
+/** Fixed certificate body text under the student name. */
 export function buildCertificateDescription(
   courseTitle: string,
-  level?: string,
-  summary?: string | null,
+  completionDate?: Date | string | null,
 ): string {
-  const summaryText =
-    typeof summary === 'string' ? summary.trim() : ''
-  if (summaryText) return summaryText
+  const courseName = (courseTitle || '').trim() || 'this'
+  const awardedOn =
+    completionDate instanceof Date
+      ? formatCertificateDate(completionDate)
+      : typeof completionDate === 'string' && completionDate.trim()
+        ? completionDate.trim()
+        : formatCertificateDate(new Date())
 
-  const levelLabels: Record<string, string> = {
-    all: 'All Levels',
-    beginner: 'Beginner Level',
-    intermediate: 'Intermediate Level',
-    advanced: 'Advanced Level',
-  }
-
-  const levelLabel = levelLabels[level || 'all'] || 'All Levels'
-  const field = (courseTitle || '').trim() || 'this program'
-
-  return `He/ she has successfully completed ${levelLabel} in the field of ${field}, demonstrating strong communication skills, pronunciation, and fluency. He/ she is competent and confident in practical English conversation, presentations, and daily communication.`
+  return (
+    `For successfully completing the ${courseName} program. ` +
+    `This certificate recognizes their exceptional dedication, continuous skill development, ` +
+    `and strong commitment to learning in accordance with international educational standards.\n\n` +
+    `Awarded on this day, ${awardedOn}`
+  )
 }
 
 export async function generateCertificatePdf(

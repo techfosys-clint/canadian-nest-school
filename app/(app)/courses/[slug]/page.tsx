@@ -216,8 +216,8 @@ export default async function CourseDetailPage({ params }: Props) {
 
       {/* Background glow accents */}
       <div className='absolute inset-0 overflow-hidden pointer-events-none z-0'>
-        <div className='absolute top-[25%] right-[-10%] w-[500px] h-[500px] bg-[#E61C24]/3 rounded-full blur-[120px]' />
-        <div className='absolute bottom-[25%] left-[-10%] w-[500px] h-[500px] bg-[#FDBF2D]/3 rounded-full blur-[120px]' />
+        <div className='absolute top-[25%] right-[-10%] w-125 h-125 bg-[#E61C24]/3 rounded-full blur-[120px]' />
+        <div className='absolute bottom-[25%] left-[-10%] w-125 h-125 bg-[#FDBF2D]/3 rounded-full blur-[120px]' />
       </div>
 
       {/* ── Breadcrumb bar (Premium Glassmorphism Style) ── */}
@@ -607,7 +607,7 @@ export default async function CourseDetailPage({ params }: Props) {
         </div>
 
         {/* Right Area: Premium Sticky Pricing Card (4 cols) */}
-        <div className='lg:col-span-4 relative z-20 lg:mt-[-591px] w-full order-1 lg:order-2'>
+        <div className='lg:col-span-4 relative z-20 lg:-mt-147.75 w-full order-1 lg:order-2'>
           <div className='sticky top-28 bg-white border border-zinc-200 rounded-lg shadow-[0_12px_45px_rgba(0,0,0,0.06)] overflow-hidden'>
             {/* Aspect image header on widget */}
             {imageUrl ? (
@@ -708,7 +708,7 @@ export default async function CourseDetailPage({ params }: Props) {
                   <p className='text-base font-bold text-zinc-400 uppercase tracking-wide'>
                     Instructor
                   </p>
-                  <p className='text-base font-bold text-zinc-800 truncate max-w-[200px]'>
+                  <p className='text-base font-bold text-zinc-800 truncate max-w-50'>
                     {instructorName}
                   </p>
                 </div>

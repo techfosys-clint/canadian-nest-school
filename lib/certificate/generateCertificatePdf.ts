@@ -172,7 +172,7 @@ export async function generateCertificatePdf(
 
     doc
       .font(BODY_FONT)
-      .fontSize(11)
+      .fontSize(14)
       .fillColor(BODY_COLOR)
       .text(input.description, contentX, descriptionY, {
         width: contentWidth,

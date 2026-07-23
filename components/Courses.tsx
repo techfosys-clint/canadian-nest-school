@@ -433,7 +433,7 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                     >
                       <Link
                         href={`/courses/${course.slug}`}
-                        className='bg-white rounded-lg overflow-hidden border-0 border-transparent shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(230,28,36,0.06)] hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full w-full max-w-[380px]'
+                        className='bg-white rounded-lg overflow-hidden border-0 border-transparent shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(230,28,36,0.06)] hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full w-full max-w-95'
                       >
                         {/* Aspect-ratio constrained image wrapper */}
                         <div className='relative aspect-16/10 bg-[#f9fafb] overflow-hidden rounded-t-lg'>

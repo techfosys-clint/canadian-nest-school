@@ -50,6 +50,20 @@ export async function GET(request: Request) {
       )
     }
 
+    // If this student has stuck pending/failed EPS enrollments, re-check EPS
+    // before listing courses — recovers payments that succeeded but never
+    // completed the browser callback (no IPN / closed tab / verify lag).
+    if (!isAdminOrStaff) {
+      try {
+        const { healStudentPendingEnrollments } = await import(
+          '@/lib/payments/healPendingEpsPayments'
+        )
+        await healStudentPendingEnrollments(userId)
+      } catch (healError) {
+        console.error('Student EPS heal on enrollments list failed:', healError)
+      }
+    }
+
     const { searchParams } = new URL(request.url)
     const studentQueryParam = searchParams.get('student')
 

@@ -48,7 +48,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
                   delay: 0.15,
                   ease: [0.16, 1, 0.3, 1],
                 }}
-                className='inline-flex items-center bg-[#FDBF2D] text-[#0A163A] px-4 md:px-8 py-0.5 md:py-[4px] rounded-full mx-1 md:mx-2 align-middle relative '
+                className='inline-flex items-center bg-[#FDBF2D] text-[#0A163A] px-4 md:px-8 py-0.5 md:py-1 rounded-full mx-1 md:mx-2 align-middle relative '
               >
                 Authentic
               </motion.span>
@@ -63,7 +63,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
                   type: 'spring',
                   stiffness: 120,
                 }}
-                className='inline-block align-middle ml-[-16px] md:ml-[-26px] relative -top-0.5 md:-top-0.5 z-10'
+                className='inline-block align-middle -ml-4 md:-ml-6.5 relative -top-0.5 md:-top-0.5 z-10'
               >
                 <Image
                   src='https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150&h=150'
@@ -106,7 +106,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
                   initial={{ opacity: 0, x: -15 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.35, ease: 'easeOut' }}
-                  src='https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150&h=150'
+                  src='https://images.unsplash.com/photo-1506827155776-53ce0b5d56b4?auto=format&fit=crop&q=80&w=150&h=150'
                   alt='Student 1'
                   width={48}
                   height={48}
@@ -116,7 +116,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
                   initial={{ opacity: 0, x: 15 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.45, ease: 'easeOut' }}
-                  src='https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150&h=150'
+                  src='https://images.unsplash.com/photo-1552873816-636e43209957?auto=format&fit=crop&q=80&w=150&h=150'
                   alt='Student 2'
                   width={48}
                   height={48}
@@ -137,7 +137,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
           className='text-base md:text-lg text-[#4F5B7C] font-semibold text-center max-w-3xl mx-auto mb-10 leading-relaxed font-sans'
         >
           {
-            'Discover premium Phonics, Spoken English, IELTS, Online Schooling, and Teacher Training programs built on Canadian educational standards.'
+            'Discover premium Phonics, Spoken English, IELTS, Online Schooling, and Teacher Training programs built on international educational standards.'
           }{' '}
           <br className='hidden md:block' />{' '}
           {

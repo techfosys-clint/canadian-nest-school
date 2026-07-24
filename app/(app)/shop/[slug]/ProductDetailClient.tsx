@@ -105,8 +105,8 @@ export default function ProductDetailClient({
                 }
                 alt={product.title}
                 className='w-full h-full object-cover'
-                width={600}
-                height={800}
+                width={700}
+                height={900}
               />
             ) : (
               <FiBookOpen className='h-16 w-16 text-zinc-300' />

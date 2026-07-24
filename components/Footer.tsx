@@ -3,14 +3,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React, { useState } from 'react';
 import {
   FaFacebookF,
   FaInstagram,
   FaLinkedinIn,
   FaYoutube,
 } from 'react-icons/fa';
-import Swal from 'sweetalert2';
 
 // Nav link definitions — href is the "page" to match against
 const MAIN_PAGES = [{ label: 'Home', href: '/', match: '/' }];
@@ -23,8 +21,8 @@ const QUICK_LINKS = [
 
 export default function Footer() {
   const pathname = usePathname();
-  const [email, setEmail] = useState('');
-  const [submitting, setSubmitting] = useState(false);
+  // const [email, setEmail] = useState('');
+  // const [submitting, setSubmitting] = useState(false);
 
   // Returns true if this link should be highlighted as active
   const isActive = (match: string | null): boolean => {
@@ -38,31 +36,31 @@ export default function Footer() {
       ? 'text-[#E61C24] font-bold transition-colors'
       : 'text-zinc-400 hover:text-[#E61C24] transition-colors';
 
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    setSubmitting(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      Swal.fire({
-        icon: 'success',
-        title: 'Subscribed!',
-        text: 'Thank you for subscribing to our newsletter.',
-        confirmButtonColor: '#E61C24',
-      });
-      setEmail('');
-    } catch (error) {
-      console.error(error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Failed',
-        text: 'Something went wrong, please try again.',
-        confirmButtonColor: '#E61C24',
-      });
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  // const handleSubscribe = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (!email) return;
+  //   setSubmitting(true);
+  //   try {
+  //     await new Promise((resolve) => setTimeout(resolve, 800));
+  //     Swal.fire({
+  //       icon: 'success',
+  //       title: 'Subscribed!',
+  //       text: 'Thank you for subscribing to our newsletter.',
+  //       confirmButtonColor: '#E61C24',
+  //     });
+  //     setEmail('');
+  //   } catch (error) {
+  //     console.error(error);
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Failed',
+  //       text: 'Something went wrong, please try again.',
+  //       confirmButtonColor: '#E61C24',
+  //     });
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
 
   return (
     <footer className='bg-[#0b0b0f] text-zinc-300 relative overflow-hidden mt-auto font-sans'>

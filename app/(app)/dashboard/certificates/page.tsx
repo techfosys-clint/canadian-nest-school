@@ -20,6 +20,7 @@ import {
   FiXCircle,
 } from 'react-icons/fi';
 import Swal from 'sweetalert2';
+import { formatBdDate } from '@/lib/bdTime';
 
 interface CertificateItem {
   id: string;
@@ -182,14 +183,7 @@ export default function MyCertificatesPage() {
     [certificates],
   );
 
-  const formatDate = (dateStr: string) => {
-    const dateObj = new Date(dateStr);
-    return dateObj.toLocaleDateString('en-BD', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
-  };
+  const formatDate = (dateStr: string) => formatBdDate(dateStr);
 
   function renderStatusBadge(cert: CertificateItem) {
     const gate = getGate(cert);

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { generateEventId, pushToDataLayer } from '@/lib/gtm';
 import { parseJsonResponse } from '@/lib/safeJson';
@@ -710,7 +709,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                           disabled={
                             sendingRegOtp || regOtpVerified || countdown > 0
                           }
-                          className='px-4 min-w-[140px] flex items-center justify-center rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
+                          className='px-4 min-w-35 flex items-center justify-center rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
                         >
                           {sendingRegOtp ? (
                             <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
@@ -823,16 +822,6 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
           ) : (
             /* USER IS AUTHENTICATED: COUPON + PURCHASE (no billing on course checkout) */
             <div className='space-y-6'>
-              <div className='bg-white border border-zinc-200 rounded-lg p-5 sm:p-6 space-y-1'>
-                <p className='text-base font-bold text-zinc-800'>
-                  Signed in as {user.name}
-                </p>
-                <p className='text-base font-semibold text-zinc-500'>
-                  No billing form needed — after you confirm, you&apos;ll continue
-                  to the secure payment page (or enroll instantly if free).
-                </p>
-              </div>
-
               <form onSubmit={handleCompletePurchase} className='space-y-6'>
                 {checkoutError && (
                   <div className='p-3.5 bg-rose-50 border border-rose-105 rounded-lg text-rose-650 font-semibold text-base'>
@@ -870,7 +859,10 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                       onChange={(e) => {
                         const next = e.target.value.toUpperCase();
                         setCouponCode(next);
-                        if (appliedCoupon && next.trim() !== appliedCoupon.code) {
+                        if (
+                          appliedCoupon &&
+                          next.trim() !== appliedCoupon.code
+                        ) {
                           setAppliedCoupon(null);
                           setCouponSuccess('');
                         }
@@ -959,8 +951,8 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                   src={course.imageUrl}
                   alt={course.title}
                   className='w-full h-full object-cover'
-                  width={100}
-                  height={100}
+                  width={610}
+                  height={380}
                 />
               </div>
             )}

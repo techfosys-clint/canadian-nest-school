@@ -22,6 +22,7 @@ import {
   FiX,
 } from 'react-icons/fi';
 import Swal from 'sweetalert2';
+import { formatBdDate, formatBdDateTime } from '@/lib/bdTime';
 
 interface DashboardData {
   role: 'admin' | 'staff' | 'instructor';
@@ -102,11 +103,7 @@ function formatCurrency(amount: number) {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-BD', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
+  return formatBdDate(dateStr);
 }
 
 const statusColors: Record<string, string> = {
@@ -1096,12 +1093,8 @@ export default function AdminDashboardPage() {
                       ? new Date(lesson.liveDate)
                       : null;
                     const formattedDate = dateObj
-                      ? dateObj.toLocaleString('en-BD', {
-                          month: 'short',
-                          day: '2-digit',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          hour12: true,
+                      ? formatBdDateTime(dateObj, {
+                          year: undefined,
                         })
                       : 'Not Scheduled';
 

@@ -1,7 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import PDFDocument from 'pdfkit';
+import type PDFKit from 'pdfkit';
 import sharp from 'sharp';
+import { formatBdLongDate } from '@/lib/bdTime';
 
 /** Prefer assets/ (not volume-mounted). Fallbacks cover local/legacy paths. */
 const CERTIFICATE_BACKGROUND_CANDIDATES = [
@@ -98,11 +100,7 @@ async function loadBackgroundBuffer(): Promise<Buffer> {
 }
 
 export function formatCertificateDate(date: Date = new Date()): string {
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  return formatBdLongDate(date)
 }
 
 /** Fixed certificate body text under the student name. */

@@ -1,3 +1,4 @@
+import { formatBdDateTime } from '@/lib/bdTime';
 import nodemailer from 'nodemailer';
 
 let cachedTransporter: ReturnType<typeof nodemailer.createTransport> | null =
@@ -44,13 +45,8 @@ export async function sendEnrollmentConfirmationEmail(
     return false;
   }
 
-  const formattedDate = new Date(enrolledAt).toLocaleString('en-BD', {
-    day: '2-digit',
+  const formattedDate = formatBdDateTime(enrolledAt, {
     month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
   });
 
   const formattedPrice = new Intl.NumberFormat('en-BD', {
@@ -156,13 +152,8 @@ export async function sendOrderConfirmationEmail(
     return false;
   }
 
-  const formattedDate = new Date(orderedAt).toLocaleString('en-BD', {
-    day: '2-digit',
+  const formattedDate = formatBdDateTime(orderedAt, {
     month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
   });
 
   const formatMoney = (amount: number) =>
@@ -327,15 +318,9 @@ export async function sendLiveClassReminderEmail(
     return false;
   }
 
-  const formattedDate = new Date(liveDate).toLocaleString('en-BD', {
+  const formattedDate = formatBdDateTime(liveDate, {
     weekday: 'long',
-    day: '2-digit',
     month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-    timeZone: 'Asia/Dhaka',
   });
 
   const subject = `⚠️ URGENT REMINDER: Your Live Class Starts Soon!`;
@@ -410,7 +395,6 @@ export async function checkAndSendLiveClassReminders() {
 
     const { Lesson } = await import('@/lib/db/models/Lesson');
     const { Course } = await import('@/lib/db/models/Course');
-    const { User } = await import('@/lib/db/models/User');
 
     // Find live classes starting in the next 2 hours (or already started in the last 15 minutes) that haven't received a reminder yet
     const now = new Date();

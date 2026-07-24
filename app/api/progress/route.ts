@@ -9,6 +9,7 @@ import {
 import { syncEnrollmentProgressSideEffects } from '@/lib/progress/syncEnrollmentProgress'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
+import { bdTodayYmd } from '@/lib/bdTime'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -67,8 +68,8 @@ export async function GET() {
     const progressDoc = await StudentProgress.findOne({ student: userId }).lean() as any
     const loginDates: string[] = progressDoc?.loginDates || []
 
-    // Auto-record today's login
-    const today = new Date().toISOString().split('T')[0]
+    // Auto-record today's login (Bangladesh calendar day)
+    const today = bdTodayYmd()
     if (!loginDates.includes(today)) {
       await StudentProgress.findOneAndUpdate(
         { student: userId },

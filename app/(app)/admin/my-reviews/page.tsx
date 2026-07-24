@@ -9,6 +9,7 @@ import {
   FiStar,
   FiUser,
 } from 'react-icons/fi'
+import { formatBdDate } from '@/lib/bdTime'
 
 type ReviewStatus = 'pending' | 'approved' | 'rejected'
 
@@ -111,12 +112,7 @@ export default function TeacherMyReviewsPage() {
   const approvedCount = reviews.filter((r) => r.status === 'approved').length
   const pendingCount = reviews.filter((r) => r.status === 'pending').length
 
-  const formatDate = (dateStr: string) =>
-    new Date(dateStr).toLocaleDateString('en-BD', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    })
+  const formatDate = (dateStr: string) => formatBdDate(dateStr)
 
   if (loading) {
     return (

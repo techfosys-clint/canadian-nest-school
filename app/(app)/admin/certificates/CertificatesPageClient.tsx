@@ -15,6 +15,7 @@ import {
   FiXCircle,
 } from 'react-icons/fi';
 import Swal from 'sweetalert2';
+import { formatBdDate, formatBdDateTime } from '@/lib/bdTime';
 
 interface Student {
   id: string;
@@ -410,10 +411,9 @@ export default function CertificatesPageClient() {
                                 {sub.type}
                               </span>
                               <span className='text-base font-semibold text-slate-400'>
-                                {new Date(sub.submittedAt).toLocaleDateString(
-                                  'en-BD',
-                                  { day: '2-digit', month: 'short' },
-                                )}
+                                {formatBdDate(sub.submittedAt, {
+                                  year: undefined,
+                                })}
                               </span>
                             </div>
                           </div>
@@ -707,17 +707,7 @@ export default function CertificatesPageClient() {
               </thead>
               <tbody className='divide-y divide-slate-100 font-semibold text-slate-700'>
                 {filteredRequests.map((req) => {
-                  const requestDate = new Date(req.createdAt).toLocaleString(
-                    'en-BD',
-                    {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      hour12: true,
-                    },
-                  );
+                  const requestDate = formatBdDateTime(req.createdAt);
 
                   return (
                     <tr

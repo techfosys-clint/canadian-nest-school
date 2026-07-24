@@ -12,6 +12,7 @@ import {
   FiUser,
   FiX,
 } from 'react-icons/fi'
+import { formatBdDate } from '@/lib/bdTime'
 
 interface CourseReviewItem {
   _id: string
@@ -292,11 +293,7 @@ export default function ReviewsModerationClient({
                     </span>
                     <span className="inline-flex items-center gap-1.5 text-base font-semibold text-slate-400">
                       <FiCalendar className="h-4 w-4" />
-                      {new Date(pack.courseReview.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
+                      {formatBdDate(pack.courseReview.createdAt)}
                     </span>
                   </div>
                 </div>

@@ -16,6 +16,7 @@ import {
   FiX,
 } from 'react-icons/fi';
 import Swal from 'sweetalert2';
+import { formatBdDate } from '@/lib/bdTime';
 
 interface MediaItem {
   id: string;
@@ -40,11 +41,7 @@ function formatBytes(bytes: number) {
 
 function formatDate(iso: string) {
   if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
+  return formatBdDate(iso);
 }
 
 type SortKey = 'filename' | 'filesize' | 'mimeType' | 'createdAt';

@@ -14,6 +14,7 @@ import {
   FiArrowLeft,
 } from 'react-icons/fi'
 import Swal from 'sweetalert2'
+import { formatBdDate } from '@/lib/bdTime'
 
 interface Enrollment {
   id: string
@@ -41,11 +42,7 @@ function formatCurrency(amount: number) {
 }
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-BD', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  })
+  return formatBdDate(dateStr)
 }
 
 export default function ManageEnrollmentsPage() {

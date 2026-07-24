@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiArrowRight } from 'react-icons/fi';
+import { formatBdDate } from '@/lib/bdTime';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -31,28 +32,9 @@ function getPlainPreview(htmlContent: string, maxLength = 120): string {
   return cleaned.substring(0, maxLength) + '...';
 }
 
-// Helper to format date precisely like "14 Jan 2026"
+// Helper to format date precisely like "24 Jul 2026" (Asia/Dhaka)
 function formatDate(dateStr?: string): string {
-  if (!dateStr) return '';
-  const date = new Date(dateStr);
-  const day = String(date.getDate()).padStart(2, '0');
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-  const month = months[date.getMonth()];
-  const year = date.getFullYear();
-  return `${day} ${month} ${year}`;
+  return formatBdDate(dateStr);
 }
 
 // ─── Animation Variants ───────────────────────────────────────────────────────

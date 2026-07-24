@@ -11,6 +11,7 @@ import {
   FiShoppingBag,
   FiUser,
 } from 'react-icons/fi';
+import { formatBdDate } from '@/lib/bdTime';
 
 export interface ThankYouOrderItem {
   title: string;
@@ -41,11 +42,7 @@ export default function OrderThankYouClient({
   order: ThankYouOrderData;
   customerName?: string;
 }) {
-  const placedOn = new Date(order.createdAt).toLocaleDateString('en-BD', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
+  const placedOn = formatBdDate(order.createdAt);
 
   return (
     <div className='min-h-[70vh] bg-[#f8fafc] pt-28 pb-12'>

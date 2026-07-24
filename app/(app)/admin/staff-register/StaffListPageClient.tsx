@@ -14,6 +14,7 @@ import {
   FiUser,
   FiUserPlus,
 } from 'react-icons/fi';
+import { formatBdDate } from '@/lib/bdTime';
 
 interface StaffMember {
   id: string;
@@ -267,14 +268,7 @@ export default function StaffListPageClient({
                         <FiCalendar className='h-4 w-4 text-slate-400' />
                         <span>
                           {member.createdAt
-                            ? new Date(member.createdAt).toLocaleDateString(
-                                'en-US',
-                                {
-                                  year: 'numeric',
-                                  month: 'short',
-                                  day: 'numeric',
-                                },
-                              )
+                            ? formatBdDate(member.createdAt)
                             : 'N/A'}
                         </span>
                       </div>

@@ -17,6 +17,7 @@ import {
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
 import { checkAndSendLiveClassReminders } from '@/lib/email'
+import { bdTodayYmd } from '@/lib/bdTime'
 
 export async function GET() {
   try {
@@ -90,22 +91,21 @@ export async function GET() {
           createdAt: e.createdAt,
         }))
 
-      // Sparkline revenue chart (last 7 days)
-      const chartData: Array<{ day: string; income: number }> = []
+      // Sparkline revenue chart (last 7 days, Bangladesh calendar)
       const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-      const today = new Date()
+      const todayNoonBd = new Date(`${bdTodayYmd()}T12:00:00+06:00`)
+      const chartData: { day: string; income: number }[] = []
 
       for (let i = 6; i >= 0; i--) {
-        const d = new Date()
-        d.setDate(today.getDate() - i)
-        const dateStr = d.toDateString()
-        const dayLabel = days[d.getDay()]
+        const day = new Date(todayNoonBd.getTime() - i * 24 * 60 * 60 * 1000)
+        const dayYmd = bdTodayYmd(day)
+        const label = days[new Date(`${dayYmd}T12:00:00+06:00`).getUTCDay()]
 
         const dayIncome = completedList
-          .filter((e) => new Date(e.createdAt).toDateString() === dateStr)
+          .filter((e) => bdTodayYmd(new Date(e.createdAt)) === dayYmd)
           .reduce((sum, e) => sum + (e.pricePaid || 0), 0)
 
-        chartData.push({ day: dayLabel, income: dayIncome })
+        chartData.push({ day: label, income: dayIncome })
       }
 
       return NextResponse.json({

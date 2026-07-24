@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { FiPackage, FiMapPin, FiCheckCircle } from 'react-icons/fi'
+import { formatBdDate } from '@/lib/bdTime'
 
 interface UserSession {
   id: string
@@ -102,7 +103,7 @@ export default function MyOrdersPage() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex items-center gap-2 text-sm font-semibold text-zinc-450">
                   <FiCheckCircle className="h-4 w-4 text-emerald-500" />
-                  Placed on {new Date(order.createdAt).toLocaleDateString('en-BD', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  Placed on {formatBdDate(order.createdAt)}
                 </div>
                 <span className={`px-3 py-1 rounded-lg text-sm font-bold uppercase tracking-wide border w-fit ${STATUS_STYLES[order.orderStatus]}`}>
                   {order.orderStatus}

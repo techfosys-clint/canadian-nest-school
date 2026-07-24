@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { FiBookOpen, FiSearch, FiX } from 'react-icons/fi';
+import { formatBdDate } from '@/lib/bdTime';
 
 interface BlogItem {
   id: string;
@@ -21,28 +22,9 @@ interface BlogsPageClientProps {
   initialBlogs: BlogItem[];
 }
 
-// Format date helper: "14 Jan 2026"
+// Format date helper: "24 Jul 2026" (Asia/Dhaka)
 function formatDate(dateStr?: Date | string): string {
-  if (!dateStr) return '';
-  const date = new Date(dateStr);
-  const day = String(date.getDate()).padStart(2, '0');
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-  const month = months[date.getMonth()];
-  const year = date.getFullYear();
-  return `${day} ${month} ${year}`;
+  return formatBdDate(dateStr);
 }
 
 // Helper to strip HTML tags for safe preview rendering

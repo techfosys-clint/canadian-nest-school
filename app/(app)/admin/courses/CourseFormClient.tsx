@@ -6,6 +6,7 @@ import type { MediaItem } from '@/components/MediaPickerModal';
 import MediaPickerModal from '@/components/MediaPickerModal';
 import RichTextEditor from '@/components/RichTextEditor';
 import { parseJsonResponse } from '@/lib/safeJson';
+import { formatBdDate } from '@/lib/bdTime';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -1861,11 +1862,8 @@ export default function CourseFormClient({
                                 </span>
                                 <span className='flex items-center gap-1.5'>
                                   <FiCalendar className='h-3.5 w-3.5' />
-                                  {new Date(
-                                    batch.startDate,
-                                  ).toLocaleDateString()}{' '}
-                                  -{' '}
-                                  {new Date(batch.endDate).toLocaleDateString()}
+                                  {formatBdDate(batch.startDate)} -{' '}
+                                  {formatBdDate(batch.endDate)}
                                 </span>
                               </div>
                             </div>

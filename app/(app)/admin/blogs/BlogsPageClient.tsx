@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import { formatBdDate } from '@/lib/bdTime';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
@@ -359,16 +359,7 @@ export default function BlogsPageClient({
                         {blog.publishedDate ? (
                           <div className='flex items-center gap-2 text-base font-semibold text-slate-500'>
                             <FiCalendar className='h-4 w-4 text-slate-400' />
-                            <span>
-                              {new Date(blog.publishedDate).toLocaleDateString(
-                                'en-US',
-                                {
-                                  month: 'short',
-                                  day: 'numeric',
-                                  year: 'numeric',
-                                },
-                              )}
-                            </span>
+                            <span>{formatBdDate(blog.publishedDate)}</span>
                           </div>
                         ) : (
                           <span className='text-base font-semibold text-slate-400'>

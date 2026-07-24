@@ -11,6 +11,7 @@ import {
   FiClock,
   FiInfo 
 } from 'react-icons/fi'
+import { bdTodayYmd, formatBdDate } from '@/lib/bdTime'
 
 interface BatchItem {
   _id: string
@@ -86,7 +87,7 @@ export default function AttendanceAdminPage() {
         setLoading(false)
       }
     }
-    setDate(new Date().toISOString().split('T')[0])
+    setDate(bdTodayYmd())
     loadBatches()
   }, [])
 
@@ -487,7 +488,12 @@ export default function AttendanceAdminPage() {
                         <div className="space-y-1">
                           <h4 className="text-lg font-bold text-slate-800 flex items-center gap-2">
                             <FiCalendar className="text-[#E61C24] h-5 w-5" />
-                            {lDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                            {formatBdDate(lDate, {
+                              weekday: 'long',
+                              month: 'long',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })}
                           </h4>
                           {log.remarks && (
                             <p className="text-base font-semibold text-slate-500 italic">

@@ -320,16 +320,24 @@ export default function MyCoursesPage() {
                         gateLoading={gatesLoading && !reviewGates[course.id]}
                       />
                     ) : (
-                      <button
-                        type='button'
-                        onClick={() =>
-                          handleResumeLearning(course.id, course.slug)
-                        }
-                        className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all duration-200 cursor-pointer border-none active:scale-[0.99]'
-                      >
-                        <span>Resume Learning</span>
-                        <FiArrowRight className='h-5 w-5 group-hover:translate-x-0.5 transition-transform' />
-                      </button>
+                      <div className='space-y-3'>
+                        <button
+                          type='button'
+                          onClick={() =>
+                            handleResumeLearning(course.id, course.slug)
+                          }
+                          className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all duration-200 cursor-pointer border-none active:scale-[0.99]'
+                        >
+                          <span>Resume Learning</span>
+                          <FiArrowRight className='h-5 w-5 group-hover:translate-x-0.5 transition-transform' />
+                        </button>
+                        <Link
+                          href={`/dashboard/courses/${course.id}/complete`}
+                          className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-white border border-zinc-200/80 hover:border-[#E61C24]/40 text-zinc-700 hover:text-[#E61C24] font-bold text-base transition-all duration-200'
+                        >
+                          Leave Reviews
+                        </Link>
+                      </div>
                     )}
                   </div>
                 </div>

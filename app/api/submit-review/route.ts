@@ -59,8 +59,8 @@ export async function POST(request: Request) {
       status: 'pending',
     })
 
-    // If teacher reviews are already done (or none required), unlock the cert now.
-    await syncCertificateRequestWithReviewGate(decoded.id, course, 100)
+    // Sync cert only when syllabus is also complete (progress recomputed inside).
+    await syncCertificateRequestWithReviewGate(decoded.id, course)
 
     return NextResponse.json({ doc: review }, { status: 201 })
   } catch (err: any) {

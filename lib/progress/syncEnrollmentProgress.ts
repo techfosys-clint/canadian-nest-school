@@ -23,7 +23,7 @@ export async function syncEnrollmentProgressSideEffects(
   }
 
   // At 100%: create/update cert — auto-approved once reviews are submitted
-  await syncCertificateRequestWithReviewGate(userId, courseId, progress)
+  await syncCertificateRequestWithReviewGate(userId, courseId)
 
   return progress
 }

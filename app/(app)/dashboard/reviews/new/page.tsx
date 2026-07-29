@@ -19,8 +19,8 @@ interface EnrollmentItem {
 }
 
 /**
- * Legacy "write a course-only review" entry is replaced by the completion
- * flow that requires course + teacher reviews for certificate unlock.
+ * Pick any paid enrollment to leave course + teacher reviews.
+ * Certificate download still requires 100% syllabus after reviews.
  */
 export default function NewReviewPage() {
   const router = useRouter()
@@ -75,10 +75,7 @@ export default function NewReviewPage() {
             const total = e.course.totalLessons || 1
             const done = (completedLessonsMap[e.course.id] || []).length
             const progress = Math.min(Math.round((done / total) * 100), 100)
-            if (progress < 100) continue
 
-            // Still show if course review exists but teacher reviews may be pending —
-            // completion page handles remaining steps.
             rows.push({
               courseId: e.course.id,
               title: e.course.title,
@@ -86,7 +83,6 @@ export default function NewReviewPage() {
             })
           }
 
-          // Prefer courses that still need the completion review flow
           const needingReview = rows.filter((r) => !reviewedCourseIds.has(r.courseId))
           setEligible(needingReview.length > 0 ? needingReview : rows)
         }
@@ -101,43 +97,38 @@ export default function NewReviewPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
-          <p className="text-base font-bold text-zinc-600">Loading review options...</p>
-        </div>
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="h-10 w-10 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto px-6 py-8 pb-16">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-200/80 pb-6 mb-8">
-        <div className="space-y-1">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => router.push('/dashboard/reviews')}
-              className="h-10 w-10 border border-zinc-200 hover:border-zinc-300 rounded-lg flex items-center justify-center text-zinc-600 hover:text-zinc-900 bg-white transition-colors cursor-pointer"
-            >
-              <FiArrowLeft className="h-5 w-5" />
-            </button>
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-800 font-display">
-              Leave Reviews
-            </h1>
-          </div>
-          <p className="text-base font-semibold text-zinc-500 pl-13">
-            Course and teacher reviews are submitted together in the completion flow.
-            Your certificate unlocks as soon as both are submitted.
-          </p>
+    <div className="container mx-auto px-6 py-8 pb-16 max-w-3xl">
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-2">
+          <button
+            type="button"
+            onClick={() => router.push('/dashboard/reviews')}
+            className="h-10 w-10 border border-zinc-200 hover:border-zinc-300 rounded-lg flex items-center justify-center text-zinc-600 hover:text-zinc-900 bg-white transition-colors cursor-pointer"
+          >
+            <FiArrowLeft className="h-5 w-5" />
+          </button>
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-800 font-display">
+            Leave Reviews
+          </h1>
         </div>
+        <p className="text-base font-semibold text-zinc-500 pl-13">
+          You can rate a course and its teachers anytime after purchase. Your certificate
+          unlocks once the syllabus is 100% complete and both reviews are submitted.
+        </p>
       </div>
 
       <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3 mb-6">
         <FiAlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
         <p className="text-base font-semibold text-amber-800">
-          Course-only reviews are disabled. Choose a completed course below to rate the course
-          and its teachers.
+          Pick a purchased course below. Reviews can be left at any progress; finishing the
+          syllabus is only required to download the certificate.
         </p>
       </div>
 
@@ -148,10 +139,9 @@ export default function NewReviewPage() {
               <FiStar className="h-8 w-8" />
             </div>
             <div className="max-w-md space-y-1.5">
-              <p className="text-lg font-bold text-zinc-800">No completed courses ready</p>
+              <p className="text-lg font-bold text-zinc-800">No purchased courses yet</p>
               <p className="text-base font-semibold text-zinc-500 leading-relaxed">
-                Finish 100% of a course syllabus first, then return here to leave reviews and
-                unlock your certificate.
+                Enroll in a course with completed payment, then return here to leave reviews.
               </p>
             </div>
             <Link
@@ -172,6 +162,9 @@ export default function NewReviewPage() {
                   <p className="text-lg font-bold text-zinc-800 truncate">{course.title}</p>
                   <p className="text-base font-semibold text-zinc-500">
                     Syllabus {course.progress}% complete
+                    {course.progress < 100
+                      ? ' · Certificate unlocks at 100%'
+                      : ' · Ready for certificate after reviews'}
                   </p>
                 </div>
                 <Link
@@ -179,7 +172,7 @@ export default function NewReviewPage() {
                   className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base shrink-0"
                 >
                   <FiAward className="h-5 w-5" />
-                  Review &amp; Get Certificate
+                  Leave Reviews
                 </Link>
               </li>
             ))}

@@ -63,6 +63,20 @@ export async function downloadCourseCertificate(
     const res = await fetch(`/api/certificates/download?courseId=${courseId}`)
     if (!res.ok) {
       const data = await res.json().catch(() => ({}))
+      if (data.code === 'COURSE_INCOMPLETE') {
+        await Swal.fire({
+          icon: 'info',
+          title: 'Finish the Syllabus',
+          text:
+            data.error ||
+            'Complete all lessons before downloading your certificate. You can leave reviews anytime.',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#E61C24',
+          background: '#ffffff',
+          color: '#1e293b',
+        })
+        return 'error'
+      }
       if (data.code === 'REVIEWS_REQUIRED' || data.redirectTo) {
         if (data.code === 'REVIEWS_REJECTED') {
           const result = await Swal.fire({

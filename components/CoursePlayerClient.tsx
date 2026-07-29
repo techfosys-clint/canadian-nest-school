@@ -568,10 +568,6 @@ export default function CoursePlayerClient({
       : 0;
 
   useEffect(() => {
-    if (progressPercentage < 100) {
-      setReviewGate(null);
-      return;
-    }
     let cancelled = false;
     (async () => {
       try {
@@ -585,13 +581,13 @@ export default function CoursePlayerClient({
           teacherReviewStatus: data.teacherReviewStatus || 'idle',
         });
       } catch {
-        /* keep null — show generic cert link */
+        /* keep null — show generic review link */
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [course.id, progressPercentage]);
+  }, [course.id]);
 
   if (sortedLessons.length === 0) {
     return (
@@ -1562,22 +1558,29 @@ export default function CoursePlayerClient({
         </p>
       </div>
 
-      {/* Dynamic Certificate + Reviews widget */}
-      {progressPercentage === 100 && (
-        <div className='mx-4 mt-4 p-4 bg-slate-50 border border-zinc-200 rounded-lg flex flex-col gap-3 shadow-sm select-none animate-fadeIn'>
-          <div className='flex items-center gap-2'>
-            <FiAward className='h-6 w-6 text-[#E61C24]' />
-            <h3 className='text-base font-bold text-zinc-900 leading-tight'>
-              Course Completed!
-            </h3>
-          </div>
+      {/* Reviews anytime + certificate unlock at 100% */}
+      {(() => {
+        const completeHref = `/dashboard/courses/${course.id}/complete`;
+        const mode = getCertCtaMode(reviewGate);
+        const reviewsDone =
+          mode === 'download' ||
+          (reviewGate &&
+            reviewGate.courseReviewStatus !== 'idle' &&
+            reviewGate.teacherReviewStatus !== 'idle' &&
+            reviewGate.courseReviewStatus !== 'rejected' &&
+            reviewGate.teacherReviewStatus !== 'rejected');
 
-          {(() => {
-            const mode = getCertCtaMode(reviewGate);
-            const completeHref = `/dashboard/courses/${course.id}/complete`;
+        if (progressPercentage === 100) {
+          return (
+            <div className='mx-4 mt-4 p-4 bg-slate-50 border border-zinc-200 rounded-lg flex flex-col gap-3 shadow-sm select-none animate-fadeIn'>
+              <div className='flex items-center gap-2'>
+                <FiAward className='h-6 w-6 text-[#E61C24]' />
+                <h3 className='text-base font-bold text-zinc-900 leading-tight'>
+                  Course Completed!
+                </h3>
+              </div>
 
-            if (mode === 'download') {
-              return (
+              {mode === 'download' ? (
                 <>
                   <p className='text-base font-semibold text-zinc-500 leading-relaxed'>
                     Your reviews are in. You can download your official
@@ -1610,11 +1613,7 @@ export default function CoursePlayerClient({
                     </span>
                   </button>
                 </>
-              );
-            }
-
-            if (mode === 'resubmit_reviews') {
-              return (
+              ) : mode === 'resubmit_reviews' ? (
                 <>
                   <p className='text-base font-semibold text-zinc-500 leading-relaxed'>
                     Your previous reviews were rejected. Please resubmit them to
@@ -1628,27 +1627,87 @@ export default function CoursePlayerClient({
                     <span>Resubmit Reviews</span>
                   </Link>
                 </>
-              );
-            }
+              ) : (
+                <>
+                  <p className='text-base font-semibold text-zinc-500 leading-relaxed'>
+                    Leave short reviews for this course and your teachers to
+                    unlock your certificate instantly.
+                  </p>
+                  <Link
+                    href={completeHref}
+                    className='w-full py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white text-base font-bold transition-all cursor-pointer border-none text-center flex items-center justify-center gap-1.5'
+                  >
+                    <span>Leave Reviews to Unlock Certificate</span>
+                    <FiExternalLink className='h-4 w-4' />
+                  </Link>
+                </>
+              )}
+            </div>
+          );
+        }
 
-            return (
-              <>
-                <p className='text-base font-semibold text-zinc-500 leading-relaxed'>
-                  Leave short reviews for this course and your teachers to
-                  unlock your certificate instantly.
-                </p>
-                <Link
-                  href={completeHref}
-                  className='w-full py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white text-base font-bold transition-all cursor-pointer border-none text-center flex items-center justify-center gap-1.5'
-                >
-                  <span>Leave Reviews to Unlock Certificate</span>
-                  <FiExternalLink className='h-4 w-4' />
-                </Link>
-              </>
-            );
-          })()}
-        </div>
-      )}
+        // Before 100%: still offer reviews anytime after purchase
+        if (mode === 'resubmit_reviews') {
+          return (
+            <div className='mx-4 mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg flex flex-col gap-3 shadow-sm select-none'>
+              <div className='flex items-center gap-2'>
+                <FiLock className='h-5 w-5 text-amber-700' />
+                <h3 className='text-base font-bold text-amber-900 leading-tight'>
+                  Resubmit Reviews
+                </h3>
+              </div>
+              <p className='text-base font-semibold text-amber-800/80 leading-relaxed'>
+                Your previous reviews were rejected. You can resubmit them anytime.
+              </p>
+              <Link
+                href={completeHref}
+                className='w-full py-2.5 rounded-lg bg-amber-100 border border-amber-200 text-amber-900 text-base font-bold text-center flex items-center justify-center gap-1.5'
+              >
+                Resubmit Reviews
+              </Link>
+            </div>
+          );
+        }
+
+        if (!reviewsDone) {
+          return (
+            <div className='mx-4 mt-4 p-4 bg-slate-50 border border-zinc-200 rounded-lg flex flex-col gap-3 shadow-sm select-none'>
+              <div className='flex items-center gap-2'>
+                <FiAward className='h-5 w-5 text-[#E61C24]' />
+                <h3 className='text-base font-bold text-zinc-900 leading-tight'>
+                  Share Your Feedback
+                </h3>
+              </div>
+              <p className='text-base font-semibold text-zinc-500 leading-relaxed'>
+                You can leave course and teacher reviews anytime. Certificate download
+                unlocks when you finish the syllabus ({progressPercentage}% so far).
+              </p>
+              <Link
+                href={completeHref}
+                className='w-full py-2.5 rounded-lg bg-white border border-zinc-200 hover:border-[#E61C24]/40 text-zinc-800 hover:text-[#E61C24] text-base font-bold text-center flex items-center justify-center gap-1.5'
+              >
+                <span>Leave Reviews</span>
+                <FiExternalLink className='h-4 w-4' />
+              </Link>
+            </div>
+          );
+        }
+
+        return (
+          <div className='mx-4 mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg flex flex-col gap-2 shadow-sm select-none'>
+            <div className='flex items-center gap-2'>
+              <FiAward className='h-5 w-5 text-emerald-700' />
+              <h3 className='text-base font-bold text-emerald-900 leading-tight'>
+                Reviews Submitted
+              </h3>
+            </div>
+            <p className='text-base font-semibold text-emerald-800/80 leading-relaxed'>
+              Finish the remaining syllabus ({progressPercentage}%) to download your
+              certificate.
+            </p>
+          </div>
+        );
+      })()}
 
       <div className='grow shrink flex-1 overflow-y-auto p-4 space-y-4 max-h-162.5 pr-2 bg-slate-50/50'>
         {moduleGroups.map((group) => {

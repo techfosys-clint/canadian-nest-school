@@ -43,6 +43,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'courseId is required.' }, { status: 400 })
     }
 
+    let progress = 0
+    try {
+      const enrolled = await assertStudentCanReviewCourse(studentId, courseId)
+      progress = enrolled.progress
+    } catch {
+      // Still return gate for enrolled UI; download stays locked without payment.
+    }
+
     const gate = await getStudentCourseReviewGate(studentId, courseId)
     const instructors = await Course.findById(courseId)
       .populate({
@@ -79,18 +87,22 @@ export async function GET(request: NextRequest) {
       return []
     })()
 
+    const reviewsOk = canDownloadCertificate(
+      gate.courseReviewStatus,
+      gate.teacherReviewStatus,
+    )
+
     return NextResponse.json({
       success: true,
+      progress,
       courseReviewStatus: gate.courseReviewStatus,
       teacherReviewStatus: gate.teacherReviewStatus,
       submitted: hasSubmittedRequiredReviews(
         gate.courseReviewStatus,
         gate.teacherReviewStatus,
       ),
-      canDownload: canDownloadCertificate(
-        gate.courseReviewStatus,
-        gate.teacherReviewStatus,
-      ),
+      // Certificate still requires 100% syllabus + submitted reviews.
+      canDownload: reviewsOk && progress >= 100,
       courseReview: gate.courseReview
         ? {
             id: gate.courseReview._id.toString(),
@@ -217,8 +229,8 @@ export async function POST(request: NextRequest) {
       })),
     )
 
-    // Both review tracks submitted → unlock certificate immediately.
-    await syncCertificateRequestWithReviewGate(studentId, courseId, 100)
+    // Unlock certificate only when syllabus is also complete (recomputed inside).
+    await syncCertificateRequestWithReviewGate(studentId, courseId)
 
     return NextResponse.json(
       {

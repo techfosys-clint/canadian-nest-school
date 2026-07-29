@@ -78,7 +78,11 @@ export async function GET(request: NextRequest) {
 
     if (progress < 100) {
       return NextResponse.json(
-        { error: 'Complete all lessons before downloading your certificate.' },
+        {
+          error: 'Complete all lessons before downloading your certificate.',
+          code: 'COURSE_INCOMPLETE',
+          progress,
+        },
         { status: 403 },
       )
     }
@@ -124,7 +128,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Reviews submitted → approve/create the certificate row immediately.
-    await syncCertificateRequestWithReviewGate(userId, courseId, 100)
+    await syncCertificateRequestWithReviewGate(userId, courseId)
     const certificateRequest = await CertificateRequest.findOne({
       student: userId,
       course: courseId,

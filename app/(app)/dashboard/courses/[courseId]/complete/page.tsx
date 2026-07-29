@@ -142,6 +142,7 @@ export default function CourseCompleteReviewPage() {
 
   const [certStatus, setCertStatus] = useState<'locked' | 'pending' | 'ready'>('locked')
   const [downloadingCert, setDownloadingCert] = useState(false)
+  const [syllabusProgress, setSyllabusProgress] = useState(0)
 
   const bothReviewsSubmitted =
     courseReviewStatus !== 'idle' &&
@@ -152,15 +153,16 @@ export default function CourseCompleteReviewPage() {
   const reviewsRejected =
     courseReviewStatus === 'rejected' || teacherReviewStatus === 'rejected'
 
+  const syllabusComplete = syllabusProgress >= 100
+  const certReady = bothReviewsSubmitted && syllabusComplete
+
   useEffect(() => {
-    if (bothReviewsSubmitted) {
+    if (certReady) {
       setCertStatus('ready')
-    } else if (reviewsRejected) {
-      setCertStatus('locked')
     } else {
       setCertStatus('locked')
     }
-  }, [bothReviewsSubmitted, reviewsRejected])
+  }, [certReady])
 
   useEffect(() => {
     async function load() {
@@ -210,6 +212,9 @@ export default function CourseCompleteReviewPage() {
           setInstructors(teacherList)
           setCourseReviewStatus(completionData.courseReviewStatus || 'idle')
           setTeacherReviewStatus(completionData.teacherReviewStatus || 'idle')
+          if (typeof completionData.progress === 'number') {
+            setSyllabusProgress(completionData.progress)
+          }
 
           if (completionData.courseReview) {
             setCourseRating(Number(completionData.courseReview.rating) || 0)
@@ -475,15 +480,15 @@ export default function CourseCompleteReviewPage() {
               <FiArrowLeft className="h-4 w-4" /> Back to course player
             </button>
             <span className="inline-flex items-center px-3 py-1 rounded-lg bg-[#E61C24]/20 border border-[#E61C24]/30 text-base font-bold text-[#FF4D55] uppercase tracking-wider">
-              Course Completed
+              Course Reviews
             </span>
             <h1 className="text-3xl md:text-4xl font-bold font-display text-white leading-tight">
-              Congrats — leave reviews & unlock your certificate
+              Leave reviews anytime — unlock your certificate when ready
             </h1>
             <p className="text-zinc-400 text-base font-semibold leading-relaxed max-w-2xl">
               Rate <span className="text-white">{course.title}</span> and the teachers
-              assigned to it. As soon as both reviews are submitted, your
-              certificate unlocks for download.
+              assigned to it whenever you like after purchase. Your certificate unlocks
+              once the syllabus is 100% complete and both reviews are submitted.
             </p>
           </div>
 
@@ -530,6 +535,7 @@ export default function CourseCompleteReviewPage() {
             ) : (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-zinc-100 text-zinc-500 border border-zinc-200/80 text-base font-bold">
                 <FiLock className="h-4 w-4" /> Locked
+                {!syllabusComplete ? ` · ${syllabusProgress}% syllabus` : ''}
               </span>
             )}
           </div>
@@ -808,19 +814,19 @@ export default function CourseCompleteReviewPage() {
           <div className="space-y-1">
             <h2 className="text-2xl font-bold font-display text-zinc-800">Your certificate</h2>
             <p className="text-base font-semibold text-zinc-500">
-              Once course and teacher reviews are submitted, your certificate is ready
-              to download right away.
+              Download unlocks after course and teacher reviews are submitted and the
+              syllabus is 100% complete.
             </p>
           </div>
 
           <div
             className={`relative overflow-hidden rounded-lg border p-8 sm:p-10 ${
-              bothReviewsSubmitted
+              certReady
                 ? 'border-emerald-200 bg-linear-to-br from-emerald-50 to-white'
                 : 'border-zinc-200/80 bg-linear-to-br from-zinc-50 to-white'
             }`}
           >
-            {!bothReviewsSubmitted && (
+            {!certReady && (
               <div className="absolute inset-0 bg-white/55 backdrop-blur-[2px] flex items-center justify-center z-10">
                 <div className="text-center space-y-3 px-6 max-w-md">
                   <div className="mx-auto h-14 w-14 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center">
@@ -830,25 +836,37 @@ export default function CourseCompleteReviewPage() {
                   <p className="text-base font-semibold text-zinc-500 leading-relaxed">
                     {reviewsRejected
                       ? 'Your reviews were rejected. Please resubmit course and teacher reviews to unlock your certificate.'
-                      : 'Submit your course and teacher reviews first. Your certificate unlocks as soon as both are submitted.'}
+                      : !bothReviewsSubmitted
+                        ? 'Submit your course and teacher reviews first. You can do this anytime after purchase.'
+                        : `Reviews are in — finish the syllabus (${syllabusProgress}%) to download your certificate.`}
                   </p>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setStep(
-                        courseReviewStatus === 'idle' ||
-                          courseReviewStatus === 'rejected'
-                          ? 1
-                          : 2,
-                      )
-                    }
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base cursor-pointer border-none"
-                  >
-                    {courseReviewStatus === 'idle' ||
-                    courseReviewStatus === 'rejected'
-                      ? 'Go to Course Review'
-                      : 'Go to Teacher Reviews'}
-                  </button>
+                  {!bothReviewsSubmitted ? (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setStep(
+                          courseReviewStatus === 'idle' ||
+                            courseReviewStatus === 'rejected'
+                            ? 1
+                            : 2,
+                        )
+                      }
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base cursor-pointer border-none"
+                    >
+                      {courseReviewStatus === 'idle' ||
+                      courseReviewStatus === 'rejected'
+                        ? 'Go to Course Review'
+                        : 'Go to Teacher Reviews'}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/courses/${course.slug}/watch`)}
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base cursor-pointer border-none"
+                    >
+                      Continue Learning
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -867,7 +885,7 @@ export default function CourseCompleteReviewPage() {
                 Canadian Nest School · Official verified credential
               </p>
               <div className="w-full max-w-sm h-px bg-zinc-200 my-2" />
-              {bothReviewsSubmitted ? (
+              {certReady ? (
                 <button
                   type="button"
                   onClick={handleDownloadCertificate}
@@ -880,7 +898,11 @@ export default function CourseCompleteReviewPage() {
               ) : (
                 <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-zinc-200/80 text-zinc-500 font-bold text-base">
                   <FiLock className="h-4 w-4" />
-                  {reviewsRejected ? 'Resubmit reviews' : 'Reviews required'}
+                  {reviewsRejected
+                    ? 'Resubmit reviews'
+                    : !bothReviewsSubmitted
+                      ? 'Reviews required'
+                      : 'Finish syllabus'}
                 </div>
               )}
             </div>

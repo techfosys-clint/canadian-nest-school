@@ -178,7 +178,7 @@ export default function MyCertificatesPage() {
     () =>
       certificates.filter((c) => {
         const gate = getGate(c);
-        return c.progress >= 100 && !hasSubmittedRequiredReviews(gate);
+        return !hasSubmittedRequiredReviews(gate);
       }).length,
     [certificates],
   );
@@ -190,11 +190,20 @@ export default function MyCertificatesPage() {
     const reviewsDone = hasSubmittedRequiredReviews(gate);
     const reviewsAccepted = canDownloadCertificate(gate);
 
-    if (cert.progress >= 100 && !reviewsDone) {
+    if (!reviewsDone) {
       return (
         <span className='inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-base font-bold bg-[#E61C24]/10 text-[#E61C24] border border-[#E61C24]/20'>
           <FiStar className='h-4.5 w-4.5' />
           Reviews required
+        </span>
+      );
+    }
+
+    if (reviewsDone && cert.progress < 100) {
+      return (
+        <span className='inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-base font-bold bg-amber-50 text-amber-700 border border-amber-100'>
+          <FiClock className='h-4.5 w-4.5' />
+          Finish syllabus ({cert.progress}%)
         </span>
       );
     }
@@ -266,6 +275,22 @@ export default function MyCertificatesPage() {
             className='inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white text-base font-bold'
           >
             Resubmit <FiExternalLink className='h-4 w-4' />
+          </Link>
+        </div>
+      );
+    }
+
+    if (cert.progress < 100) {
+      return (
+        <div className='inline-flex flex-col items-center gap-2'>
+          <span className='inline-flex items-center gap-1.5 text-amber-700 text-base font-semibold'>
+            <FiLock className='h-4.5 w-4.5' /> Finish syllabus ({cert.progress}%)
+          </span>
+          <Link
+            href={`/courses/${cert.courseSlug || ''}/watch`}
+            className='inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-zinc-200 hover:border-[#E61C24]/40 text-zinc-700 hover:text-[#E61C24] text-base font-bold'
+          >
+            Continue Learning <FiExternalLink className='h-4 w-4' />
           </Link>
         </div>
       );

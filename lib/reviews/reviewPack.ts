@@ -141,7 +141,7 @@ export async function getStudentCourseReviewGate(studentId: string, courseId: st
   }
 }
 
-/** Enrollment + 100% syllabus required before submitting reviews */
+/** Paid enrollment required before submitting reviews (anytime after purchase). */
 export async function assertStudentCanReviewCourse(studentId: string, courseId: string) {
   const enrollment = await Enrollment.findOne({
     student: studentId,
@@ -161,14 +161,6 @@ export async function assertStudentCanReviewCourse(studentId: string, courseId: 
     courseId,
     enrollment.completedLessons || [],
   )
-
-  if (progress < 100) {
-    const error = new Error(
-      'Complete 100% of the course syllabus before submitting reviews.',
-    )
-    ;(error as Error & { status: number }).status = 403
-    throw error
-  }
 
   return { enrollment, progress }
 }
@@ -191,11 +183,21 @@ async function syncCertificateForReviewPack(
     : 0
 
   if (status === 'approved') {
-    // Upsert so approval is not lost if the cert row is created later / never existed
+    // Reviews may be moderated before the student finishes the syllabus —
+    // never approve the certificate until progress is 100%.
+    if (progress < 100) {
+      await CertificateRequest.findOneAndUpdate(
+        { student: studentId, course: courseId },
+        { $set: { progress } },
+        { upsert: false },
+      )
+      return
+    }
+
     await CertificateRequest.findOneAndUpdate(
       { student: studentId, course: courseId },
       {
-        $set: { status: 'approved', progress: Math.max(progress, 100) },
+        $set: { status: 'approved', progress },
         $setOnInsert: { student: studentId, course: courseId },
       },
       { upsert: true, new: true },
@@ -331,12 +333,26 @@ export async function reconcileCertificateWithReviewGate(
   return { certificate: existing, gate, heldForReviews }
 }
 
-/** When a student hits 100%, create/update certificate using current review gate */
+/**
+ * Sync certificate row with review gate.
+ * Always recomputes syllabus progress from enrollment.
+ */
 export async function syncCertificateRequestWithReviewGate(
   studentId: string,
   courseId: string,
-  progress: number,
 ) {
+  const enrollment = await Enrollment.findOne({
+    student: studentId,
+    course: courseId,
+    paymentStatus: 'completed',
+  })
+    .select('completedLessons')
+    .lean()
+
+  const progress = enrollment
+    ? await getCourseProgressPercent(courseId, enrollment.completedLessons || [])
+    : 0
+
   const existing = await CertificateRequest.findOne({
     student: studentId,
     course: courseId,
@@ -345,6 +361,10 @@ export async function syncCertificateRequestWithReviewGate(
   if (progress < 100) {
     if (existing) {
       existing.progress = progress
+      // Reviews alone must not approve a cert before syllabus is finished.
+      if (existing.status === 'approved') {
+        existing.status = 'pending'
+      }
       await existing.save()
     }
     return

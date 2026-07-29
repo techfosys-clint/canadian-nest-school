@@ -42,13 +42,23 @@ export async function POST(request: Request) {
     const existing = await Review.findOne({
       course,
       student: decoded.id,
-    }).lean()
+    })
 
     if (existing) {
-      return NextResponse.json(
-        { error: 'You have already submitted a review for this course.', already: true },
-        { status: 409 },
-      )
+      if (existing.status !== 'rejected') {
+        return NextResponse.json(
+          { error: 'You have already submitted a review for this course.', already: true },
+          { status: 409 },
+        )
+      }
+
+      existing.rating = String(rating) as '1' | '2' | '3' | '4' | '5'
+      existing.comment = comment.trim()
+      existing.status = 'pending'
+      await existing.save()
+      await syncCertificateRequestWithReviewGate(decoded.id, course)
+
+      return NextResponse.json({ doc: existing }, { status: 200 })
     }
 
     const review = await Review.create({

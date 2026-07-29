@@ -77,25 +77,24 @@ export async function downloadCourseCertificate(
         })
         return 'error'
       }
-      if (data.code === 'REVIEWS_REQUIRED' || data.redirectTo) {
-        if (data.code === 'REVIEWS_REJECTED') {
-          const result = await Swal.fire({
-            icon: 'info',
-            title: 'Reviews Rejected',
-            text:
-              data.error ||
-              'Please resubmit your reviews to unlock the certificate.',
-            showCancelButton: true,
-            confirmButtonText: 'Resubmit Reviews',
-            cancelButtonText: 'OK',
-            confirmButtonColor: '#E61C24',
-            background: '#ffffff',
-            color: '#1e293b',
-          })
-          if (result.isConfirmed) onNeedReviews?.(courseId)
-          return 'rejected'
-        }
-
+      if (data.code === 'REVIEWS_REJECTED') {
+        const result = await Swal.fire({
+          icon: 'info',
+          title: 'Reviews Rejected',
+          text:
+            data.error ||
+            'Please resubmit your reviews to unlock the certificate.',
+          showCancelButton: true,
+          confirmButtonText: 'Resubmit Reviews',
+          cancelButtonText: 'OK',
+          confirmButtonColor: '#E61C24',
+          background: '#ffffff',
+          color: '#1e293b',
+        })
+        if (result.isConfirmed) onNeedReviews?.(courseId)
+        return 'rejected'
+      }
+      if (data.code === 'REVIEWS_REQUIRED') {
         const result = await Swal.fire({
           icon: 'info',
           title: 'Reviews Required',

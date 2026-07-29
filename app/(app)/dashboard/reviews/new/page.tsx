@@ -83,8 +83,15 @@ export default function NewReviewPage() {
             })
           }
 
-          const needingReview = rows.filter((r) => !reviewedCourseIds.has(r.courseId))
-          setEligible(needingReview.length > 0 ? needingReview : rows)
+          // Prefer courses missing a course review, but never hide ones that may
+          // still need teacher reviews (course-only check is incomplete).
+          const needingCourseReview = rows.filter(
+            (r) => !reviewedCourseIds.has(r.courseId),
+          )
+          const alreadyHaveCourseReview = rows.filter((r) =>
+            reviewedCourseIds.has(r.courseId),
+          )
+          setEligible([...needingCourseReview, ...alreadyHaveCourseReview])
         }
       } catch (err) {
         console.error(err)

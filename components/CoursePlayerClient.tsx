@@ -1627,11 +1627,11 @@ export default function CoursePlayerClient({
                     <span>Resubmit Reviews</span>
                   </Link>
                 </>
-              ) : (
+              ) : mode === 'leave_reviews' ? (
                 <>
                   <p className='text-base font-semibold text-zinc-500 leading-relaxed'>
                     Leave short reviews for this course and your teachers to
-                    unlock your certificate instantly.
+                    unlock your certificate.
                   </p>
                   <Link
                     href={completeHref}
@@ -1639,6 +1639,45 @@ export default function CoursePlayerClient({
                   >
                     <span>Leave Reviews to Unlock Certificate</span>
                     <FiExternalLink className='h-4 w-4' />
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <p className='text-base font-semibold text-zinc-500 leading-relaxed'>
+                    Check your review status or download your certificate if it
+                    is already unlocked.
+                  </p>
+                  <button
+                    type='button'
+                    disabled={downloadingCert}
+                    onClick={async () => {
+                      setDownloadingCert(true);
+                      try {
+                        // No client gate — API is the source of truth.
+                        await downloadCourseCertificate({
+                          courseId: course.id,
+                          courseTitle: course.title,
+                          onNeedReviews: () => router.push(completeHref),
+                          onViewStatus: () => router.push(completeHref),
+                        });
+                      } finally {
+                        setDownloadingCert(false);
+                      }
+                    }}
+                    className='w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-base font-bold transition-all cursor-pointer border-none text-center flex items-center justify-center gap-1.5 disabled:opacity-60'
+                  >
+                    <FiDownload className='h-4 w-4' />
+                    <span>
+                      {downloadingCert
+                        ? 'Preparing PDF...'
+                        : 'Download Certificate'}
+                    </span>
+                  </button>
+                  <Link
+                    href={completeHref}
+                    className='w-full py-2.5 rounded-lg bg-white border border-zinc-200 text-zinc-700 text-base font-bold text-center flex items-center justify-center gap-1.5'
+                  >
+                    Reviews &amp; Certificate Status
                   </Link>
                 </>
               )}

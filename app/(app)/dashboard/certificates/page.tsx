@@ -53,13 +53,18 @@ export default function MyCertificatesPage() {
     };
   }
 
-  async function promptLeaveReviews(courseId: string, message: string) {
+  async function promptLeaveReviews(
+    courseId: string,
+    message: string,
+    opts?: { rejected?: boolean },
+  ) {
+    const rejected = Boolean(opts?.rejected);
     const result = await Swal.fire({
       icon: 'info',
-      title: 'Reviews Required',
+      title: rejected ? 'Reviews Rejected' : 'Reviews Required',
       text: message,
       showCancelButton: true,
-      confirmButtonText: 'Leave Reviews',
+      confirmButtonText: rejected ? 'Resubmit Reviews' : 'Leave Reviews',
       cancelButtonText: 'Later',
       confirmButtonColor: '#E61C24',
       background: '#ffffff',
@@ -75,7 +80,7 @@ export default function MyCertificatesPage() {
     if (!hasSubmittedRequiredReviews(gate)) {
       await promptLeaveReviews(
         cert.courseId,
-        'You finished this course before reviews were required. Please rate the course and teachers to unlock your certificate download.',
+        'Please rate the course and teachers to unlock your certificate download.',
       );
       return;
     }
@@ -83,6 +88,7 @@ export default function MyCertificatesPage() {
       await promptLeaveReviews(
         cert.courseId,
         'Your reviews were rejected. Please resubmit course and teacher reviews to unlock the certificate.',
+        { rejected: true },
       );
       return;
     }
@@ -94,11 +100,22 @@ export default function MyCertificatesPage() {
       );
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        if (
-          data.code === 'REVIEWS_REQUIRED' ||
-          data.code === 'REVIEWS_REJECTED' ||
-          data.redirectTo
-        ) {
+        if (data.code === 'COURSE_INCOMPLETE') {
+          throw new Error(
+            data.error ||
+              'Complete all lessons before downloading your certificate.',
+          );
+        }
+        if (data.code === 'REVIEWS_REJECTED') {
+          await promptLeaveReviews(
+            cert.courseId,
+            data.error ||
+              'Your reviews were rejected. Please resubmit course and teacher reviews to unlock the certificate.',
+            { rejected: true },
+          );
+          return;
+        }
+        if (data.code === 'REVIEWS_REQUIRED') {
           await promptLeaveReviews(
             cert.courseId,
             data.error ||
@@ -199,16 +216,7 @@ export default function MyCertificatesPage() {
       );
     }
 
-    if (reviewsDone && cert.progress < 100) {
-      return (
-        <span className='inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-base font-bold bg-amber-50 text-amber-700 border border-amber-100'>
-          <FiClock className='h-4.5 w-4.5' />
-          Finish syllabus ({cert.progress}%)
-        </span>
-      );
-    }
-
-    if (reviewsDone && !reviewsAccepted) {
+    if (!reviewsAccepted) {
       return (
         <span className='inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-base font-bold bg-rose-50 text-rose-600 border border-rose-100'>
           <FiXCircle className='h-4.5 w-4.5' />
@@ -217,7 +225,16 @@ export default function MyCertificatesPage() {
       );
     }
 
-    if ((cert.status === 'approved' || reviewsAccepted) && reviewsDone) {
+    if (cert.progress < 100) {
+      return (
+        <span className='inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-base font-bold bg-amber-50 text-amber-700 border border-amber-100'>
+          <FiClock className='h-4.5 w-4.5' />
+          Finish syllabus ({cert.progress}%)
+        </span>
+      );
+    }
+
+    if (cert.status === 'approved' || reviewsAccepted) {
       return (
         <span className='inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-base font-bold bg-emerald-50 text-emerald-600 border border-emerald-100'>
           <FiCheckCircle className='h-4.5 w-4.5' />
@@ -343,7 +360,8 @@ export default function MyCertificatesPage() {
           Certificates
         </h1>
         <p className='text-base font-semibold text-zinc-500 mt-1 select-none'>
-          Certificates unlock as soon as you submit course and teacher reviews
+          Certificates unlock after 100% syllabus progress and course + teacher
+          reviews
         </p>
       </div>
 

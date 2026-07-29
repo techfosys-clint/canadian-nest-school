@@ -1,4 +1,3 @@
-import { CertificateRequest } from '@/lib/db/models/CertificateRequest'
 import { getCourseProgressPercent } from '@/lib/progress/getCourseProgress'
 import { syncCertificateRequestWithReviewGate } from '@/lib/reviews/reviewPack'
 
@@ -9,20 +8,7 @@ export async function syncEnrollmentProgressSideEffects(
 ): Promise<number> {
   const progress = await getCourseProgressPercent(courseId, completedLessons)
 
-  // Keep progress field updated even below 100%
-  if (progress < 100) {
-    const existingCertificate = await CertificateRequest.findOne({
-      student: userId,
-      course: courseId,
-    })
-    if (existingCertificate) {
-      existingCertificate.progress = progress
-      await existingCertificate.save()
-    }
-    return progress
-  }
-
-  // At 100%: create/update cert — auto-approved once reviews are submitted
+  // Single source of truth for cert row status vs reviews + syllabus %.
   await syncCertificateRequestWithReviewGate(userId, courseId)
 
   return progress

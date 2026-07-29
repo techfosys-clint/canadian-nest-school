@@ -62,9 +62,9 @@ export default async function ReviewsPage() {
   const coursesLean = await Course.find({ _id: { $in: courseIdsNeedingInstructors } })
     .select('instructor instructors')
     .lean()
-  const courseInstructorCount = new Map<string, number>()
+  const courseInstructorIds = new Map<string, string[]>()
   for (const c of coursesLean as any[]) {
-    courseInstructorCount.set(c._id.toString(), getCourseInstructorIds(c).length)
+    courseInstructorIds.set(c._id.toString(), getCourseInstructorIds(c))
   }
 
   const teacherMap = new Map<string, any[]>()
@@ -73,6 +73,8 @@ export default async function ReviewsPage() {
     const list = teacherMap.get(key) || []
     list.push({
       id: ir._id.toString(),
+      instructorId: ir.instructor?._id?.toString() || ir.instructor?.toString() || '',
+      instructor: ir.instructor?._id?.toString() || ir.instructor?.toString() || '',
       teacherName: ir.instructor?.name || 'Instructor',
       rating: Number(ir.rating) || 0,
       comment: ir.comment,
@@ -85,21 +87,25 @@ export default async function ReviewsPage() {
     const studentId = r.student?._id?.toString() || ''
     const courseId = r.course?._id?.toString() || ''
     const teacherReviews = teacherMap.get(`${studentId}:${courseId}`) || []
-    const expectedInstructorCount = courseInstructorCount.get(courseId) || 0
+    const expectedInstructorIds = courseInstructorIds.get(courseId) || []
 
     const jointStatus = computeJointPackStatus({
       courseStatus: r.status,
       teacherReviews,
-      expectedInstructorCount,
+      expectedInstructorIds,
     })
 
     const teachersIncomplete =
-      expectedInstructorCount > 0 && teacherReviews.length < expectedInstructorCount
+      expectedInstructorIds.length > 0 &&
+      (teacherReviews.length < expectedInstructorIds.length ||
+        expectedInstructorIds.some(
+          (id) => !teacherReviews.some((t: any) => t.instructorId === id),
+        ))
 
     return {
       id: r._id.toString(),
       jointStatus,
-      expectedInstructorCount,
+      expectedInstructorCount: expectedInstructorIds.length,
       teachersIncomplete,
       courseReview: {
         _id: r._id.toString(),

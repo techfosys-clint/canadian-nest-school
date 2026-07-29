@@ -40,17 +40,32 @@ export function getCourseInstructorIds(course: {
 }
 
 export function deriveTeacherReviewStatus(
-  expectedInstructorCount: number,
-  instructorReviews: Array<{ status: string }>,
+  expectedInstructorIds: string[],
+  instructorReviews: Array<{ status: string; instructor?: unknown }>,
 ): ReviewFlowStatus {
-  if (expectedInstructorCount === 0) {
+  if (expectedInstructorIds.length === 0) {
     // No teachers assigned — treat teacher reviews as satisfied
     return 'approved'
   }
-  if (instructorReviews.length === 0) return 'idle'
-  if (instructorReviews.length < expectedInstructorCount) return 'idle'
-  if (instructorReviews.some((r) => r.status === 'rejected')) return 'rejected'
-  if (instructorReviews.every((r) => r.status === 'approved')) return 'approved'
+
+  const expectedSet = new Set(expectedInstructorIds)
+  // Ignore reviews for teachers no longer assigned to the course.
+  const relevantReviews = instructorReviews.filter((r) =>
+    expectedSet.has(toId(r.instructor)),
+  )
+
+  const reviewedIds = new Set(
+    relevantReviews.map((r) => toId(r.instructor)).filter(Boolean),
+  )
+  const coversAllCurrentTeachers = expectedInstructorIds.every((id) =>
+    reviewedIds.has(id),
+  )
+
+  if (!coversAllCurrentTeachers || relevantReviews.length === 0) {
+    return 'idle'
+  }
+  if (relevantReviews.some((r) => r.status === 'rejected')) return 'rejected'
+  if (relevantReviews.every((r) => r.status === 'approved')) return 'approved'
   return 'pending'
 }
 
@@ -86,20 +101,29 @@ export function canDownloadCertificate(
 /** Joint admin-pack status — never "approved" while teacher reviews are still missing */
 export function computeJointPackStatus(args: {
   courseStatus: string
-  teacherReviews: Array<{ status: string }>
-  expectedInstructorCount: number
+  teacherReviews: Array<{ status: string; instructor?: unknown }>
+  expectedInstructorIds: string[]
 }): 'pending' | 'approved' | 'rejected' {
-  const { courseStatus, teacherReviews, expectedInstructorCount } = args
-  const teacherStatuses = teacherReviews.map((t) => t.status)
+  const { courseStatus, teacherReviews, expectedInstructorIds } = args
 
-  if (courseStatus === 'rejected' || teacherStatuses.includes('rejected')) {
+  if (courseStatus === 'rejected') {
     return 'rejected'
   }
 
+  const expectedSet = new Set(expectedInstructorIds)
+  const relevantRejected = teacherReviews.some(
+    (t) => t.status === 'rejected' && expectedSet.has(toId(t.instructor)),
+  )
+  if (relevantRejected) {
+    return 'rejected'
+  }
+
+  const teacherGate = deriveTeacherReviewStatus(
+    expectedInstructorIds,
+    teacherReviews,
+  )
   const teachersComplete =
-    expectedInstructorCount === 0 ||
-    (teacherReviews.length >= expectedInstructorCount &&
-      teacherStatuses.every((s) => s === 'approved'))
+    expectedInstructorIds.length === 0 || teacherGate === 'approved'
 
   if (courseStatus === 'approved' && teachersComplete) {
     return 'approved'
@@ -135,7 +159,7 @@ export async function getStudentCourseReviewGate(studentId: string, courseId: st
     instructorIds,
     courseReviewStatus: deriveCourseReviewStatus(courseReview),
     teacherReviewStatus: deriveTeacherReviewStatus(
-      instructorIds.length,
+      instructorIds,
       instructorReviews,
     ),
   }
@@ -188,7 +212,7 @@ async function syncCertificateForReviewPack(
     if (progress < 100) {
       await CertificateRequest.findOneAndUpdate(
         { student: studentId, course: courseId },
-        { $set: { progress } },
+        { $set: { progress, status: 'pending' } },
         { upsert: false },
       )
       return
@@ -239,10 +263,9 @@ export async function moderateReviewPack(
   }).lean()
 
   if (status === 'approved') {
-    if (
-      instructorIds.length > 0 &&
-      teacherReviews.length < instructorIds.length
-    ) {
+    const reviewedIds = new Set(teacherReviews.map((t) => toId(t.instructor)))
+    const missingInstructor = instructorIds.some((id) => !reviewedIds.has(id))
+    if (instructorIds.length > 0 && missingInstructor) {
       const error = new Error(
         'Cannot approve yet: the student must submit reviews for every assigned teacher first.',
       )
@@ -273,6 +296,7 @@ export async function moderateReviewPack(
 /**
  * Hold legacy/previously-approved certificates until course + teacher reviews
  * are submitted. Safe to call on certificate list/download.
+ * Never approves a certificate when syllabus progress is below 100%.
  */
 export async function reconcileCertificateWithReviewGate(
   studentId: string,
@@ -290,6 +314,20 @@ export async function reconcileCertificateWithReviewGate(
     }
   }
 
+  const enrollment = await Enrollment.findOne({
+    student: studentId,
+    course: courseId,
+    paymentStatus: 'completed',
+  })
+    .select('completedLessons')
+    .lean()
+
+  const progress = enrollment
+    ? await getCourseProgressPercent(courseId, enrollment.completedLessons || [])
+    : 0
+
+  existing.progress = progress
+
   const gate = await getStudentCourseReviewGate(studentId, courseId)
   const reviewsApproved = canDownloadCertificate(
     gate.courseReviewStatus,
@@ -305,29 +343,42 @@ export async function reconcileCertificateWithReviewGate(
 
   let heldForReviews = false
 
+  if (progress < 100) {
+    // Reviews alone must never unlock/approve a certificate early.
+    // If reviews were resubmitted after a rejection, clear stale "rejected".
+    if (reviewsRejected) {
+      existing.status = 'rejected'
+    } else if (existing.status === 'approved' || existing.status === 'rejected') {
+      existing.status = 'pending'
+    }
+    await existing.save()
+    return { certificate: existing, gate, heldForReviews: !reviewsSubmitted }
+  }
+
   if (reviewsApproved) {
     if (existing.status !== 'approved') {
       existing.status = 'approved'
-      await existing.save()
     }
+    await existing.save()
   } else if (reviewsRejected) {
     if (existing.status !== 'rejected') {
       existing.status = 'rejected'
-      await existing.save()
     }
+    await existing.save()
   } else {
     // Reviews still missing — hold download until the student submits them.
-    if (existing.status === 'approved') {
+    // Also clear a stale rejected status if the gate is no longer rejected.
+    if (existing.status === 'approved' || existing.status === 'rejected') {
       existing.status = 'pending'
-      if (!existing.adminNotes) {
+      if (!existing.adminNotes && !reviewsSubmitted) {
         existing.adminNotes =
           'Held until the student submits course and teacher reviews.'
       }
-      await existing.save()
       heldForReviews = true
     } else if (!reviewsSubmitted) {
       heldForReviews = true
     }
+    await existing.save()
   }
 
   return { certificate: existing, gate, heldForReviews }
@@ -361,8 +412,14 @@ export async function syncCertificateRequestWithReviewGate(
   if (progress < 100) {
     if (existing) {
       existing.progress = progress
-      // Reviews alone must not approve a cert before syllabus is finished.
-      if (existing.status === 'approved') {
+      const gate = await getStudentCourseReviewGate(studentId, courseId)
+      const reviewsRejected =
+        gate.courseReviewStatus === 'rejected' ||
+        gate.teacherReviewStatus === 'rejected'
+      // Never approved below 100%. Clear stale rejected after resubmit.
+      if (reviewsRejected) {
+        existing.status = 'rejected'
+      } else if (existing.status === 'approved' || existing.status === 'rejected') {
         existing.status = 'pending'
       }
       await existing.save()

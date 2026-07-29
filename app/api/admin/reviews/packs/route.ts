@@ -54,6 +54,8 @@ export async function GET() {
       const list = teacherMap.get(key) || []
       list.push({
         id: ir._id.toString(),
+        instructorId: ir.instructor?._id?.toString() || ir.instructor?.toString() || '',
+        instructor: ir.instructor?._id?.toString() || ir.instructor?.toString() || '',
         teacherName: ir.instructor?.name || 'Instructor',
         rating: Number(ir.rating) || 0,
         comment: ir.comment,
@@ -72,30 +74,35 @@ export async function GET() {
     const coursesLean = await Course.find({ _id: { $in: courseIds } })
       .select('instructor instructors')
       .lean()
-    const courseInstructorCount = new Map<string, number>()
+    const courseInstructorIds = new Map<string, string[]>()
     for (const c of coursesLean as any[]) {
-      courseInstructorCount.set(c._id.toString(), getCourseInstructorIds(c).length)
+      courseInstructorIds.set(c._id.toString(), getCourseInstructorIds(c))
     }
 
     const packs = courseReviews.map((r: any) => {
       const studentId = r.student?._id?.toString() || ''
       const courseId = r.course?._id?.toString() || ''
       const teacherReviews = teacherMap.get(`${studentId}:${courseId}`) || []
-      const expectedInstructorCount = courseInstructorCount.get(courseId) || 0
+      const expectedInstructorIds = courseInstructorIds.get(courseId) || []
 
       const jointStatus = computeJointPackStatus({
         courseStatus: r.status,
         teacherReviews,
-        expectedInstructorCount,
+        expectedInstructorIds,
       })
 
       return {
         id: r._id.toString(),
         jointStatus,
-        expectedInstructorCount,
+        expectedInstructorCount: expectedInstructorIds.length,
         teachersIncomplete:
-          expectedInstructorCount > 0 &&
-          teacherReviews.length < expectedInstructorCount,
+          expectedInstructorIds.length > 0 &&
+          jointStatus !== 'approved' &&
+          !teacherReviews.some((t: any) => t.status === 'rejected') &&
+          (teacherReviews.length < expectedInstructorIds.length ||
+            expectedInstructorIds.some(
+              (id) => !teacherReviews.some((t: any) => t.instructorId === id),
+            )),
         courseReview: {
           _id: r._id.toString(),
           rating: r.rating,

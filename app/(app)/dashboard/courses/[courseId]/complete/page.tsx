@@ -235,13 +235,21 @@ export default function CourseCompleteReviewPage() {
           }
           setTeacherRatings(ratingShell)
 
-          if (completionData.canDownload) setStep(3)
-          else if (completionData.courseReviewStatus !== 'idle') {
-            if (completionData.teacherReviewStatus === 'idle' && teacherList.length > 0) {
-              setStep(2)
-            } else {
-              setStep(3)
-            }
+          if (completionData.canDownload) {
+            setStep(3)
+          } else if (
+            completionData.courseReviewStatus === 'idle' ||
+            completionData.courseReviewStatus === 'rejected'
+          ) {
+            setStep(1)
+          } else if (
+            (completionData.teacherReviewStatus === 'idle' ||
+              completionData.teacherReviewStatus === 'rejected') &&
+            teacherList.length > 0
+          ) {
+            setStep(2)
+          } else {
+            setStep(3)
           }
         } else {
           // Fallback to enrollment instructors
@@ -302,7 +310,10 @@ export default function CourseCompleteReviewPage() {
       await Swal.fire({
         icon: 'success',
         title: 'Course Review Submitted',
-        text: 'Thanks! Rate your teachers next. Your certificate unlocks as soon as both course and teacher reviews are submitted.',
+        text:
+          syllabusProgress >= 100
+            ? 'Thanks! Rate your teachers next. Your certificate unlocks once both reviews are submitted.'
+            : 'Thanks! Rate your teachers next. You can finish the syllabus anytime — the certificate unlocks at 100% after both reviews.',
         confirmButtonColor: '#E61C24',
         background: '#ffffff',
         color: '#1e293b',
@@ -322,6 +333,17 @@ export default function CourseCompleteReviewPage() {
 
     if (instructors.length === 0) {
       setTeacherReviewStatus('approved')
+      await Swal.fire({
+        icon: 'success',
+        title: 'Reviews Complete',
+        text:
+          syllabusProgress >= 100
+            ? 'All set — your certificate is ready to download now.'
+            : `Reviews are in. Finish the syllabus (${syllabusProgress}%) to download your certificate.`,
+        confirmButtonColor: '#E61C24',
+        background: '#ffffff',
+        color: '#1e293b',
+      })
       setStep(3)
       return
     }
@@ -359,7 +381,10 @@ export default function CourseCompleteReviewPage() {
       await Swal.fire({
         icon: 'success',
         title: 'Teacher Reviews Submitted',
-        text: 'All set — your certificate is ready to download now.',
+        text:
+          syllabusProgress >= 100
+            ? 'All set — your certificate is ready to download now.'
+            : `Reviews are in. Finish the syllabus (${syllabusProgress}%) to download your certificate.`,
         confirmButtonColor: '#E61C24',
         background: '#ffffff',
         color: '#1e293b',
@@ -374,13 +399,15 @@ export default function CourseCompleteReviewPage() {
   }
 
   const handleDownloadCertificate = async () => {
-    if (!course || !bothReviewsSubmitted) {
+    if (!course || !certReady) {
       await Swal.fire({
         icon: 'info',
         title: 'Certificate Locked',
         text: reviewsRejected
           ? 'Your reviews were rejected. Please resubmit course and teacher reviews to unlock the certificate.'
-          : 'Please submit course and teacher reviews first. Your certificate unlocks as soon as both are submitted.',
+          : !bothReviewsSubmitted
+            ? 'Please submit course and teacher reviews first.'
+            : `Finish the syllabus (${syllabusProgress}%) to download your certificate.`,
         confirmButtonColor: '#E61C24',
       })
       if (courseReviewStatus === 'idle' || courseReviewStatus === 'rejected') setStep(1)
@@ -395,6 +422,11 @@ export default function CourseCompleteReviewPage() {
         if (data.code === 'REVIEWS_REQUIRED' || data.code === 'REVIEWS_REJECTED') {
           setStep(1)
           throw new Error(data.error || 'Please leave reviews before downloading.')
+        }
+        if (data.code === 'COURSE_INCOMPLETE') {
+          throw new Error(
+            data.error || 'Complete all lessons before downloading your certificate.',
+          )
         }
         throw new Error(
           data.error ||
@@ -684,7 +716,9 @@ export default function CourseCompleteReviewPage() {
                 <p className="text-base font-semibold text-zinc-600">
                   {teacherReviewStatus === 'approved'
                     ? 'Teacher reviews were accepted.'
-                    : 'Teacher reviews are submitted. Your certificate is ready.'}
+                    : syllabusProgress >= 100
+                      ? 'Teacher reviews are submitted. Your certificate is ready.'
+                      : `Teacher reviews are submitted. Finish the syllabus (${syllabusProgress}%) to download your certificate.`}
                 </p>
               </div>
               <button
@@ -700,7 +734,7 @@ export default function CourseCompleteReviewPage() {
               <FiUser className="mx-auto h-8 w-8 text-zinc-400" />
               <p className="text-base font-semibold text-zinc-600">
                 No teachers are assigned to this course. After your course review
-                is submitted, your certificate unlocks.
+                is submitted, finish the syllabus at 100% to unlock your certificate.
               </p>
               <button
                 type="button"

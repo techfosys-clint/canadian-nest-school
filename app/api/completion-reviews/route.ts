@@ -167,6 +167,12 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       )
     }
+    if (courseReview.status === 'rejected') {
+      return NextResponse.json(
+        { error: 'Resubmit your course review before rating teachers.' },
+        { status: 400 },
+      )
+    }
 
     const course = await Course.findById(courseId).select('instructor instructors').lean()
     if (!course) {
@@ -209,13 +215,27 @@ export async function POST(request: NextRequest) {
     const existing = await InstructorReview.find({
       student: studentId,
       course: courseId,
-    }).lean()
+    })
 
     if (existing.length > 0) {
-      return NextResponse.json(
-        { error: 'Teacher reviews already submitted for this course.' },
-        { status: 409 },
+      const anyRejected = existing.some((r) => r.status === 'rejected')
+      const coveredIds = new Set(
+        existing.map((r) => String(r.instructor?.toString?.() || r.instructor)),
       )
+      const missingInstructor = [...allowedInstructorIds].some(
+        (id) => !coveredIds.has(id),
+      )
+
+      // Allow replace when rejected, or when the course gained teachers after
+      // the student already submitted an older incomplete pack.
+      if (!anyRejected && !missingInstructor) {
+        return NextResponse.json(
+          { error: 'Teacher reviews already submitted for this course.' },
+          { status: 409 },
+        )
+      }
+
+      await InstructorReview.deleteMany({ student: studentId, course: courseId })
     }
 
     const docs = await InstructorReview.insertMany(
@@ -243,7 +263,7 @@ export async function POST(request: NextRequest) {
           status: d.status,
         })),
       },
-      { status: 201 },
+      { status: existing.length > 0 ? 200 : 201 },
     )
   } catch (error: any) {
     console.error('POST /api/completion-reviews error:', error)

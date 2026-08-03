@@ -11,6 +11,7 @@ export type CompletePaidEnrollmentResult =
   | 'already_completed'
   | 'failed'
   | 'pending'
+  | 'not_found'
 
 /**
  * Verifies an EPS transaction and updates the enrollment.
@@ -18,6 +19,8 @@ export type CompletePaidEnrollmentResult =
  * - Failed is only written when EPS confirms failure/cancel.
  * - Pending / unknown statuses leave the enrollment pending so a later
  *   callback or reconcile job can complete it.
+ * - NotFound (EPS 404) leaves the enrollment pending; stale coupon release
+ *   may abandon it after the unpaid window.
  */
 export async function completePaidEnrollment(
   enrollment: IEnrollment,
@@ -33,6 +36,10 @@ export async function completePaidEnrollment(
   const previousStatus = enrollment.paymentStatus
   const result = await verifyEpsTransaction(enrollment.merchantTransactionId)
   const status = normalizeEpsStatus(result.status)
+
+  if (status === 'not_found') {
+    return 'not_found'
+  }
 
   if (status === 'success') {
     enrollment.paymentStatus = 'completed'

@@ -45,8 +45,13 @@ export async function releaseStalePendingCouponUses(couponCode: string): Promise
           // Still open at EPS — leave the coupon slot reserved a bit longer.
           continue
         }
-        // Confirmed failed — completePaidEnrollment already released the coupon.
-        continue
+        if (result === 'not_found') {
+          // EPS has no record (abandoned / never initialized). Fall through
+          // to local fail + coupon release after the stale window.
+        } else {
+          // Confirmed failed — completePaidEnrollment already released the coupon.
+          continue
+        }
       } catch (err) {
         console.error(
           `EPS verify failed while releasing stale coupon use for enrollment ${enrollment._id}:`,

@@ -41,7 +41,7 @@ export async function GET(request: Request) {
       )
     }
 
-    if (result === 'pending') {
+    if (result === 'pending' || result === 'not_found') {
       return NextResponse.redirect(
         `${appUrl}/shop/order/thank-you?orderId=${orderId}&outcome=pending`,
       )

@@ -66,6 +66,7 @@ export async function healStudentPendingEnrollments(
       if (result === 'completed' || result === 'already_completed') {
         completed += 1
       }
+      // pending / not_found: leave as-is; IPN or a later heal may still complete.
     } catch (err) {
       console.error(
         'healStudentPendingEnrollments error:',

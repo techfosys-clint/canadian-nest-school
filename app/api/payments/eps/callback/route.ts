@@ -41,8 +41,8 @@ export async function GET(request: Request) {
       )
     }
 
-    if (result === 'pending') {
-      // Payment may still be settling — keep the user on dashboard with a soft hint.
+    if (result === 'pending' || result === 'not_found') {
+      // Still settling, or EPS has no record yet — soft pending, not hard fail.
       return NextResponse.redirect(
         `${appUrl}/dashboard?enrollment=pending&enrollmentId=${enrollmentId}`,
       )

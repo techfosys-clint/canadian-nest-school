@@ -320,6 +320,21 @@ export async function verifyEpsTransaction(
     }
 
     const rawVerify = await res.text()
+
+    // EPS returns 404 (often empty/HTML) when the merchantTransactionId was
+    // never recorded or the checkout session expired. Treat as not-found so
+    // heal/reconcile can leave the enrollment pending instead of throwing.
+    if (res.status === 404) {
+      console.warn(
+        `EPS verify: transaction not found (HTTP 404) for ${merchantTransactionId}`,
+      )
+      return {
+        status: 'NotFound',
+        totalAmount: '',
+        merchantTransactionId,
+      }
+    }
+
     let data: any
     try {
       data = JSON.parse(rawVerify)
@@ -351,7 +366,7 @@ export async function verifyEpsTransaction(
     return {
       status: data.Status,
       totalAmount: data.TotalAmount,
-      merchantTransactionId: data.MerchantTransactionId,
+      merchantTransactionId: data.MerchantTransactionId || merchantTransactionId,
     }
   }
 

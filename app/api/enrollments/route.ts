@@ -332,6 +332,8 @@ export async function POST(request: Request) {
       } else if (coupon.discountType === 'fixed') {
         pricePaid = Math.max(0, pricePaid - coupon.discountValue)
       }
+      // Avoid float artifacts (e.g. 3900.0000001) before sending to EPS.
+      pricePaid = Math.round(pricePaid * 100) / 100
 
       appliedCoupon = coupon
 

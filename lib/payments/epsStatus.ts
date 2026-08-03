@@ -37,7 +37,7 @@ export function normalizeEpsStatus(
     return 'failed'
   }
 
-  if (s === 'notfound' || s === 'unknown' || s === 'doesnotexist') {
+  if (s === 'notfound' || s === 'doesnotexist') {
     return 'not_found'
   }
 

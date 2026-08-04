@@ -121,7 +121,7 @@ export async function POST(request: Request) {
         selectedAnswers: type === 'quiz' ? selectedAnswers : undefined,
         submittedAt: new Date(),
       },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: 'after' }
     )
 
     // Automatically mark the lesson as completed in Enrollment progress

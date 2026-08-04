@@ -63,14 +63,14 @@ export async function PATCH(req: NextRequest) {
 
     let updated
     if (type === 'student') {
-      updated = await Student.findByIdAndUpdate(id, { status }, { new: true }).select('-password')
+      updated = await Student.findByIdAndUpdate(id, { status }, { returnDocument: 'after' }).select('-password')
     } else if (type === 'user') {
       // Prevent suspending super admin?
       const targetUser = await User.findById(id)
       if (targetUser && targetUser.isSuperAdmin && status === 'suspended') {
          return NextResponse.json({ error: 'Cannot suspend super admin account' }, { status: 403 })
       }
-      updated = await User.findByIdAndUpdate(id, { status }, { new: true }).select('-password')
+      updated = await User.findByIdAndUpdate(id, { status }, { returnDocument: 'after' }).select('-password')
     } else {
       return NextResponse.json({ error: 'Invalid user type' }, { status: 400 })
     }

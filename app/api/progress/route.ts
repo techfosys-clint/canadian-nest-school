@@ -74,7 +74,7 @@ export async function GET() {
       await StudentProgress.findOneAndUpdate(
         { student: userId },
         { $addToSet: { loginDates: today } },
-        { upsert: true, new: true }
+        { upsert: true, returnDocument: 'after' }
       )
       loginDates.push(today)
     }

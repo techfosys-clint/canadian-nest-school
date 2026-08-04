@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 /**
  * Parses a fetch Response as JSON safely. Returns a readable error instead of
  * crashing with "Unexpected token <" or "Unexpected end of JSON input" when

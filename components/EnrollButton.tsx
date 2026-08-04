@@ -2,8 +2,7 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { FiZap, FiCheck, FiArrowRight } from 'react-icons/fi'
-import Swal from 'sweetalert2'
+import { FiZap, FiCheck } from 'react-icons/fi'
 import { pushToDataLayer, generateEventId } from '@/lib/gtm'
 
 interface EnrollButtonProps {
@@ -22,11 +21,10 @@ export default function EnrollButton({
   courseSlug,
   coursePrice = 0,
   courseCategory = '',
-  isLoggedIn,
   isAlreadyEnrolled,
 }: EnrollButtonProps) {
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
+  const [loading] = useState(false)
 
   const handleEnrollClick = async () => {
     if (isAlreadyEnrolled) {

@@ -22,10 +22,6 @@ export default function UsersDatabaseClient() {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('all'); // all, admin, staff, instructor, student
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   const fetchUsers = async () => {
     try {
       const res = await fetch('/api/admin/users-db');
@@ -39,6 +35,10 @@ export default function UsersDatabaseClient() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const handleDelete = async (id: string, type: string) => {
     const result = await Swal.fire({

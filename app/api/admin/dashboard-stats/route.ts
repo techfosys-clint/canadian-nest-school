@@ -135,7 +135,7 @@ export async function GET() {
     // ─── STAFF ROLE DATA ──────────────────────────────────────────────────────
     if (role === 'staff') {
       const [
-        totalCategories,
+        ,
         totalBlogs,
         totalFAQs,
         pendingReviewsCount,

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { getAuthorizedUser } from '@/lib/auth/auth';
 import { Product } from '@/lib/db/models/Product';
 import { connectToDatabase } from '@/lib/db/mongodb';

@@ -171,7 +171,7 @@ export default function ReviewsPage() {
                     <FiMessageSquare className='h-6 w-6' />
                   </div>
                   <p className='text-base font-semibold text-zinc-400 max-w-xs leading-relaxed'>
-                    You haven't submitted any reviews yet. Complete your course
+                    You haven&apos;t submitted any reviews yet. Complete your course
                     lessons and submit your first testimonial!
                   </p>
                 </div>

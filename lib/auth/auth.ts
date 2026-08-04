@@ -24,7 +24,7 @@ export function signToken(payload: any): string {
 export function verifyToken(token: string): any {
   try {
     return jwt.verify(token, PAYLOAD_SECRET)
-  } catch (error) {
+  } catch {
     return null
   }
 }

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { verifyToken } from '@/lib/auth/auth';
 import { Order } from '@/lib/db/models/Order';
 import { Product } from '@/lib/db/models/Product';

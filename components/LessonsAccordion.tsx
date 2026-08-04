@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiVideo, FiRadio, FiEye, FiChevronDown, FiChevronUp, FiX, FiPlay, FiLock, FiHelpCircle, FiFileText } from 'react-icons/fi'
+import { FiVideo, FiRadio, FiChevronDown, FiChevronUp, FiX, FiPlay, FiLock, FiHelpCircle, FiFileText } from 'react-icons/fi'
 
 interface LessonItem {
   id: string

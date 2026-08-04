@@ -4,7 +4,7 @@ import { User } from '@/lib/db/models/User'
 import { Student } from '@/lib/db/models/Student'
 import { getAuthorizedUser } from '@/lib/auth/auth'
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const adminUser = await getAuthorizedUser(['admin'])
     if (!adminUser || adminUser.role !== 'admin') {

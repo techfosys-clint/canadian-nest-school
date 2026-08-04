@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props) {
       description: blog.seo?.metaDescription || `${blog.title} educational article on Canadian Nest School.`,
       keywords: blog.seo?.keywords || '',
     }
-  } catch (err) {
+  } catch {
     return { title: 'Blog Details - Canadian Nest School' }
   }
 }
@@ -46,7 +46,7 @@ export default async function BlogDetailsPage({ params }: Props) {
       })
       .populate({ path: 'coverImage', select: 'url alt' })
       .lean()
-  } catch (err) {
+  } catch {
     // Cast or query error leads to 404
   }
 

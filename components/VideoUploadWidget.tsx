@@ -197,7 +197,7 @@ export default function VideoUploadWidget({
             </button>
           </div>
           <p className='text-base font-medium text-zinc-400'>
-            Paste this key in the "Video Source" field below
+            Paste this key in the &quot;Video Source&quot; field below
           </p>
         </div>
       )}

@@ -47,6 +47,23 @@ function formatDate(iso: string) {
 type SortKey = 'filename' | 'filesize' | 'mimeType' | 'createdAt';
 type SortDir = 'asc' | 'desc';
 
+function SortIcon({
+  col,
+  sortKey,
+  sortDir,
+}: {
+  col: SortKey;
+  sortKey: SortKey;
+  sortDir: SortDir;
+}) {
+  if (sortKey !== col) return <span className='ml-1 text-slate-400'>↕</span>;
+  return sortDir === 'asc' ? (
+    <FiChevronUp className='ml-1 inline h-4 w-4 text-[#E61C24]' />
+  ) : (
+    <FiChevronDown className='ml-1 inline h-4 w-4 text-[#E61C24]' />
+  );
+}
+
 export default function MediaLibraryClient({
   initialMedia,
 }: {
@@ -90,15 +107,6 @@ export default function MediaLibraryClient({
       setSortKey(key);
       setSortDir('asc');
     }
-  }
-
-  function SortIcon({ col }: { col: SortKey }) {
-    if (sortKey !== col) return <span className='ml-1 text-slate-400'>↕</span>;
-    return sortDir === 'asc' ? (
-      <FiChevronUp className='ml-1 inline h-4 w-4 text-[#E61C24]' />
-    ) : (
-      <FiChevronDown className='ml-1 inline h-4 w-4 text-[#E61C24]' />
-    );
   }
 
   // Copy URL
@@ -213,26 +221,26 @@ export default function MediaLibraryClient({
                     className={thClass}
                     onClick={() => toggleSort('filename')}
                   >
-                    Filename <SortIcon col='filename' />
+                    Filename <SortIcon col='filename' sortKey={sortKey} sortDir={sortDir} />
                   </th>
                   <th
                     className={thClass}
                     onClick={() => toggleSort('mimeType')}
                   >
-                    Type <SortIcon col='mimeType' />
+                    Type <SortIcon col='mimeType' sortKey={sortKey} sortDir={sortDir} />
                   </th>
                   <th
                     className={thClass}
                     onClick={() => toggleSort('filesize')}
                   >
-                    Size <SortIcon col='filesize' />
+                    Size <SortIcon col='filesize' sortKey={sortKey} sortDir={sortDir} />
                   </th>
                   <th className={thClass}>Dimensions</th>
                   <th
                     className={thClass}
                     onClick={() => toggleSort('createdAt')}
                   >
-                    Uploaded <SortIcon col='createdAt' />
+                    Uploaded <SortIcon col='createdAt' sortKey={sortKey} sortDir={sortDir} />
                   </th>
                   <th className={`${thClass} text-right`}>Actions</th>
                 </tr>

@@ -1,7 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import {
@@ -213,7 +214,7 @@ export default function StudyHubPage() {
 
         {/* Live Classes Quick-Link Card */}
         <div className='lg:col-span-7'>
-          <a
+          <Link
             href='/dashboard/live-classes'
             className='block bg-white p-6 border border-zinc-200/80 rounded-lg space-y-5 shadow-sm hover:border-[#E61C24]/40 hover:shadow-md transition-all duration-300 group'
           >
@@ -274,7 +275,7 @@ export default function StudyHubPage() {
                 View All Live Classes <FiExternalLink className='h-4 w-4' />
               </span>
             </div>
-          </a>
+          </Link>
         </div>
       </div>
 

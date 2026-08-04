@@ -98,7 +98,7 @@ export default function PrivacyPolicyPage() {
                   We use your information exclusively to process your course
                   enrollment and payments, provide you with access to our live
                   classes and learning materials, send important updates, and
-                  improve our website's user experience.
+                  improve our website&apos;s user experience.
                 </p>
               </div>
             </div>

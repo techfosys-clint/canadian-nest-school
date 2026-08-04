@@ -3,7 +3,6 @@ import { connectToDatabase } from '@/lib/db/mongodb'
 import { Media } from '@/lib/db/models/Media'
 import { getAuthorizedUser } from '@/lib/auth/auth'
 import { rateLimit } from '@/lib/rateLimit'
-import fs from 'fs/promises'
 import path from 'path'
 import sharp from 'sharp'
 

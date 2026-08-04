@@ -7,7 +7,7 @@ import { Review } from '@/lib/db/models/Review'
 import { Enrollment } from '@/lib/db/models/Enrollment'
 import '@/lib/db/models/Media'
 import InstructorsPageClient from './InstructorsPageClient'
-import type { CourseDoc, CategoryDoc } from '@/components/Courses'
+import type { CourseDoc } from '@/components/Courses'
 import type { ReviewDoc } from '@/components/Reviews'
 
 export const metadata = {

@@ -67,7 +67,7 @@ export async function POST(request: Request) {
     let formData
     try {
       formData = await request.formData()
-    } catch (e) {
+    } catch {
       return NextResponse.json(
         { success: false, error: 'Invalid form data', code: 'VALIDATION_ERROR' },
         { status: 400 }

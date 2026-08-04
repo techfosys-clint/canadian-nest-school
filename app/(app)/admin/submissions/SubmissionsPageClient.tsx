@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { FiCheckCircle, FiClock, FiFileText, FiAward, FiEye, FiSearch, FiX, FiCheck, FiChevronRight } from 'react-icons/fi'
+import { FiCheckCircle, FiClock, FiFileText, FiAward, FiEye, FiSearch, FiX, FiCheck } from 'react-icons/fi'
 import Swal from 'sweetalert2'
 
 interface SubmissionItem {

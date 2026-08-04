@@ -60,7 +60,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const searchQuery = searchParams.get('search') || ''
 
-    let matchCriteria: any = {}
+    const matchCriteria: any = {}
 
     if (searchQuery) {
       // Escape regex special characters to prevent injection

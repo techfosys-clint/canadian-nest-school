@@ -37,21 +37,6 @@ export default function LessonsPageClient({ courses }: { courses: CourseOption[]
   const [lessons, setLessons] = useState<LessonItem[]>([])
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    if (selectedCourseId) {
-      fetchLessons(selectedCourseId)
-      // Sync search param with router to keep state on refresh/back
-      const params = new URLSearchParams(window.location.search)
-      params.set('courseId', selectedCourseId)
-      router.replace(`?${params.toString()}`)
-    } else {
-      setLessons([])
-      const params = new URLSearchParams(window.location.search)
-      params.delete('courseId')
-      router.replace(`?${params.toString()}`)
-    }
-  }, [selectedCourseId])
-
   async function fetchLessons(courseId: string) {
     setLoading(true)
     try {
@@ -81,6 +66,21 @@ export default function LessonsPageClient({ courses }: { courses: CourseOption[]
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (selectedCourseId) {
+      fetchLessons(selectedCourseId)
+      // Sync search param with router to keep state on refresh/back
+      const params = new URLSearchParams(window.location.search)
+      params.set('courseId', selectedCourseId)
+      router.replace(`?${params.toString()}`)
+    } else {
+      setLessons([])
+      const params = new URLSearchParams(window.location.search)
+      params.delete('courseId')
+      router.replace(`?${params.toString()}`)
+    }
+  }, [selectedCourseId, router])
 
   async function handleDelete(lesson: LessonItem) {
     const result = await Swal.fire({
@@ -198,19 +198,6 @@ export default function LessonsPageClient({ courses }: { courses: CourseOption[]
                     {lessons
                       .sort((a, b) => a.order - b.order)
                       .map((lesson) => {
-                        const dateObj = lesson.liveDate ? new Date(lesson.liveDate) : null
-                        const formattedDate = dateObj
-                          ? dateObj.toLocaleString('en-BD', {
-                              weekday: 'short',
-                              day: '2-digit',
-                              month: 'short',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                              hour12: true,
-                              timeZone: 'Asia/Dhaka',
-                            })
-                          : '—'
-
                         return (
                           <tr key={lesson.id} className="hover:bg-slate-50 transition-colors">
                             {/* Order */}

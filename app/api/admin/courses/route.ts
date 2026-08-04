@@ -11,7 +11,7 @@ import { revalidatePath } from 'next/cache'
  * Fetch all courses (admin: all, instructor: own)
  * Returns standardized response format
  */
-export async function GET(request: Request) {
+export async function GET() {
   try {
     await connectToDatabase()
 

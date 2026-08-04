@@ -13,7 +13,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
     }
 
-    let lessonsQuery: any = { lessonType: 'live' }
+    const lessonsQuery: any = { lessonType: 'live' }
 
     if (user.role === 'instructor') {
       // Instructors only see live classes in their assigned courses (regardless of who created the lesson)

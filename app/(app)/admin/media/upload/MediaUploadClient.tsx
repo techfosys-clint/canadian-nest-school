@@ -183,7 +183,7 @@ export default function MediaUploadClient() {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [allDone]);
+  }, [allDone, entries, router]);
 
   const queuedCount = entries.filter((e) => e.status === 'queued').length;
   const doneCount = entries.filter((e) => e.status === 'done').length;

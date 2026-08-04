@@ -4,7 +4,7 @@ import { User } from '@/lib/db/models/User'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     await connectToDatabase()
 

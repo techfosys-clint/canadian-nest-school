@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { FiArrowLeft, FiSave, FiCheck, FiTag, FiAlertCircle } from 'react-icons/fi'
+import { FiArrowLeft, FiCheck, FiTag, FiAlertCircle } from 'react-icons/fi'
 import Swal from 'sweetalert2'
 
 interface CouponFormClientProps {

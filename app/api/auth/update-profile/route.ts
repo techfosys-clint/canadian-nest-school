@@ -17,7 +17,6 @@ export async function POST(request: Request) {
     const payloadToken = cookieStore.get('payload-token')?.value
 
     let authUser: any = null
-    let targetCollection: 'students' | 'users' = 'students'
     let role = 'student'
 
     // 1. Authenticate user session using JWT tokens
@@ -25,7 +24,6 @@ export async function POST(request: Request) {
       const decoded = verifyToken(studentToken)
       if (decoded && decoded.id) {
         authUser = await Student.findById(decoded.id).populate('profilePic')
-        targetCollection = 'students'
         role = 'student'
       }
     }
@@ -34,7 +32,6 @@ export async function POST(request: Request) {
       const decoded = verifyToken(payloadToken)
       if (decoded && decoded.id) {
         authUser = await User.findById(decoded.id).populate('profilePic')
-        targetCollection = 'users'
         role = authUser?.role || 'staff'
       }
     }

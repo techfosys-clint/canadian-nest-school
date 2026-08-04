@@ -36,35 +36,10 @@ function getPlainPreview(htmlContent: string, maxLength = 120): string {
   return cleaned.substring(0, maxLength) + '...';
 }
 
-// Calculate reading time
-function calculateReadingTime(htmlContent: string): number {
-  if (!htmlContent) return 1;
-  const words = htmlContent
-    .replace(/<[^>]*>/g, ' ')
-    .trim()
-    .split(/\s+/).length;
-  const wordsPerMinute = 200;
-  return Math.max(1, Math.ceil(words / wordsPerMinute));
-}
-
 export default function BlogsPageClient({
   initialBlogs,
 }: BlogsPageClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
-
-  // Extract all unique tags across all blogs
-  const allTags = useMemo(() => {
-    const tagsSet = new Set<string>();
-    initialBlogs.forEach((blog) => {
-      if (blog.tags) {
-        blog.tags.forEach((t) => {
-          if (t.tag) tagsSet.add(t.tag.toLowerCase());
-        });
-      }
-    });
-    return Array.from(tagsSet);
-  }, [initialBlogs]);
 
   // Filtered blogs list
   const filteredBlogs = useMemo(() => {
@@ -74,16 +49,9 @@ export default function BlogsPageClient({
         blog.authorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         blog.content.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesTag =
-        !selectedTag ||
-        (blog.tags &&
-          blog.tags.some(
-            (t) => t.tag.toLowerCase() === selectedTag.toLowerCase(),
-          ));
-
-      return matchesSearch && matchesTag;
+      return matchesSearch;
     });
-  }, [initialBlogs, searchQuery, selectedTag]);
+  }, [initialBlogs, searchQuery]);
 
   // Framer Motion Animation Variants (Spring physics for bouncy premium transitions)
   const staggerContainer = {

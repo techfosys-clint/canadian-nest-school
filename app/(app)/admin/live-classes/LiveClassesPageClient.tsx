@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { FiRadio, FiRefreshCw, FiExternalLink } from 'react-icons/fi'
 import Swal from 'sweetalert2'
 
@@ -18,10 +17,10 @@ interface LiveLesson {
 }
 
 export default function LiveClassesPageClient() {
-  const router = useRouter()
   const [lessons, setLessons] = useState<LiveLesson[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  const [now] = useState(() => Date.now())
 
   async function fetchLiveLessons() {
     try {
@@ -123,7 +122,7 @@ export default function LiveClassesPageClient() {
                         })
                       : 'Not Scheduled'
 
-                    const isUpcoming = dateObj ? dateObj.getTime() > Date.now() : false
+                    const isUpcoming = dateObj ? dateObj.getTime() > now : false
 
                     return (
                       <tr key={lesson.id} className="hover:bg-slate-50 transition-colors">

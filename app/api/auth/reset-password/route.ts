@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Student } from '@/lib/db/models/Student'
 import { User } from '@/lib/db/models/User'
-import { Media } from '@/lib/db/models/Media'
 import { hashPassword, signToken } from '@/lib/auth/auth'
 
 export async function POST(request: Request) {

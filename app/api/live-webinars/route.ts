@@ -41,7 +41,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized: Session missing.' }, { status: 401 })
     }
 
-    let lessonsQuery: any = { lessonType: 'live' }
+    const lessonsQuery: any = { lessonType: 'live' }
 
     if (!isAdmin) {
       // For standard students, query only live classes belonging to courses they purchased

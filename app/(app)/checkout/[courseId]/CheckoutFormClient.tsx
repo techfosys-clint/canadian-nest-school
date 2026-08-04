@@ -312,11 +312,12 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
         );
       }
 
-      // 2. Perform silent login
+      // Silent login with email (just registered) — more reliable than raw phone,
+      // which may not match the normalized phone stored at registration.
       const loginRes = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: regPhone, password: regPassword }),
+        body: JSON.stringify({ email: regEmail, password: regPassword }),
       });
       const loginData = await loginRes.json();
 

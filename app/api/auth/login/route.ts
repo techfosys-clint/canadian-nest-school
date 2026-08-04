@@ -2,6 +2,7 @@ import { comparePasswords, signToken } from '@/lib/auth/auth';
 import { Student } from '@/lib/db/models/Student';
 import { User } from '@/lib/db/models/User';
 import { connectToDatabase } from '@/lib/db/mongodb';
+import { normalizePhone } from '@/lib/phone';
 import { rateLimit } from '@/lib/rateLimit';
 import { NextResponse } from 'next/server';
 
@@ -49,9 +50,20 @@ export async function POST(request: Request) {
       );
     }
 
-    const identifier = email.toLowerCase().trim();
+    const identifier = String(email).toLowerCase().trim();
+    // Students are stored with normalizePhone() (01XXXXXXXXX). Login must use
+    // the same form or "01771-172812" / "+8801..." won't match after register.
+    const phoneIdentifier = /\d/.test(identifier)
+      ? normalizePhone(identifier)
+      : null;
     const query = {
-      $or: [{ email: identifier }, { phone: identifier }],
+      $or: [
+        { email: identifier },
+        { phone: identifier },
+        ...(phoneIdentifier && phoneIdentifier !== identifier
+          ? [{ phone: phoneIdentifier }]
+          : []),
+      ],
     };
 
     await connectToDatabase();

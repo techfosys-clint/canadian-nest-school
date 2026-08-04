@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     let body;
     try {
       body = await request.json();
-    } catch (e) {
+    } catch {
       return NextResponse.json(
         { success: false, error: 'Invalid JSON format' },
         { status: 400 },
@@ -53,15 +53,16 @@ export async function POST(request: Request) {
     const identifier = String(email).toLowerCase().trim();
     // Students are stored with normalizePhone() (01XXXXXXXXX). Login must use
     // the same form or "01771-172812" / "+8801..." won't match after register.
-    const phoneIdentifier = /\d/.test(identifier)
-      ? normalizePhone(identifier)
-      : null;
+    // Skip emails (even ones with digits like user123@gmail.com).
+    const looksLikePhone = !identifier.includes('@') && /\d/.test(identifier);
+    const phoneIdentifier = looksLikePhone ? normalizePhone(identifier) : null;
     const query = {
       $or: [
         { email: identifier },
-        { phone: identifier },
-        ...(phoneIdentifier && phoneIdentifier !== identifier
-          ? [{ phone: phoneIdentifier }]
+        ...(phoneIdentifier
+          ? Array.from(new Set([phoneIdentifier, identifier])).map((phone) => ({
+              phone,
+            }))
           : []),
       ],
     };

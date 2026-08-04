@@ -82,7 +82,7 @@ export default function LoginForm() {
         }, 1500);
       } else {
         throw new Error(
-          data.message || 'Invalid credentials. Please try again.',
+          data.error || 'Invalid credentials. Please try again.',
         );
       }
     } catch (err: any) {

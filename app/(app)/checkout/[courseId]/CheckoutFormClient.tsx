@@ -201,7 +201,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
           },
         });
       } else {
-        throw new Error(data.message || 'Invalid email or password.');
+        throw new Error(data.error || 'Invalid email or password.');
       }
     } catch (err: any) {
       setAuthError(err.message || 'Authentication failed.');
@@ -312,12 +312,13 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
         );
       }
 
-      // Silent login with email (just registered) — more reliable than raw phone,
-      // which may not match the normalized phone stored at registration.
+      // Silent login with the email stored by register (canonical lowercased/
+      // trimmed), not the raw form field — avoids trim/case mismatches.
+      const loginEmail = regData.user?.email || regEmail.trim();
       const loginRes = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: regEmail, password: regPassword }),
+        body: JSON.stringify({ email: loginEmail, password: regPassword }),
       });
       const loginData = await loginRes.json();
 
@@ -351,7 +352,8 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
         });
       } else {
         throw new Error(
-          'Registration succeeded, but login failed. Please sign in manually.',
+          loginData.error ||
+            'Registration succeeded, but login failed. Please sign in manually.',
         );
       }
     } catch (err: any) {

@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     let body
     try {
       body = await request.json()
-    } catch (e) {
+    } catch {
       return NextResponse.json(
         { success: false, error: 'Invalid JSON format' },
         { status: 400 }
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     }
 
     const { name, email, password, phone: rawPhone, profilePic, role, permissions, designation } = body
-    let targetRole = role || 'student'
+    const targetRole = role || 'student'
     const phone = rawPhone ? normalizePhone(rawPhone) : undefined
 
     // 1. Basic validation
@@ -60,7 +60,8 @@ export async function POST(request: Request) {
       )
     }
 
-    if (!email) {
+    const emailLower = email ? String(email).toLowerCase().trim() : ''
+    if (!emailLower) {
       return NextResponse.json(
         { success: false, error: 'Email is required.' },
         { status: 400 }
@@ -77,18 +78,14 @@ export async function POST(request: Request) {
     await connectToDatabase()
 
     // 2. Check for duplicate email/phone across collections
-    const emailLower = email ? email.toLowerCase() : undefined
+    const existingStudent = await Student.findOne({ email: emailLower })
+    const existingUser = await User.findOne({ email: emailLower })
 
-    if (emailLower) {
-      const existingStudent = await Student.findOne({ email: emailLower })
-      const existingUser = await User.findOne({ email: emailLower })
-
-      if (existingStudent || existingUser) {
-        return NextResponse.json(
-          { success: false, error: 'Email is already registered.' },
-          { status: 400 }
-        )
-      }
+    if (existingStudent || existingUser) {
+      return NextResponse.json(
+        { success: false, error: 'Email is already registered.' },
+        { status: 400 }
+      )
     }
 
     if (targetRole === 'student') {

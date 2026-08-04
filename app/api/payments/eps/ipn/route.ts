@@ -3,6 +3,7 @@ import { connectToDatabase } from '@/lib/db/mongodb'
 import {
   decryptEpsIpnData,
   getEpsIpnSecretKey,
+  getEpsIpnSecretSource,
   ipnStatusLooksSuccessful,
   parseEpsIpnPayload,
 } from '@/lib/payments/epsIpn'
@@ -27,11 +28,18 @@ export async function POST(request: Request) {
     await connectToDatabase()
 
     const secret = getEpsIpnSecretKey()
+    const secretSource = getEpsIpnSecretSource()
     if (!secret) {
       console.error('EPS IPN: no EPS_IPN_SECRET_KEY / EPS_HASH_KEY configured')
       return NextResponse.json(
         { status: 'ERROR', message: 'IPN secret not configured' },
         { status: 500 },
+      )
+    }
+
+    if (secretSource === 'EPS_HASH_KEY') {
+      console.warn(
+        'EPS IPN: using EPS_HASH_KEY fallback. Prefer EPS_IPN_SECRET_KEY from the EPS merchant IPN settings — hash key is for API HMAC and often causes ERR_OSSL_BAD_DECRYPT.',
       )
     }
 

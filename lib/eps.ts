@@ -27,8 +27,11 @@ function getEpsConfig(): EpsConfig {
 }
 
 /**
- * EPS hash mechanism (per their integration guide):
- * HMACSHA512(hashKey, value) -> base64
+ * EPS hash mechanism (Integration Guide V5):
+ * 1) Encode Hash Key as UTF-8
+ * 2) HMAC-SHA512(key = hashKey, data = userName | merchantTransactionId | …)
+ * 3) Return Base64 digest
+ * Used as the `x-hash` header on GetToken / InitializeEPS / Verify.
  */
 function generateHash(value: string, hashKey: string): string {
   return crypto
@@ -189,9 +192,12 @@ async function postInitializeEps(
       'x-hash': generateHash(params.merchantTransactionId, config.hashKey),
     },
     body: JSON.stringify({
+      // Guide V5: merchantId + storeId are both mandatory.
+      merchantId: config.merchantId,
       storeId: config.storeId,
       CustomerOrderId: params.customerOrderId,
       merchantTransactionId: params.merchantTransactionId,
+      // Guide table lists 1=Web; sample body uses 10 — keep 10 (live-proven).
       transactionTypeId,
       financialEntityId: 0,
       transitionStatusId: 0,
@@ -212,6 +218,8 @@ async function postInitializeEps(
       productName,
       productProfile: 'general',
       productCategory: 'Online Course',
+      NoOfItem: '1',
+      ShippingMethod: 'NO',
     }),
     signal: epsSignal(),
   })

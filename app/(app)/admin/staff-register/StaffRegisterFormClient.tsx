@@ -291,6 +291,11 @@ export default function StaffRegisterFormClient() {
             <label className='text-base font-bold text-slate-600'>
               Profile Picture (Optional)
             </label>
+            <p className='text-base font-medium text-slate-500'>
+              Use a 10:9 landscape image (for example 800×720 px, JPG or PNG)
+              with the face centered. This matches the instructor card on the
+              public Mentors page so the face is never cropped.
+            </p>
             <div className='flex items-center gap-5 flex-wrap bg-slate-100 p-4 rounded-lg shadow-sm border-none'>
               <div className='h-16 w-16 rounded-full bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-inner'>
                 {profilePicUrl ? (

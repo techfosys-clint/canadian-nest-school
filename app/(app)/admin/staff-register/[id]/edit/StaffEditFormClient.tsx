@@ -312,6 +312,11 @@ export default function StaffEditFormClient({
             <label className='text-sm font-bold text-slate-700'>
               Profile Picture
             </label>
+            <p className='text-base font-medium text-slate-500'>
+              Use a 10:9 landscape image (for example 800×720 px, JPG or PNG)
+              with the face centered. This matches the instructor card on the
+              public Mentors page so the face is never cropped.
+            </p>
             <div className='flex items-center gap-5 flex-wrap bg-slate-50 border border-slate-200 p-5 rounded-lg shadow-sm'>
               <div className='h-16 w-16 rounded-full bg-white border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm'>
                 {profilePicUrl ? (

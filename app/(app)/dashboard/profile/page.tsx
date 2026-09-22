@@ -280,9 +280,10 @@ export default function StudentProfile() {
               ? 'student'
               : user.role}
           </p>
-          <p className='text-sm font-semibold text-zinc-400 mt-4 leading-relaxed max-w-xs'>
-            Upload a high-quality JPG or PNG picture. Images are cropped into
-            exact sizes automatically.
+          <p className='text-base font-semibold text-zinc-400 mt-4 leading-relaxed max-w-xs'>
+            Upload a high-quality JPG or PNG image in a 10:9 ratio (for example
+            800×720 px) with your face centered. Other ratios are cropped
+            automatically and may cut off your face on the Mentors page.
           </p>
 
           <button

@@ -23,7 +23,7 @@ import {
 
 function getImageUrl(thumbnail: CourseDoc['thumbnail']): string {
   if (!thumbnail || typeof thumbnail === 'string') return '';
-  return (thumbnail as any).sizes?.card?.url ?? (thumbnail as any).url ?? '';
+  return (thumbnail as any).url ?? (thumbnail as any).sizes?.card?.url ?? '';
 }
 function formatPrice(price?: number | null): string {
   if (!price || price === 0) return 'Free';
@@ -85,14 +85,14 @@ function CourseCard({
         className='flex flex-col md:flex-row gap-6 bg-white rounded-lg p-5 border border-[#E61C24]/20 hover:border-[#E61C24]/50 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(230,28,36,0.10)] hover:-translate-y-1 transition-all duration-300 group w-full'
       >
         {/* Aspect-ratio constrained image wrapper */}
-        <div className='shrink-0 w-full md:w-60 aspect-16/10 rounded-lg overflow-hidden bg-zinc-50 relative'>
+        <div className='shrink-0 w-full md:w-60 aspect-video rounded-lg overflow-hidden bg-zinc-50 relative'>
           {imgUrl ? (
             <Image
               src={imgUrl}
               alt={course.title}
               className='w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500 rounded-lg'
               width={240}
-              height={160}
+              height={135}
             />
           ) : (
             <div className='w-full h-full bg-linear-to-br from-[#0A163A] to-[#1e1b4b] flex items-center justify-center rounded-lg'>
@@ -182,14 +182,14 @@ function CourseCard({
         className='bg-white rounded-lg overflow-hidden border border-[#E61C24]/20 hover:border-[#E61C24]/50 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(230,28,36,0.10)] hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full w-full max-w-95'
       >
         {/* Aspect-ratio constrained image wrapper */}
-        <div className='relative aspect-16/10 bg-zinc-50 overflow-hidden rounded-t-lg'>
+        <div className='relative aspect-video bg-zinc-50 overflow-hidden rounded-t-lg'>
           {imgUrl ? (
             <Image
               src={imgUrl}
               alt={course.title}
               className='w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 rounded-t-lg'
               width={380}
-              height={280}
+              height={214}
             />
           ) : (
             <div className='w-full h-full bg-linear-to-br from-[#0A163A] to-[#1e1b4b] flex flex-col items-center justify-center rounded-t-lg'>

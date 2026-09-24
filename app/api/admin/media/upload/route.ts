@@ -78,7 +78,7 @@ export async function POST(request: Request) {
     if (mimeType.startsWith('image/')) {
       const sizesConfig = [
         { name: 'thumbnail', w: 400, h: 300 },
-        { name: 'card', w: 800, h: 600 },
+        { name: 'card', w: 800, h: 450 },
         { name: 'hero', w: 1920, h: 1080 },
       ]
 

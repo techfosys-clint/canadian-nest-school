@@ -1,10 +1,10 @@
 'use client';
 
+import { formatBdDate } from '@/lib/bdTime';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiArrowRight } from 'react-icons/fi';
-import { formatBdDate } from '@/lib/bdTime';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -124,14 +124,14 @@ export default function BlogSection({ blogs }: BlogSectionProps) {
                   {/* Image Container */}
                   <Link
                     href={`/blogs/${blog.id}`}
-                    className='block aspect-16/10 w-full overflow-hidden bg-zinc-50 rounded-lg mb-5 cursor-pointer relative'
+                    className='block aspect-video w-full overflow-hidden bg-zinc-50 rounded-lg mb-5 cursor-pointer relative'
                   >
                     {blog.coverImageUrl ? (
                       <Image
                         src={blog.coverImageUrl}
                         alt={blog.title}
-                        width={100}
-                        height={100}
+                        width={500}
+                        height={350}
                         className='w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500 ease-out'
                       />
                     ) : (

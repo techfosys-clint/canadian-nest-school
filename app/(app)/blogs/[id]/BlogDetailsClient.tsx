@@ -1,11 +1,11 @@
 'use client';
 
 import ShareButton from '@/components/ShareButton';
+import { formatBdDate } from '@/lib/bdTime';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiArrowLeft, FiCalendar, FiClock, FiTag } from 'react-icons/fi';
-import { formatBdDate } from '@/lib/bdTime';
 
 interface BlogDoc {
   id: string;
@@ -242,8 +242,8 @@ export default function BlogDetailsClient({
                 src={blog.coverImageUrl}
                 alt={blog.title}
                 className='w-full h-full object-cover hover:scale-[1.015] transition-transform duration-700'
-                width={100}
-                height={100}
+                width={1500}
+                height={650}
               />
             ) : (
               <div className='w-full h-full flex flex-col items-center justify-center text-zinc-300 bg-linear-to-br from-[#f8fafc] to-[#e2e8f0]'>

@@ -611,7 +611,7 @@ export default async function CourseDetailPage({ params }: Props) {
           <div className='sticky top-28 bg-white border border-zinc-200 rounded-lg shadow-[0_12px_45px_rgba(0,0,0,0.06)] overflow-hidden'>
             {/* Aspect image header on widget */}
             {imageUrl ? (
-              <div className='aspect-16/10 overflow-hidden bg-zinc-50 border-b border-zinc-100 relative group hidden lg:block'>
+              <div className='aspect-video overflow-hidden bg-zinc-50 border-b border-zinc-100 relative group hidden lg:block'>
                 <Image
                   src={imageUrl}
                   alt={course.title}

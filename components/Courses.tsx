@@ -291,7 +291,7 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                 >
                   <div className='grid grid-cols-1 lg:grid-cols-12 gap-8 items-center'>
                     {/* Image */}
-                    <div className='lg:col-span-6 relative aspect-16/10 bg-[#f9fafb] rounded-lg overflow-hidden border border-zinc-100'>
+                    <div className='lg:col-span-6 relative aspect-video bg-[#f9fafb] rounded-lg overflow-hidden border border-zinc-100'>
                       {getImageUrl(featuredCourse.thumbnail) ? (
                         <Image
                           src={getImageUrl(featuredCourse.thumbnail)}

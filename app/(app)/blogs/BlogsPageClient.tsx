@@ -203,9 +203,10 @@ export default function BlogsPageClient({
                           <Image
                             src={blog.coverImageUrl}
                             alt={blog.title}
-                            className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02] ease-out rounded-lg'
-                            width={100}
-                            height={100}
+                            className='object-cover transition-transform duration-500 group-hover:scale-[1.02] ease-out rounded-lg'
+                            fill
+                            sizes='(max-width: 767px) calc(100vw - 3rem), (max-width: 1023px) calc(50vw - 2.5rem), calc(33vw - 2.7rem)'
+                            quality={90}
                           />
                         ) : (
                           <div className='w-full h-full flex flex-col items-center justify-center text-zinc-350 bg-linear-to-br from-[#f8fafc] to-[#e2e8f0] rounded-lg'>

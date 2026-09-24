@@ -1,0 +1,1 @@
+- Expects client-uploaded HD images to render sharply at their displayed size, without low-resolution stretching or excessive image degradation. Confidence: 0.9

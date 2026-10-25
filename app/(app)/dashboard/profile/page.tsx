@@ -229,7 +229,7 @@ export default function StudentProfile() {
           My Profile
         </h1>
         <p className='text-base font-semibold text-zinc-400 mt-1'>
-          Manage your personal details, credentials, and profile image.
+          Manage the student’s details, credentials, and profile photo.
         </p>
       </div>
 
@@ -281,9 +281,8 @@ export default function StudentProfile() {
               : user.role}
           </p>
           <p className='text-base font-semibold text-zinc-400 mt-4 leading-relaxed max-w-xs'>
-            Upload a high-quality JPG or PNG image in a 10:9 ratio (for example
-            800×720 px) with your face centered. Other ratios are cropped
-            automatically and may cut off your face on the Mentors page.
+            Upload the student’s photo (JPG or PNG, ideally 10:9 e.g. 800×720 px)
+            with their face centered. Other ratios are cropped automatically.
           </p>
 
           <button
@@ -291,7 +290,7 @@ export default function StudentProfile() {
             className='mt-6 px-5 py-2.5 rounded-lg border border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50 text-zinc-600 font-bold text-base transition-all duration-300 w-full flex items-center justify-center gap-2 cursor-pointer'
           >
             <FiCamera className='h-4.5 w-4.5' />
-            <span>Upload Image</span>
+            <span>Upload Student Photo</span>
           </button>
         </div>
 
@@ -299,7 +298,7 @@ export default function StudentProfile() {
         <div className='lg:col-span-2 bg-white rounded-lg border border-zinc-200/80 p-6 md:p-8'>
           <h2 className='text-xl font-bold text-zinc-800 mb-6 pb-3 border-b border-zinc-100 flex items-center gap-2.5 select-none'>
             <FiUser className='text-[#E61C24] h-5 w-5' />
-            <span>Personal Information</span>
+            <span>Student Information</span>
           </h2>
 
           <form onSubmit={handleSubmit} className='space-y-6'>
@@ -309,7 +308,7 @@ export default function StudentProfile() {
                 htmlFor='name'
                 className='text-base font-bold text-zinc-700 block'
               >
-                Full Name <span className='text-red-500'>*</span>
+                Student Name <span className='text-red-500'>*</span>
               </label>
               <div className='relative flex items-center rounded-lg bg-zinc-50 border border-zinc-200 focus-within:border-[#E61C24]/60 transition-colors'>
                 <FiUser className='absolute left-3.5 h-4.5 w-4.5 text-zinc-400' />
@@ -319,10 +318,13 @@ export default function StudentProfile() {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder='Enter your full name'
+                  placeholder="Student's full name"
                   className='bg-transparent border-none outline-none w-full pl-11 pr-4 py-3.5 text-base font-semibold text-zinc-800 placeholder-zinc-400'
                 />
               </div>
+              <p className='text-base font-semibold text-zinc-500 select-none'>
+                Use the learner’s name, not the parent’s.
+              </p>
             </div>
 
             {/* Email Input (Disabled/Read-only for safety) */}
@@ -331,7 +333,7 @@ export default function StudentProfile() {
                 htmlFor='email'
                 className='text-base font-bold text-zinc-700 block'
               >
-                Email Address
+                Student Email
               </label>
               <div className='relative flex items-center rounded-lg bg-zinc-100 border border-zinc-200/80 select-none'>
                 <FiMail className='absolute left-3.5 h-4.5 w-4.5 text-zinc-400' />
@@ -344,9 +346,9 @@ export default function StudentProfile() {
                 />
                 <FiLock className='absolute right-3.5 h-4 w-4 text-zinc-400' />
               </div>
-              <p className='text-sm font-semibold text-zinc-400 mt-1 select-none'>
-                Your login email address is verified and locked. Contact support
-                to change it.
+              <p className='text-base font-semibold text-zinc-400 mt-1 select-none'>
+                Student login email is verified and locked. Contact support to
+                change it.
               </p>
             </div>
 
@@ -356,7 +358,7 @@ export default function StudentProfile() {
                 htmlFor='phone'
                 className='text-base font-bold text-zinc-700 block'
               >
-                Phone Number
+                Student Mobile Number
               </label>
               <div className='relative flex items-center rounded-lg bg-zinc-50 border border-zinc-200 focus-within:border-[#E61C24]/60 transition-colors'>
                 <FiPhone className='absolute left-3.5 h-4.5 w-4.5 text-zinc-400' />
@@ -365,7 +367,7 @@ export default function StudentProfile() {
                   type='tel'
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder='Enter phone number (e.g. +880123456789)'
+                  placeholder='01XXXXXXXXX'
                   className='bg-transparent border-none outline-none w-full pl-11 pr-4 py-3.5 text-base font-semibold text-zinc-800 placeholder-zinc-400'
                 />
               </div>

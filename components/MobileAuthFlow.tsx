@@ -214,7 +214,9 @@ export default function MobileAuthFlow({
         throw new Error(data.error || 'Incorrect OTP.');
       }
 
-      setSuccess('Phone verified! Complete your account details below.');
+      setSuccess(
+        'Phone verified! Enter the student’s details below to finish signup.',
+      );
       setStep('register');
     } catch (err: any) {
       setError(err.message || 'Verification failed.');
@@ -304,8 +306,9 @@ export default function MobileAuthFlow({
       description: `We sent a code to ${phone.trim()}. Enter it below.`,
     },
     register: {
-      title: 'Complete your account',
-      description: 'Add your details to finish creating your student account.',
+      title: 'Complete student account',
+      description:
+        'Enter the student’s details below (not the parent’s) to finish creating the account.',
     },
   };
 
@@ -504,7 +507,7 @@ export default function MobileAuthFlow({
         <form onSubmit={handleRegisterSubmit} className='space-y-4'>
           <div className='space-y-1.5'>
             <label className='text-base font-bold text-zinc-700'>
-              Full Name
+              Student Name
             </label>
             <div className='relative'>
               <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
@@ -515,16 +518,19 @@ export default function MobileAuthFlow({
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder='John Doe'
+                placeholder="Student's full name"
                 autoComplete='name'
                 className={inputClass}
               />
             </div>
+            <p className='text-base font-semibold text-zinc-500'>
+              Use the learner’s name, not the parent’s.
+            </p>
           </div>
 
           <div className='space-y-1.5'>
             <label className='text-base font-bold text-zinc-700'>
-              Email Address
+              Student Email
             </label>
             <div className='relative'>
               <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
@@ -535,7 +541,7 @@ export default function MobileAuthFlow({
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder='you@example.com'
+                placeholder='student@example.com'
                 autoComplete='email'
                 className={inputClass}
               />
@@ -544,7 +550,7 @@ export default function MobileAuthFlow({
 
           <div className='space-y-1.5'>
             <label className='text-base font-bold text-zinc-700'>
-              Password (Min 6 chars)
+              Student Password (Min 6 chars)
             </label>
             <div className='relative'>
               <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>

@@ -351,6 +351,9 @@ export default function RegisterForm() {
             <h2 className='text-3xl font-bold text-zinc-900 tracking-tight font-display'>
               Student Registration
             </h2>
+            <p className='text-base font-semibold text-zinc-500 mt-2'>
+              Parents: enter the student’s details below, not your own.
+            </p>
           </div>
 
           {/* Multi-step progress indicator */}
@@ -404,7 +407,7 @@ export default function RegisterForm() {
                           htmlFor='name'
                           className='text-base font-bold text-zinc-700'
                         >
-                          Full Name
+                          Student Name
                         </label>
                         <div className='relative'>
                           <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
@@ -416,10 +419,13 @@ export default function RegisterForm() {
                             required
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            placeholder='John Doe'
+                            placeholder="Student's full name"
                             className='w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white'
                           />
                         </div>
+                        <p className='text-base font-semibold text-zinc-500'>
+                          Use the learner’s name, not the parent’s.
+                        </p>
                       </div>
 
                       {/* Phone Number */}
@@ -428,7 +434,7 @@ export default function RegisterForm() {
                           htmlFor='phone'
                           className='text-base font-bold text-zinc-700'
                         >
-                          Mobile Number
+                          Student Mobile Number
                         </label>
                         <div className='relative'>
                           <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
@@ -557,7 +563,7 @@ export default function RegisterForm() {
                       htmlFor='email'
                       className='text-base font-bold text-zinc-700'
                     >
-                      Email Address
+                      Student Email
                     </label>
                     <div className='relative'>
                       <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
@@ -569,7 +575,7 @@ export default function RegisterForm() {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder='you@example.com'
+                        placeholder='student@example.com'
                         className='w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base transition-all font-medium text-zinc-800 placeholder-zinc-400 bg-white'
                       />
                     </div>
@@ -613,7 +619,7 @@ export default function RegisterForm() {
                         htmlFor='password'
                         className='text-base font-bold text-zinc-700'
                       >
-                        Password (Min. 6 chars)
+                        Student Password (Min. 6 chars)
                       </label>
                       <div className='relative'>
                         <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
@@ -648,7 +654,7 @@ export default function RegisterForm() {
                         htmlFor='confirmPassword'
                         className='text-base font-bold text-zinc-700'
                       >
-                        Confirm Password
+                        Confirm Student Password
                       </label>
                       <div className='relative'>
                         <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>

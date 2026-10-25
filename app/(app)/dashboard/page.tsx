@@ -122,61 +122,162 @@ export default function StudentDashboard() {
           }
         }
 
-        // Fire the GTM purchase event after returning from the EPS payment
-        // gateway callback, since that's the only confirmation point for
-        // paid enrollments (the checkout page can't fire it — the browser
-        // is redirected away to EPS and back). Free enrollments already
-        // fire purchase synchronously from the checkout page itself.
+        // Handle return from EPS payment gateway.
+        // Paid enrollments redirect here with enrollment=success|confirming|error.
+        // "confirming" means EPS status lagged — keep healing/polling so a paid
+        // course unlocks instead of looking like a failed purchase.
         const params = new URLSearchParams(window.location.search);
-        if (params.get('enrollment') === 'success') {
-          const enrollmentId = params.get('enrollmentId');
-          const purchasedEnrollment = enrollmentId
-            ? fetchedEnrollments.find((e: any) => e.id === enrollmentId)
-            : fetchedEnrollments[0];
+        const enrollmentStatus = params.get('enrollment');
+        const enrollmentId = params.get('enrollmentId');
 
-          if (purchasedEnrollment) {
-            const e = purchasedEnrollment as any;
-            pushToDataLayer({
-              event: 'purchase',
-              event_id: generateEventId(),
-              ecommerce: {
-                transaction_id: e.paymentReference || e.id,
-                currency: 'BDT',
-                value: e.pricePaid,
-                coupon: e.couponCode || '',
-                items: [
-                  {
-                    item_id: e.course?.id || '',
-                    item_name: e.course?.title || '',
-                    item_category: e.course?.category?.name || '',
-                    price: e.course?.price,
-                    quantity: 1,
-                  },
-                ],
-              },
-              user_data: {
-                user_id: sessionData.user.id,
-                email: sessionData.user.email,
-                phone_number: sessionData.user.phone || '',
-                first_name: sessionData.user.name
-                  ? sessionData.user.name.split(' ')[0]
+        const firePurchaseEvent = (purchasedEnrollment: any) => {
+          if (!purchasedEnrollment) return;
+          const e = purchasedEnrollment;
+          pushToDataLayer({
+            event: 'purchase',
+            event_id: generateEventId(),
+            ecommerce: {
+              transaction_id: e.paymentReference || e.id,
+              currency: 'BDT',
+              value: e.pricePaid,
+              coupon: e.couponCode || '',
+              items: [
+                {
+                  item_id: e.course?.id || '',
+                  item_name: e.course?.title || '',
+                  item_category: e.course?.category?.name || '',
+                  price: e.course?.price,
+                  quantity: 1,
+                },
+              ],
+            },
+            user_data: {
+              user_id: sessionData.user.id,
+              email: sessionData.user.email,
+              phone_number: sessionData.user.phone || '',
+              first_name: sessionData.user.name
+                ? sessionData.user.name.split(' ')[0]
+                : '',
+              last_name:
+                sessionData.user.name && sessionData.user.name.includes(' ')
+                  ? sessionData.user.name.split(' ').slice(1).join(' ')
                   : '',
-                last_name:
-                  sessionData.user.name && sessionData.user.name.includes(' ')
-                    ? sessionData.user.name.split(' ').slice(1).join(' ')
-                    : '',
-                city: '',
-                country: 'BD',
-              },
-            });
-          }
+              city: '',
+              country: 'BD',
+            },
+          });
+        };
 
-          // Strip the query params so a page refresh doesn't re-fire purchase
+        const clearEnrollmentQuery = () => {
           window.history.replaceState(
             {},
             document.title,
             window.location.pathname,
           );
+        };
+
+        if (enrollmentStatus === 'success') {
+          const purchasedEnrollment = enrollmentId
+            ? fetchedEnrollments.find((e: any) => e.id === enrollmentId)
+            : fetchedEnrollments[0];
+          firePurchaseEvent(purchasedEnrollment);
+          clearEnrollmentQuery();
+          Swal.fire({
+            icon: 'success',
+            title: 'Payment successful!',
+            text: 'Your course is unlocked. Happy learning!',
+            confirmButtonColor: '#E61C24',
+            timer: 4000,
+          });
+        } else if (
+          enrollmentStatus === 'confirming' ||
+          enrollmentStatus === 'pending'
+        ) {
+          clearEnrollmentQuery();
+          // Non-blocking: keep healing in the background while the dashboard loads.
+          void (async () => {
+            Swal.fire({
+              title: 'Confirming your payment…',
+              html: 'Please wait a moment. If you completed payment, your course will unlock automatically.',
+              allowOutsideClick: false,
+              allowEscapeKey: false,
+              showConfirmButton: false,
+              didOpen: () => {
+                Swal.showLoading();
+              },
+            });
+
+            const maxAttempts = 12;
+            const delayMs = 3500;
+            let unlocked: EnrollmentItem | null = null;
+
+            // Immediate re-check (GET /api/enrollments already heals open EPS payments)
+            try {
+              const immediateRes = await fetch('/api/enrollments?depth=2', {
+                cache: 'no-store',
+              });
+              if (immediateRes.ok) {
+                const immediateData = await immediateRes.json();
+                const docs: EnrollmentItem[] = immediateData.docs || [];
+                setEnrollments(docs);
+                if (enrollmentId) {
+                  unlocked = docs.find((e) => e.id === enrollmentId) || null;
+                }
+              }
+            } catch {
+              /* continue polling */
+            }
+
+            for (
+              let attempt = 0;
+              attempt < maxAttempts && !unlocked;
+              attempt++
+            ) {
+              await new Promise((r) => setTimeout(r, delayMs));
+              try {
+                const pollRes = await fetch('/api/enrollments?depth=2', {
+                  cache: 'no-store',
+                });
+                if (!pollRes.ok) continue;
+                const pollData = await pollRes.json();
+                const docs: EnrollmentItem[] = pollData.docs || [];
+                setEnrollments(docs);
+
+                if (enrollmentId) {
+                  unlocked = docs.find((e) => e.id === enrollmentId) || null;
+                } else if (docs.length > 0) {
+                  unlocked = docs[0];
+                }
+              } catch (pollErr) {
+                console.error('Enrollment payment poll failed:', pollErr);
+              }
+            }
+
+            if (unlocked) {
+              firePurchaseEvent(unlocked);
+              Swal.fire({
+                icon: 'success',
+                title: 'Payment confirmed!',
+                text: 'Your course is unlocked. Happy learning!',
+                confirmButtonColor: '#E61C24',
+              });
+            } else {
+              Swal.fire({
+                icon: 'info',
+                title: 'Still confirming payment',
+                html: 'If you completed payment, your course will unlock shortly. Refresh this page in a minute, or contact support with your mobile number if it does not appear.',
+                confirmButtonColor: '#E61C24',
+              });
+            }
+          })();
+        } else if (enrollmentStatus === 'error') {
+          clearEnrollmentQuery();
+          Swal.fire({
+            icon: 'info',
+            title: 'Checking your enrollment',
+            html: 'We could not confirm the payment return link. If you already paid, refresh this page shortly — your course should unlock automatically once the payment clears.',
+            confirmButtonColor: '#E61C24',
+          });
         }
 
         // Fetch upcoming live webinars for enrolled courses

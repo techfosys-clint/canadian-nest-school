@@ -6,6 +6,7 @@ import { generateEventId, pushToDataLayer } from '@/lib/gtm';
 import { parseJsonResponse } from '@/lib/safeJson';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import {
   FiAlertCircle,
@@ -15,6 +16,7 @@ import {
   FiTag,
   FiZap,
 } from 'react-icons/fi';
+import Swal from 'sweetalert2';
 
 interface CourseData {
   id: string;
@@ -36,9 +38,34 @@ interface UserSession {
 }
 
 export default function CheckoutFormClient({ course }: { course: CourseData }) {
+  const router = useRouter();
+
   // Auth states
   const [user, setUser] = useState<UserSession | null>(null);
   const [loadingSession, setLoadingSession] = useState(true);
+
+  // Soft-handle legacy EPS fail redirects (?enrollment=failed) — send people
+  // to the dashboard confirming flow instead of a hard "purchase failed" feel.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('enrollment') !== 'failed') return;
+
+    const enrollmentId = params.get('enrollmentId');
+    Swal.fire({
+      icon: 'info',
+      title: 'Checking your payment',
+      html: 'If you completed payment at the gateway, we are confirming it now. You will be taken to your dashboard.',
+      confirmButtonColor: '#E61C24',
+      timer: 2500,
+      showConfirmButton: true,
+    }).then(() => {
+      const q = enrollmentId
+        ? `?enrollment=confirming&enrollmentId=${encodeURIComponent(enrollmentId)}`
+        : '?enrollment=confirming';
+      router.replace(`/dashboard${q}`);
+    });
+  }, [router]);
 
   // Checkout states
   const [couponCode, setCouponCode] = useState('');

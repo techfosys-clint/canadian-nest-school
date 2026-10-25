@@ -45,22 +45,32 @@ export async function healPaymentByMerchantTransactionId(
 /**
  * Re-check a student's open EPS enrollments so a successful payment that
  * never hit the browser callback still unlocks the course on next dashboard load.
+ * Also re-checks recently failed ones (EPS lag / premature fail redirect).
  */
 export async function healStudentPendingEnrollments(
   studentId: string,
-  options?: { limit?: number },
+  options?: { limit?: number; recoverFailedWithinHours?: number },
 ): Promise<{ checked: number; completed: number }> {
-  const limit = options?.limit ?? 5
-  const pending = await Enrollment.find({
+  const limit = options?.limit ?? 8
+  const recoverFailedWithinHours = options?.recoverFailedWithinHours ?? 72
+  const failedSince = new Date(
+    Date.now() - recoverFailedWithinHours * 60 * 60 * 1000,
+  )
+
+  const open = await Enrollment.find({
     student: studentId,
-    paymentStatus: 'pending',
     merchantTransactionId: { $exists: true, $nin: [null, ''] },
+    $or: [
+      { paymentStatus: 'pending' },
+      { paymentStatus: 'failed', updatedAt: { $gte: failedSince } },
+      { paymentStatus: 'failed', createdAt: { $gte: failedSince } },
+    ],
   })
     .sort({ createdAt: -1 })
     .limit(limit)
 
   let completed = 0
-  for (const enrollment of pending) {
+  for (const enrollment of open) {
     try {
       const result = await completePaidEnrollment(enrollment)
       if (result === 'completed' || result === 'already_completed') {
@@ -76,5 +86,5 @@ export async function healStudentPendingEnrollments(
     }
   }
 
-  return { checked: pending.length, completed }
+  return { checked: open.length, completed }
 }

@@ -1,9 +1,10 @@
 import { Coupon } from '@/lib/db/models/Coupon'
 import { Course } from '@/lib/db/models/Course'
-import type { IEnrollment } from '@/lib/db/models/Enrollment'
+import { Enrollment, type IEnrollment } from '@/lib/db/models/Enrollment'
 import { Student } from '@/lib/db/models/Student'
 import { User } from '@/lib/db/models/User'
 import { verifyEpsTransaction } from '@/lib/eps'
+import { epsAmountsMatch } from '@/lib/payments/epsAmount'
 import { normalizeEpsStatus } from '@/lib/payments/epsStatus'
 
 export type CompletePaidEnrollmentResult =
@@ -16,11 +17,11 @@ export type CompletePaidEnrollmentResult =
 /**
  * Verifies an EPS transaction and updates the enrollment.
  * - Success always wins (including recovering a wrongly marked "failed").
+ * - Requires EPS TotalAmount to match enrollment.pricePaid.
+ * - Atomic claim prevents double side-effects from callback + IPN races.
  * - Failed is only written when EPS confirms failure/cancel.
- * - Pending / unknown statuses leave the enrollment pending so a later
- *   callback or reconcile job can complete it.
- * - NotFound (EPS 404) leaves the enrollment pending; stale coupon release
- *   may abandon it after the unpaid window.
+ * - Pending / unknown / amount mismatch leave the enrollment open so a later
+ *   callback or reconcile job can finish it.
  */
 export async function completePaidEnrollment(
   enrollment: IEnrollment,
@@ -42,25 +43,54 @@ export async function completePaidEnrollment(
   }
 
   if (status === 'success') {
-    enrollment.paymentStatus = 'completed'
-    if (!enrollment.paymentReference) {
-      enrollment.paymentReference = enrollment.merchantTransactionId
+    if (!epsAmountsMatch(result.totalAmount, enrollment.pricePaid)) {
+      console.error('EPS enrollment amount mismatch — leaving pending', {
+        enrollmentId: enrollment._id?.toString?.(),
+        merchantTransactionId: enrollment.merchantTransactionId,
+        expected: enrollment.pricePaid,
+        epsTotalAmount: result.totalAmount,
+      })
+      return 'pending'
     }
-    await enrollment.save()
 
-    // If we previously released the coupon on a false "failed", reclaim it.
-    if (previousStatus === 'failed' && enrollment.couponCode) {
+    const paymentReference =
+      enrollment.paymentReference || enrollment.merchantTransactionId
+
+    // Only one worker may transition into completed and run side effects.
+    const claimed = await Enrollment.findOneAndUpdate(
+      {
+        _id: enrollment._id,
+        paymentStatus: { $ne: 'completed' },
+      },
+      {
+        $set: {
+          paymentStatus: 'completed',
+          paymentReference,
+        },
+      },
+      { new: true },
+    )
+
+    if (!claimed) {
+      enrollment.paymentStatus = 'completed'
+      return 'already_completed'
+    }
+
+    enrollment.paymentStatus = 'completed'
+    enrollment.paymentReference = claimed.paymentReference
+
+    if (previousStatus === 'failed' && claimed.couponCode) {
       await Coupon.updateOne(
-        { code: enrollment.couponCode },
+        { code: claimed.couponCode },
         { $inc: { usedCount: 1 } },
       )
     }
 
-    let student = await Student.findById(enrollment.student).lean()
+    let student = await Student.findById(claimed.student).lean()
     if (!student) {
-      student = await User.findById(enrollment.student).lean()
+      student = await User.findById(claimed.student).lean()
     }
-    const course = await Course.findById(enrollment.course).lean()
+    const course = await Course.findById(claimed.course).lean()
 
     if (student?.email && course) {
       const { sendEnrollmentConfirmationEmail } = await import('@/lib/email')
@@ -68,9 +98,9 @@ export async function completePaidEnrollment(
         student.email,
         student.name,
         (course as { title?: string }).title || 'Course',
-        enrollment.pricePaid,
-        enrollment.paymentReference || enrollment.merchantTransactionId!,
-        enrollment.createdAt,
+        claimed.pricePaid,
+        claimed.paymentReference || claimed.merchantTransactionId!,
+        claimed.createdAt,
       ).catch((err) =>
         console.error('Failed to send enrollment confirmation email:', err),
       )
@@ -80,20 +110,26 @@ export async function completePaidEnrollment(
   }
 
   if (status === 'failed') {
-    if (enrollment.paymentStatus !== 'failed') {
-      enrollment.paymentStatus = 'failed'
-      await enrollment.save()
+    const failed = await Enrollment.findOneAndUpdate(
+      {
+        _id: enrollment._id,
+        paymentStatus: { $nin: ['completed', 'failed'] },
+      },
+      { $set: { paymentStatus: 'failed' } },
+      { new: true },
+    )
 
-      if (enrollment.couponCode) {
-        await Coupon.updateOne(
-          { code: enrollment.couponCode },
-          { $inc: { usedCount: -1 } },
-        )
-      }
+    enrollment.paymentStatus = 'failed'
+    // Release coupon only when this worker actually transitioned → failed.
+    if (failed?.couponCode) {
+      await Coupon.updateOne(
+        { code: failed.couponCode },
+        { $inc: { usedCount: -1 } },
+      )
     }
+
     return 'failed'
   }
 
-  // Still pending at EPS — do not flip the local record to failed.
   return 'pending'
 }

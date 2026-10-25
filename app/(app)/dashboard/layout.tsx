@@ -1,5 +1,6 @@
 'use client';
 
+import RequiredStudentPhotoModal from '@/components/RequiredStudentPhotoModal';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -103,6 +104,9 @@ export default function DashboardLayout({
 
   if (!user) return null;
 
+  const needsStudentPhoto =
+    user.role === 'student' && !user.profilePic;
+
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -137,6 +141,18 @@ export default function DashboardLayout({
 
   return (
     <div className='h-screen bg-zinc-50/50 flex font-sans overflow-hidden'>
+      {needsStudentPhoto && (
+        <RequiredStudentPhotoModal
+          studentName={user.name}
+          onUploaded={(profilePicUrl) => {
+            setUser((prev) =>
+              prev ? { ...prev, profilePic: profilePicUrl } : prev,
+            );
+          }}
+          onLogout={handleLogout}
+        />
+      )}
+
       {/* 1. Sidebar for Desktop (Sleek, Premium Dark slate theme) */}
       <aside className='hidden lg:flex flex-col w-64 bg-[#0A1128] text-zinc-300 border-r border-[#152347] shrink-0 select-none h-full'>
         {/* Sidebar Brand Header */}

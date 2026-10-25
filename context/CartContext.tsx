@@ -27,6 +27,7 @@ interface CartContextValue {
   removeItem: (productId: string) => void;
   clearCart: () => void;
   requireLogin: (returnPath?: string) => boolean;
+  refreshAuth: () => Promise<string | null>;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -73,10 +74,35 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems(next);
   }, []);
 
+  const refreshAuth = useCallback(async (): Promise<string | null> => {
+    try {
+      const res = await fetch('/api/auth/me');
+      const data = await res.json();
+
+      if (res.ok && data.authenticated && data.user?.id) {
+        const uid = data.user.id as string;
+        setUserId(uid);
+        setItems(readCart(uid));
+        return uid;
+      }
+
+      setUserId(null);
+      setItems([]);
+      return null;
+    } catch {
+      setUserId(null);
+      setItems([]);
+      return null;
+    } finally {
+      setAuthLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
 
     async function loadAuth() {
+      setAuthLoading(true);
       try {
         const res = await fetch('/api/auth/me');
         const data = await res.json();
@@ -186,6 +212,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       removeItem,
       clearCart,
       requireLogin,
+      refreshAuth,
     }),
     [
       items,
@@ -197,6 +224,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       removeItem,
       clearCart,
       requireLogin,
+      refreshAuth,
     ],
   );
 

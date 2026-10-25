@@ -1,6 +1,8 @@
- 
 'use client';
 
+import MobileAuthFlow, {
+  type MobileAuthUser,
+} from '@/components/MobileAuthFlow';
 import { useCart } from '@/context/CartContext';
 import { parseJsonResponse } from '@/lib/safeJson';
 import Image from 'next/image';
@@ -26,7 +28,7 @@ interface UserSession {
 
 export default function ShopCheckoutFormClient() {
   const router = useRouter();
-  const { items, authLoading, userId, requireLogin, clearCart } = useCart();
+  const { items, authLoading, userId, refreshAuth, clearCart } = useCart();
 
   const [user, setUser] = useState<UserSession | null>(null);
   const [loadingSession, setLoadingSession] = useState(true);
@@ -38,16 +40,7 @@ export default function ShopCheckoutFormClient() {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!userId) {
-      requireLogin('/shop-checkout');
-      return;
-    }
-    if (items.length === 0) {
-      router.replace('/shop/cart');
-    }
-  }, [authLoading, userId, items.length, requireLogin, router]);
 
-  useEffect(() => {
     async function getSession() {
       try {
         const res = await fetch('/api/auth/me');
@@ -56,15 +49,33 @@ export default function ShopCheckoutFormClient() {
           setUser(data.user);
           setShippingName(data.user.name || '');
           setShippingPhone(data.user.phone || '');
+        } else {
+          setUser(null);
         }
       } catch (err) {
         console.error('Session verify failed:', err);
+        setUser(null);
       } finally {
         setLoadingSession(false);
       }
     }
-    if (userId) getSession();
-  }, [userId]);
+
+    getSession();
+  }, [authLoading, userId]);
+
+  useEffect(() => {
+    if (authLoading || loadingSession) return;
+    if (userId && items.length === 0) {
+      router.replace('/shop/cart');
+    }
+  }, [authLoading, loadingSession, userId, items.length, router]);
+
+  const handleAuthSuccess = async (authUser: MobileAuthUser) => {
+    setUser(authUser);
+    setShippingName(authUser.name || '');
+    setShippingPhone(authUser.phone || '');
+    await refreshAuth();
+  };
 
   const totalPrice = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -123,13 +134,50 @@ export default function ShopCheckoutFormClient() {
     }
   };
 
-  if (authLoading || loadingSession || !userId || items.length === 0) {
+  if (authLoading || loadingSession) {
     return (
       <div className='min-h-screen flex items-center justify-center bg-zinc-50'>
         <div className='flex flex-col items-center gap-4'>
           <div className='h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin' />
           <p className='text-base font-bold text-zinc-600'>
             Loading Checkout...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Guest: show mobile-first auth instead of redirecting to /login
+  if (!userId || !user) {
+    return (
+      <div className='container mx-auto px-6 pt-28 pb-16'>
+        <Link
+          href='/shop/cart'
+          className='inline-flex items-center gap-2 text-base font-bold text-zinc-500 hover:text-zinc-900 transition-colors mb-8 group'
+        >
+          <FiChevronLeft className='h-5 w-5 transition-transform group-hover:-translate-x-0.5' />
+          <span>Back to Cart</span>
+        </Link>
+
+        <div className='max-w-lg mx-auto'>
+          <MobileAuthFlow
+            onSuccess={handleAuthSuccess}
+            heading='Sign in to checkout'
+            subheading='Enter your mobile number to continue with your shop order.'
+            signUpMethod='shop_checkout_inline'
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className='min-h-screen flex items-center justify-center bg-zinc-50'>
+        <div className='flex flex-col items-center gap-4'>
+          <div className='h-12 w-12 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin' />
+          <p className='text-base font-bold text-zinc-600'>
+            Redirecting to cart...
           </p>
         </div>
       </div>
@@ -156,15 +204,13 @@ export default function ShopCheckoutFormClient() {
               <h2 className='text-xl font-bold text-zinc-800'>
                 Shipping Details
               </h2>
-              {user && (
-                <p className='text-base font-semibold text-zinc-500 mt-1'>
-                  Checkout as {user.name}
-                </p>
-              )}
+              <p className='text-base font-semibold text-zinc-500 mt-1'>
+                Checkout as {user.name}
+              </p>
             </div>
 
             {orderError && (
-              <div className='p-3.5 bg-rose-50 border border-rose-100 rounded-lg text-rose-650 font-semibold text-base'>
+              <div className='p-3.5 bg-rose-50 border border-rose-100 rounded-lg text-rose-700 font-semibold text-base'>
                 {orderError}
               </div>
             )}

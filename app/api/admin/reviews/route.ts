@@ -34,9 +34,13 @@ export async function POST(request: Request) {
         finalStudentId = existingStudent._id.toString()
       } else {
         // Create new student profile
+        const { allocateStudentId } = await import('@/lib/students/studentId')
+        const studentId = await allocateStudentId()
         const newStudent = await Student.create({
           name: studentName.trim(),
           email: studentEmail.trim().toLowerCase(),
+          phone: '01700000000',
+          studentId,
           profilePic: studentProfilePic || undefined,
           status: 'active',
         })

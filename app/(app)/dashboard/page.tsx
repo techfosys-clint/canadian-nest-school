@@ -26,6 +26,7 @@ interface UserSession {
   name: string;
   email: string;
   phone?: string;
+  studentId?: string;
   profilePic?: any; // Populated media object or ID
   role: string;
 }
@@ -521,6 +522,14 @@ export default function StudentDashboard() {
             </span>
             ! 👋
           </h1>
+          {user.studentId && (
+            <p className='text-base font-semibold text-white/90 mb-3'>
+              Student ID:{' '}
+              <span className='font-mono font-bold tracking-wide text-white'>
+                {user.studentId}
+              </span>
+            </p>
+          )}
           <p className='text-zinc-400 text-base md:text-lg font-semibold leading-relaxed'>
             Ready to unlock more skills? Resume your courses or explore new
             learning avenues today!

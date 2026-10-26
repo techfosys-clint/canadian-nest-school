@@ -122,6 +122,17 @@ export async function POST(request: Request) {
       role: role,
     });
 
+    let studentId: string | undefined;
+    if (role === 'student') {
+      try {
+        const { ensureStudentId } = await import('@/lib/students/studentId');
+        studentId = await ensureStudentId(verifiedDoc);
+      } catch (idErr) {
+        console.error('ensureStudentId on login failed:', idErr);
+        studentId = verifiedDoc.studentId || undefined;
+      }
+    }
+
     // 4. Resolve profile picture URL
     let profilePicUrl = null;
     if (verifiedDoc.profilePic) {
@@ -135,6 +146,7 @@ export async function POST(request: Request) {
       name: verifiedDoc.name,
       email: verifiedDoc.email,
       phone: verifiedDoc.phone,
+      studentId,
       profilePic: profilePicUrl,
       role: role,
     };

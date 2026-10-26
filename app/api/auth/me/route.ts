@@ -47,6 +47,17 @@ export async function GET() {
       )
     }
 
+    let studentId: string | undefined
+    if (role === 'student') {
+      try {
+        const { ensureStudentId } = await import('@/lib/students/studentId')
+        studentId = await ensureStudentId(verifiedDoc)
+      } catch (idErr) {
+        console.error('ensureStudentId on /api/auth/me failed:', idErr)
+        studentId = verifiedDoc.studentId || undefined
+      }
+    }
+
     // 3. Resolve profile picture URL
     let profilePicUrl = null
     if (verifiedDoc.profilePic) {
@@ -60,6 +71,7 @@ export async function GET() {
       name: verifiedDoc.name,
       email: verifiedDoc.email,
       phone: verifiedDoc.phone,
+      studentId,
       profilePic: profilePicUrl,
       role: role,
       permissions: verifiedDoc.permissions || [],

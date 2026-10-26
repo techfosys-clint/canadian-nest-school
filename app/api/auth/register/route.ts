@@ -181,11 +181,14 @@ export async function POST(request: Request) {
     let staffEmailSent = false
 
     if (targetRole === 'student') {
+      const { allocateStudentId } = await import('@/lib/students/studentId')
+      const studentId = await allocateStudentId()
       newUser = await Student.create({
         name,
         email: emailLower,
         password: hashedPassword,
         phone,
+        studentId,
         profilePic: profilePicId || undefined,
         status: 'active',
       })
@@ -232,6 +235,8 @@ export async function POST(request: Request) {
       name: newUser.name,
       email: newUser.email,
       phone: newUser.phone,
+      studentId:
+        targetRole === 'student' ? newUser.studentId || undefined : undefined,
       profilePic: profilePicUrl,
       role: targetRole === 'student' ? 'student' : newUser.role,
       createdAt: newUser.createdAt,

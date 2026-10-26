@@ -88,7 +88,17 @@ export async function PUT(
 
     // 2. Parse request body
     const body = await request.json()
-    const { name, email, phone, role, permissions, profilePic, password, designation } = body
+    const {
+      name,
+      email,
+      phone,
+      role,
+      permissions,
+      profilePic,
+      password,
+      designation,
+      bio,
+    } = body
 
     if (!name || !email || !role) {
       return NextResponse.json({ error: 'Name, email, and role are required fields.' }, { status: 400 })
@@ -123,6 +133,9 @@ export async function PUT(
     staffToEdit.permissions = role === 'admin' ? ['courses', 'lessons', 'reviews', 'categories', 'faqs', 'blogs', 'media'] : (permissions || [])
     staffToEdit.profilePic = profilePic || undefined
     staffToEdit.designation = designation || undefined
+    if (bio !== undefined) {
+      staffToEdit.bio = typeof bio === 'string' ? bio : ''
+    }
 
     if (password && password.trim().length >= 6) {
       const { hashPassword } = await import('@/lib/auth/auth')

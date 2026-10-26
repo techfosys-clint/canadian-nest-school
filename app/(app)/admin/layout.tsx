@@ -204,6 +204,13 @@ const NAV_GROUPS: SidebarGroup[] = [
     groupIcon: FiUserPlus,
     links: [
       {
+        label: 'My Profile',
+        href: '/admin/my-profile',
+        icon: FiUser,
+        roles: ['admin', 'staff', 'instructor'],
+        permission: 'overview',
+      },
+      {
         label: 'Staff Registry',
         href: '/admin/staff-register',
         icon: FiUserPlus,

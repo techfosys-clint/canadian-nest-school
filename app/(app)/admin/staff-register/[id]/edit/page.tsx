@@ -48,6 +48,7 @@ export default async function EditStaffPage({ params }: Props) {
     phone: staffDoc.phone || '',
     role: staffDoc.role,
     designation: staffDoc.designation || '',
+    bio: staffDoc.bio || '',
     permissions: staffDoc.permissions || [],
     profilePicId: staffDoc.profilePic?._id?.toString() || '',
     profilePicUrl: staffDoc.profilePic?.url || '',

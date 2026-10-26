@@ -10,6 +10,7 @@ import '@/lib/db/models/Media';
 import { Review } from '@/lib/db/models/Review';
 import '@/lib/db/models/Student';
 import { connectToDatabase } from '@/lib/db/mongodb';
+import { isRichTextEmpty } from '@/lib/richText';
 import { getYoutubeOrVimeoEmbedUrl } from '@/lib/videoEmbed';
 import { cookies } from 'next/headers';
 import Image from 'next/image';
@@ -401,8 +402,31 @@ export default async function CourseDetailPage({ params }: Props) {
                       {resolvedInstructor.designation}
                     </p>
                   )}
+                  {!isRichTextEmpty(resolvedInstructor.bio) && (
+                    <div
+                      className='instructor-bio-content font-sans select-text text-base text-zinc-600 leading-relaxed pt-3 border-t border-zinc-100 mt-3'
+                      dangerouslySetInnerHTML={{
+                        __html: resolvedInstructor.bio,
+                      }}
+                    />
+                  )}
                 </div>
               </div>
+              {!isRichTextEmpty(resolvedInstructor.bio) && (
+                <style
+                  dangerouslySetInnerHTML={{
+                    __html: `
+                .instructor-bio-content p { margin-bottom: 0.75rem; }
+                .instructor-bio-content strong { font-weight: 700; color: #0A163A; }
+                .instructor-bio-content em { font-style: italic; }
+                .instructor-bio-content ul { list-style: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+                .instructor-bio-content ol { list-style: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+                .instructor-bio-content a { color: #E61C24; text-decoration: underline; font-weight: 600; }
+                .instructor-bio-content h2, .instructor-bio-content h3 { font-weight: 700; color: #0A163A; margin: 0.75rem 0 0.5rem; }
+              `,
+                  }}
+                />
+              )}
             </div>
           )}
 

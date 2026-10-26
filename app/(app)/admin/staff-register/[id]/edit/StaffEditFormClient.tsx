@@ -2,6 +2,7 @@
 
 import type { MediaItem } from '@/components/MediaPickerModal';
 import MediaPickerModal from '@/components/MediaPickerModal';
+import RichTextEditor from '@/components/RichTextEditor';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
@@ -26,6 +27,7 @@ interface StaffEditFormClientProps {
     phone?: string;
     role: 'admin' | 'staff' | 'instructor';
     designation?: string;
+    bio?: string;
     permissions?: string[];
     profilePicId?: string;
     profilePicUrl?: string;
@@ -42,6 +44,7 @@ export default function StaffEditFormClient({
   const [designation, setDesignation] = useState(
     initialStaff.designation || '',
   );
+  const [bio, setBio] = useState(initialStaff.bio || '');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<'staff' | 'instructor' | 'admin'>(
     initialStaff.role,
@@ -140,6 +143,7 @@ export default function StaffEditFormClient({
           password: password || undefined,
           role,
           designation: designation || undefined,
+          bio,
           permissions:
             role === 'admin'
               ? [
@@ -304,6 +308,23 @@ export default function StaffEditFormClient({
             <p className='text-xs text-slate-500 font-medium'>
               This designation will display on public views (like the Mentors
               page).
+            </p>
+          </div>
+
+          <div className='flex flex-col gap-2'>
+            <label className='text-sm font-bold text-slate-700'>
+              Public instructor bio{' '}
+              <span className='text-slate-400 font-normal'>(Optional)</span>
+            </label>
+            <RichTextEditor
+              label=''
+              value={bio}
+              onChange={setBio}
+              placeholder='Short introduction shown on course pages…'
+            />
+            <p className='text-xs text-slate-500 font-medium'>
+              Leave empty to hide. Shown on the Lead Mentor section of every
+              course this instructor teaches.
             </p>
           </div>
 

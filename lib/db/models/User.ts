@@ -8,6 +8,8 @@ export interface IUser extends Document {
   profilePic?: mongoose.Types.ObjectId | string
   role: 'admin' | 'staff' | 'instructor'
   designation?: string
+  /** Public rich-text intro shown on course pages (optional). */
+  bio?: string
   resetPasswordToken?: string
   resetPasswordExpiration?: Date
   permissions?: string[]
@@ -24,6 +26,7 @@ const UserSchema = new Schema<IUser>(
     profilePic: { type: Schema.Types.ObjectId, ref: 'Media' },
     role: { type: String, enum: ['admin', 'staff', 'instructor'], default: 'staff', required: true },
     designation: { type: String },
+    bio: { type: String, default: '' },
     resetPasswordToken: { type: String },
     resetPasswordExpiration: { type: Date },
     permissions: { type: [String], default: [] },
@@ -35,5 +38,9 @@ const UserSchema = new Schema<IUser>(
   },
   { collection: 'users', timestamps: true }
 )
+
+if (mongoose.models.User && !mongoose.models.User.schema.paths.bio) {
+  delete mongoose.models.User
+}
 
 export const User = mongoose.models.User || mongoose.model<IUser>('User', UserSchema)

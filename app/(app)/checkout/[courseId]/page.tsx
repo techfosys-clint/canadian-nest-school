@@ -25,13 +25,15 @@ export default async function CheckoutPage({ params }: Props) {
 
   if (!course) notFound()
 
+  const isMonthly = course.billingType === 'monthly'
   // Format course for the client component
   const serializedCourse = {
     id: course._id.toString(),
     slug: course.slug || '',
     title: course.title || '',
     summary: course.summary || '',
-    price: course.price || 0,
+    price: isMonthly ? Number(course.monthlyFee || 0) : course.price || 0,
+    billingType: isMonthly ? ('monthly' as const) : ('one_time' as const),
     imageUrl: course.thumbnail?.sizes?.card?.url ?? course.thumbnail?.sizes?.hero?.url ?? course.thumbnail?.url ?? '',
     instructorName: course.instructor?.name || 'Expert Instructor',
     categoryName: course.category?.name || '',

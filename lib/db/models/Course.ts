@@ -29,6 +29,17 @@ export interface ICourse extends Document {
     coverImage?: string
   }>
   modules?: string[]
+  /** one_time = lifetime purchase; monthly = 30-day subscription */
+  billingType?: 'one_time' | 'monthly'
+  monthlyFee?: number
+  lateFeeEnabled?: boolean
+  lateFeeAmount?: number
+  /** Days before paidUntil when red dashboard notice starts. */
+  noticeStartOffsetDays?: number
+  /** Days after paidUntil when red notice ends (usually <= blockOffsetDays). */
+  noticeEndOffsetDays?: number
+  /** Days after paidUntil when course access is blocked. */
+  blockOffsetDays?: number
 }
 
 const CourseSchema = new Schema<ICourse>(
@@ -71,6 +82,17 @@ const CourseSchema = new Schema<ICourse>(
       },
     ],
     modules: { type: [String], default: [] },
+    billingType: {
+      type: String,
+      enum: ['one_time', 'monthly'],
+      default: 'one_time',
+    },
+    monthlyFee: { type: Number, min: 0 },
+    lateFeeEnabled: { type: Boolean, default: false },
+    lateFeeAmount: { type: Number, min: 0, default: 0 },
+    noticeStartOffsetDays: { type: Number, min: 0, default: 5 },
+    noticeEndOffsetDays: { type: Number, min: 0, default: 2 },
+    blockOffsetDays: { type: Number, min: 0, default: 2 },
   },
   { collection: 'courses', timestamps: true }
 )
@@ -80,7 +102,8 @@ if (
   mongoose.models.Course &&
   (!mongoose.models.Course.schema.paths.modules ||
     !mongoose.models.Course.schema.paths.category ||
-    !mongoose.models.Course.schema.paths['studyMaterials.coverImage'])
+    !mongoose.models.Course.schema.paths['studyMaterials.coverImage'] ||
+    !mongoose.models.Course.schema.paths.billingType)
 ) {
   delete mongoose.models.Course
 }

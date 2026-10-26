@@ -9,12 +9,15 @@ interface CouponFormClientProps {
   initialCoupon?: {
     id: string
     code: string
+    kind?: 'discount' | 'subscription_extension'
     discountType: 'percentage' | 'fixed'
     discountValue: number
     expirationDate?: string
     maxUses?: number | string
     isActive: boolean
     course?: string
+    extensionDays?: number
+    overrideFee?: number | null
   }
   courses?: { id: string; title: string }[]
 }
@@ -23,6 +26,11 @@ export default function CouponFormClient({ initialCoupon, courses = [] }: Coupon
   const router = useRouter()
   
   const [code, setCode] = useState(initialCoupon?.code || '')
+  const [kind, setKind] = useState<'discount' | 'subscription_extension'>(
+    initialCoupon?.kind === 'subscription_extension'
+      ? 'subscription_extension'
+      : 'discount',
+  )
   const [discountType, setDiscountType] = useState<'percentage' | 'fixed'>(
     initialCoupon?.discountType || 'fixed'
   )
@@ -33,6 +41,12 @@ export default function CouponFormClient({ initialCoupon, courses = [] }: Coupon
   const [maxUses, setMaxUses] = useState<number | string>(initialCoupon?.maxUses || '')
   const [isActive, setIsActive] = useState(initialCoupon?.isActive !== undefined ? initialCoupon.isActive : true)
   const [courseId, setCourseId] = useState(initialCoupon?.course || '')
+  const [extensionDays, setExtensionDays] = useState<number | ''>(
+    initialCoupon?.extensionDays ?? 0,
+  )
+  const [overrideFee, setOverrideFee] = useState<number | ''>(
+    initialCoupon?.overrideFee != null ? initialCoupon.overrideFee : '',
+  )
   
   const [saving, setSaving] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
@@ -56,7 +70,7 @@ export default function CouponFormClient({ initialCoupon, courses = [] }: Coupon
       setErrorMsg('Promo coupon code is required.')
       return
     }
-    if (discountValue === '' || discountValue < 0) {
+    if (kind === 'discount' && (discountValue === '' || discountValue < 0)) {
       setErrorMsg('A valid discount value is required.')
       return
     }
@@ -65,12 +79,19 @@ export default function CouponFormClient({ initialCoupon, courses = [] }: Coupon
     const payload = {
       id: initialCoupon?.id,
       code: code.toUpperCase().trim(),
-      discountType,
-      discountValue: Number(discountValue),
+      kind,
+      discountType: kind === 'discount' ? discountType : 'fixed',
+      discountValue: kind === 'discount' ? Number(discountValue) : 0,
       expirationDate: expirationDate || undefined,
       maxUses: maxUses ? Number(maxUses) : undefined,
       isActive,
       course: courseId || null,
+      extensionDays:
+        kind === 'subscription_extension' ? Number(extensionDays) || 0 : 0,
+      overrideFee:
+        kind === 'subscription_extension' && overrideFee !== ''
+          ? Number(overrideFee)
+          : null,
     }
 
     try {
@@ -165,7 +186,28 @@ export default function CouponFormClient({ initialCoupon, courses = [] }: Coupon
             </div>
           </div>
 
-          {/* Discount Parameters Group */}
+          <div className="flex flex-col gap-2">
+            <label className="text-base font-bold text-slate-600">Coupon kind</label>
+            <select
+              value={kind}
+              onChange={(e) =>
+                setKind(
+                  e.target.value === 'subscription_extension'
+                    ? 'subscription_extension'
+                    : 'discount',
+                )
+              }
+              className="w-full px-4 py-3 rounded-lg bg-slate-100 border border-slate-200 focus:border-[#E61C24]/60 text-slate-800 font-semibold text-base focus:outline-none transition-colors"
+            >
+              <option value="discount">Checkout discount</option>
+              <option value="subscription_extension">
+                Monthly subscription extension / fee override
+              </option>
+            </select>
+          </div>
+
+          {kind === 'discount' ? (
+          /* Discount Parameters Group */
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
               <label className="text-base font-bold text-slate-600">Discount Type</label>
@@ -195,6 +237,43 @@ export default function CouponFormClient({ initialCoupon, courses = [] }: Coupon
               />
             </div>
           </div>
+          ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-base font-bold text-slate-600">
+                Extra days to add on renew
+              </label>
+              <input
+                type="number"
+                min={0}
+                value={extensionDays}
+                onChange={(e) =>
+                  setExtensionDays(
+                    e.target.value === '' ? '' : Number(e.target.value),
+                  )
+                }
+                className="w-full px-4 py-3 rounded-lg bg-slate-100 border border-slate-200 focus:border-[#E61C24]/60 text-slate-800 font-semibold text-base focus:outline-none transition-colors"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-base font-bold text-slate-600">
+                Override renewal fee (BDT, optional)
+              </label>
+              <input
+                type="number"
+                min={0}
+                value={overrideFee}
+                onChange={(e) =>
+                  setOverrideFee(
+                    e.target.value === '' ? '' : Number(e.target.value),
+                  )
+                }
+                placeholder="Leave blank to use monthly fee"
+                className="w-full px-4 py-3 rounded-lg bg-slate-100 border border-slate-200 focus:border-[#E61C24]/60 text-slate-800 font-semibold text-base focus:outline-none transition-colors"
+              />
+            </div>
+          </div>
+          )}
 
           {/* Limits Parameters Group */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

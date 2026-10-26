@@ -19,6 +19,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Invalid coupon code.' }, { status: 404 })
     }
 
+    if (coupon.kind === 'subscription_extension') {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            'Extension coupons can only be used when renewing a monthly subscription.',
+        },
+        { status: 400 },
+      )
+    }
+
     if (!coupon.isActive) {
       return NextResponse.json({ success: false, error: 'This coupon is no longer active.' }, { status: 400 })
     }

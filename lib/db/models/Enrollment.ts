@@ -12,6 +12,13 @@ export interface IEnrollment extends Document {
   billingAddress?: string
   couponCode?: string
   completedLessons: string[] // Array of lesson IDs completed by the student
+  /** Present for monthly-subscription enrollments. */
+  billingType?: 'one_time' | 'monthly'
+  /** End of the current paid 30-day period (monthly only). */
+  paidUntil?: Date
+  /** Join date used as billing cycle anchor (monthly only). */
+  billingCycleAnchor?: Date
+  accessStatus?: 'active' | 'blocked'
   createdAt: Date
   updatedAt: Date
 }
@@ -29,9 +36,28 @@ const EnrollmentSchema = new Schema<IEnrollment>(
     billingAddress: String,
     couponCode: String,
     completedLessons: { type: [String], default: [] },
+    billingType: {
+      type: String,
+      enum: ['one_time', 'monthly'],
+      default: 'one_time',
+    },
+    paidUntil: { type: Date },
+    billingCycleAnchor: { type: Date },
+    accessStatus: {
+      type: String,
+      enum: ['active', 'blocked'],
+      default: 'active',
+    },
   },
   { collection: 'enrollments', timestamps: true }
 )
+
+if (
+  mongoose.models.Enrollment &&
+  !mongoose.models.Enrollment.schema.paths.billingType
+) {
+  delete mongoose.models.Enrollment
+}
 
 // Defense-in-depth: even though the enrollment API already checks for an
 // existing completed enrollment before charging, this DB-level partial

@@ -43,11 +43,51 @@ export async function GET() {
 
     const lessonsQuery: any = { lessonType: 'live' }
 
+    const blockedCourseIds = new Set<string>()
+
     if (!isAdmin) {
       // For standard students, query only live classes belonging to courses they purchased
-      const enrollments = await Enrollment.find({ student: userId, paymentStatus: 'completed' }).select('course').lean()
-      const courseIds = enrollments.map((e) => e.course)
-      
+      const enrollments = await Enrollment.find({
+        student: userId,
+        paymentStatus: 'completed',
+      })
+        .select(
+          'course billingType paidUntil accessStatus paymentStatus',
+        )
+        .lean()
+
+      const { getSubscriptionAccessSnapshot } = await import(
+        '@/lib/subscriptions/billing'
+      )
+      const { Course } = await import('@/lib/db/models/Course')
+
+      const courseIds: any[] = []
+      for (const e of enrollments as any[]) {
+        const courseId = e.course?.toString?.() || String(e.course)
+        if (e.billingType === 'monthly') {
+          const course = await Course.findById(courseId)
+            .select(
+              'billingType noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays',
+            )
+            .lean()
+          if (course) {
+            const snapshot = getSubscriptionAccessSnapshot(e, course)
+            if (snapshot.isBlocked) {
+              blockedCourseIds.add(courseId)
+              // Persist block if cron hasn't caught up
+              if (e.accessStatus !== 'blocked') {
+                await Enrollment.updateOne(
+                  { _id: e._id },
+                  { $set: { accessStatus: 'blocked' } },
+                )
+              }
+              continue
+            }
+          }
+        }
+        courseIds.push(e.course)
+      }
+
       lessonsQuery.course = { $in: courseIds }
     }
 
@@ -57,16 +97,21 @@ export async function GET() {
       .sort({ liveDate: 1 })
       .lean()
 
-    const serializedLessons = (liveLessons as any[]).map((l: any) => ({
-      id: l._id.toString(),
-      title: l.title,
-      slug: l.slug,
-      courseTitle: l.course?.title || 'Unknown Course',
-      livePlatform: l.livePlatform || 'zoom',
-      liveUrl: l.liveUrl || '',
-      liveDate: l.liveDate ? l.liveDate.toISOString() : null,
-      duration: l.duration || 60,
-    }))
+    const serializedLessons = (liveLessons as any[])
+      .filter((l: any) => {
+        const cid = l.course?._id?.toString?.() || l.course?.toString?.()
+        return !cid || !blockedCourseIds.has(cid)
+      })
+      .map((l: any) => ({
+        id: l._id.toString(),
+        title: l.title,
+        slug: l.slug,
+        courseTitle: l.course?.title || 'Unknown Course',
+        livePlatform: l.livePlatform || 'zoom',
+        liveUrl: l.liveUrl || '',
+        liveDate: l.liveDate ? l.liveDate.toISOString() : null,
+        duration: l.duration || 60,
+      }))
 
     return NextResponse.json({ success: true, liveLessons: serializedLessons })
   } catch (error: any) {

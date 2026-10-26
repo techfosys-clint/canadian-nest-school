@@ -51,6 +51,7 @@ export interface CourseDoc {
   slug: string;
   summary: string;
   price: number;
+  billingType?: 'one_time' | 'monthly';
   thumbnail: ThumbnailDoc | string | null;
   category: CategoryDoc | string | null;
   instructor?: { id: string; name: string } | null;
@@ -76,9 +77,13 @@ function getImageUrl(thumbnail: CourseDoc['thumbnail']): string {
   return thumbnail.sizes?.card?.url ?? thumbnail.url ?? '';
 }
 
-function formatPrice(price?: number | null): string {
+function formatPrice(
+  price?: number | null,
+  billingType?: 'one_time' | 'monthly',
+): string {
   if (!price || price === 0) return 'Free';
-  return `৳${price.toLocaleString('en-BD')}`;
+  const base = `৳${price.toLocaleString('en-BD')}`;
+  return billingType === 'monthly' ? `${base}/mo` : base;
 }
 
 function getLevelLabel(level: CourseDoc['level']): string {
@@ -400,7 +405,10 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                       {/* Price & CTA */}
                       <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2'>
                         <span className='text-3xl font-bold text-[#E61C24]'>
-                          {formatPrice(featuredCourse.price)}
+                          {formatPrice(
+                            featuredCourse.price,
+                            featuredCourse.billingType,
+                          )}
                         </span>
                         <Link
                           href={`/courses/${featuredCourse.slug}`}
@@ -534,7 +542,10 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                                 <span
                                   className={`text-xl font-bold ${course.price === 0 ? 'text-emerald-600' : 'text-zinc-900'} truncate`}
                                 >
-                                  {formatPrice(course.price)}
+                                  {formatPrice(
+                                    course.price,
+                                    course.billingType,
+                                  )}
                                 </span>
                               </div>
 

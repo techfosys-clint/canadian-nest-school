@@ -1,12 +1,10 @@
- 
- 
 'use client';
 
 import type { MediaItem } from '@/components/MediaPickerModal';
 import MediaPickerModal from '@/components/MediaPickerModal';
 import RichTextEditor from '@/components/RichTextEditor';
-import { parseJsonResponse } from '@/lib/safeJson';
 import { formatBdDate } from '@/lib/bdTime';
+import { parseJsonResponse } from '@/lib/safeJson';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -76,6 +74,27 @@ export default function CourseFormClient({
         : '',
   );
   const [price, setPrice] = useState<number | ''>(initialData?.price ?? '');
+  const [billingType, setBillingType] = useState<'one_time' | 'monthly'>(
+    initialData?.billingType === 'monthly' ? 'monthly' : 'one_time',
+  );
+  const [monthlyFee, setMonthlyFee] = useState<number | ''>(
+    initialData?.monthlyFee ?? '',
+  );
+  const [lateFeeEnabled, setLateFeeEnabled] = useState(
+    !!initialData?.lateFeeEnabled,
+  );
+  const [lateFeeAmount, setLateFeeAmount] = useState<number | ''>(
+    initialData?.lateFeeAmount ?? 0,
+  );
+  const [noticeStartOffsetDays, setNoticeStartOffsetDays] = useState(
+    initialData?.noticeStartOffsetDays ?? 5,
+  );
+  const [noticeEndOffsetDays, setNoticeEndOffsetDays] = useState(
+    initialData?.noticeEndOffsetDays ?? 2,
+  );
+  const [blockOffsetDays, setBlockOffsetDays] = useState(
+    initialData?.blockOffsetDays ?? 2,
+  );
   const [duration, setDuration] = useState(initialData?.duration || '');
   const [level, setLevel] = useState<string>(initialData?.level || 'all');
   const [categories, setCategories] = useState<string[]>(
@@ -860,7 +879,20 @@ export default function CourseFormClient({
     slug,
     summary,
     description,
-    price: Number(price),
+    price: Number(price) || 0,
+    billingType,
+    monthlyFee: billingType === 'monthly' ? Number(monthlyFee) || 0 : undefined,
+    lateFeeEnabled: billingType === 'monthly' ? lateFeeEnabled : false,
+    lateFeeAmount:
+      billingType === 'monthly' && lateFeeEnabled
+        ? Number(lateFeeAmount) || 0
+        : 0,
+    noticeStartOffsetDays:
+      billingType === 'monthly' ? Number(noticeStartOffsetDays) || 0 : 5,
+    noticeEndOffsetDays:
+      billingType === 'monthly' ? Number(noticeEndOffsetDays) || 0 : 2,
+    blockOffsetDays:
+      billingType === 'monthly' ? Number(blockOffsetDays) || 0 : 2,
     thumbnail: thumbnailId || null,
     categories,
     instructors: user.role === 'instructor' ? [user.id] : instructors,
@@ -1997,7 +2029,7 @@ export default function CourseFormClient({
                                     Students in this batch (
                                     {batch.students.length})
                                   </h4>
-                                  <div className='border border-slate-200 rounded-lg bg-white p-3 max-h-[260px] overflow-y-auto space-y-2'>
+                                  <div className='border border-slate-200 rounded-lg bg-white p-3 max-h-65 overflow-y-auto space-y-2'>
                                     {batch.students.length === 0 ? (
                                       <p className='text-sm font-semibold text-slate-400 text-center py-6'>
                                         No students added yet.
@@ -2052,7 +2084,7 @@ export default function CourseFormClient({
                                       className='w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2.5 text-sm font-semibold outline-none'
                                     />
                                   </div>
-                                  <div className='border border-slate-200 rounded-lg bg-white p-3 max-h-[220px] overflow-y-auto space-y-2'>
+                                  <div className='border border-slate-200 rounded-lg bg-white p-3 max-h-55 overflow-y-auto space-y-2'>
                                     {availableStudentsForSelectedBatch.length ===
                                     0 ? (
                                       <p className='text-sm font-semibold text-slate-400 text-center py-6'>
@@ -2255,22 +2287,140 @@ export default function CourseFormClient({
               Finance & Status
             </h3>
 
-            {/* Price field */}
             <div className='flex flex-col gap-2'>
               <label className='text-base font-bold text-slate-600'>
-                Price (BDT)
+                Billing type
               </label>
-              <input
-                type='number'
-                min={0}
-                value={price}
+              <select
+                value={billingType}
                 onChange={(e) =>
-                  setPrice(e.target.value === '' ? '' : Number(e.target.value))
+                  setBillingType(
+                    e.target.value === 'monthly' ? 'monthly' : 'one_time',
+                  )
                 }
-                placeholder='4500'
-                className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
-              />
+                className='bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer'
+              >
+                <option value='one_time'>One-time purchase (lifetime)</option>
+                <option value='monthly'>Monthly subscription (30 days)</option>
+              </select>
             </div>
+
+            {billingType === 'one_time' ? (
+              <div className='flex flex-col gap-2'>
+                <label className='text-base font-bold text-slate-600'>
+                  Price (BDT)
+                </label>
+                <input
+                  type='number'
+                  min={0}
+                  value={price}
+                  onChange={(e) =>
+                    setPrice(
+                      e.target.value === '' ? '' : Number(e.target.value),
+                    )
+                  }
+                  placeholder='4500'
+                  className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
+                />
+              </div>
+            ) : (
+              <div className='space-y-4'>
+                <div className='flex flex-col gap-2'>
+                  <label className='text-base font-bold text-slate-600'>
+                    Monthly fee (BDT)
+                  </label>
+                  <input
+                    type='number'
+                    min={0}
+                    value={monthlyFee}
+                    onChange={(e) =>
+                      setMonthlyFee(
+                        e.target.value === '' ? '' : Number(e.target.value),
+                      )
+                    }
+                    placeholder='1500'
+                    className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
+                  />
+                </div>
+                <div className='flex items-center gap-3'>
+                  <input
+                    type='checkbox'
+                    id='lateFeeEnabled'
+                    checked={lateFeeEnabled}
+                    onChange={(e) => setLateFeeEnabled(e.target.checked)}
+                    className='h-5 w-5 accent-[#E61C24] rounded cursor-pointer'
+                  />
+                  <label
+                    htmlFor='lateFeeEnabled'
+                    className='text-base font-bold text-slate-600 cursor-pointer'
+                  >
+                    Add late fee when renewing after period end
+                  </label>
+                </div>
+                {lateFeeEnabled && (
+                  <div className='flex flex-col gap-2'>
+                    <label className='text-base font-bold text-slate-600'>
+                      Late fee amount (BDT)
+                    </label>
+                    <input
+                      type='number'
+                      min={0}
+                      value={lateFeeAmount}
+                      onChange={(e) =>
+                        setLateFeeAmount(
+                          e.target.value === '' ? '' : Number(e.target.value),
+                        )
+                      }
+                      className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
+                    />
+                  </div>
+                )}
+                <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
+                  <div className='flex flex-col gap-2'>
+                    <label className='text-base font-bold text-slate-600'>
+                      Notice starts (days before due)
+                    </label>
+                    <input
+                      type='number'
+                      min={0}
+                      value={noticeStartOffsetDays}
+                      onChange={(e) =>
+                        setNoticeStartOffsetDays(Number(e.target.value) || 0)
+                      }
+                      className='bg-slate-100 border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none'
+                    />
+                  </div>
+                  <div className='flex flex-col gap-2'>
+                    <label className='text-base font-bold text-slate-600'>
+                      Notice ends (days after due)
+                    </label>
+                    <input
+                      type='number'
+                      min={0}
+                      value={noticeEndOffsetDays}
+                      onChange={(e) =>
+                        setNoticeEndOffsetDays(Number(e.target.value) || 0)
+                      }
+                      className='bg-slate-100 border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none'
+                    />
+                  </div>
+                  <div className='flex flex-col gap-2'>
+                    <label className='text-base font-bold text-slate-600'>
+                      Block access (days after due)
+                    </label>
+                    <input
+                      type='number'
+                      min={0}
+                      value={blockOffsetDays}
+                      onChange={(e) =>
+                        setBlockOffsetDays(Number(e.target.value) || 0)
+                      }
+                      className='bg-slate-100 border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none'
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Status Select */}
             <div className='flex flex-col gap-2'>

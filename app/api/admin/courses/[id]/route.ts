@@ -303,6 +303,13 @@ export async function PUT(
       summary,
       description,
       price,
+      billingType,
+      monthlyFee,
+      lateFeeEnabled,
+      lateFeeAmount,
+      noticeStartOffsetDays,
+      noticeEndOffsetDays,
+      blockOffsetDays,
       thumbnail,
       categories,
       instructors,
@@ -373,11 +380,31 @@ export async function PUT(
     const oldSlug = course.slug
 
     // 4. Perform Mongoose Update
+    const resolvedBillingType =
+      billingType === 'monthly' ? 'monthly' : 'one_time'
+
     course.title = title
     course.slug = slug
     course.summary = summary
     course.description = description
     course.price = price ? Number(price) : undefined
+    course.billingType = resolvedBillingType
+    course.monthlyFee =
+      resolvedBillingType === 'monthly' ? Number(monthlyFee) || 0 : undefined
+    course.lateFeeEnabled =
+      resolvedBillingType === 'monthly' ? !!lateFeeEnabled : false
+    course.lateFeeAmount =
+      resolvedBillingType === 'monthly' ? Number(lateFeeAmount) || 0 : 0
+    course.noticeStartOffsetDays =
+      resolvedBillingType === 'monthly'
+        ? Number(noticeStartOffsetDays ?? 5)
+        : 5
+    course.noticeEndOffsetDays =
+      resolvedBillingType === 'monthly'
+        ? Number(noticeEndOffsetDays ?? 2)
+        : 2
+    course.blockOffsetDays =
+      resolvedBillingType === 'monthly' ? Number(blockOffsetDays ?? 2) : 2
     course.thumbnail = thumbnail
     course.categories = categories || course.categories || []
     course.category = course.categories[0] || null

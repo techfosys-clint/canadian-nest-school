@@ -41,9 +41,13 @@ function getLevelLabel(level: string): string {
   return map[level] ?? 'All Levels';
 }
 
-function formatPrice(price?: number | null) {
+function formatPrice(
+  price?: number | null,
+  billingType?: 'one_time' | 'monthly',
+) {
   if (!price || price === 0) return 'Free';
-  return `৳${price.toLocaleString('en-BD')}`;
+  const base = `৳${price.toLocaleString('en-BD')}`;
+  return billingType === 'monthly' ? `${base}/mo` : base;
 }
 
 function getImageUrl(thumbnail: any): string {
@@ -109,6 +113,11 @@ export default async function CourseDetailPage({ params }: Props) {
     .lean()) as any;
 
   if (!course) notFound();
+
+  const isMonthly = course.billingType === 'monthly'
+  const displayPrice = isMonthly
+    ? Number(course.monthlyFee || 0)
+    : Number(course.price || 0)
 
   // ─── Session and Enrollment Check ───
   const cookieStore = await cookies();
@@ -201,13 +210,13 @@ export default async function CourseDetailPage({ params }: Props) {
         data={{
           ecommerce: {
             currency: 'BDT',
-            value: course.price,
+            value: displayPrice,
             items: [
               {
                 item_id: course._id.toString(),
                 item_name: course.title,
                 item_category: categoryName,
-                price: course.price,
+                price: displayPrice,
               },
             ],
           },
@@ -630,9 +639,12 @@ export default async function CourseDetailPage({ params }: Props) {
                 </p>
                 <div className='flex items-baseline gap-2'>
                   <span
-                    className={`text-4xl font-bold ${course.price === 0 ? 'text-emerald-600' : 'text-[#E61C24]'}`}
+                    className={`text-4xl font-bold ${displayPrice === 0 ? 'text-emerald-600' : 'text-[#E61C24]'}`}
                   >
-                    {formatPrice(course.price)}
+                    {formatPrice(
+                      displayPrice,
+                      isMonthly ? 'monthly' : 'one_time',
+                    )}
                   </span>
                 </div>
               </div>
@@ -642,7 +654,7 @@ export default async function CourseDetailPage({ params }: Props) {
                 courseId={course._id.toString()}
                 courseTitle={course.title}
                 courseSlug={course.slug}
-                coursePrice={course.price}
+                coursePrice={displayPrice}
                 courseCategory={categoryName}
                 isLoggedIn={!!userId}
                 isAlreadyEnrolled={isAlreadyEnrolled}

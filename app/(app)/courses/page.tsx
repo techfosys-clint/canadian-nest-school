@@ -60,7 +60,14 @@ export default async function CoursesPage({ searchParams }: Props) {
       title: doc.title,
       slug: doc.slug,
       summary: doc.summary,
-      price: Number(doc.price || 0),
+      price:
+        doc.billingType === 'monthly'
+          ? Number(doc.monthlyFee || 0)
+          : Number(doc.price || 0),
+      billingType:
+        doc.billingType === 'monthly'
+          ? ('monthly' as const)
+          : ('one_time' as const),
       thumbnail: doc.thumbnail ? {
         id: doc.thumbnail._id.toString(),
         url: doc.thumbnail.url || null,

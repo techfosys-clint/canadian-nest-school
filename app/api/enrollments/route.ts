@@ -287,8 +287,11 @@ export async function POST(request: Request) {
       })
     }
 
+    const isMonthly = (course as any).billingType === 'monthly'
     // Coupon logic
-    let pricePaid = course.price || 0
+    let pricePaid = isMonthly
+      ? Number((course as any).monthlyFee || 0)
+      : course.price || 0
     let appliedCoupon = null
 
     if (couponCode) {
@@ -297,6 +300,17 @@ export async function POST(request: Request) {
 
       if (!coupon) {
         return NextResponse.json({ success: false, error: 'Invalid coupon code.' }, { status: 400 })
+      }
+
+      if (coupon.kind === 'subscription_extension') {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              'Extension coupons can only be used when renewing a monthly subscription.',
+          },
+          { status: 400 },
+        )
       }
 
       if (!coupon.isActive) {
@@ -360,7 +374,9 @@ export async function POST(request: Request) {
     // immediately with no payment gateway involved.
     if (pricePaid === 0) {
       let newEnrollment
+      const now = new Date()
       try {
+        const { initialPaidUntil } = await import('@/lib/subscriptions/billing')
         newEnrollment = await Enrollment.create({
           student: userId,
           course: courseId,
@@ -371,6 +387,14 @@ export async function POST(request: Request) {
           billingPhone: resolvedBillingPhone,
           billingAddress: resolvedBillingAddress,
           couponCode: appliedCoupon ? appliedCoupon.code : undefined,
+          billingType: isMonthly ? 'monthly' : 'one_time',
+          accessStatus: 'active',
+          ...(isMonthly
+            ? {
+                paidUntil: initialPaidUntil(now),
+                billingCycleAnchor: now,
+              }
+            : {}),
         })
       } catch (enrollError) {
         if (appliedCoupon) {
@@ -419,6 +443,8 @@ export async function POST(request: Request) {
         billingPhone: resolvedBillingPhone,
         billingAddress: resolvedBillingAddress,
         couponCode: appliedCoupon ? appliedCoupon.code : undefined,
+        billingType: isMonthly ? 'monthly' : 'one_time',
+        accessStatus: 'active',
       })
     } catch (enrollError) {
       if (appliedCoupon) {

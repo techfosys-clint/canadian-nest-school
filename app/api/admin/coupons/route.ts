@@ -23,10 +23,33 @@ export async function POST(request: Request) {
     if (!user) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
 
     const body = await request.json()
-    const { code, discountType, discountValue, expirationDate, maxUses, isActive, course } = body
+    const {
+      code,
+      kind,
+      discountType,
+      discountValue,
+      expirationDate,
+      maxUses,
+      isActive,
+      course,
+      extensionDays,
+      overrideFee,
+    } = body
 
-    if (!code || !discountType || discountValue === undefined) {
-      return NextResponse.json({ error: 'code, discountType and discountValue are required.' }, { status: 400 })
+    const couponKind =
+      kind === 'subscription_extension' ? 'subscription_extension' : 'discount'
+
+    if (!code) {
+      return NextResponse.json({ error: 'code is required.' }, { status: 400 })
+    }
+
+    if (couponKind === 'discount') {
+      if (!discountType || discountValue === undefined) {
+        return NextResponse.json(
+          { error: 'code, discountType and discountValue are required.' },
+          { status: 400 },
+        )
+      }
     }
 
     const uppercaseCode = code.toUpperCase().trim()
@@ -39,12 +62,27 @@ export async function POST(request: Request) {
 
     const coupon = new Coupon({
       code: uppercaseCode,
-      discountType,
-      discountValue,
+      kind: couponKind,
+      discountType: discountType || 'fixed',
+      discountValue:
+        couponKind === 'subscription_extension'
+          ? Number(discountValue) || 0
+          : discountValue,
       expirationDate: expirationDate ? new Date(expirationDate) : undefined,
       maxUses: maxUses ? parseInt(maxUses, 10) : undefined,
       isActive: isActive !== undefined ? isActive : true,
       course: course || null,
+      extensionDays:
+        couponKind === 'subscription_extension'
+          ? Math.max(0, Number(extensionDays) || 0)
+          : 0,
+      overrideFee:
+        couponKind === 'subscription_extension' &&
+        overrideFee !== undefined &&
+        overrideFee !== null &&
+        overrideFee !== ''
+          ? Number(overrideFee)
+          : undefined,
     })
 
     await coupon.save()
@@ -61,7 +99,18 @@ export async function PUT(request: Request) {
     if (!user) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
 
     const body = await request.json()
-    const { id, discountType, discountValue, expirationDate, maxUses, isActive, course } = body
+    const {
+      id,
+      kind,
+      discountType,
+      discountValue,
+      expirationDate,
+      maxUses,
+      isActive,
+      course,
+      extensionDays,
+      overrideFee,
+    } = body
 
     if (!id) {
       return NextResponse.json({ error: 'Coupon id is required.' }, { status: 400 })
@@ -72,12 +121,25 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Coupon not found.' }, { status: 404 })
     }
 
+    if (kind !== undefined) {
+      coupon.kind =
+        kind === 'subscription_extension' ? 'subscription_extension' : 'discount'
+    }
     if (discountType !== undefined) coupon.discountType = discountType
     if (discountValue !== undefined) coupon.discountValue = discountValue
     if (expirationDate !== undefined) coupon.expirationDate = expirationDate ? new Date(expirationDate) : undefined
     if (maxUses !== undefined) coupon.maxUses = maxUses ? parseInt(maxUses, 10) : undefined
     if (isActive !== undefined) coupon.isActive = isActive
     if (course !== undefined) coupon.course = course || null
+    if (extensionDays !== undefined) {
+      coupon.extensionDays = Math.max(0, Number(extensionDays) || 0)
+    }
+    if (overrideFee !== undefined) {
+      coupon.overrideFee =
+        overrideFee === null || overrideFee === ''
+          ? undefined
+          : Number(overrideFee)
+    }
 
     await coupon.save()
     return NextResponse.json({ success: true, coupon })

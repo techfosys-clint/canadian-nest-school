@@ -60,16 +60,20 @@ export default async function CourseWatchPage({ params }: Props) {
     redirect(`/login?redirectTo=/courses/${slug}/watch`)
   }
 
-  // Check enrollment
-  const existingEnrollment = await Enrollment.findOne({
-    student: userId,
-    course: course._id,
-    paymentStatus: 'completed'
-  }).lean()
+  // Check enrollment + monthly subscription access
+  const { assertCourseContentAccess } = await import(
+    '@/lib/subscriptions/access'
+  )
+  const access = await assertCourseContentAccess(userId, course._id.toString())
 
   // If not enrolled, redirect back to landing page
-  if (!existingEnrollment) {
+  if (!access.allowed && access.reason === 'NOT_ENROLLED') {
     redirect(`/courses/${slug}`)
+  }
+
+  // Monthly fee overdue / blocked — send to dashboard red banner + pay CTA
+  if (!access.allowed && access.reason === 'SUBSCRIPTION_BLOCKED') {
+    redirect('/dashboard?subscription=blocked')
   }
 
   // Fetch all lessons belonging to the course

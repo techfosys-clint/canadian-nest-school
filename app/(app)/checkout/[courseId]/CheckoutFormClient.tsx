@@ -23,6 +23,7 @@ interface CourseData {
   title: string;
   summary: string;
   price: number;
+  billingType?: 'one_time' | 'monthly';
   imageUrl: string;
   instructorName: string;
   categoryName: string;
@@ -429,10 +430,17 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                     <>
                       <FiZap className='h-5 w-5 fill-white' />
                       <span>
-                        Complete Course Purchase (
+                        {course.billingType === 'monthly'
+                          ? 'Start monthly subscription ('
+                          : 'Complete Course Purchase ('}
                         {!finalPrice || finalPrice === 0
                           ? 'Free'
                           : `৳${finalPrice.toLocaleString('en-BD')}`}
+                        {course.billingType === 'monthly' &&
+                        finalPrice &&
+                        finalPrice > 0
+                          ? '/mo'
+                          : ''}
                         )
                       </span>
                     </>
@@ -486,11 +494,17 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                 </p>
 
                 <div className='flex justify-between items-center text-base font-semibold text-zinc-600'>
-                  <span>Base Course Price</span>
+                  <span>
+                    {course.billingType === 'monthly'
+                      ? 'First month fee'
+                      : 'Base Course Price'}
+                  </span>
                   <span className='font-bold text-zinc-800'>
                     {!basePrice || basePrice === 0
                       ? 'Free'
-                      : `৳${basePrice.toLocaleString('en-BD')}`}
+                      : `৳${basePrice.toLocaleString('en-BD')}${
+                          course.billingType === 'monthly' ? '/mo' : ''
+                        }`}
                   </span>
                 </div>
 

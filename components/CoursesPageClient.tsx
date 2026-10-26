@@ -25,9 +25,13 @@ function getImageUrl(thumbnail: CourseDoc['thumbnail']): string {
   if (!thumbnail || typeof thumbnail === 'string') return '';
   return (thumbnail as any).url ?? (thumbnail as any).sizes?.card?.url ?? '';
 }
-function formatPrice(price?: number | null): string {
+function formatPrice(
+  price?: number | null,
+  billingType?: 'one_time' | 'monthly',
+): string {
   if (!price || price === 0) return 'Free';
-  return `৳${price.toLocaleString('en-BD')}`;
+  const base = `৳${price.toLocaleString('en-BD')}`;
+  return billingType === 'monthly' ? `${base}/mo` : base;
 }
 
 function getLevelLabel(level: string): string {
@@ -160,7 +164,7 @@ function CourseCard({
               <span
                 className={`text-lg sm:text-xl font-bold ${course.price === 0 ? 'text-emerald-600' : 'text-zinc-900'} truncate`}
               >
-                {formatPrice(course.price)}
+                {formatPrice(course.price, course.billingType)}
               </span>
             </div>
 
@@ -263,7 +267,7 @@ function CourseCard({
                 <span
                   className={`text-xl font-bold ${course.price === 0 ? 'text-emerald-600' : 'text-zinc-900'} truncate`}
                 >
-                  {formatPrice(course.price)}
+                  {formatPrice(course.price, course.billingType)}
                 </span>
               </div>
 

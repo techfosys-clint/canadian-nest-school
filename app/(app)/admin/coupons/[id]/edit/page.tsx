@@ -46,12 +46,21 @@ export default async function EditCouponPage({ params }: Props) {
   const serializedCoupon = {
     id: couponDoc._id.toString(),
     code: couponDoc.code,
+    kind:
+      couponDoc.kind === 'subscription_extension'
+        ? ('subscription_extension' as const)
+        : ('discount' as const),
     discountType: couponDoc.discountType,
     discountValue: couponDoc.discountValue,
     expirationDate: couponDoc.expirationDate ? couponDoc.expirationDate.toISOString().split('T')[0] : '',
     maxUses: couponDoc.maxUses !== undefined ? couponDoc.maxUses : '',
     isActive: couponDoc.isActive,
     course: couponDoc.course ? couponDoc.course.toString() : '',
+    extensionDays: couponDoc.extensionDays ?? 0,
+    overrideFee:
+      couponDoc.overrideFee !== undefined && couponDoc.overrideFee !== null
+        ? couponDoc.overrideFee
+        : null,
   }
 
   const courseDocs = await Course.find().select('title').sort({ title: 1 }).lean() as any[]

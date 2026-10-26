@@ -57,17 +57,37 @@ export async function GET(request: Request) {
         paymentStatus: 'completed'
       }).populate('course').lean()
 
-      const isEnrolled = enrollments.some((e: any) => {
+      const { getSubscriptionAccessSnapshot } = await import(
+        '@/lib/subscriptions/billing'
+      )
+
+      let allowed = false
+      for (const e of enrollments as any[]) {
         const course = e.course
-        if (!course || !course.studyMaterials) return false
-        // Check if any study material URL contains our target filename
-        return course.studyMaterials.some((material: any) => {
+        if (!course || !course.studyMaterials) continue
+        const matches = course.studyMaterials.some((material: any) => {
           return material.url && material.url.includes(filename)
         })
-      })
+        if (!matches) continue
 
-      if (!isEnrolled) {
-        return NextResponse.json({ error: 'Forbidden. You are not enrolled in the course offering this material.' }, { status: 403 })
+        if (e.billingType === 'monthly') {
+          const snapshot = getSubscriptionAccessSnapshot(e, course)
+          if (snapshot.isBlocked) {
+            continue
+          }
+        }
+        allowed = true
+        break
+      }
+
+      if (!allowed) {
+        return NextResponse.json(
+          {
+            error:
+              'Forbidden. You are not enrolled, or monthly fee access is paused for this material.',
+          },
+          { status: 403 },
+        )
       }
     }
 

@@ -6,6 +6,7 @@ import { User } from '@/lib/db/models/User'
 import { verifyEpsTransaction } from '@/lib/eps'
 import { epsAmountsMatch } from '@/lib/payments/epsAmount'
 import { normalizeEpsStatus } from '@/lib/payments/epsStatus'
+import { initialPaidUntil } from '@/lib/subscriptions/billing'
 
 export type CompletePaidEnrollmentResult =
   | 'completed'
@@ -56,6 +57,13 @@ export async function completePaidEnrollment(
     const paymentReference =
       enrollment.paymentReference || enrollment.merchantTransactionId
 
+    const courseForBilling = await Course.findById(enrollment.course)
+      .select('billingType title')
+      .lean()
+    const isMonthly = courseForBilling?.billingType === 'monthly'
+    const now = new Date()
+    const paidUntil = isMonthly ? initialPaidUntil(now) : undefined
+
     // Only one worker may transition into completed and run side effects.
     const claimed = await Enrollment.findOneAndUpdate(
       {
@@ -66,6 +74,14 @@ export async function completePaidEnrollment(
         $set: {
           paymentStatus: 'completed',
           paymentReference,
+          ...(isMonthly
+            ? {
+                billingType: 'monthly',
+                paidUntil,
+                billingCycleAnchor: now,
+                accessStatus: 'active',
+              }
+            : { billingType: 'one_time', accessStatus: 'active' }),
         },
       },
       { new: true },
@@ -78,6 +94,12 @@ export async function completePaidEnrollment(
 
     enrollment.paymentStatus = 'completed'
     enrollment.paymentReference = claimed.paymentReference
+    if (isMonthly) {
+      enrollment.billingType = 'monthly'
+      enrollment.paidUntil = paidUntil
+      enrollment.billingCycleAnchor = now
+      enrollment.accessStatus = 'active'
+    }
 
     if (previousStatus === 'failed' && claimed.couponCode) {
       await Coupon.updateOne(
@@ -90,7 +112,7 @@ export async function completePaidEnrollment(
     if (!student) {
       student = await User.findById(claimed.student).lean()
     }
-    const course = await Course.findById(claimed.course).lean()
+    const course = courseForBilling || (await Course.findById(claimed.course).lean())
 
     if (student?.email && course) {
       const { sendEnrollmentConfirmationEmail } = await import('@/lib/email')

@@ -17,6 +17,7 @@ import {
 } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 import CompletedCourseActions from '@/components/CompletedCourseActions';
+import SubscriptionFeeBanner from '@/components/SubscriptionFeeBanner';
 import { fetchReviewGatesForCourses } from '@/lib/certificates/downloadClient';
 import type { CompletionReviewState } from '@/lib/reviews/completionGate';
 
@@ -280,6 +281,77 @@ export default function StudentDashboard() {
           });
         }
 
+        // Monthly subscription renewal return from EPS
+        const subscriptionStatus = params.get('subscription');
+        if (subscriptionStatus === 'success') {
+          clearEnrollmentQuery();
+          Swal.fire({
+            icon: 'success',
+            title: 'Subscription renewed!',
+            text: 'Your monthly access has been extended. Thank you.',
+            confirmButtonColor: '#E61C24',
+            timer: 4000,
+          });
+        } else if (subscriptionStatus === 'confirming') {
+          clearEnrollmentQuery();
+          void (async () => {
+            Swal.fire({
+              title: 'Confirming renewal…',
+              html: 'Please wait. If payment completed, access will unlock automatically.',
+              allowOutsideClick: false,
+              allowEscapeKey: false,
+              showConfirmButton: false,
+              didOpen: () => Swal.showLoading(),
+            });
+            for (let attempt = 0; attempt < 10; attempt++) {
+              await new Promise((r) => setTimeout(r, 3000));
+              try {
+                const nRes = await fetch('/api/subscriptions/notices', {
+                  cache: 'no-store',
+                });
+                if (!nRes.ok) continue;
+                const nData = await nRes.json();
+                const stillBlocked = (nData.notices || []).some(
+                  (n: any) => n.isBlocked,
+                );
+                if (!stillBlocked) {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Renewal confirmed!',
+                    text: 'Your course access is active again.',
+                    confirmButtonColor: '#E61C24',
+                  });
+                  return;
+                }
+              } catch {
+                /* continue */
+              }
+            }
+            Swal.fire({
+              icon: 'info',
+              title: 'Still confirming renewal',
+              html: 'If you completed payment, refresh in a minute. Contact support with your mobile number if access stays locked.',
+              confirmButtonColor: '#E61C24',
+            });
+          })();
+        } else if (subscriptionStatus === 'blocked') {
+          clearEnrollmentQuery();
+          Swal.fire({
+            icon: 'warning',
+            title: 'Monthly fee unpaid',
+            html: 'Live classes and recordings for this course are paused. Use the red notice below to renew.',
+            confirmButtonColor: '#E61C24',
+          });
+        } else if (subscriptionStatus === 'error') {
+          clearEnrollmentQuery();
+          Swal.fire({
+            icon: 'info',
+            title: 'Checking your renewal',
+            html: 'We could not confirm the payment return. If you already paid, refresh shortly.',
+            confirmButtonColor: '#E61C24',
+          });
+        }
+
         // Fetch upcoming live webinars for enrolled courses
         const webinarsRes = await fetch('/api/live-webinars');
         if (webinarsRes.ok) {
@@ -431,6 +503,8 @@ export default function StudentDashboard() {
 
   return (
     <div className='container mx-auto px-6 py-8 pb-16'>
+      <SubscriptionFeeBanner />
+
       {/* Dynamic Premium Header/Banner */}
       <div className='w-full bg-[#0A163A] rounded-lg p-8 md:p-12 relative overflow-hidden mb-10 border border-zinc-800/20'>
         <div className='absolute -top-32 -left-32 w-96 h-96 bg-[#E61C24]/15 rounded-full blur-3xl pointer-events-none' />

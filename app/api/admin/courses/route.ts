@@ -141,6 +141,13 @@ export async function POST(request: Request) {
       summary,
       description,
       price,
+      billingType,
+      monthlyFee,
+      lateFeeEnabled,
+      lateFeeAmount,
+      noticeStartOffsetDays,
+      noticeEndOffsetDays,
+      blockOffsetDays,
       thumbnail,
       categories,
       instructors,
@@ -211,12 +218,36 @@ export async function POST(request: Request) {
 
     // 3. Create course document
     const finalCategories = categories || []
+    const resolvedBillingType =
+      billingType === 'monthly' ? 'monthly' : 'one_time'
+
     const newCourse = new Course({
       title,
       slug,
       summary,
       description,
       price: price ? Number(price) : undefined,
+      billingType: resolvedBillingType,
+      monthlyFee:
+        resolvedBillingType === 'monthly'
+          ? Number(monthlyFee) || 0
+          : undefined,
+      lateFeeEnabled:
+        resolvedBillingType === 'monthly' ? !!lateFeeEnabled : false,
+      lateFeeAmount:
+        resolvedBillingType === 'monthly' ? Number(lateFeeAmount) || 0 : 0,
+      noticeStartOffsetDays:
+        resolvedBillingType === 'monthly'
+          ? Number(noticeStartOffsetDays ?? 5)
+          : 5,
+      noticeEndOffsetDays:
+        resolvedBillingType === 'monthly'
+          ? Number(noticeEndOffsetDays ?? 2)
+          : 2,
+      blockOffsetDays:
+        resolvedBillingType === 'monthly'
+          ? Number(blockOffsetDays ?? 2)
+          : 2,
       thumbnail,
       categories: finalCategories,
       category: finalCategories[0] || undefined,

@@ -163,6 +163,12 @@ export default function CourseFormClient({
   const [requirements, setRequirements] = useState<
     Array<{ requirement: string }>
   >(initialData?.requirements || []);
+  const [faqSource, setFaqSource] = useState<'global' | 'course'>(
+    initialData?.faqSource === 'course' ? 'course' : 'global',
+  );
+  const [courseFaqs, setCourseFaqs] = useState<
+    Array<{ question: string; answer: string }>
+  >(initialData?.courseFaqs || []);
   const [modules, setModules] = useState<string[]>(initialData?.modules || []);
   const [newModuleName, setNewModuleName] = useState('');
   const [editingModuleIndex, setEditingModuleIndex] = useState<number | null>(
@@ -684,6 +690,22 @@ export default function CourseFormClient({
     setRequirements(requirements.filter((_, i) => i !== index));
   };
 
+  const handleAddCourseFaq = () => {
+    setCourseFaqs([...courseFaqs, { question: '', answer: '' }]);
+  };
+  const handleCourseFaqChange = (
+    index: number,
+    field: 'question' | 'answer',
+    value: string,
+  ) => {
+    const updated = [...courseFaqs];
+    updated[index] = { ...updated[index], [field]: value };
+    setCourseFaqs(updated);
+  };
+  const handleRemoveCourseFaq = (index: number) => {
+    setCourseFaqs(courseFaqs.filter((_, i) => i !== index));
+  };
+
   const handleAddStudyMaterial = () => {
     setStudyMaterials([
       ...studyMaterials,
@@ -907,6 +929,10 @@ export default function CourseFormClient({
       (item) => item.outcome.trim() !== '',
     ),
     requirements: requirements.filter((item) => item.requirement.trim() !== ''),
+    faqSource,
+    courseFaqs: courseFaqs.filter(
+      (item) => item.question.trim() !== '' && item.answer.trim() !== '',
+    ),
     studyMaterials: studyMaterials.filter(
       (item) => item.title.trim() !== '' && item.url.trim() !== '',
     ),
@@ -1257,6 +1283,104 @@ export default function CourseFormClient({
                     </button>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+
+          {/* Course page FAQ source */}
+          <div className='bg-white border border-slate-200 rounded-lg p-6 space-y-4'>
+            <div className='border-b border-slate-100 pb-4 space-y-1'>
+              <h2 className='text-xl font-bold text-slate-800 tracking-tight'>
+                Course page FAQs
+              </h2>
+              <p className='text-base font-semibold text-slate-500'>
+                Choose whether this course shows the site-wide FAQ list or its
+                own Q&amp;As at the bottom of the public course page.
+              </p>
+            </div>
+
+            <div className='flex flex-col gap-2'>
+              <label className='text-base font-bold text-slate-600'>
+                FAQ source
+              </label>
+              <select
+                value={faqSource}
+                onChange={(e) =>
+                  setFaqSource(
+                    e.target.value === 'course' ? 'course' : 'global',
+                  )
+                }
+                className='bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full cursor-pointer'
+              >
+                <option value='global'>Global site FAQs (default)</option>
+                <option value='course'>Course-specific FAQs</option>
+              </select>
+            </div>
+
+            {faqSource === 'course' && (
+              <div className='space-y-4 pt-2'>
+                <div className='flex items-center justify-between gap-3'>
+                  <p className='text-base font-semibold text-slate-500'>
+                    If you leave this empty, the FAQ block is hidden on the
+                    course page.
+                  </p>
+                  <button
+                    type='button'
+                    onClick={handleAddCourseFaq}
+                    className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#E61C24]/15 hover:bg-[#E61C24]/25 text-[#E61C24] border border-[#E61C24]/20 rounded-lg text-base font-bold transition-colors cursor-pointer shrink-0'
+                  >
+                    <FiPlus className='h-4.5 w-4.5' /> Add FAQ
+                  </button>
+                </div>
+                {courseFaqs.length === 0 ? (
+                  <p className='text-base font-semibold text-slate-400 py-2'>
+                    No course FAQs yet.
+                  </p>
+                ) : (
+                  <div className='space-y-4'>
+                    {courseFaqs.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className='bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-3'
+                      >
+                        <div className='flex items-start justify-between gap-3'>
+                          <label className='text-base font-bold text-slate-600'>
+                            Question {idx + 1}
+                          </label>
+                          <button
+                            type='button'
+                            onClick={() => handleRemoveCourseFaq(idx)}
+                            className='p-2 text-slate-400 hover:text-red-400 bg-white border border-slate-200 rounded-lg cursor-pointer'
+                          >
+                            <FiTrash2 className='h-5 w-5' />
+                          </button>
+                        </div>
+                        <input
+                          type='text'
+                          value={item.question}
+                          onChange={(e) =>
+                            handleCourseFaqChange(
+                              idx,
+                              'question',
+                              e.target.value,
+                            )
+                          }
+                          placeholder='e.g. How do I pay for this course?'
+                          className='w-full bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none focus:border-[#E61C24]/80'
+                        />
+                        <textarea
+                          value={item.answer}
+                          onChange={(e) =>
+                            handleCourseFaqChange(idx, 'answer', e.target.value)
+                          }
+                          rows={3}
+                          placeholder='Answer…'
+                          className='w-full bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none focus:border-[#E61C24]/80 resize-y'
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>

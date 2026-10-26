@@ -1,12 +1,14 @@
 import CourseCertificateSample from '@/components/CourseCertificateSample';
 import CourseTrailerPlayer from '@/components/CourseTrailerPlayer';
 import EnrollButton from '@/components/EnrollButton';
+import FAQ from '@/components/FAQ';
 import GTMTracker from '@/components/GTMTracker';
 import LessonsAccordion from '@/components/LessonsAccordion';
 import { verifyToken } from '@/lib/auth/auth';
 import { buildCertificateDescription } from '@/lib/certificate/certificateCopy';
 import { Course } from '@/lib/db/models/Course';
 import { Enrollment } from '@/lib/db/models/Enrollment';
+import { FAQ as FAQModel } from '@/lib/db/models/FAQ';
 import { Lesson } from '@/lib/db/models/Lesson';
 import '@/lib/db/models/Media';
 import { Review } from '@/lib/db/models/Review';
@@ -151,14 +153,37 @@ export default async function CourseDetailPage({ params }: Props) {
     }
   }
 
-  // Parallel: lessons + approved reviews
-  const [lessonsDocs, reviewsDocs] = await Promise.all([
+  const useCourseFaqs = course.faqSource === 'course';
+
+  // Parallel: lessons + approved reviews (+ global FAQs when needed)
+  const [lessonsDocs, reviewsDocs, globalFaqDocs] = await Promise.all([
     Lesson.find({ course: course._id }).lean(),
     Review.find({ course: course._id, status: 'approved' })
       .populate('student')
       .lean()
       .catch(() => []),
+    useCourseFaqs
+      ? Promise.resolve([])
+      : FAQModel.find({ isActive: true })
+          .sort({ order: 1, createdAt: 1 })
+          .lean(),
   ]);
+
+  const pageFaqs = useCourseFaqs
+    ? (course.courseFaqs || [])
+        .filter((f: any) => f?.question && f?.answer)
+        .map((f: any, i: number) => ({
+          id: `course-faq-${i}`,
+          question: f.question,
+          answer: f.answer,
+        }))
+    : (globalFaqDocs as any[]).map((f) => ({
+        id: f._id.toString(),
+        question: f.question,
+        answer: f.answer,
+        order: f.order,
+        isActive: f.isActive,
+      }));
 
   const lessonCount = lessonsDocs.length;
   const reviews = reviewsDocs as any[];
@@ -768,6 +793,14 @@ export default async function CourseDetailPage({ params }: Props) {
           </div>
         </div>
       </div>
+
+      {pageFaqs.length > 0 && (
+        <FAQ
+          faqs={pageFaqs}
+          eyebrow='Course FAQs'
+          subtitle='Common questions about enrollment, payment, and how classes work for this course.'
+        />
+      )}
     </div>
   );
 }

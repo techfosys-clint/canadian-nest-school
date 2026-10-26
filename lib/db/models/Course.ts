@@ -42,6 +42,12 @@ export interface ICourse extends Document {
   blockOffsetDays?: number
   /** Optional YouTube/Vimeo trailer URL for the public course page. */
   trailerVideoUrl?: string
+  /**
+   * Which FAQ list to show on the public course page.
+   * global = site FAQs; course = courseFaqs only (hidden if empty).
+   */
+  faqSource?: 'global' | 'course'
+  courseFaqs?: Array<{ question: string; answer: string }>
 }
 
 const CourseSchema = new Schema<ICourse>(
@@ -96,6 +102,17 @@ const CourseSchema = new Schema<ICourse>(
     noticeEndOffsetDays: { type: Number, min: 0, default: 2 },
     blockOffsetDays: { type: Number, min: 0, default: 2 },
     trailerVideoUrl: { type: String, default: '' },
+    faqSource: {
+      type: String,
+      enum: ['global', 'course'],
+      default: 'global',
+    },
+    courseFaqs: [
+      {
+        question: { type: String, required: true },
+        answer: { type: String, required: true },
+      },
+    ],
   },
   { collection: 'courses', timestamps: true }
 )
@@ -107,7 +124,8 @@ if (
     !mongoose.models.Course.schema.paths.category ||
     !mongoose.models.Course.schema.paths['studyMaterials.coverImage'] ||
     !mongoose.models.Course.schema.paths.billingType ||
-    !mongoose.models.Course.schema.paths.trailerVideoUrl)
+    !mongoose.models.Course.schema.paths.trailerVideoUrl ||
+    !mongoose.models.Course.schema.paths.faqSource)
 ) {
   delete mongoose.models.Course
 }

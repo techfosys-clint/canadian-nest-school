@@ -312,6 +312,8 @@ export async function PUT(
       blockOffsetDays,
       thumbnail,
       trailerVideoUrl,
+      faqSource,
+      courseFaqs,
       categories,
       instructors,
       status,
@@ -427,6 +429,25 @@ export async function PUT(
     course.seo = seo || {}
     course.studyMaterials = studyMaterials || []
     course.modules = modules || []
+    if (faqSource !== undefined) {
+      course.faqSource = faqSource === 'course' ? 'course' : 'global'
+    }
+    if (courseFaqs !== undefined) {
+      course.courseFaqs = Array.isArray(courseFaqs)
+        ? courseFaqs
+            .filter(
+              (f: any) =>
+                f?.question &&
+                String(f.question).trim() &&
+                f?.answer &&
+                String(f.answer).trim(),
+            )
+            .map((f: any) => ({
+              question: String(f.question).trim(),
+              answer: String(f.answer).trim(),
+            }))
+        : []
+    }
 
     await course.save()
 

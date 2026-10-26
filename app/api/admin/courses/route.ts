@@ -150,6 +150,8 @@ export async function POST(request: Request) {
       blockOffsetDays,
       thumbnail,
       trailerVideoUrl,
+      faqSource,
+      courseFaqs,
       categories,
       instructors,
       status,
@@ -251,6 +253,21 @@ export async function POST(request: Request) {
           : 2,
       trailerVideoUrl:
         typeof trailerVideoUrl === 'string' ? trailerVideoUrl.trim() : '',
+      faqSource: faqSource === 'course' ? 'course' : 'global',
+      courseFaqs: Array.isArray(courseFaqs)
+        ? courseFaqs
+            .filter(
+              (f: any) =>
+                f?.question &&
+                String(f.question).trim() &&
+                f?.answer &&
+                String(f.answer).trim(),
+            )
+            .map((f: any) => ({
+              question: String(f.question).trim(),
+              answer: String(f.answer).trim(),
+            }))
+        : [],
       thumbnail,
       categories: finalCategories,
       category: finalCategories[0] || undefined,

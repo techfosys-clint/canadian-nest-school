@@ -1,8 +1,10 @@
+import CourseCertificateSample from '@/components/CourseCertificateSample';
 import CourseTrailerPlayer from '@/components/CourseTrailerPlayer';
 import EnrollButton from '@/components/EnrollButton';
 import GTMTracker from '@/components/GTMTracker';
 import LessonsAccordion from '@/components/LessonsAccordion';
 import { verifyToken } from '@/lib/auth/auth';
+import { buildCertificateDescription } from '@/lib/certificate/certificateCopy';
 import { Course } from '@/lib/db/models/Course';
 import { Enrollment } from '@/lib/db/models/Enrollment';
 import { Lesson } from '@/lib/db/models/Lesson';
@@ -732,6 +734,11 @@ export default async function CourseDetailPage({ params }: Props) {
                   <span>Certificate of completion</span>
                 </div>
               </div>
+
+              <CourseCertificateSample
+                courseTitle={course.title}
+                description={buildCertificateDescription(course.title)}
+              />
 
               {/* Verified Instructor footer within widget */}
               <div className='border-t border-zinc-100 pt-4 flex items-center gap-3'>

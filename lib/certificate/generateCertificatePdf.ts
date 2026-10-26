@@ -3,7 +3,10 @@ import path from 'path';
 import PDFDocument from 'pdfkit';
 import type PDFKit from 'pdfkit';
 import sharp from 'sharp';
-import { formatBdLongDate } from '@/lib/bdTime';
+export {
+  buildCertificateDescription,
+  formatCertificateDate,
+} from '@/lib/certificate/certificateCopy';
 
 /** Prefer assets/ (not volume-mounted). Fallbacks cover local/legacy paths. */
 const CERTIFICATE_BACKGROUND_CANDIDATES = [
@@ -97,31 +100,6 @@ async function loadBackgroundBuffer(): Promise<Buffer> {
 
   const source = await fs.promises.readFile(backgroundPath);
   return sharp(source).jpeg({ quality: 95 }).toBuffer();
-}
-
-export function formatCertificateDate(date: Date = new Date()): string {
-  return formatBdLongDate(date)
-}
-
-/** Fixed certificate body text under the student name. */
-export function buildCertificateDescription(
-  courseTitle: string,
-  completionDate?: Date | string | null,
-): string {
-  const courseName = (courseTitle || '').trim() || 'this';
-  const awardedOn =
-    completionDate instanceof Date
-      ? formatCertificateDate(completionDate)
-      : typeof completionDate === 'string' && completionDate.trim()
-        ? completionDate.trim()
-        : formatCertificateDate(new Date());
-
-  return (
-    `For successfully completing the ${courseName} program. ` +
-    `This certificate recognizes their exceptional dedication, continuous skill development, ` +
-    `and strong commitment to learning in accordance with international educational standards.\n\n` +
-    `Awarded on this day, ${awardedOn}`
-  );
 }
 
 export async function generateCertificatePdf(

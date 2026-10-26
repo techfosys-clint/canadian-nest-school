@@ -1,3 +1,4 @@
+import CourseTrailerPlayer from '@/components/CourseTrailerPlayer';
 import EnrollButton from '@/components/EnrollButton';
 import GTMTracker from '@/components/GTMTracker';
 import LessonsAccordion from '@/components/LessonsAccordion';
@@ -9,6 +10,7 @@ import '@/lib/db/models/Media';
 import { Review } from '@/lib/db/models/Review';
 import '@/lib/db/models/Student';
 import { connectToDatabase } from '@/lib/db/mongodb';
+import { getYoutubeOrVimeoEmbedUrl } from '@/lib/videoEmbed';
 import { cookies } from 'next/headers';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -618,8 +620,14 @@ export default async function CourseDetailPage({ params }: Props) {
         {/* Right Area: Premium Sticky Pricing Card (4 cols) */}
         <div className='lg:col-span-4 relative z-20 lg:-mt-147.75 w-full order-1 lg:order-2'>
           <div className='sticky top-28 bg-white border border-zinc-200 rounded-lg shadow-[0_12px_45px_rgba(0,0,0,0.06)] overflow-hidden'>
-            {/* Aspect image header on widget */}
-            {imageUrl ? (
+            {/* Trailer (optional) or cover image */}
+            {getYoutubeOrVimeoEmbedUrl(course.trailerVideoUrl) ? (
+              <CourseTrailerPlayer
+                title={course.title}
+                trailerUrl={course.trailerVideoUrl}
+                posterUrl={imageUrl || null}
+              />
+            ) : imageUrl ? (
               <div className='aspect-video overflow-hidden bg-zinc-50 border-b border-zinc-100 relative group hidden lg:block'>
                 <Image
                   src={imageUrl}

@@ -311,6 +311,7 @@ export async function PUT(
       noticeEndOffsetDays,
       blockOffsetDays,
       thumbnail,
+      trailerVideoUrl,
       categories,
       instructors,
       status,
@@ -405,6 +406,10 @@ export async function PUT(
         : 2
     course.blockOffsetDays =
       resolvedBillingType === 'monthly' ? Number(blockOffsetDays ?? 2) : 2
+    if (trailerVideoUrl !== undefined) {
+      course.trailerVideoUrl =
+        typeof trailerVideoUrl === 'string' ? trailerVideoUrl.trim() : ''
+    }
     course.thumbnail = thumbnail
     course.categories = categories || course.categories || []
     course.category = course.categories[0] || null

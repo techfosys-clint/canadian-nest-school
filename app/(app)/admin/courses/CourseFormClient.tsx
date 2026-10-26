@@ -146,6 +146,9 @@ export default function CourseFormClient({
   const [thumbnailAlt, setThumbnailAlt] = useState<string>(
     initialData?.thumbnail?.alt || '',
   );
+  const [trailerVideoUrl, setTrailerVideoUrl] = useState(
+    initialData?.trailerVideoUrl || '',
+  );
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
   const [showMediaPickerForMaterial, setShowMediaPickerForMaterial] = useState<
@@ -894,6 +897,7 @@ export default function CourseFormClient({
     blockOffsetDays:
       billingType === 'monthly' ? Number(blockOffsetDays) || 0 : 2,
     thumbnail: thumbnailId || null,
+    trailerVideoUrl: trailerVideoUrl.trim(),
     categories,
     instructors: user.role === 'instructor' ? [user.id] : instructors,
     status,
@@ -2254,6 +2258,29 @@ export default function CourseFormClient({
             onChange={handleImageChange}
             className='hidden'
           />
+
+          {/* Optional course trailer (YouTube / Vimeo) */}
+          <div className='bg-white border border-slate-200 rounded-lg p-6 space-y-4'>
+            <h3 className='text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-2.5'>
+              Course trailer video
+            </h3>
+            <div className='flex flex-col gap-2'>
+              <label className='text-base font-bold text-slate-600'>
+                YouTube or Vimeo URL (optional)
+              </label>
+              <input
+                type='url'
+                value={trailerVideoUrl}
+                onChange={(e) => setTrailerVideoUrl(e.target.value)}
+                placeholder='https://www.youtube.com/watch?v=… or https://vimeo.com/…'
+                className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
+              />
+              <p className='text-base text-slate-500'>
+                Leave empty to show only the cover image. When set, the cover
+                becomes the video poster on the public course page.
+              </p>
+            </div>
+          </div>
 
           {/* Media Picker Modal */}
           <MediaPickerModal

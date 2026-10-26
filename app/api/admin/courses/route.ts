@@ -149,6 +149,7 @@ export async function POST(request: Request) {
       noticeEndOffsetDays,
       blockOffsetDays,
       thumbnail,
+      trailerVideoUrl,
       categories,
       instructors,
       status,
@@ -248,6 +249,8 @@ export async function POST(request: Request) {
         resolvedBillingType === 'monthly'
           ? Number(blockOffsetDays ?? 2)
           : 2,
+      trailerVideoUrl:
+        typeof trailerVideoUrl === 'string' ? trailerVideoUrl.trim() : '',
       thumbnail,
       categories: finalCategories,
       category: finalCategories[0] || undefined,

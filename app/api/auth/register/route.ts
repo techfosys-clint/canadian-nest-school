@@ -9,7 +9,6 @@ import crypto from 'crypto'
 import { rateLimit } from '@/lib/rateLimit'
 import { normalizePhone } from '@/lib/phone'
 import { cookies } from 'next/headers'
-import fs from 'fs/promises'
 import path from 'path'
 
 export async function POST(request: Request) {
@@ -155,11 +154,13 @@ export async function POST(request: Request) {
         const fileName = `${base}_${Date.now()}${ext}`
         const mimeType = profilePic.mimeType || 'image/jpeg'
 
-        // Save file to public/media folder
-        const mediaDir = path.join(process.cwd(), 'public', 'media')
-        await fs.mkdir(mediaDir, { recursive: true })
-        const filePath = path.join(mediaDir, fileName)
-        await fs.writeFile(filePath, buffer)
+        const { uploadToStorage } = await import('@/lib/storage')
+        const fileUrl = await uploadToStorage(
+          buffer,
+          fileName,
+          'media',
+          mimeType,
+        )
 
         // Create Media Document in MongoDB
         const mediaDoc = await Media.create({
@@ -167,7 +168,7 @@ export async function POST(request: Request) {
           mimeType: mimeType,
           filesize: buffer.length,
           alt: `${name} Profile Picture`,
-          url: `/media/${fileName}`,
+          url: fileUrl || `/media/${fileName}`,
         })
         profilePicId = mediaDoc._id.toString()
       } catch (uploadError) {

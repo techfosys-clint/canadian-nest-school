@@ -5,7 +5,6 @@ import { User } from '@/lib/db/models/User'
 import { Media } from '@/lib/db/models/Media'
 import { verifyToken, comparePasswords, hashPassword } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
-import fs from 'fs/promises'
 import path from 'path'
 
 export async function POST(request: Request) {
@@ -69,11 +68,30 @@ export async function POST(request: Request) {
         const fileName = `${base}_${Date.now()}${ext}`
         const mimeType = profilePic.mimeType || 'image/jpeg'
 
-        // Save file to public/media folder
-        const mediaDir = path.join(process.cwd(), 'public', 'media')
-        await fs.mkdir(mediaDir, { recursive: true })
-        const filePath = path.join(mediaDir, fileName)
-        await fs.writeFile(filePath, buffer)
+        // R2/S3 when configured; local disk fallback on VPS (Coolify)
+        const { uploadToStorage, isS3Configured } = await import(
+          '@/lib/storage'
+        )
+        if (
+          process.env.VERCEL &&
+          !isS3Configured
+        ) {
+          return NextResponse.json(
+            {
+              success: false,
+              error:
+                'Photo storage is not configured. Add S3/R2 environment variables and redeploy.',
+            },
+            { status: 500 },
+          )
+        }
+
+        const fileUrl = await uploadToStorage(
+          buffer,
+          fileName,
+          'media',
+          mimeType,
+        )
 
         // Create Media Document in MongoDB
         const mediaDoc = await Media.create({
@@ -81,7 +99,7 @@ export async function POST(request: Request) {
           mimeType: mimeType,
           filesize: buffer.length,
           alt: `${name} Profile Picture`,
-          url: `/media/${fileName}`,
+          url: fileUrl || `/media/${fileName}`,
         })
         profilePicId = mediaDoc._id.toString()
       } catch (uploadError: any) {

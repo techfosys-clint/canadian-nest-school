@@ -21,13 +21,30 @@ export async function POST(request: Request) {
 
     const { question, answer, questionBn, answerBn, order, isActive } =
       await request.json()
-    if (!question || !answer) return NextResponse.json({ error: 'Question and answer are required.' }, { status: 400 })
+    const resolvedQuestionBn =
+      typeof questionBn === 'string' ? questionBn.trim() : ''
+    const resolvedAnswerBn =
+      typeof answerBn === 'string' ? answerBn.trim() : ''
+    if (!resolvedQuestionBn || !resolvedAnswerBn) {
+      return NextResponse.json(
+        {
+          error:
+            'Bangla question and answer are required. English fields are optional.',
+        },
+        { status: 400 },
+      )
+    }
+    const resolvedQuestion =
+      (typeof question === 'string' ? question.trim() : '') ||
+      resolvedQuestionBn
+    const resolvedAnswer =
+      (typeof answer === 'string' ? answer.trim() : '') || resolvedAnswerBn
 
     const faq = new FAQ({
-      question,
-      answer,
-      questionBn: typeof questionBn === 'string' ? questionBn.trim() : '',
-      answerBn: typeof answerBn === 'string' ? answerBn.trim() : '',
+      question: resolvedQuestion,
+      answer: resolvedAnswer,
+      questionBn: resolvedQuestionBn,
+      answerBn: resolvedAnswerBn,
       order: order || 0,
       isActive: isActive !== false,
     })
@@ -51,10 +68,34 @@ export async function PUT(request: Request) {
     const faq = await FAQ.findById(id)
     if (!faq) return NextResponse.json({ error: 'FAQ not found.' }, { status: 404 })
 
-    if (question !== undefined) faq.question = question
-    if (answer !== undefined) faq.answer = answer
-    if (questionBn !== undefined) faq.questionBn = String(questionBn).trim()
-    if (answerBn !== undefined) faq.answerBn = String(answerBn).trim()
+    if (questionBn !== undefined) {
+      const bn = String(questionBn).trim()
+      if (!bn) {
+        return NextResponse.json(
+          { error: 'Bangla question is required.' },
+          { status: 400 },
+        )
+      }
+      faq.questionBn = bn
+    }
+    if (answerBn !== undefined) {
+      const bn = String(answerBn).trim()
+      if (!bn) {
+        return NextResponse.json(
+          { error: 'Bangla answer is required.' },
+          { status: 400 },
+        )
+      }
+      faq.answerBn = bn
+    }
+    if (question !== undefined) {
+      const en = String(question).trim()
+      faq.question = en || faq.questionBn || ''
+    }
+    if (answer !== undefined) {
+      const en = String(answer).trim()
+      faq.answer = en || faq.answerBn || ''
+    }
     if (order !== undefined) faq.order = order
     if (isActive !== undefined) faq.isActive = isActive
     await faq.save()

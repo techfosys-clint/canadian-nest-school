@@ -169,13 +169,18 @@ export async function POST(request: Request) {
       modules,
     } = body
 
-    if (!title || !slug) {
+    const resolvedTitleBn =
+      typeof titleBn === 'string' ? titleBn.trim() : ''
+    const resolvedTitle =
+      (typeof title === 'string' ? title.trim() : '') || resolvedTitleBn
+
+    if (!resolvedTitleBn || !slug) {
       return NextResponse.json(
         {
           success: false,
           error: 'Missing required parameters',
           code: 'VALIDATION_ERROR',
-          message: 'Required fields: title, slug.',
+          message: 'Required fields: titleBn (Bangla title), slug. English title is optional.',
         },
         { status: 400 }
       )
@@ -230,8 +235,8 @@ export async function POST(request: Request) {
       billingType === 'monthly' ? 'monthly' : 'one_time'
 
     const newCourse = new Course({
-      title,
-      titleBn: typeof titleBn === 'string' ? titleBn.trim() : '',
+      title: resolvedTitle,
+      titleBn: resolvedTitleBn,
       slug,
       summary,
       summaryBn: typeof summaryBn === 'string' ? summaryBn.trim() : '',

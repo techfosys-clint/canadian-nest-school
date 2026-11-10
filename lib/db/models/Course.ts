@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose'
 
 export interface ICourse extends Document {
   title: string
-  /** Bangla title — shown when locale is `bn` if set; else falls back to `title`. */
+  /** Bangla title — primary content. English `title` is optional and falls back to this. */
   titleBn?: string
   slug: string
   summary?: string

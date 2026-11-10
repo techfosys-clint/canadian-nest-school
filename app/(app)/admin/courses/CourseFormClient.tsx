@@ -924,7 +924,8 @@ export default function CourseFormClient({
 
   // Builds the API payload from current form state
   const buildPayload = () => ({
-    title,
+    // Bangla is primary; keep `title` populated for DB/legacy readers.
+    title: title.trim() || titleBn.trim(),
     titleBn: titleBn.trim(),
     slug,
     summary,
@@ -964,13 +965,21 @@ export default function CourseFormClient({
     ),
     faqSource,
     courseFaqs: courseFaqs
-      .filter((item) => item.question.trim() !== '' && item.answer.trim() !== '')
-      .map((item) => ({
-        question: item.question.trim(),
-        answer: item.answer.trim(),
-        questionBn: (item.questionBn || '').trim(),
-        answerBn: (item.answerBn || '').trim(),
-      })),
+      .filter((item) => {
+        const hasBn =
+          (item.questionBn || '').trim() !== '' &&
+          (item.answerBn || '').trim() !== ''
+        const hasEn =
+          item.question.trim() !== '' && item.answer.trim() !== ''
+        return hasBn || hasEn
+      })
+      .map((item) => {
+        const questionBn = (item.questionBn || '').trim()
+        const answerBn = (item.answerBn || '').trim()
+        const question = item.question.trim() || questionBn
+        const answer = item.answer.trim() || answerBn
+        return { question, answer, questionBn, answerBn }
+      }),
     studyMaterials: studyMaterials.filter(
       (item) => item.title.trim() !== '' && item.url.trim() !== '',
     ),
@@ -1019,11 +1028,11 @@ export default function CourseFormClient({
   // Saves the course (if needed) and takes the admin to the lesson form for
   // it — lessons can only be created against a real, persisted course ID.
   const handleAddLessonClick = async () => {
-    if (!title || !slug) {
+    if (!titleBn.trim() || !slug) {
       Swal.fire({
         icon: 'warning',
         title: 'Add a Title First',
-        text: 'Please fill in the course title and slug before adding lessons.',
+        text: 'Please fill in the Bangla course title and slug before adding lessons.',
         background: '#ffffff',
         color: '#1a1a1a',
       });
@@ -1066,11 +1075,11 @@ export default function CourseFormClient({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title || !slug) {
+    if (!titleBn.trim() || !slug) {
       Swal.fire({
         icon: 'warning',
         title: 'Validation Error',
-        text: 'Please complete required fields (Title, Slug).',
+        text: 'Please complete required fields (Bangla Title, Slug). English fields are optional.',
         background: '#ffffff',
         color: '#1a1a1a',
       });
@@ -1153,19 +1162,21 @@ export default function CourseFormClient({
               Course Parameters
             </h2>
 
-            {/* Title field */}
+            {/* English title — optional; falls back to Bangla on /en */}
             <div className='flex flex-col gap-2'>
               <label className='text-base font-bold text-slate-600'>
-                Course Title *
+                Course Title (English) — optional
               </label>
               <input
                 type='text'
-                required
                 value={title}
                 onChange={handleTitleChange}
                 placeholder='e.g. Master Next.js 16 and Mongoose Database Engineering'
                 className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
               />
+              <p className='text-base font-semibold text-slate-500'>
+                If left empty, the English site shows the Bangla title.
+              </p>
             </div>
 
             {/* Slug URL selector */}
@@ -1208,7 +1219,7 @@ export default function CourseFormClient({
             <div className='flex flex-col gap-2'>
               <div className='flex items-center justify-between'>
                 <label className='text-base font-bold text-slate-600'>
-                  Short Summary (Optional)
+                  Short Summary (English) — optional
                 </label>
                 <span className='text-sm font-semibold text-slate-450'>
                   {summary.length}/160 characters
@@ -1226,7 +1237,7 @@ export default function CourseFormClient({
 
             {/* Detailed Description */}
             <RichTextEditor
-              label='Detailed Description (Optional)'
+              label='Detailed Description (English) — optional'
               rows={8}
               value={description}
               onChange={setDescription}
@@ -1234,24 +1245,25 @@ export default function CourseFormClient({
             />
           </div>
 
-          {/* Bangla content — shown on public site when locale is BN */}
+          {/* Bangla content — primary language (required) */}
           <div className='bg-white border border-[#E61C24]/20 rounded-lg p-6 space-y-5'>
             <div className='border-b border-slate-100 pb-3 space-y-1'>
               <h2 className='text-xl font-bold text-slate-800 tracking-tight'>
-                Bangla content (বাংলা)
+                Bangla content (বাংলা) — primary
               </h2>
               <p className='text-base font-semibold text-slate-500'>
-                Optional. When filled, the BN|EN switcher shows these on Bangla
-                URLs. Empty fields fall back to English above.
+                Required for the public site. English fields above are optional;
+                missing English content falls back to these Bangla values.
               </p>
             </div>
 
             <div className='flex flex-col gap-2'>
               <label className='text-base font-bold text-slate-600'>
-                Course Title (Bangla)
+                Course Title (Bangla) *
               </label>
               <input
                 type='text'
+                required
                 value={titleBn}
                 onChange={(e) => setTitleBn(e.target.value)}
                 placeholder='যেমন: IELTS সম্পূর্ণ প্রস্তুতি কোর্স'
@@ -1541,28 +1553,6 @@ export default function CourseFormClient({
                         </div>
                         <input
                           type='text'
-                          value={item.question}
-                          onChange={(e) =>
-                            handleCourseFaqChange(
-                              idx,
-                              'question',
-                              e.target.value,
-                            )
-                          }
-                          placeholder='e.g. How do I pay for this course?'
-                          className='w-full bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none focus:border-[#E61C24]/80'
-                        />
-                        <textarea
-                          value={item.answer}
-                          onChange={(e) =>
-                            handleCourseFaqChange(idx, 'answer', e.target.value)
-                          }
-                          rows={3}
-                          placeholder='Answer…'
-                          className='w-full bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none focus:border-[#E61C24]/80 resize-y'
-                        />
-                        <input
-                          type='text'
                           value={item.questionBn || ''}
                           onChange={(e) =>
                             handleCourseFaqChange(
@@ -1571,7 +1561,7 @@ export default function CourseFormClient({
                               e.target.value,
                             )
                           }
-                          placeholder='প্রশ্ন (বাংলা) — optional'
+                          placeholder='প্রশ্ন (বাংলা) — primary'
                           className='w-full bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none focus:border-[#E61C24]/80'
                           lang='bn'
                         />
@@ -1585,9 +1575,31 @@ export default function CourseFormClient({
                             )
                           }
                           rows={2}
-                          placeholder='উত্তর (বাংলা) — optional'
+                          placeholder='উত্তর (বাংলা) — primary'
                           className='w-full bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none focus:border-[#E61C24]/80 resize-y'
                           lang='bn'
+                        />
+                        <input
+                          type='text'
+                          value={item.question}
+                          onChange={(e) =>
+                            handleCourseFaqChange(
+                              idx,
+                              'question',
+                              e.target.value,
+                            )
+                          }
+                          placeholder='Question (English) — optional; falls back to Bangla'
+                          className='w-full bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none focus:border-[#E61C24]/80'
+                        />
+                        <textarea
+                          value={item.answer}
+                          onChange={(e) =>
+                            handleCourseFaqChange(idx, 'answer', e.target.value)
+                          }
+                          rows={3}
+                          placeholder='Answer (English) — optional; falls back to Bangla'
+                          className='w-full bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none focus:border-[#E61C24]/80 resize-y'
                         />
                       </div>
                     ))}

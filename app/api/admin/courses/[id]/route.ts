@@ -332,13 +332,18 @@ export async function PUT(
       moduleRenames,
     } = body
 
-    if (!title || !slug) {
+    const resolvedTitleBn =
+      typeof titleBn === 'string' ? titleBn.trim() : ''
+    const resolvedTitle =
+      (typeof title === 'string' ? title.trim() : '') || resolvedTitleBn
+
+    if (!resolvedTitleBn || !slug) {
       return NextResponse.json(
         {
           success: false,
           error: 'Missing required parameters',
           code: 'VALIDATION_ERROR',
-          message: 'Required fields: title, slug.',
+          message: 'Required fields: titleBn (Bangla title), slug. English title is optional.',
         },
         { status: 400 }
       )
@@ -391,8 +396,8 @@ export async function PUT(
     const resolvedBillingType =
       billingType === 'monthly' ? 'monthly' : 'one_time'
 
-    course.title = title
-    course.titleBn = typeof titleBn === 'string' ? titleBn.trim() : ''
+    course.title = resolvedTitle
+    course.titleBn = resolvedTitleBn
     course.slug = slug
     course.summary = summary
     course.summaryBn = typeof summaryBn === 'string' ? summaryBn.trim() : ''

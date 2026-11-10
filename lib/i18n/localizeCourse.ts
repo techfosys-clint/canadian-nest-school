@@ -8,8 +8,16 @@ import {
 
 /** Resolve display fields for a course document at a given locale. */
 export function localizeCourseDoc(doc: Record<string, any>, locale: Locale) {
-  const title = pickLocalizedString(doc, 'title', locale) || doc.title || ''
-  const summary = pickLocalizedString(doc, 'summary', locale) || doc.summary || ''
+  const title =
+    pickLocalizedString(doc, 'title', locale) ||
+    doc.titleBn ||
+    doc.title ||
+    ''
+  const summary =
+    pickLocalizedString(doc, 'summary', locale) ||
+    doc.summaryBn ||
+    doc.summary ||
+    ''
   const description = pickLocalizedRichText(doc, 'description', locale)
   const whatYouWillLearn = pickLocalizedList(
     doc.whatYouWillLearn,
@@ -23,14 +31,19 @@ export function localizeCourseDoc(doc: Record<string, any>, locale: Locale) {
   )
   const courseFaqs = pickLocalizedFaqs(doc.courseFaqs, locale)
 
+  const metaTitleBn = doc.seo?.metaTitleBn?.trim() || ''
+  const metaTitleEn = doc.seo?.metaTitle?.trim() || ''
+  const metaDescriptionBn = doc.seo?.metaDescriptionBn?.trim() || ''
+  const metaDescriptionEn = doc.seo?.metaDescription?.trim() || ''
+
   const metaTitle =
-    locale === 'bn' && doc.seo?.metaTitleBn?.trim()
-      ? doc.seo.metaTitleBn
-      : doc.seo?.metaTitle
+    locale === 'en'
+      ? metaTitleEn || metaTitleBn
+      : metaTitleBn || metaTitleEn
   const metaDescription =
-    locale === 'bn' && doc.seo?.metaDescriptionBn?.trim()
-      ? doc.seo.metaDescriptionBn
-      : doc.seo?.metaDescription
+    locale === 'en'
+      ? metaDescriptionEn || metaDescriptionBn
+      : metaDescriptionBn || metaDescriptionEn
 
   return {
     title,
@@ -51,18 +64,28 @@ export function localizeInstructorBio(
   locale: Locale,
 ): string {
   if (!instructor) return ''
-  return pickLocalizedString(instructor, 'bio', locale) || instructor.bio || ''
+  return (
+    pickLocalizedString(instructor, 'bio', locale) ||
+    instructor.bioBn ||
+    instructor.bio ||
+    ''
+  )
 }
 
 export function localizeFaqDoc(doc: Record<string, any>, locale: Locale) {
+  const questionBn = doc.questionBn?.trim() || ''
+  const answerBn = doc.answerBn?.trim() || ''
+  const questionEn = doc.question?.trim() || ''
+  const answerEn = doc.answer?.trim() || ''
+
+  if (locale === 'en') {
+    return {
+      question: questionEn || questionBn,
+      answer: answerEn || answerBn,
+    }
+  }
   return {
-    question:
-      locale === 'bn' && doc.questionBn?.trim()
-        ? doc.questionBn
-        : doc.question || '',
-    answer:
-      locale === 'bn' && doc.answerBn?.trim()
-        ? doc.answerBn
-        : doc.answer || '',
+    question: questionBn || questionEn,
+    answer: answerBn || answerEn,
   }
 }

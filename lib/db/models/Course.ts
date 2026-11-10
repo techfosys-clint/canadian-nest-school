@@ -29,9 +29,10 @@ export interface ICourse extends Document {
     coverImage?: string
   }>
   modules?: string[]
-  /** one_time = lifetime purchase; monthly = 30-day subscription */
-  billingType?: 'one_time' | 'monthly'
+  /** one_time = lifetime; monthly = 30-day; quarterly = calendar quarters */
+  billingType?: 'one_time' | 'monthly' | 'quarterly'
   monthlyFee?: number
+  quarterlyFee?: number
   lateFeeEnabled?: boolean
   lateFeeAmount?: number
   /** Days before paidUntil when red dashboard notice starts. */
@@ -92,10 +93,11 @@ const CourseSchema = new Schema<ICourse>(
     modules: { type: [String], default: [] },
     billingType: {
       type: String,
-      enum: ['one_time', 'monthly'],
+      enum: ['one_time', 'monthly', 'quarterly'],
       default: 'one_time',
     },
     monthlyFee: { type: Number, min: 0 },
+    quarterlyFee: { type: Number, min: 0 },
     lateFeeEnabled: { type: Boolean, default: false },
     lateFeeAmount: { type: Number, min: 0, default: 0 },
     noticeStartOffsetDays: { type: Number, min: 0, default: 5 },
@@ -125,7 +127,8 @@ if (
     !mongoose.models.Course.schema.paths['studyMaterials.coverImage'] ||
     !mongoose.models.Course.schema.paths.billingType ||
     !mongoose.models.Course.schema.paths.trailerVideoUrl ||
-    !mongoose.models.Course.schema.paths.faqSource)
+    !mongoose.models.Course.schema.paths.faqSource ||
+    !mongoose.models.Course.schema.paths.quarterlyFee)
 ) {
   delete mongoose.models.Course
 }

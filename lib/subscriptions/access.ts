@@ -1,13 +1,15 @@
 import { Course } from '@/lib/db/models/Course'
 import { Enrollment } from '@/lib/db/models/Enrollment'
 import {
+  courseFee,
   getSubscriptionAccessSnapshot,
+  isRecurringEnrollment,
   type SubscriptionAccessSnapshot,
 } from '@/lib/subscriptions/billing'
 
 /**
  * Returns whether a student may access live/recordings for a course.
- * One-time completed enrollments always pass. Monthly enrollments respect block.
+ * One-time completed enrollments always pass. Recurring enrollments respect block.
  */
 export async function assertCourseContentAccess(
   studentId: string,
@@ -28,13 +30,13 @@ export async function assertCourseContentAccess(
     return { allowed: false, reason: 'NOT_ENROLLED' }
   }
 
-  if (enrollment.billingType !== 'monthly') {
+  if (!isRecurringEnrollment(enrollment)) {
     return { allowed: true, enrollment }
   }
 
   const course = await Course.findById(courseId)
     .select(
-      'billingType noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays title monthlyFee',
+      'billingType noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays title monthlyFee quarterlyFee',
     )
     .lean()
 
@@ -44,7 +46,6 @@ export async function assertCourseContentAccess(
 
   const snapshot = getSubscriptionAccessSnapshot(enrollment, course)
 
-  // Persist blocked status when cron hasn't run yet.
   if (snapshot.isBlocked && enrollment.accessStatus !== 'blocked') {
     enrollment.accessStatus = 'blocked'
     await enrollment.save()
@@ -66,12 +67,12 @@ export async function getStudentSubscriptionNotices(studentId: string) {
   const enrollments = await Enrollment.find({
     student: studentId,
     paymentStatus: 'completed',
-    billingType: 'monthly',
+    billingType: { $in: ['monthly', 'quarterly'] },
   })
     .populate({
       path: 'course',
       select:
-        'title slug billingType monthlyFee noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays lateFeeEnabled lateFeeAmount',
+        'title slug billingType monthlyFee quarterlyFee noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays lateFeeEnabled lateFeeAmount',
     })
     .lean()
 
@@ -86,6 +87,8 @@ export async function getStudentSubscriptionNotices(studentId: string) {
     daysPastDue: number
     daysUntilDue: number
     monthlyFee: number
+    fee: number
+    billingType: 'monthly' | 'quarterly'
   }> = []
 
   for (const e of enrollments as any[]) {
@@ -93,6 +96,10 @@ export async function getStudentSubscriptionNotices(studentId: string) {
     if (!course) continue
     const snapshot = getSubscriptionAccessSnapshot(e, course)
     if (!snapshot.showOverdueNotice && !snapshot.isBlocked) continue
+
+    const fee = courseFee(course)
+    const billingType =
+      e.billingType === 'quarterly' ? 'quarterly' : 'monthly'
 
     notices.push({
       enrollmentId: e._id.toString(),
@@ -106,7 +113,9 @@ export async function getStudentSubscriptionNotices(studentId: string) {
       showOverdueNotice: snapshot.showOverdueNotice,
       daysPastDue: snapshot.daysPastDue,
       daysUntilDue: snapshot.daysUntilDue,
-      monthlyFee: Number(course.monthlyFee || 0),
+      monthlyFee: fee,
+      fee,
+      billingType,
     })
   }
 

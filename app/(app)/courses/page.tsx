@@ -63,11 +63,15 @@ export default async function CoursesPage({ searchParams }: Props) {
       price:
         doc.billingType === 'monthly'
           ? Number(doc.monthlyFee || 0)
-          : Number(doc.price || 0),
+          : doc.billingType === 'quarterly'
+            ? Number(doc.quarterlyFee || 0)
+            : Number(doc.price || 0),
       billingType:
         doc.billingType === 'monthly'
           ? ('monthly' as const)
-          : ('one_time' as const),
+          : doc.billingType === 'quarterly'
+            ? ('quarterly' as const)
+            : ('one_time' as const),
       thumbnail: doc.thumbnail ? {
         id: doc.thumbnail._id.toString(),
         url: doc.thumbnail.url || null,

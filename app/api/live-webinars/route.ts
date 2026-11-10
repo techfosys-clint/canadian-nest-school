@@ -64,7 +64,7 @@ export async function GET() {
       const courseIds: any[] = []
       for (const e of enrollments as any[]) {
         const courseId = e.course?.toString?.() || String(e.course)
-        if (e.billingType === 'monthly') {
+        if (e.billingType === 'monthly' || e.billingType === 'quarterly') {
           const course = await Course.findById(courseId)
             .select(
               'billingType noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays',

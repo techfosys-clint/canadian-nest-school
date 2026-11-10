@@ -27,11 +27,13 @@ function getImageUrl(thumbnail: CourseDoc['thumbnail']): string {
 }
 function formatPrice(
   price?: number | null,
-  billingType?: 'one_time' | 'monthly',
+  billingType?: 'one_time' | 'monthly' | 'quarterly',
 ): string {
   if (!price || price === 0) return 'Free';
   const base = `৳${price.toLocaleString('en-BD')}`;
-  return billingType === 'monthly' ? `${base}/mo` : base;
+  if (billingType === 'monthly') return `${base}/mo`;
+  if (billingType === 'quarterly') return `${base}/qtr`;
+  return base;
 }
 
 function getLevelLabel(level: string): string {

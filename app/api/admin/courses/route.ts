@@ -143,6 +143,7 @@ export async function POST(request: Request) {
       price,
       billingType,
       monthlyFee,
+      quarterlyFee,
       lateFeeEnabled,
       lateFeeAmount,
       noticeStartOffsetDays,
@@ -222,7 +223,13 @@ export async function POST(request: Request) {
     // 3. Create course document
     const finalCategories = categories || []
     const resolvedBillingType =
-      billingType === 'monthly' ? 'monthly' : 'one_time'
+      billingType === 'monthly'
+        ? 'monthly'
+        : billingType === 'quarterly'
+          ? 'quarterly'
+          : 'one_time'
+    const isRecurring =
+      resolvedBillingType === 'monthly' || resolvedBillingType === 'quarterly'
 
     const newCourse = new Course({
       title,
@@ -235,22 +242,19 @@ export async function POST(request: Request) {
         resolvedBillingType === 'monthly'
           ? Number(monthlyFee) || 0
           : undefined,
-      lateFeeEnabled:
-        resolvedBillingType === 'monthly' ? !!lateFeeEnabled : false,
-      lateFeeAmount:
-        resolvedBillingType === 'monthly' ? Number(lateFeeAmount) || 0 : 0,
-      noticeStartOffsetDays:
-        resolvedBillingType === 'monthly'
-          ? Number(noticeStartOffsetDays ?? 5)
-          : 5,
-      noticeEndOffsetDays:
-        resolvedBillingType === 'monthly'
-          ? Number(noticeEndOffsetDays ?? 2)
-          : 2,
-      blockOffsetDays:
-        resolvedBillingType === 'monthly'
-          ? Number(blockOffsetDays ?? 2)
-          : 2,
+      quarterlyFee:
+        resolvedBillingType === 'quarterly'
+          ? Number(quarterlyFee) || 0
+          : undefined,
+      lateFeeEnabled: isRecurring ? !!lateFeeEnabled : false,
+      lateFeeAmount: isRecurring ? Number(lateFeeAmount) || 0 : 0,
+      noticeStartOffsetDays: isRecurring
+        ? Number(noticeStartOffsetDays ?? 5)
+        : 5,
+      noticeEndOffsetDays: isRecurring
+        ? Number(noticeEndOffsetDays ?? 2)
+        : 2,
+      blockOffsetDays: isRecurring ? Number(blockOffsetDays ?? 2) : 2,
       trailerVideoUrl:
         typeof trailerVideoUrl === 'string' ? trailerVideoUrl.trim() : '',
       faqSource: faqSource === 'course' ? 'course' : 'global',

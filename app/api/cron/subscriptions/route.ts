@@ -43,9 +43,9 @@ async function run(request: Request) {
   const todayStart = bdStartOfToday(now);
 
   // ── Auto-block ──────────────────────────────────────────────
-  const monthlyEnrollments = await Enrollment.find({
+  const recurringEnrollments = await Enrollment.find({
     paymentStatus: 'completed',
-    billingType: 'monthly',
+    billingType: { $in: ['monthly', 'quarterly'] },
     paidUntil: { $exists: true },
     accessStatus: { $ne: 'blocked' },
   })
@@ -55,13 +55,13 @@ async function run(request: Request) {
   let blocked = 0;
   const courseCache = new Map<string, any>();
 
-  for (const e of monthlyEnrollments as any[]) {
+  for (const e of recurringEnrollments as any[]) {
     const courseId = e.course?.toString?.() || String(e.course);
     let course = courseCache.get(courseId);
     if (!course) {
       course = await Course.findById(courseId)
         .select(
-          'billingType noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays title monthlyFee',
+          'billingType noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays title monthlyFee quarterlyFee',
         )
         .lean();
       if (course) courseCache.set(courseId, course);
@@ -101,13 +101,13 @@ async function run(request: Request) {
 
     const candidates = await Enrollment.find({
       paymentStatus: 'completed',
-      billingType: 'monthly',
+      billingType: { $in: ['monthly', 'quarterly'] },
       paidUntil: { $exists: true },
       accessStatus: { $ne: 'blocked' },
     })
       .populate({
         path: 'course',
-        select: 'title monthlyFee billingType',
+        select: 'title monthlyFee quarterlyFee billingType',
       })
       .lean();
 
@@ -149,11 +149,18 @@ async function run(request: Request) {
         continue;
       }
 
+      const amount =
+        course.billingType === 'quarterly'
+          ? Number(course.quarterlyFee || 0)
+          : Number(course.monthlyFee || 0);
+
       const message = buildFeeReminderSms({
         studentName: student?.name || 'Student',
         courseTitle: course.title || 'your course',
         paidUntilLabel: formatBdDate(paidUntil),
-        amount: Number(course.monthlyFee || 0),
+        amount,
+        periodLabel:
+          course.billingType === 'quarterly' ? 'quarterly fee' : 'monthly fee',
       });
 
       const ok = await sendSms(phone, message);

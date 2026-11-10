@@ -232,7 +232,8 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { courseId, couponCode, billingName, billingPhone, billingAddress } = body
+    const { courseId, couponCode, billingName, billingPhone, billingAddress } =
+      body
 
     if (!courseId) {
       return NextResponse.json(
@@ -248,6 +249,47 @@ export async function POST(request: Request) {
         { success: false, error: 'Course not found.' },
         { status: 404 }
       )
+    }
+
+    const {
+      courseFee,
+      initialPaidUntil,
+      initialQuarterlyPaidUntil,
+      isRecurringCourse,
+    } = await import('@/lib/subscriptions/billing')
+    const { canStudentJoinBatch } = await import('@/lib/batchCapacity')
+    const { Batch } = await import('@/lib/db/models/Batch')
+    const { assignStudentToBatch } = await import('@/lib/batches/assignStudent')
+
+    const isRecurring = isRecurringCourse(course as any)
+    const resolvedBillingType =
+      (course as any).billingType === 'quarterly'
+        ? 'quarterly'
+        : (course as any).billingType === 'monthly'
+          ? 'monthly'
+          : 'one_time'
+
+    // Monthly/quarterly: only one batch should have an open join window at a
+    // time. Auto-assign that batch — students do not pick.
+    let selectedBatch: any = null
+    if (isRecurring) {
+      const candidates = await Batch.find({
+        course: courseId,
+        status: { $ne: 'completed' },
+      })
+      selectedBatch =
+        candidates.find((b) => canStudentJoinBatch(b)) || null
+
+      if (!selectedBatch) {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              'Enrollment is closed. No batch join window is open right now. Please wait until the admin opens a batch.',
+          },
+          { status: 400 },
+        )
+      }
     }
 
     let student = await Student.findById(userId).lean()
@@ -287,11 +329,8 @@ export async function POST(request: Request) {
       })
     }
 
-    const isMonthly = (course as any).billingType === 'monthly'
     // Coupon logic
-    let pricePaid = isMonthly
-      ? Number((course as any).monthlyFee || 0)
-      : course.price || 0
+    let pricePaid = courseFee(course as any)
     let appliedCoupon = null
 
     if (couponCode) {
@@ -307,7 +346,7 @@ export async function POST(request: Request) {
           {
             success: false,
             error:
-              'Extension coupons can only be used when renewing a monthly subscription.',
+              'Extension coupons can only be used when renewing a subscription.',
           },
           { status: 400 },
         )
@@ -376,7 +415,15 @@ export async function POST(request: Request) {
       let newEnrollment
       const now = new Date()
       try {
-        const { initialPaidUntil } = await import('@/lib/subscriptions/billing')
+        const paidUntil =
+          resolvedBillingType === 'monthly'
+            ? initialPaidUntil(now)
+            : resolvedBillingType === 'quarterly'
+              ? initialQuarterlyPaidUntil(
+                  selectedBatch ? new Date(selectedBatch.endDate) : now,
+                )
+              : undefined
+
         newEnrollment = await Enrollment.create({
           student: userId,
           course: courseId,
@@ -387,15 +434,29 @@ export async function POST(request: Request) {
           billingPhone: resolvedBillingPhone,
           billingAddress: resolvedBillingAddress,
           couponCode: appliedCoupon ? appliedCoupon.code : undefined,
-          billingType: isMonthly ? 'monthly' : 'one_time',
+          billingType: resolvedBillingType,
           accessStatus: 'active',
-          ...(isMonthly
+          ...(isRecurring
             ? {
-                paidUntil: initialPaidUntil(now),
+                batch: selectedBatch._id,
+                paidUntil,
                 billingCycleAnchor: now,
               }
             : {}),
         })
+
+        if (isRecurring && selectedBatch) {
+          const assigned = await assignStudentToBatch({
+            batchId: selectedBatch._id.toString(),
+            studentId: userId,
+            courseId,
+            force: true,
+          })
+          if (!assigned.ok) {
+            await Enrollment.deleteOne({ _id: newEnrollment._id })
+            throw new Error(assigned.error)
+          }
+        }
       } catch (enrollError) {
         if (appliedCoupon) {
           await Coupon.updateOne({ _id: appliedCoupon._id }, { $inc: { usedCount: -1 } })
@@ -443,8 +504,11 @@ export async function POST(request: Request) {
         billingPhone: resolvedBillingPhone,
         billingAddress: resolvedBillingAddress,
         couponCode: appliedCoupon ? appliedCoupon.code : undefined,
-        billingType: isMonthly ? 'monthly' : 'one_time',
+        billingType: resolvedBillingType,
         accessStatus: 'active',
+        ...(isRecurring && selectedBatch
+          ? { batch: selectedBatch._id }
+          : {}),
       })
     } catch (enrollError) {
       if (appliedCoupon) {

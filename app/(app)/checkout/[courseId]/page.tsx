@@ -6,6 +6,7 @@ import '@/lib/db/models/Category'
 import '@/lib/db/models/Media'
 import '@/lib/db/models/User'
 import CheckoutFormClient from './CheckoutFormClient'
+import { courseFee, isRecurringCourse } from '@/lib/subscriptions/billing'
 
 type Props = {
   params: Promise<{ courseId: string }>
@@ -25,16 +26,26 @@ export default async function CheckoutPage({ params }: Props) {
 
   if (!course) notFound()
 
-  const isMonthly = course.billingType === 'monthly'
-  // Format course for the client component
+  const billingType =
+    course.billingType === 'monthly'
+      ? ('monthly' as const)
+      : course.billingType === 'quarterly'
+        ? ('quarterly' as const)
+        : ('one_time' as const)
+
   const serializedCourse = {
     id: course._id.toString(),
     slug: course.slug || '',
     title: course.title || '',
     summary: course.summary || '',
-    price: isMonthly ? Number(course.monthlyFee || 0) : course.price || 0,
-    billingType: isMonthly ? ('monthly' as const) : ('one_time' as const),
-    imageUrl: course.thumbnail?.sizes?.card?.url ?? course.thumbnail?.sizes?.hero?.url ?? course.thumbnail?.url ?? '',
+    price: courseFee(course),
+    billingType,
+    requiresBatch: isRecurringCourse(course),
+    imageUrl:
+      course.thumbnail?.sizes?.card?.url ??
+      course.thumbnail?.sizes?.hero?.url ??
+      course.thumbnail?.url ??
+      '',
     instructorName: course.instructor?.name || 'Expert Instructor',
     categoryName: course.category?.name || '',
   }

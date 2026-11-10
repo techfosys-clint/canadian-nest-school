@@ -7,7 +7,10 @@ import {
 import { verifyEpsTransaction } from '@/lib/eps'
 import { epsAmountsMatch } from '@/lib/payments/epsAmount'
 import { normalizeEpsStatus } from '@/lib/payments/epsStatus'
-import { nextPaidUntil } from '@/lib/subscriptions/billing'
+import {
+  nextPaidUntil,
+  type RecurringBillingType,
+} from '@/lib/subscriptions/billing'
 
 export type CompleteSubscriptionPaymentResult =
   | 'completed'
@@ -79,18 +82,23 @@ export async function completeSubscriptionPayment(
           ? new Date(enrollment.paidUntil)
           : new Date(claimed.periodStart)
 
+      const recurringType: RecurringBillingType =
+        enrollment.billingType === 'quarterly' ? 'quarterly' : 'monthly'
+
       const paidUntil = nextPaidUntil(
         previousEnd,
         claimed.extensionDays || 0,
+        recurringType,
       )
 
       enrollment.paidUntil = paidUntil
       enrollment.accessStatus = 'active'
-      enrollment.billingType = 'monthly'
+      enrollment.billingType = recurringType
       enrollment.pricePaid = claimed.amount
       if (!enrollment.billingCycleAnchor) {
         enrollment.billingCycleAnchor = claimed.periodStart
       }
+      // Renewals stay on the same batch — do not reassign.
       await enrollment.save()
     }
 

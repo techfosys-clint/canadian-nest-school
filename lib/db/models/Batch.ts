@@ -6,6 +6,12 @@ export interface IBatch extends Document {
   instructor: mongoose.Types.ObjectId | string
   startDate: Date
   endDate: Date
+  /**
+   * Enrollment join window (separate from class start/end).
+   * Students may only join while now is within [joinOpensAt, joinClosesAt].
+   */
+  joinOpensAt?: Date | null
+  joinClosesAt?: Date | null
   status: 'upcoming' | 'active' | 'completed'
   students: mongoose.Types.ObjectId[] | string[]
   // Maximum number of students who can join this batch. 0 = unlimited.
@@ -24,7 +30,14 @@ const BatchSchema = new Schema<IBatch>(
     instructor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
-    status: { type: String, enum: ['upcoming', 'active', 'completed'], default: 'upcoming', required: true },
+    joinOpensAt: { type: Date, default: null },
+    joinClosesAt: { type: Date, default: null },
+    status: {
+      type: String,
+      enum: ['upcoming', 'active', 'completed'],
+      default: 'upcoming',
+      required: true,
+    },
     students: [{ type: Schema.Types.ObjectId, ref: 'Student' }],
     maxStudents: { type: Number, default: 0, min: 0 },
     reactivateDate: { type: Date, default: null },
@@ -32,4 +45,9 @@ const BatchSchema = new Schema<IBatch>(
   { collection: 'batches', timestamps: true }
 )
 
-export const Batch = mongoose.models.Batch || mongoose.model<IBatch>('Batch', BatchSchema)
+if (mongoose.models.Batch && !mongoose.models.Batch.schema.paths.joinOpensAt) {
+  delete mongoose.models.Batch
+}
+
+export const Batch =
+  mongoose.models.Batch || mongoose.model<IBatch>('Batch', BatchSchema)

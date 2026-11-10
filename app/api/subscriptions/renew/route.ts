@@ -11,7 +11,7 @@ import {
   BILLING_PERIOD_DAYS,
   addDays,
   computeRenewalAmount,
-  isMonthlyCourse,
+  isRecurringCourse,
 } from '@/lib/subscriptions/billing'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -76,9 +76,21 @@ export async function POST(request: Request) {
     }
 
     const course = await Course.findById(enrollment.course)
-    if (!course || !isMonthlyCourse(course)) {
+    if (!course || !isRecurringCourse(course)) {
       return NextResponse.json(
-        { success: false, error: 'This course is not a monthly subscription.' },
+        {
+          success: false,
+          error: 'This course is not a monthly/quarterly subscription.',
+        },
+        { status: 400 },
+      )
+    }
+    if (
+      enrollment.billingType !== 'monthly' &&
+      enrollment.billingType !== 'quarterly'
+    ) {
+      return NextResponse.json(
+        { success: false, error: 'This enrollment is not a subscription.' },
         { status: 400 },
       )
     }
@@ -143,7 +155,11 @@ export async function POST(request: Request) {
           ? new Date(enrollment.paidUntil)
           : new Date()
       const { nextPaidUntil } = await import('@/lib/subscriptions/billing')
-      enrollment.paidUntil = nextPaidUntil(previousEnd, extensionDays)
+      enrollment.paidUntil = nextPaidUntil(
+        previousEnd,
+        extensionDays,
+        enrollment.billingType === 'quarterly' ? 'quarterly' : 'monthly',
+      )
       enrollment.accessStatus = 'active'
       await enrollment.save()
       if (appliedCouponCode) {

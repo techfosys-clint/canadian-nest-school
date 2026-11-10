@@ -50,11 +50,13 @@ function getLevelLabel(level: string): string {
 
 function formatPrice(
   price?: number | null,
-  billingType?: 'one_time' | 'monthly',
+  billingType?: 'one_time' | 'monthly' | 'quarterly',
 ) {
   if (!price || price === 0) return 'Free';
   const base = `৳${price.toLocaleString('en-BD')}`;
-  return billingType === 'monthly' ? `${base}/mo` : base;
+  if (billingType === 'monthly') return `${base}/mo`;
+  if (billingType === 'quarterly') return `${base}/qtr`;
+  return base;
 }
 
 function getImageUrl(thumbnail: any): string {
@@ -122,9 +124,17 @@ export default async function CourseDetailPage({ params }: Props) {
   if (!course) notFound();
 
   const isMonthly = course.billingType === 'monthly'
+  const isQuarterly = course.billingType === 'quarterly'
   const displayPrice = isMonthly
     ? Number(course.monthlyFee || 0)
-    : Number(course.price || 0)
+    : isQuarterly
+      ? Number(course.quarterlyFee || 0)
+      : Number(course.price || 0)
+  const displayBillingType = isMonthly
+    ? ('monthly' as const)
+    : isQuarterly
+      ? ('quarterly' as const)
+      : ('one_time' as const)
 
   // ─── Session and Enrollment Check ───
   const cookieStore = await cookies();
@@ -700,10 +710,7 @@ export default async function CourseDetailPage({ params }: Props) {
                   <span
                     className={`text-4xl font-bold ${displayPrice === 0 ? 'text-emerald-600' : 'text-[#E61C24]'}`}
                   >
-                    {formatPrice(
-                      displayPrice,
-                      isMonthly ? 'monthly' : 'one_time',
-                    )}
+                    {formatPrice(displayPrice, displayBillingType)}
                   </span>
                 </div>
               </div>

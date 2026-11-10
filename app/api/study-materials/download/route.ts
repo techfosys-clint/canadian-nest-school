@@ -70,7 +70,7 @@ export async function GET(request: Request) {
         })
         if (!matches) continue
 
-        if (e.billingType === 'monthly') {
+        if (e.billingType === 'monthly' || e.billingType === 'quarterly') {
           const snapshot = getSubscriptionAccessSnapshot(e, course)
           if (snapshot.isBlocked) {
             continue

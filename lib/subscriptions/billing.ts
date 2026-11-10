@@ -4,6 +4,8 @@ import { BD_TIME_ZONE } from '@/lib/bdTime'
 
 export const BILLING_PERIOD_DAYS = 30
 
+export type RecurringBillingType = 'monthly' | 'quarterly'
+
 export function addDays(date: Date, days: number): Date {
   const d = new Date(date.getTime())
   d.setUTCDate(d.getUTCDate() + days)
@@ -28,29 +30,106 @@ export function isMonthlyCourse(
   return course?.billingType === 'monthly'
 }
 
+export function isQuarterlyCourse(
+  course: Pick<ICourse, 'billingType'> | null | undefined,
+): boolean {
+  return course?.billingType === 'quarterly'
+}
+
+/** Monthly or quarterly courses use subscription access + batches. */
+export function isRecurringCourse(
+  course: Pick<ICourse, 'billingType'> | null | undefined,
+): boolean {
+  return course?.billingType === 'monthly' || course?.billingType === 'quarterly'
+}
+
 export function isMonthlyEnrollment(
   enrollment: Pick<IEnrollment, 'billingType'> | null | undefined,
 ): boolean {
   return enrollment?.billingType === 'monthly'
 }
 
+export function isRecurringEnrollment(
+  enrollment: Pick<IEnrollment, 'billingType'> | null | undefined,
+): boolean {
+  return (
+    enrollment?.billingType === 'monthly' ||
+    enrollment?.billingType === 'quarterly'
+  )
+}
+
+export function courseFee(
+  course: Pick<ICourse, 'billingType' | 'price' | 'monthlyFee' | 'quarterlyFee'>,
+): number {
+  if (course.billingType === 'monthly') return Number(course.monthlyFee || 0)
+  if (course.billingType === 'quarterly') return Number(course.quarterlyFee || 0)
+  return Number(course.price || 0)
+}
+
+/** YYYY-MM-DD parts in Asia/Dhaka. */
+function bdYmdParts(date: Date): { y: number; m: number; d: number } {
+  const ymd = date.toLocaleDateString('en-CA', { timeZone: BD_TIME_ZONE })
+  const [y, m, d] = ymd.split('-').map(Number)
+  return { y, m, d }
+}
+
+function lastDayOfMonth(year: number, month1to12: number): number {
+  // Day 0 of next month = last day of month1to12
+  return new Date(Date.UTC(year, month1to12, 0)).getUTCDate()
+}
+
 /**
- * Next paidUntil after a successful renewal: always previous period end + 30 days
- * (+ optional extension days from coupon). Cycle does not shift with pay date.
+ * End of the calendar quarter containing `date` (Asia/Dhaka),
+ * as 23:59:59.999 +06:00 on the last day of Mar/Jun/Sep/Dec.
+ */
+export function endOfCalendarQuarterContaining(date: Date): Date {
+  const { y, m } = bdYmdParts(date)
+  const qEndMonth = Math.ceil(m / 3) * 3 // 3, 6, 9, or 12
+  const lastDay = lastDayOfMonth(y, qEndMonth)
+  const endYmd = `${y}-${String(qEndMonth).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
+  return new Date(`${endYmd}T23:59:59.999+06:00`)
+}
+
+/** Next calendar-quarter end after the current paidUntil. */
+export function nextCalendarQuarterEnd(afterPaidUntil: Date): Date {
+  return endOfCalendarQuarterContaining(addDays(afterPaidUntil, 1))
+}
+
+/**
+ * Next paidUntil after a successful renewal.
+ * Monthly: previous period end + 30 days (+ extension).
+ * Quarterly: next calendar quarter end (+ extension days after that).
  */
 export function nextPaidUntil(
   previousPaidUntil: Date,
   extensionDays = 0,
+  billingType: RecurringBillingType = 'monthly',
 ): Date {
-  return addDays(previousPaidUntil, BILLING_PERIOD_DAYS + Math.max(0, extensionDays))
+  const base =
+    billingType === 'quarterly'
+      ? nextCalendarQuarterEnd(previousPaidUntil)
+      : addDays(previousPaidUntil, BILLING_PERIOD_DAYS)
+  return addDays(base, Math.max(0, extensionDays))
 }
 
+/** First monthly paidUntil: now + 30 days. */
 export function initialPaidUntil(from: Date = new Date()): Date {
   return addDays(from, BILLING_PERIOD_DAYS)
 }
 
+/**
+ * First quarterly paidUntil: end of the calendar quarter the batch sits in
+ * (uses batch endDate).
+ */
+export function initialQuarterlyPaidUntil(batchEndDate: Date): Date {
+  return endOfCalendarQuarterContaining(batchEndDate)
+}
+
 export type SubscriptionAccessSnapshot = {
   isMonthly: boolean
+  /** True for monthly or quarterly subscription enrollments. */
+  isRecurring: boolean
+  billingType: 'one_time' | 'monthly' | 'quarterly' | null
   paidUntil: Date | null
   accessStatus: 'active' | 'blocked'
   /** True when live join / recordings must be denied. */
@@ -78,13 +157,24 @@ export function getSubscriptionAccessSnapshot(
   >,
   now: Date = new Date(),
 ): SubscriptionAccessSnapshot {
-  const isMonthly =
-    enrollment.paymentStatus === 'completed' &&
-    (enrollment.billingType === 'monthly' || course.billingType === 'monthly')
+  const recurringType: RecurringBillingType | null =
+    enrollment.paymentStatus === 'completed'
+      ? enrollment.billingType === 'quarterly' ||
+        course.billingType === 'quarterly'
+        ? 'quarterly'
+        : enrollment.billingType === 'monthly' ||
+            course.billingType === 'monthly'
+          ? 'monthly'
+          : null
+      : null
 
-  if (!isMonthly || !enrollment.paidUntil) {
+  const isRecurring = !!recurringType
+
+  if (!isRecurring || !enrollment.paidUntil) {
     return {
       isMonthly: false,
+      isRecurring: false,
+      billingType: null,
       paidUntil: null,
       accessStatus: 'active',
       isBlocked: false,
@@ -112,13 +202,13 @@ export function getSubscriptionAccessSnapshot(
   const isBlocked =
     enrollment.accessStatus === 'blocked' || now.getTime() >= blockAt.getTime()
 
-  // Show from noticeStart until block (noticeEnd is soft end for SMS window;
-  // dashboard keeps the red banner until access is blocked or paid).
   const showOverdueNotice =
     !isBlocked && now.getTime() >= noticeStartAt.getTime()
 
   return {
-    isMonthly: true,
+    isMonthly: recurringType === 'monthly',
+    isRecurring: true,
+    billingType: recurringType,
     paidUntil,
     accessStatus: isBlocked ? 'blocked' : 'active',
     isBlocked,
@@ -132,7 +222,14 @@ export function getSubscriptionAccessSnapshot(
 }
 
 export function computeRenewalAmount(
-  course: Pick<ICourse, 'monthlyFee' | 'lateFeeEnabled' | 'lateFeeAmount'>,
+  course: Pick<
+    ICourse,
+    | 'billingType'
+    | 'monthlyFee'
+    | 'quarterlyFee'
+    | 'lateFeeEnabled'
+    | 'lateFeeAmount'
+  >,
   enrollment: Pick<IEnrollment, 'paidUntil'>,
   options?: {
     overrideFee?: number | null
@@ -140,10 +237,15 @@ export function computeRenewalAmount(
   },
 ): { baseFee: number; lateFee: number; total: number } {
   const now = options?.now ?? new Date()
+  const defaultFee =
+    course.billingType === 'quarterly'
+      ? Number(course.quarterlyFee || 0)
+      : Number(course.monthlyFee || 0)
+
   const baseFee =
     typeof options?.overrideFee === 'number' && options.overrideFee >= 0
       ? options.overrideFee
-      : Number(course.monthlyFee || 0)
+      : defaultFee
 
   let lateFee = 0
   if (
@@ -164,11 +266,13 @@ export function buildFeeReminderSms(params: {
   courseTitle: string
   paidUntilLabel: string
   amount: number
+  periodLabel?: string
 }): string {
+  const period = params.periodLabel || 'fee'
   return (
     `[ Canadian Nest School ]\n\n` +
     `Dear ${params.studentName},\n` +
-    `Please pay the monthly fee for "${params.courseTitle}" ` +
+    `Please pay the ${period} for "${params.courseTitle}" ` +
     `(due ${params.paidUntilLabel}). Amount: BDT ${params.amount}.\n` +
     `Pay from your student portal to keep access.\n\n` +
     `Thank you.`

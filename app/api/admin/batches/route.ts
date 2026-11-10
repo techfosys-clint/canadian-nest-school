@@ -45,10 +45,16 @@ export async function GET(request: Request) {
       .sort({ createdAt: -1 })
       .lean()
 
-    const { isBatchAcceptingStudents } = await import('@/lib/batchCapacity')
+    const {
+      canStudentJoinBatch,
+      isBatchAcceptingStudents,
+      isBatchJoinWindowOpen,
+    } = await import('@/lib/batchCapacity')
     const batchesWithStatus = batches.map((b: any) => ({
       ...b,
       isAcceptingStudents: isBatchAcceptingStudents(b),
+      isJoinWindowOpen: isBatchJoinWindowOpen(b),
+      isOpenForEnrollment: canStudentJoinBatch(b),
     }))
 
     return NextResponse.json({ success: true, batches: batchesWithStatus })
@@ -81,10 +87,37 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { name, course, instructor, startDate, endDate, status, maxStudents, reactivateDate } = body
+    const {
+      name,
+      course,
+      instructor,
+      startDate,
+      endDate,
+      joinOpensAt,
+      joinClosesAt,
+      status,
+      maxStudents,
+      reactivateDate,
+    } = body
 
     if (!name || !course || !startDate || !endDate) {
       return NextResponse.json({ error: 'Missing required batch parameters.' }, { status: 400 })
+    }
+
+    if (!joinOpensAt || !joinClosesAt) {
+      return NextResponse.json(
+        { error: 'Join window is required (join opens and join closes).' },
+        { status: 400 },
+      )
+    }
+
+    const opens = new Date(joinOpensAt)
+    const closes = new Date(joinClosesAt)
+    if (!(opens.getTime() < closes.getTime())) {
+      return NextResponse.json(
+        { error: 'Join opens must be before join closes.' },
+        { status: 400 },
+      )
     }
 
     // Force instructor ID for instructor role
@@ -96,6 +129,8 @@ export async function POST(request: Request) {
       instructor: finalInstructor,
       startDate: new Date(startDate),
       endDate: new Date(endDate),
+      joinOpensAt: opens,
+      joinClosesAt: closes,
       status: status || 'upcoming',
       students: [],
       maxStudents: Number(maxStudents) || 0,

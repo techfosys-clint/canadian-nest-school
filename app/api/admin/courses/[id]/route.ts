@@ -305,6 +305,7 @@ export async function PUT(
       price,
       billingType,
       monthlyFee,
+      quarterlyFee,
       lateFeeEnabled,
       lateFeeAmount,
       noticeStartOffsetDays,
@@ -384,7 +385,13 @@ export async function PUT(
 
     // 4. Perform Mongoose Update
     const resolvedBillingType =
-      billingType === 'monthly' ? 'monthly' : 'one_time'
+      billingType === 'monthly'
+        ? 'monthly'
+        : billingType === 'quarterly'
+          ? 'quarterly'
+          : 'one_time'
+    const isRecurring =
+      resolvedBillingType === 'monthly' || resolvedBillingType === 'quarterly'
 
     course.title = title
     course.slug = slug
@@ -394,20 +401,19 @@ export async function PUT(
     course.billingType = resolvedBillingType
     course.monthlyFee =
       resolvedBillingType === 'monthly' ? Number(monthlyFee) || 0 : undefined
-    course.lateFeeEnabled =
-      resolvedBillingType === 'monthly' ? !!lateFeeEnabled : false
-    course.lateFeeAmount =
-      resolvedBillingType === 'monthly' ? Number(lateFeeAmount) || 0 : 0
-    course.noticeStartOffsetDays =
-      resolvedBillingType === 'monthly'
-        ? Number(noticeStartOffsetDays ?? 5)
-        : 5
-    course.noticeEndOffsetDays =
-      resolvedBillingType === 'monthly'
-        ? Number(noticeEndOffsetDays ?? 2)
-        : 2
-    course.blockOffsetDays =
-      resolvedBillingType === 'monthly' ? Number(blockOffsetDays ?? 2) : 2
+    course.quarterlyFee =
+      resolvedBillingType === 'quarterly' ? Number(quarterlyFee) || 0 : undefined
+    course.lateFeeEnabled = isRecurring ? !!lateFeeEnabled : false
+    course.lateFeeAmount = isRecurring ? Number(lateFeeAmount) || 0 : 0
+    course.noticeStartOffsetDays = isRecurring
+      ? Number(noticeStartOffsetDays ?? 5)
+      : 5
+    course.noticeEndOffsetDays = isRecurring
+      ? Number(noticeEndOffsetDays ?? 2)
+      : 2
+    course.blockOffsetDays = isRecurring
+      ? Number(blockOffsetDays ?? 2)
+      : 2
     if (trailerVideoUrl !== undefined) {
       course.trailerVideoUrl =
         typeof trailerVideoUrl === 'string' ? trailerVideoUrl.trim() : ''

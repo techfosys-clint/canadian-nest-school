@@ -4,7 +4,11 @@ import { Batch } from '@/lib/db/models/Batch'
 import { User } from '@/lib/db/models/User'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
-import { isBatchAcceptingStudents } from '@/lib/batchCapacity'
+import {
+  canStudentJoinBatch,
+  isBatchAcceptingStudents,
+  isBatchJoinWindowOpen,
+} from '@/lib/batchCapacity'
 
 type Props = {
   params: Promise<{ id: string }>
@@ -42,7 +46,15 @@ export async function GET(request: Request, { params }: Props) {
       return NextResponse.json({ error: 'Batch not found.' }, { status: 404 })
     }
 
-    return NextResponse.json({ success: true, batch: { ...batch, isAcceptingStudents: isBatchAcceptingStudents(batch as any) } })
+    return NextResponse.json({
+      success: true,
+      batch: {
+        ...batch,
+        isAcceptingStudents: isBatchAcceptingStudents(batch as any),
+        isJoinWindowOpen: isBatchJoinWindowOpen(batch as any),
+        isOpenForEnrollment: canStudentJoinBatch(batch as any),
+      },
+    })
 
   } catch (error: any) {
     console.error('Get Batch API Error:', error)
@@ -73,7 +85,18 @@ export async function PUT(request: Request, { params }: Props) {
     }
 
     const body = await request.json()
-    const { name, instructor, startDate, endDate, status, students, maxStudents, reactivateDate } = body
+    const {
+      name,
+      instructor,
+      startDate,
+      endDate,
+      joinOpensAt,
+      joinClosesAt,
+      status,
+      students,
+      maxStudents,
+      reactivateDate,
+    } = body
 
     const batch = await Batch.findById(id)
     if (!batch) {
@@ -89,6 +112,22 @@ export async function PUT(request: Request, { params }: Props) {
     if (instructor && user.role === 'admin') batch.instructor = instructor
     if (startDate) batch.startDate = new Date(startDate)
     if (endDate) batch.endDate = new Date(endDate)
+    if (joinOpensAt !== undefined) {
+      batch.joinOpensAt = joinOpensAt ? new Date(joinOpensAt) : null
+    }
+    if (joinClosesAt !== undefined) {
+      batch.joinClosesAt = joinClosesAt ? new Date(joinClosesAt) : null
+    }
+    if (
+      batch.joinOpensAt &&
+      batch.joinClosesAt &&
+      !(batch.joinOpensAt.getTime() < batch.joinClosesAt.getTime())
+    ) {
+      return NextResponse.json(
+        { error: 'Join opens must be before join closes.' },
+        { status: 400 },
+      )
+    }
     if (status) batch.status = status
     if (maxStudents !== undefined) batch.maxStudents = Number(maxStudents) || 0
     if (reactivateDate !== undefined) batch.reactivateDate = reactivateDate ? new Date(reactivateDate) : null

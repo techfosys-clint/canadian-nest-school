@@ -74,12 +74,23 @@ export default function CourseFormClient({
         : '',
   );
   const [price, setPrice] = useState<number | ''>(initialData?.price ?? '');
-  const [billingType, setBillingType] = useState<'one_time' | 'monthly'>(
-    initialData?.billingType === 'monthly' ? 'monthly' : 'one_time',
+  const [billingType, setBillingType] = useState<
+    'one_time' | 'monthly' | 'quarterly'
+  >(
+    initialData?.billingType === 'monthly'
+      ? 'monthly'
+      : initialData?.billingType === 'quarterly'
+        ? 'quarterly'
+        : 'one_time',
   );
   const [monthlyFee, setMonthlyFee] = useState<number | ''>(
     initialData?.monthlyFee ?? '',
   );
+  const [quarterlyFee, setQuarterlyFee] = useState<number | ''>(
+    initialData?.quarterlyFee ?? '',
+  );
+  const isRecurringBilling =
+    billingType === 'monthly' || billingType === 'quarterly';
   const [lateFeeEnabled, setLateFeeEnabled] = useState(
     !!initialData?.lateFeeEnabled,
   );
@@ -330,11 +341,15 @@ export default function CourseFormClient({
     instructor: { _id: string; name: string } | null;
     startDate: string;
     endDate: string;
+    joinOpensAt: string | null;
+    joinClosesAt: string | null;
     status: 'upcoming' | 'active' | 'completed';
     students: BatchStudent[];
     maxStudents: number;
     reactivateDate: string | null;
     isAcceptingStudents: boolean;
+    isJoinWindowOpen?: boolean;
+    isOpenForEnrollment?: boolean;
   }
 
   const [batches, setBatches] = useState<BatchItem[]>([]);
@@ -347,6 +362,8 @@ export default function CourseFormClient({
   const [newBatchInstructor, setNewBatchInstructor] = useState('');
   const [newBatchStart, setNewBatchStart] = useState('');
   const [newBatchEnd, setNewBatchEnd] = useState('');
+  const [newBatchJoinOpens, setNewBatchJoinOpens] = useState('');
+  const [newBatchJoinCloses, setNewBatchJoinCloses] = useState('');
   const [newBatchMax, setNewBatchMax] = useState<number | ''>(0);
   const [newBatchReactivate, setNewBatchReactivate] = useState('');
 
@@ -369,11 +386,15 @@ export default function CourseFormClient({
               instructor: b.instructor,
               startDate: b.startDate,
               endDate: b.endDate,
+              joinOpensAt: b.joinOpensAt || null,
+              joinClosesAt: b.joinClosesAt || null,
               status: b.status,
               students: b.students || [],
               maxStudents: b.maxStudents || 0,
               reactivateDate: b.reactivateDate || null,
               isAcceptingStudents: b.isAcceptingStudents,
+              isJoinWindowOpen: b.isJoinWindowOpen,
+              isOpenForEnrollment: b.isOpenForEnrollment,
             })),
           );
         }
@@ -418,12 +439,14 @@ export default function CourseFormClient({
       !newBatchName.trim() ||
       !newBatchInstructor ||
       !newBatchStart ||
-      !newBatchEnd
+      !newBatchEnd ||
+      !newBatchJoinOpens ||
+      !newBatchJoinCloses
     ) {
       Swal.fire({
         icon: 'warning',
         title: 'Missing Fields',
-        text: 'Please fill in batch name, instructor, and dates.',
+        text: 'Please fill in batch name, instructor, class dates, and join window.',
         background: '#ffffff',
         color: '#1a1a1a',
       });
@@ -440,6 +463,8 @@ export default function CourseFormClient({
           instructor: newBatchInstructor,
           startDate: newBatchStart,
           endDate: newBatchEnd,
+          joinOpensAt: newBatchJoinOpens,
+          joinClosesAt: newBatchJoinCloses,
           maxStudents: newBatchMax === '' ? 0 : Number(newBatchMax),
           reactivateDate: newBatchReactivate || undefined,
         }),
@@ -451,6 +476,8 @@ export default function CourseFormClient({
       setNewBatchInstructor('');
       setNewBatchStart('');
       setNewBatchEnd('');
+      setNewBatchJoinOpens('');
+      setNewBatchJoinCloses('');
       setNewBatchMax(0);
       setNewBatchReactivate('');
       setShowAddBatchForm(false);
@@ -907,17 +934,18 @@ export default function CourseFormClient({
     price: Number(price) || 0,
     billingType,
     monthlyFee: billingType === 'monthly' ? Number(monthlyFee) || 0 : undefined,
-    lateFeeEnabled: billingType === 'monthly' ? lateFeeEnabled : false,
+    quarterlyFee:
+      billingType === 'quarterly' ? Number(quarterlyFee) || 0 : undefined,
+    lateFeeEnabled: isRecurringBilling ? lateFeeEnabled : false,
     lateFeeAmount:
-      billingType === 'monthly' && lateFeeEnabled
-        ? Number(lateFeeAmount) || 0
-        : 0,
-    noticeStartOffsetDays:
-      billingType === 'monthly' ? Number(noticeStartOffsetDays) || 0 : 5,
-    noticeEndOffsetDays:
-      billingType === 'monthly' ? Number(noticeEndOffsetDays) || 0 : 2,
-    blockOffsetDays:
-      billingType === 'monthly' ? Number(blockOffsetDays) || 0 : 2,
+      isRecurringBilling && lateFeeEnabled ? Number(lateFeeAmount) || 0 : 0,
+    noticeStartOffsetDays: isRecurringBilling
+      ? Number(noticeStartOffsetDays) || 0
+      : 5,
+    noticeEndOffsetDays: isRecurringBilling
+      ? Number(noticeEndOffsetDays) || 0
+      : 2,
+    blockOffsetDays: isRecurringBilling ? Number(blockOffsetDays) || 0 : 2,
     thumbnail: thumbnailId || null,
     trailerVideoUrl: trailerVideoUrl.trim(),
     categories,
@@ -1852,11 +1880,11 @@ export default function CourseFormClient({
                   Batches
                 </h2>
                 <p className='text-sm font-semibold text-slate-400 mt-1'>
-                  Group enrolled students into intakes with optional seat
-                  limits.
+                  For monthly/quarterly courses, open a batch with a join window
+                  so students can enroll before class starts.
                 </p>
               </div>
-              {savedCourseId && (
+              {savedCourseId && isRecurringBilling && (
                 <button
                   type='button'
                   onClick={() => setShowAddBatchForm((v) => !v)}
@@ -1867,7 +1895,12 @@ export default function CourseFormClient({
               )}
             </div>
 
-            {!savedCourseId ? (
+            {!isRecurringBilling ? (
+              <p className='text-base font-semibold text-slate-400 py-2'>
+                Batches are only used for monthly and quarterly courses. Switch
+                billing type above to enable batch enrollment.
+              </p>
+            ) : !savedCourseId ? (
               <div className='flex flex-col items-center justify-center py-10 gap-3 text-center'>
                 <FiUsers className='h-10 w-10 text-zinc-700' />
                 <p className='text-base font-semibold text-slate-400'>
@@ -1934,6 +1967,33 @@ export default function CourseFormClient({
                           onChange={(e) => setNewBatchEnd(e.target.value)}
                           className='bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none w-full cursor-pointer'
                         />
+                      </div>
+                      <div className='flex flex-col gap-1.5'>
+                        <label className='text-base font-bold text-slate-600'>
+                          Join opens *
+                        </label>
+                        <input
+                          type='datetime-local'
+                          value={newBatchJoinOpens}
+                          onChange={(e) => setNewBatchJoinOpens(e.target.value)}
+                          className='bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none w-full cursor-pointer'
+                        />
+                      </div>
+                      <div className='flex flex-col gap-1.5'>
+                        <label className='text-base font-bold text-slate-600'>
+                          Join closes *
+                        </label>
+                        <input
+                          type='datetime-local'
+                          value={newBatchJoinCloses}
+                          onChange={(e) =>
+                            setNewBatchJoinCloses(e.target.value)
+                          }
+                          className='bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none w-full cursor-pointer'
+                        />
+                        <p className='text-xs font-semibold text-slate-400'>
+                          Students can only enroll between these times.
+                        </p>
                       </div>
                       <div className='flex flex-col gap-1.5'>
                         <label className='text-base font-bold text-slate-600'>
@@ -2025,19 +2085,33 @@ export default function CourseFormClient({
                                   {formatBdDate(batch.startDate)} -{' '}
                                   {formatBdDate(batch.endDate)}
                                 </span>
+                                {batch.joinOpensAt && batch.joinClosesAt && (
+                                  <span className='flex items-center gap-1.5'>
+                                    Join:{' '}
+                                    {new Date(
+                                      batch.joinOpensAt,
+                                    ).toLocaleString()}{' '}
+                                    →{' '}
+                                    {new Date(
+                                      batch.joinClosesAt,
+                                    ).toLocaleString()}
+                                  </span>
+                                )}
                               </div>
                             </div>
 
                             <span
                               className={`inline-block px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider ${
-                                batch.status === 'active'
+                                batch.isOpenForEnrollment
                                   ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-600'
                                   : batch.status === 'completed'
                                     ? 'bg-slate-200 border border-slate-300 text-slate-500'
                                     : 'bg-amber-500/10 border border-amber-500/20 text-amber-600'
                               }`}
                             >
-                              {batch.status}
+                              {batch.isOpenForEnrollment
+                                ? 'Open for join'
+                                : batch.status}
                             </span>
 
                             <span
@@ -2444,15 +2518,23 @@ export default function CourseFormClient({
               </label>
               <select
                 value={billingType}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const v = e.target.value;
                   setBillingType(
-                    e.target.value === 'monthly' ? 'monthly' : 'one_time',
-                  )
-                }
+                    v === 'monthly'
+                      ? 'monthly'
+                      : v === 'quarterly'
+                        ? 'quarterly'
+                        : 'one_time',
+                  );
+                }}
                 className='bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer'
               >
                 <option value='one_time'>One-time purchase (lifetime)</option>
                 <option value='monthly'>Monthly subscription (30 days)</option>
+                <option value='quarterly'>
+                  Quarterly subscription (calendar quarters)
+                </option>
               </select>
             </div>
 
@@ -2476,23 +2558,47 @@ export default function CourseFormClient({
               </div>
             ) : (
               <div className='space-y-4'>
-                <div className='flex flex-col gap-2'>
-                  <label className='text-base font-bold text-slate-600'>
-                    Monthly fee (BDT)
-                  </label>
-                  <input
-                    type='number'
-                    min={0}
-                    value={monthlyFee}
-                    onChange={(e) =>
-                      setMonthlyFee(
-                        e.target.value === '' ? '' : Number(e.target.value),
-                      )
-                    }
-                    placeholder='1500'
-                    className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
-                  />
-                </div>
+                {billingType === 'monthly' ? (
+                  <div className='flex flex-col gap-2'>
+                    <label className='text-base font-bold text-slate-600'>
+                      Monthly fee (BDT)
+                    </label>
+                    <input
+                      type='number'
+                      min={0}
+                      value={monthlyFee}
+                      onChange={(e) =>
+                        setMonthlyFee(
+                          e.target.value === '' ? '' : Number(e.target.value),
+                        )
+                      }
+                      placeholder='1500'
+                      className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
+                    />
+                  </div>
+                ) : (
+                  <div className='flex flex-col gap-2'>
+                    <label className='text-base font-bold text-slate-600'>
+                      Quarterly fee (BDT)
+                    </label>
+                    <input
+                      type='number'
+                      min={0}
+                      value={quarterlyFee}
+                      onChange={(e) =>
+                        setQuarterlyFee(
+                          e.target.value === '' ? '' : Number(e.target.value),
+                        )
+                      }
+                      placeholder='4000'
+                      className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
+                    />
+                  </div>
+                )}
+                <p className='text-base font-semibold text-slate-500'>
+                  Students can enroll only while a batch join window is open.
+                  They are auto-assigned to that batch (no picker).
+                </p>
                 <div className='flex items-center gap-3'>
                   <input
                     type='checkbox'

@@ -1,12 +1,18 @@
+import { assignStudentToBatch } from '@/lib/batches/assignStudent'
 import { Coupon } from '@/lib/db/models/Coupon'
 import { Course } from '@/lib/db/models/Course'
+import { Batch } from '@/lib/db/models/Batch'
 import { Enrollment, type IEnrollment } from '@/lib/db/models/Enrollment'
 import { Student } from '@/lib/db/models/Student'
 import { User } from '@/lib/db/models/User'
 import { verifyEpsTransaction } from '@/lib/eps'
 import { epsAmountsMatch } from '@/lib/payments/epsAmount'
 import { normalizeEpsStatus } from '@/lib/payments/epsStatus'
-import { initialPaidUntil } from '@/lib/subscriptions/billing'
+import {
+  initialPaidUntil,
+  initialQuarterlyPaidUntil,
+  isRecurringCourse,
+} from '@/lib/subscriptions/billing'
 
 export type CompletePaidEnrollmentResult =
   | 'completed'
@@ -60,11 +66,23 @@ export async function completePaidEnrollment(
     const courseForBilling = await Course.findById(enrollment.course)
       .select('billingType title')
       .lean()
-    const isMonthly = courseForBilling?.billingType === 'monthly'
-    const now = new Date()
-    const paidUntil = isMonthly ? initialPaidUntil(now) : undefined
 
-    // Only one worker may transition into completed and run side effects.
+    const billingType = courseForBilling?.billingType || 'one_time'
+    const isRecurring = isRecurringCourse(courseForBilling)
+    const now = new Date()
+
+    let paidUntil: Date | undefined
+    if (billingType === 'monthly') {
+      paidUntil = initialPaidUntil(now)
+    } else if (billingType === 'quarterly') {
+      let batchEnd = now
+      if (enrollment.batch) {
+        const batch = await Batch.findById(enrollment.batch).select('endDate').lean()
+        if (batch?.endDate) batchEnd = new Date(batch.endDate)
+      }
+      paidUntil = initialQuarterlyPaidUntil(batchEnd)
+    }
+
     const claimed = await Enrollment.findOneAndUpdate(
       {
         _id: enrollment._id,
@@ -74,9 +92,9 @@ export async function completePaidEnrollment(
         $set: {
           paymentStatus: 'completed',
           paymentReference,
-          ...(isMonthly
+          ...(isRecurring
             ? {
-                billingType: 'monthly',
+                billingType,
                 paidUntil,
                 billingCycleAnchor: now,
                 accessStatus: 'active',
@@ -94,11 +112,20 @@ export async function completePaidEnrollment(
 
     enrollment.paymentStatus = 'completed'
     enrollment.paymentReference = claimed.paymentReference
-    if (isMonthly) {
-      enrollment.billingType = 'monthly'
+    if (isRecurring) {
+      enrollment.billingType = billingType as 'monthly' | 'quarterly'
       enrollment.paidUntil = paidUntil
       enrollment.billingCycleAnchor = now
       enrollment.accessStatus = 'active'
+    }
+
+    if (isRecurring && claimed.batch) {
+      await assignStudentToBatch({
+        batchId: claimed.batch.toString(),
+        studentId: claimed.student.toString(),
+        courseId: claimed.course.toString(),
+        force: true,
+      })
     }
 
     if (previousStatus === 'failed' && claimed.couponCode) {
@@ -112,7 +139,8 @@ export async function completePaidEnrollment(
     if (!student) {
       student = await User.findById(claimed.student).lean()
     }
-    const course = courseForBilling || (await Course.findById(claimed.course).lean())
+    const course =
+      courseForBilling || (await Course.findById(claimed.course).lean())
 
     if (student?.email && course) {
       const { sendEnrollmentConfirmationEmail } = await import('@/lib/email')
@@ -142,7 +170,6 @@ export async function completePaidEnrollment(
     )
 
     enrollment.paymentStatus = 'failed'
-    // Release coupon only when this worker actually transitioned → failed.
     if (failed?.couponCode) {
       await Coupon.updateOne(
         { code: failed.couponCode },

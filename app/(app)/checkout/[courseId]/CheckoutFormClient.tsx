@@ -23,11 +23,21 @@ interface CourseData {
   title: string;
   summary: string;
   price: number;
-  billingType?: 'one_time' | 'monthly';
+  billingType?: 'one_time' | 'monthly' | 'quarterly';
+  requiresBatch?: boolean;
   imageUrl: string;
   instructorName: string;
   categoryName: string;
   slug: string;
+}
+
+interface OpenBatchInfo {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  joinClosesAt: string;
+  seatsLeft: number | null;
 }
 
 interface UserSession {
@@ -83,6 +93,36 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
   // Pop-up free inline alert states
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [checkoutSuccess, setCheckoutSuccess] = useState<string | null>(null);
+
+  /** The single batch whose join window is open (if any). */
+  const [openBatch, setOpenBatch] = useState<OpenBatchInfo | null>(null);
+  const [batchesLoading, setBatchesLoading] = useState(!!course.requiresBatch);
+
+  useEffect(() => {
+    if (!course.requiresBatch) {
+      setBatchesLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setBatchesLoading(true);
+    fetch(`/api/courses/${course.id}/open-batches`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (cancelled) return;
+        const list = data.batches || [];
+        // Join windows do not overlap — take the open batch if present.
+        setOpenBatch(list[0] || null);
+      })
+      .catch(() => {
+        if (!cancelled) setOpenBatch(null);
+      })
+      .finally(() => {
+        if (!cancelled) setBatchesLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [course.id, course.requiresBatch]);
 
   // Check login session on mount
   useEffect(() => {
@@ -211,11 +251,25 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
   discountAmount = Math.min(discountAmount, basePrice);
   const finalPrice = Math.max(0, basePrice - discountAmount);
 
+  const periodSuffix =
+    course.billingType === 'monthly'
+      ? '/mo'
+      : course.billingType === 'quarterly'
+        ? '/qtr'
+        : '';
+
   // Complete course purchase / checkout
   const handleCompletePurchase = async (e: React.FormEvent) => {
     e.preventDefault();
     setCheckoutError(null);
     setCheckoutSuccess(null);
+
+    if (course.requiresBatch && !openBatch) {
+      setCheckoutError(
+        'Enrollment is closed. No batch join window is open right now. Please check back when the admin opens a batch.',
+      );
+      return;
+    }
 
     setPurchaseLoading(true);
     try {
@@ -419,10 +473,43 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                   )}
                 </div>
 
+                {course.requiresBatch && (
+                  <div className='space-y-2 border border-zinc-200/80 rounded-lg p-4 bg-zinc-50'>
+                    {batchesLoading ? (
+                      <p className='text-base font-semibold text-zinc-500'>
+                        Checking batch availability…
+                      </p>
+                    ) : openBatch ? (
+                      <>
+                        <p className='text-base font-bold text-zinc-800'>
+                          Joining: {openBatch.name}
+                        </p>
+                        <p className='text-base font-semibold text-zinc-500'>
+                          Class:{' '}
+                          {new Date(openBatch.startDate).toLocaleDateString()} –{' '}
+                          {new Date(openBatch.endDate).toLocaleDateString()}
+                          {openBatch.joinClosesAt
+                            ? ` · Join closes ${new Date(openBatch.joinClosesAt).toLocaleString()}`
+                            : ''}
+                        </p>
+                      </>
+                    ) : (
+                      <p className='text-base font-semibold text-rose-600'>
+                        Enrollment is closed. No batch join window is open
+                        right now.
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 <button
                   type='submit'
-                  disabled={purchaseLoading}
-                  className='w-full flex items-center justify-center gap-2 py-4 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all select-none cursor-pointer'
+                  disabled={
+                    purchaseLoading ||
+                    (course.requiresBatch &&
+                      (batchesLoading || !openBatch))
+                  }
+                  className='w-full flex items-center justify-center gap-2 py-4 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all select-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
                 >
                   {purchaseLoading ? (
                     <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
@@ -432,14 +519,14 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                       <span>
                         {course.billingType === 'monthly'
                           ? 'Start monthly subscription ('
-                          : 'Complete Course Purchase ('}
+                          : course.billingType === 'quarterly'
+                            ? 'Start quarterly subscription ('
+                            : 'Complete Course Purchase ('}
                         {!finalPrice || finalPrice === 0
                           ? 'Free'
                           : `৳${finalPrice.toLocaleString('en-BD')}`}
-                        {course.billingType === 'monthly' &&
-                        finalPrice &&
-                        finalPrice > 0
-                          ? '/mo'
+                        {periodSuffix && finalPrice && finalPrice > 0
+                          ? periodSuffix
                           : ''}
                         )
                       </span>
@@ -497,14 +584,14 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                   <span>
                     {course.billingType === 'monthly'
                       ? 'First month fee'
-                      : 'Base Course Price'}
+                      : course.billingType === 'quarterly'
+                        ? 'First quarter fee'
+                        : 'Base Course Price'}
                   </span>
                   <span className='font-bold text-zinc-800'>
                     {!basePrice || basePrice === 0
                       ? 'Free'
-                      : `৳${basePrice.toLocaleString('en-BD')}${
-                          course.billingType === 'monthly' ? '/mo' : ''
-                        }`}
+                      : `৳${basePrice.toLocaleString('en-BD')}${periodSuffix}`}
                   </span>
                 </div>
 

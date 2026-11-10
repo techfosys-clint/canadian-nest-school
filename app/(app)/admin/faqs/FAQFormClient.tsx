@@ -9,6 +9,8 @@ interface FAQFormProps {
     id: string
     question: string
     answer: string
+    questionBn?: string
+    answerBn?: string
     order: number
     isActive: boolean
   }
@@ -20,6 +22,8 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
 
   const [question, setQuestion] = useState(initialData?.question || '')
   const [answer, setAnswer] = useState(initialData?.answer || '')
+  const [questionBn, setQuestionBn] = useState(initialData?.questionBn || '')
+  const [answerBn, setAnswerBn] = useState(initialData?.answerBn || '')
   const [order, setOrder] = useState(initialData?.order || 0)
   const [isActive, setIsActive] = useState(initialData ? initialData.isActive : true)
   const [saving, setSaving] = useState(false)
@@ -27,11 +31,11 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
 
-    if (!question.trim() || !answer.trim()) {
+    if (!questionBn.trim() || !answerBn.trim()) {
       Swal.fire({
         icon: 'warning',
         title: 'Validation Error',
-        text: 'Question and answer are required.',
+        text: 'Bangla question and answer are required. English fields are optional.',
         background: '#ffffff',
         color: '#1a1a1a',
       })
@@ -41,9 +45,28 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
     setSaving(true)
     try {
       const method = isEditMode ? 'PUT' : 'POST'
+      const resolvedQuestionBn = questionBn.trim()
+      const resolvedAnswerBn = answerBn.trim()
+      const resolvedQuestion = question.trim() || resolvedQuestionBn
+      const resolvedAnswer = answer.trim() || resolvedAnswerBn
       const body = isEditMode
-        ? { id: initialData?.id, question, answer, order, isActive }
-        : { question, answer, order, isActive }
+        ? {
+            id: initialData?.id,
+            question: resolvedQuestion,
+            answer: resolvedAnswer,
+            questionBn: resolvedQuestionBn,
+            answerBn: resolvedAnswerBn,
+            order,
+            isActive,
+          }
+        : {
+            question: resolvedQuestion,
+            answer: resolvedAnswer,
+            questionBn: resolvedQuestionBn,
+            answerBn: resolvedAnswerBn,
+            order,
+            isActive,
+          }
 
       const res = await fetch('/api/admin/faqs', {
         method,
@@ -107,25 +130,58 @@ export default function FAQFormClient({ initialData }: FAQFormProps) {
           <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-5">
             <h2 className="text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-3">FAQ Content</h2>
 
-            {/* Question */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-slate-600">Question *</label>
+              <label className="text-base font-bold text-slate-600">
+                Question (Bangla) *
+              </label>
               <input
                 type="text"
                 required
+                value={questionBn}
+                onChange={(e) => setQuestionBn(e.target.value)}
+                placeholder="বাংলা প্রশ্ন…"
+                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                lang="bn"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-base font-bold text-slate-600">
+                Answer (Bangla) *
+              </label>
+              <textarea
+                required
+                rows={6}
+                value={answerBn}
+                onChange={(e) => setAnswerBn(e.target.value)}
+                placeholder="বাংলা উত্তর…"
+                className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors resize-none"
+                lang="bn"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2 pt-2 border-t border-slate-100">
+              <label className="text-base font-bold text-slate-600">
+                Question (English) — optional
+              </label>
+              <input
+                type="text"
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 placeholder="e.g. How do I access my course after purchase?"
                 className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
               />
+              <p className="text-base font-semibold text-slate-500">
+                If empty, the English site shows the Bangla question.
+              </p>
             </div>
 
-            {/* Answer */}
             <div className="flex flex-col gap-2">
-              <label className="text-base font-bold text-slate-600">Answer *</label>
+              <label className="text-base font-bold text-slate-600">
+                Answer (English) — optional
+              </label>
               <textarea
-                required
-                rows={6}
+                rows={4}
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
                 placeholder="Provide a clear, helpful answer..."

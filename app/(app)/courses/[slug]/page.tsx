@@ -14,6 +14,10 @@ import '@/lib/db/models/Media';
 import { Review } from '@/lib/db/models/Review';
 import '@/lib/db/models/Student';
 import { connectToDatabase } from '@/lib/db/mongodb';
+import { getLocale } from '@/lib/i18n/getLocale';
+import { getMessages } from '@/lib/i18n/getMessages';
+import { localizeCourseDoc, localizeFaqDoc } from '@/lib/i18n/localizeCourse';
+import { localizedPath } from '@/lib/i18n/path';
 import { isRichTextEmpty } from '@/lib/richText';
 import { getYoutubeOrVimeoEmbedUrl } from '@/lib/videoEmbed';
 import { cookies } from 'next/headers';
@@ -38,24 +42,17 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-function getLevelLabel(level: string): string {
-  const map: Record<string, string> = {
-    all: 'All Levels',
-    beginner: 'Beginner',
-    intermediate: 'Intermediate',
-    advanced: 'Advanced',
-  };
-  return map[level] ?? 'All Levels';
-}
-
 function formatPrice(
   price?: number | null,
   billingType?: 'one_time' | 'monthly' | 'quarterly',
+  freeLabel = 'Free',
+  perMonth = '/mo',
+  perQuarter = '/qtr',
 ) {
-  if (!price || price === 0) return 'Free';
+  if (!price || price === 0) return freeLabel;
   const base = `৳${price.toLocaleString('en-BD')}`;
-  if (billingType === 'monthly') return `${base}/mo`;
-  if (billingType === 'quarterly') return `${base}/qtr`;
+  if (billingType === 'monthly') return `${base}${perMonth}`;
+  if (billingType === 'quarterly') return `${base}${perQuarter}`;
   return base;
 }
 
@@ -92,12 +89,17 @@ function StarDisplay({ rating }: { rating: number }) {
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
+  const locale = await getLocale();
   await connectToDatabase();
-  const course = await Course.findOne({ slug, status: 'published' }).lean();
+  const course = (await Course.findOne({
+    slug,
+    status: 'published',
+  }).lean()) as any;
   if (!course) return { title: 'Course Not Found' };
+  const localized = localizeCourseDoc(course, locale);
   return {
-    title: `${course.title} - Canadian Nest School`,
-    description: course.summary,
+    title: `${localized.seo.metaTitle} - Canadian Nest School`,
+    description: localized.seo.metaDescription,
   };
 }
 
@@ -107,6 +109,9 @@ export const dynamic = 'force-dynamic';
 
 export default async function CourseDetailPage({ params }: Props) {
   const { slug } = await params;
+  const locale = await getLocale();
+  const t = getMessages(locale).courses;
+  const nav = getMessages(locale).nav;
   await connectToDatabase();
 
   // Fetch course
@@ -123,18 +128,27 @@ export default async function CourseDetailPage({ params }: Props) {
 
   if (!course) notFound();
 
-  const isMonthly = course.billingType === 'monthly'
-  const isQuarterly = course.billingType === 'quarterly'
+  const localized = localizeCourseDoc(course, locale);
+  const courseTitle = localized.title;
+  const courseSummary = localized.summary;
+  const courseDescription = localized.description;
+  const whatYouWillLearn = localized.whatYouWillLearn;
+  const requirements = localized.requirements;
+
+  const isMonthly = course.billingType === 'monthly';
+  const isQuarterly = course.billingType === 'quarterly';
   const displayPrice = isMonthly
     ? Number(course.monthlyFee || 0)
     : isQuarterly
       ? Number(course.quarterlyFee || 0)
-      : Number(course.price || 0)
+      : Number(course.price || 0);
   const displayBillingType = isMonthly
     ? ('monthly' as const)
     : isQuarterly
       ? ('quarterly' as const)
-      : ('one_time' as const)
+      : ('one_time' as const);
+  const levelLabel =
+    t.levels[(course.level as keyof typeof t.levels) || 'all'] || t.levels.all;
 
   // ─── Session and Enrollment Check ───
   const cookieStore = await cookies();
@@ -180,20 +194,21 @@ export default async function CourseDetailPage({ params }: Props) {
   ]);
 
   const pageFaqs = useCourseFaqs
-    ? (course.courseFaqs || [])
-        .filter((f: any) => f?.question && f?.answer)
-        .map((f: any, i: number) => ({
-          id: `course-faq-${i}`,
-          question: f.question,
-          answer: f.answer,
-        }))
-    : (globalFaqDocs as any[]).map((f) => ({
-        id: f._id.toString(),
+    ? localized.courseFaqs.map((f, i) => ({
+        id: `course-faq-${i}`,
         question: f.question,
         answer: f.answer,
-        order: f.order,
-        isActive: f.isActive,
-      }));
+      }))
+    : (globalFaqDocs as any[]).map((f) => {
+        const loc = localizeFaqDoc(f, locale);
+        return {
+          id: f._id.toString(),
+          question: loc.question,
+          answer: loc.answer,
+          order: f.order,
+          isActive: f.isActive,
+        };
+      });
 
   const lessonCount = lessonsDocs.length;
   const reviews = reviewsDocs as any[];
@@ -254,7 +269,7 @@ export default async function CourseDetailPage({ params }: Props) {
             items: [
               {
                 item_id: course._id.toString(),
-                item_name: course.title,
+                item_name: courseTitle,
                 item_category: categoryName,
                 price: displayPrice,
               },
@@ -273,21 +288,21 @@ export default async function CourseDetailPage({ params }: Props) {
       <div className='relative border-b border-zinc-200/80 bg-linear-to-r from-[#FAF9FF] to-[#F5F3FF] select-text z-10'>
         <div className='container mx-auto px-6 py-4 flex flex-wrap items-center gap-2 text-base font-semibold text-zinc-500'>
           <Link
-            href='/'
+            href={localizedPath('/', locale)}
             className='hover:text-[#E61C24] transition-colors flex items-center gap-1'
           >
-            Home
+            {nav.home}
           </Link>
           <FiChevronRight className='h-4 w-4 text-zinc-400 shrink-0' />
           <Link
-            href='/courses'
+            href={localizedPath('/courses', locale)}
             className='hover:text-[#E61C24] transition-colors'
           >
-            Courses
+            {nav.courses}
           </Link>
           <FiChevronRight className='h-4 w-4 text-zinc-400 shrink-0' />
           <span className='text-zinc-800 font-bold line-clamp-1'>
-            {course.title}
+            {courseTitle}
           </span>
         </div>
       </div>
@@ -315,11 +330,11 @@ export default async function CourseDetailPage({ params }: Props) {
           {/* Left Side: Course Metadata & Main Info */}
           <div className='lg:col-span-8 space-y-6'>
             <Link
-              href='/courses'
+              href={localizedPath('/courses', locale)}
               className='inline-flex items-center gap-2 text-base font-bold text-zinc-400 hover:text-white transition-colors group'
             >
               <FiArrowLeft className='h-4.5 w-4.5 transition-transform group-hover:-translate-x-0.5' />
-              <span>Back to Courses</span>
+              <span>{t.backToCourses}</span>
             </Link>
 
             {/* Badges */}
@@ -330,18 +345,18 @@ export default async function CourseDetailPage({ params }: Props) {
                 </span>
               )}
               <span className='px-3.5 py-1.5 bg-white/8 border border-white/12 text-zinc-300 rounded-lg font-bold text-base uppercase tracking-wide'>
-                {getLevelLabel(course.level)}
+                {levelLabel}
               </span>
             </div>
 
             {/* Course Title */}
             <h1 className='text-3xl sm:text-4xl md:text-5xl font-bold font-display leading-[1.2] tracking-tight text-white'>
-              {course.title}
+              {courseTitle}
             </h1>
 
             {/* Course Summary */}
             <p className='text-lg sm:text-xl font-semibold text-zinc-300 leading-relaxed max-w-3xl'>
-              {course.summary}
+              {courseSummary}
             </p>
 
             {/* Course Meta Stats Row */}
@@ -362,7 +377,7 @@ export default async function CourseDetailPage({ params }: Props) {
               )}
               <span className='flex items-center gap-2'>
                 <FiAward className='h-5 w-5 text-[#E61C24] shrink-0' />
-                <span>{getLevelLabel(course.level)}</span>
+                <span>{levelLabel}</span>
               </span>
               {reviews.length > 0 && (
                 <span className='flex items-center gap-1.5 bg-white/5 border border-white/10 px-2.5 py-0.5 rounded-lg'>
@@ -710,7 +725,12 @@ export default async function CourseDetailPage({ params }: Props) {
                   <span
                     className={`text-4xl font-bold ${displayPrice === 0 ? 'text-emerald-600' : 'text-[#E61C24]'}`}
                   >
-                    {formatPrice(displayPrice, displayBillingType)}
+                    {formatPrice(
+                      displayPrice,
+                      displayBillingType,
+                      t.free,
+                      t.perMonth,
+                    )}
                   </span>
                 </div>
               </div>
@@ -753,7 +773,7 @@ export default async function CourseDetailPage({ params }: Props) {
 
                 <div className='flex items-center gap-3 text-base font-semibold text-zinc-600'>
                   <FiAward className='h-5 w-5 text-[#E61C24] shrink-0' />
-                  <span>{getLevelLabel(course.level)} material</span>
+                  <span>{levelLabel} material</span>
                 </div>
 
                 <div className='flex items-center gap-3 text-base font-semibold text-zinc-600'>

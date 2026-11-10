@@ -2,9 +2,13 @@ import mongoose, { Schema, Document } from 'mongoose'
 
 export interface ICourse extends Document {
   title: string
+  /** Bangla title — primary content. English `title` is optional and falls back to this. */
+  titleBn?: string
   slug: string
   summary?: string
+  summaryBn?: string
   description?: any // Lexical JSON
+  descriptionBn?: any
   price?: number
   thumbnail?: mongoose.Types.ObjectId | string
   category?: mongoose.Types.ObjectId | string
@@ -16,11 +20,15 @@ export interface ICourse extends Document {
   level?: 'all' | 'beginner' | 'intermediate' | 'advanced'
   meetingLink?: string
   whatYouWillLearn?: Array<{ outcome: string }>
+  whatYouWillLearnBn?: Array<{ outcome: string }>
   requirements?: Array<{ requirement: string }>
+  requirementsBn?: Array<{ requirement: string }>
   seo?: {
     metaTitle?: string
     metaDescription?: string
     keywords?: string
+    metaTitleBn?: string
+    metaDescriptionBn?: string
   }
   studyMaterials?: Array<{
     title: string
@@ -48,15 +56,23 @@ export interface ICourse extends Document {
    * global = site FAQs; course = courseFaqs only (hidden if empty).
    */
   faqSource?: 'global' | 'course'
-  courseFaqs?: Array<{ question: string; answer: string }>
+  courseFaqs?: Array<{
+    question: string
+    answer: string
+    questionBn?: string
+    answerBn?: string
+  }>
 }
 
 const CourseSchema = new Schema<ICourse>(
   {
     title: { type: String, required: true },
+    titleBn: { type: String, default: '' },
     slug: { type: String, required: true, unique: true },
     summary: { type: String },
+    summaryBn: { type: String, default: '' },
     description: { type: Schema.Types.Mixed }, // Lexical JSON structure
+    descriptionBn: { type: Schema.Types.Mixed },
     price: { type: Number, min: 0 },
     thumbnail: { type: Schema.Types.ObjectId, ref: 'Media' },
     category: { type: Schema.Types.ObjectId, ref: 'Category' },
@@ -72,7 +88,17 @@ const CourseSchema = new Schema<ICourse>(
         outcome: { type: String, required: true },
       },
     ],
+    whatYouWillLearnBn: [
+      {
+        outcome: { type: String, required: true },
+      },
+    ],
     requirements: [
+      {
+        requirement: { type: String, required: true },
+      },
+    ],
+    requirementsBn: [
       {
         requirement: { type: String, required: true },
       },
@@ -81,6 +107,8 @@ const CourseSchema = new Schema<ICourse>(
       metaTitle: String,
       metaDescription: String,
       keywords: String,
+      metaTitleBn: String,
+      metaDescriptionBn: String,
     },
     studyMaterials: [
       {
@@ -113,6 +141,8 @@ const CourseSchema = new Schema<ICourse>(
       {
         question: { type: String, required: true },
         answer: { type: String, required: true },
+        questionBn: { type: String, default: '' },
+        answerBn: { type: String, default: '' },
       },
     ],
   },
@@ -128,7 +158,8 @@ if (
     !mongoose.models.Course.schema.paths.billingType ||
     !mongoose.models.Course.schema.paths.trailerVideoUrl ||
     !mongoose.models.Course.schema.paths.faqSource ||
-    !mongoose.models.Course.schema.paths.quarterlyFee)
+    !mongoose.models.Course.schema.paths.quarterlyFee ||
+    !mongoose.models.Course.schema.paths.titleBn)
 ) {
   delete mongoose.models.Course
 }

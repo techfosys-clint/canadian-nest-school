@@ -299,9 +299,12 @@ export async function PUT(
     const body = await request.json()
     const {
       title,
+      titleBn,
       slug,
       summary,
+      summaryBn,
       description,
+      descriptionBn,
       price,
       billingType,
       monthlyFee,
@@ -321,20 +324,27 @@ export async function PUT(
       duration,
       level,
       whatYouWillLearn,
+      whatYouWillLearnBn,
       requirements,
+      requirementsBn,
       seo,
       studyMaterials,
       modules,
       moduleRenames,
     } = body
 
-    if (!title || !slug) {
+    const resolvedTitleBn =
+      typeof titleBn === 'string' ? titleBn.trim() : ''
+    const resolvedTitle =
+      (typeof title === 'string' ? title.trim() : '') || resolvedTitleBn
+
+    if (!resolvedTitleBn || !slug) {
       return NextResponse.json(
         {
           success: false,
           error: 'Missing required parameters',
           code: 'VALIDATION_ERROR',
-          message: 'Required fields: title, slug.',
+          message: 'Required fields: titleBn (Bangla title), slug. English title is optional.',
         },
         { status: 400 }
       )
@@ -393,10 +403,13 @@ export async function PUT(
     const isRecurring =
       resolvedBillingType === 'monthly' || resolvedBillingType === 'quarterly'
 
-    course.title = title
+    course.title = resolvedTitle
+    course.titleBn = resolvedTitleBn
     course.slug = slug
     course.summary = summary
+    course.summaryBn = typeof summaryBn === 'string' ? summaryBn.trim() : ''
     course.description = description
+    course.descriptionBn = descriptionBn ?? ''
     course.price = price ? Number(price) : undefined
     course.billingType = resolvedBillingType
     course.monthlyFee =
@@ -431,7 +444,9 @@ export async function PUT(
     course.duration = duration
     course.level = level || course.level
     course.whatYouWillLearn = whatYouWillLearn || []
+    course.whatYouWillLearnBn = whatYouWillLearnBn || []
     course.requirements = requirements || []
+    course.requirementsBn = requirementsBn || []
     course.seo = seo || {}
     course.studyMaterials = studyMaterials || []
     course.modules = modules || []
@@ -451,6 +466,8 @@ export async function PUT(
             .map((f: any) => ({
               question: String(f.question).trim(),
               answer: String(f.answer).trim(),
+              questionBn: String(f.questionBn || '').trim(),
+              answerBn: String(f.answerBn || '').trim(),
             }))
         : []
     }

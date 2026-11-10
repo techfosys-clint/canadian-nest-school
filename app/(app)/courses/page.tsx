@@ -6,11 +6,9 @@ import { Review } from '@/lib/db/models/Review'
 import { Enrollment } from '@/lib/db/models/Enrollment'
 import type { CourseDoc, CategoryDoc } from '@/components/Courses'
 import CoursesPageClient from '@/components/CoursesPageClient'
-
-export const metadata = {
-  title: 'All Courses - Canadian Nest',
-  description: 'Browse all premium courses on Canadian Nest. Filter by category, level, and price.',
-}
+import { getLocale } from '@/lib/i18n/getLocale'
+import { localizeCourseDoc } from '@/lib/i18n/localizeCourse'
+import { getMessages } from '@/lib/i18n/getMessages'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,7 +16,17 @@ type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
+export async function generateMetadata() {
+  const locale = await getLocale()
+  const t = getMessages(locale).courses
+  return {
+    title: `${t.pageTitle} - Canadian Nest`,
+    description: t.pageSubtitle,
+  }
+}
+
 export default async function CoursesPage({ searchParams }: Props) {
+  const locale = await getLocale()
   const resolvedParams = await searchParams
   const categoryParam = typeof resolvedParams?.category === 'string' ? resolvedParams.category : 'all'
 
@@ -55,11 +63,12 @@ export default async function CoursesPage({ searchParams }: Props) {
 
   const courses: CourseDoc[] = coursesDocs.map((doc: any) => {
     const cid = doc._id.toString()
+    const localized = localizeCourseDoc(doc, locale)
     return {
       id: cid,
-      title: doc.title,
+      title: localized.title,
       slug: doc.slug,
-      summary: doc.summary,
+      summary: localized.summary,
       price:
         doc.billingType === 'monthly'
           ? Number(doc.monthlyFee || 0)

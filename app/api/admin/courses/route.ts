@@ -137,9 +137,12 @@ export async function POST(request: Request) {
     const body = await request.json()
     const {
       title,
+      titleBn,
       slug,
       summary,
+      summaryBn,
       description,
+      descriptionBn,
       price,
       billingType,
       monthlyFee,
@@ -159,19 +162,26 @@ export async function POST(request: Request) {
       duration,
       level,
       whatYouWillLearn,
+      whatYouWillLearnBn,
       requirements,
+      requirementsBn,
       seo,
       studyMaterials,
       modules,
     } = body
 
-    if (!title || !slug) {
+    const resolvedTitleBn =
+      typeof titleBn === 'string' ? titleBn.trim() : ''
+    const resolvedTitle =
+      (typeof title === 'string' ? title.trim() : '') || resolvedTitleBn
+
+    if (!resolvedTitleBn || !slug) {
       return NextResponse.json(
         {
           success: false,
           error: 'Missing required parameters',
           code: 'VALIDATION_ERROR',
-          message: 'Required fields: title, slug.',
+          message: 'Required fields: titleBn (Bangla title), slug. English title is optional.',
         },
         { status: 400 }
       )
@@ -232,10 +242,13 @@ export async function POST(request: Request) {
       resolvedBillingType === 'monthly' || resolvedBillingType === 'quarterly'
 
     const newCourse = new Course({
-      title,
+      title: resolvedTitle,
+      titleBn: resolvedTitleBn,
       slug,
       summary,
+      summaryBn: typeof summaryBn === 'string' ? summaryBn.trim() : '',
       description,
+      descriptionBn: descriptionBn ?? '',
       price: price ? Number(price) : undefined,
       billingType: resolvedBillingType,
       monthlyFee:
@@ -270,6 +283,8 @@ export async function POST(request: Request) {
             .map((f: any) => ({
               question: String(f.question).trim(),
               answer: String(f.answer).trim(),
+              questionBn: String(f.questionBn || '').trim(),
+              answerBn: String(f.answerBn || '').trim(),
             }))
         : [],
       thumbnail,
@@ -281,7 +296,9 @@ export async function POST(request: Request) {
       duration,
       level: level || 'all',
       whatYouWillLearn: whatYouWillLearn || [],
+      whatYouWillLearnBn: whatYouWillLearnBn || [],
       requirements: requirements || [],
+      requirementsBn: requirementsBn || [],
       seo: seo || {},
       studyMaterials: studyMaterials || [],
       modules: modules || [],

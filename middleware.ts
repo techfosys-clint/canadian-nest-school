@@ -1,26 +1,71 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
+import { isLocaleExcludedPath } from '@/lib/i18n/config'
+import { stripLocalePrefix } from '@/lib/i18n/path'
 
-/**
- * Authenticated pages must never be cached by the browser or any proxy.
- * Without this, a logged-out user can press Back (or reopen a tab) and see
- * a cached copy of the dashboard / course player from their old session.
- */
-export function middleware() {
-  const response = NextResponse.next()
+const NO_CACHE_PREFIXES = [
+  '/dashboard',
+  '/admin',
+  '/checkout',
+  '/shop-checkout',
+]
 
-  response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
+function needsNoStore(pathname: string): boolean {
+  if (pathname.startsWith('/courses/') && pathname.endsWith('/watch')) {
+    return true
+  }
+  return NO_CACHE_PREFIXES.some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`),
+  )
+}
+
+function applyNoStore(response: NextResponse) {
+  response.headers.set(
+    'Cache-Control',
+    'no-store, no-cache, must-revalidate, private',
+  )
   response.headers.set('Pragma', 'no-cache')
   response.headers.set('Expires', '0')
+}
 
+/**
+ * Locale routing (10MS-style):
+ * - Bangla (default): `/courses/...`
+ * - English: `/en/courses/...` → rewrite to `/courses/...` + `x-locale: en`
+ *
+ * Auth pages keep no-store headers so back-button cache cannot leak sessions.
+ */
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  // `/en/...` on excluded routes → redirect to unprefixed path
+  if (pathname === '/en' || pathname.startsWith('/en/')) {
+    const bare = stripLocalePrefix(pathname)
+    if (isLocaleExcludedPath(bare)) {
+      const url = request.nextUrl.clone()
+      url.pathname = bare
+      return NextResponse.redirect(url)
+    }
+
+    const url = request.nextUrl.clone()
+    url.pathname = bare
+    const response = NextResponse.rewrite(url)
+    response.headers.set('x-locale', 'en')
+    if (needsNoStore(bare)) applyNoStore(response)
+    return response
+  }
+
+  const response = NextResponse.next()
+  response.headers.set('x-locale', 'bn')
+  if (needsNoStore(pathname)) applyNoStore(response)
   return response
 }
 
 export const config = {
   matcher: [
-    '/dashboard/:path*',
-    '/admin/:path*',
-    '/checkout/:path*',
-    '/shop-checkout/:path*',
-    '/courses/:slug/watch',
+    /*
+     * Match all pathnames except static assets and Next internals.
+     * Locale rewrite + auth no-store both run here.
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)',
   ],
 }

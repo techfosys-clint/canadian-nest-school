@@ -63,14 +63,24 @@ export default function CourseFormClient({
 
   // State parameters matching course schema
   const [title, setTitle] = useState(initialData?.title || '');
+  const [titleBn, setTitleBn] = useState(initialData?.titleBn || '');
   const [slug, setSlug] = useState(initialData?.slug || '');
   const [summary, setSummary] = useState(initialData?.summary || '');
+  const [summaryBn, setSummaryBn] = useState(initialData?.summaryBn || '');
   const [description, setDescription] = useState(
     typeof initialData?.description === 'string'
       ? initialData.description
       : typeof initialData?.description === 'object' &&
           initialData?.description !== null
         ? JSON.stringify(initialData.description) // legacy fallback
+        : '',
+  );
+  const [descriptionBn, setDescriptionBn] = useState(
+    typeof initialData?.descriptionBn === 'string'
+      ? initialData.descriptionBn
+      : typeof initialData?.descriptionBn === 'object' &&
+          initialData?.descriptionBn !== null
+        ? JSON.stringify(initialData.descriptionBn)
         : '',
   );
   const [price, setPrice] = useState<number | ''>(initialData?.price ?? '');
@@ -171,14 +181,25 @@ export default function CourseFormClient({
   const [whatYouWillLearn, setWhatYouWillLearn] = useState<
     Array<{ outcome: string }>
   >(initialData?.whatYouWillLearn || []);
+  const [whatYouWillLearnBn, setWhatYouWillLearnBn] = useState<
+    Array<{ outcome: string }>
+  >(initialData?.whatYouWillLearnBn || []);
   const [requirements, setRequirements] = useState<
     Array<{ requirement: string }>
   >(initialData?.requirements || []);
+  const [requirementsBn, setRequirementsBn] = useState<
+    Array<{ requirement: string }>
+  >(initialData?.requirementsBn || []);
   const [faqSource, setFaqSource] = useState<'global' | 'course'>(
     initialData?.faqSource === 'course' ? 'course' : 'global',
   );
   const [courseFaqs, setCourseFaqs] = useState<
-    Array<{ question: string; answer: string }>
+    Array<{
+      question: string
+      answer: string
+      questionBn?: string
+      answerBn?: string
+    }>
   >(initialData?.courseFaqs || []);
   const [modules, setModules] = useState<string[]>(initialData?.modules || []);
   const [newModuleName, setNewModuleName] = useState('');
@@ -718,11 +739,14 @@ export default function CourseFormClient({
   };
 
   const handleAddCourseFaq = () => {
-    setCourseFaqs([...courseFaqs, { question: '', answer: '' }]);
+    setCourseFaqs([
+      ...courseFaqs,
+      { question: '', answer: '', questionBn: '', answerBn: '' },
+    ]);
   };
   const handleCourseFaqChange = (
     index: number,
-    field: 'question' | 'answer',
+    field: 'question' | 'answer' | 'questionBn' | 'answerBn',
     value: string,
   ) => {
     const updated = [...courseFaqs];
@@ -927,10 +951,14 @@ export default function CourseFormClient({
 
   // Builds the API payload from current form state
   const buildPayload = () => ({
-    title,
+    // Bangla is primary; keep `title` populated for DB/legacy readers.
+    title: title.trim() || titleBn.trim(),
+    titleBn: titleBn.trim(),
     slug,
     summary,
+    summaryBn: summaryBn.trim(),
     description,
+    descriptionBn,
     price: Number(price) || 0,
     billingType,
     monthlyFee: billingType === 'monthly' ? Number(monthlyFee) || 0 : undefined,
@@ -956,11 +984,30 @@ export default function CourseFormClient({
     whatYouWillLearn: whatYouWillLearn.filter(
       (item) => item.outcome.trim() !== '',
     ),
-    requirements: requirements.filter((item) => item.requirement.trim() !== ''),
-    faqSource,
-    courseFaqs: courseFaqs.filter(
-      (item) => item.question.trim() !== '' && item.answer.trim() !== '',
+    whatYouWillLearnBn: whatYouWillLearnBn.filter(
+      (item) => item.outcome.trim() !== '',
     ),
+    requirements: requirements.filter((item) => item.requirement.trim() !== ''),
+    requirementsBn: requirementsBn.filter(
+      (item) => item.requirement.trim() !== '',
+    ),
+    faqSource,
+    courseFaqs: courseFaqs
+      .filter((item) => {
+        const hasBn =
+          (item.questionBn || '').trim() !== '' &&
+          (item.answerBn || '').trim() !== ''
+        const hasEn =
+          item.question.trim() !== '' && item.answer.trim() !== ''
+        return hasBn || hasEn
+      })
+      .map((item) => {
+        const questionBn = (item.questionBn || '').trim()
+        const answerBn = (item.answerBn || '').trim()
+        const question = item.question.trim() || questionBn
+        const answer = item.answer.trim() || answerBn
+        return { question, answer, questionBn, answerBn }
+      }),
     studyMaterials: studyMaterials.filter(
       (item) => item.title.trim() !== '' && item.url.trim() !== '',
     ),
@@ -1009,11 +1056,11 @@ export default function CourseFormClient({
   // Saves the course (if needed) and takes the admin to the lesson form for
   // it — lessons can only be created against a real, persisted course ID.
   const handleAddLessonClick = async () => {
-    if (!title || !slug) {
+    if (!titleBn.trim() || !slug) {
       Swal.fire({
         icon: 'warning',
         title: 'Add a Title First',
-        text: 'Please fill in the course title and slug before adding lessons.',
+        text: 'Please fill in the Bangla course title and slug before adding lessons.',
         background: '#ffffff',
         color: '#1a1a1a',
       });
@@ -1056,11 +1103,11 @@ export default function CourseFormClient({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title || !slug) {
+    if (!titleBn.trim() || !slug) {
       Swal.fire({
         icon: 'warning',
         title: 'Validation Error',
-        text: 'Please complete required fields (Title, Slug).',
+        text: 'Please complete required fields (Bangla Title, Slug). English fields are optional.',
         background: '#ffffff',
         color: '#1a1a1a',
       });
@@ -1143,19 +1190,21 @@ export default function CourseFormClient({
               Course Parameters
             </h2>
 
-            {/* Title field */}
+            {/* English title — optional; falls back to Bangla on /en */}
             <div className='flex flex-col gap-2'>
               <label className='text-base font-bold text-slate-600'>
-                Course Title *
+                Course Title (English) — optional
               </label>
               <input
                 type='text'
-                required
                 value={title}
                 onChange={handleTitleChange}
                 placeholder='e.g. Master Next.js 16 and Mongoose Database Engineering'
                 className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
               />
+              <p className='text-base font-semibold text-slate-500'>
+                If left empty, the English site shows the Bangla title.
+              </p>
             </div>
 
             {/* Slug URL selector */}
@@ -1198,7 +1247,7 @@ export default function CourseFormClient({
             <div className='flex flex-col gap-2'>
               <div className='flex items-center justify-between'>
                 <label className='text-base font-bold text-slate-600'>
-                  Short Summary (Optional)
+                  Short Summary (English) — optional
                 </label>
                 <span className='text-sm font-semibold text-slate-450'>
                   {summary.length}/160 characters
@@ -1216,12 +1265,159 @@ export default function CourseFormClient({
 
             {/* Detailed Description */}
             <RichTextEditor
-              label='Detailed Description (Optional)'
+              label='Detailed Description (English) — optional'
               rows={8}
               value={description}
               onChange={setDescription}
               placeholder='Write an absolute premium, highly structured syllabus overview detailing modules, targets, tools, and schedules...'
             />
+          </div>
+
+          {/* Bangla content — primary language (required) */}
+          <div className='bg-white border border-[#E61C24]/20 rounded-lg p-6 space-y-5'>
+            <div className='border-b border-slate-100 pb-3 space-y-1'>
+              <h2 className='text-xl font-bold text-slate-800 tracking-tight'>
+                Bangla content (বাংলা) — primary
+              </h2>
+              <p className='text-base font-semibold text-slate-500'>
+                Required for the public site. English fields above are optional;
+                missing English content falls back to these Bangla values.
+              </p>
+            </div>
+
+            <div className='flex flex-col gap-2'>
+              <label className='text-base font-bold text-slate-600'>
+                Course Title (Bangla) *
+              </label>
+              <input
+                type='text'
+                required
+                value={titleBn}
+                onChange={(e) => setTitleBn(e.target.value)}
+                placeholder='যেমন: IELTS সম্পূর্ণ প্রস্তুতি কোর্স'
+                className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
+                lang='bn'
+              />
+            </div>
+
+            <div className='flex flex-col gap-2'>
+              <div className='flex items-center justify-between'>
+                <label className='text-base font-bold text-slate-600'>
+                  Short Summary (Bangla)
+                </label>
+                <span className='text-sm font-semibold text-slate-450'>
+                  {summaryBn.length}/160
+                </span>
+              </div>
+              <textarea
+                rows={2}
+                maxLength={160}
+                value={summaryBn}
+                onChange={(e) => setSummaryBn(e.target.value)}
+                placeholder='বাংলায় সংক্ষিপ্ত বর্ণনা…'
+                className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors resize-none'
+                lang='bn'
+              />
+            </div>
+
+            <RichTextEditor
+              label='Detailed Description (Bangla)'
+              rows={8}
+              value={descriptionBn}
+              onChange={setDescriptionBn}
+              placeholder='বাংলায় বিস্তারিত কোর্স বর্ণনা…'
+            />
+
+            <div className='space-y-3 pt-2 border-t border-slate-100'>
+              <div className='flex items-center justify-between'>
+                <h3 className='text-base font-bold text-slate-700'>
+                  What You Will Learn (Bangla)
+                </h3>
+                <button
+                  type='button'
+                  onClick={() =>
+                    setWhatYouWillLearnBn([
+                      ...whatYouWillLearnBn,
+                      { outcome: '' },
+                    ])
+                  }
+                  className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#E61C24]/15 hover:bg-[#E61C24]/25 text-[#E61C24] border border-[#E61C24]/20 rounded-lg text-base font-bold transition-colors cursor-pointer'
+                >
+                  <FiPlus className='h-4.5 w-4.5' /> Add
+                </button>
+              </div>
+              {whatYouWillLearnBn.map((item, idx) => (
+                <div key={idx} className='flex items-center gap-3'>
+                  <input
+                    type='text'
+                    value={item.outcome}
+                    onChange={(e) => {
+                      const updated = [...whatYouWillLearnBn]
+                      updated[idx] = { outcome: e.target.value }
+                      setWhatYouWillLearnBn(updated)
+                    }}
+                    placeholder='বাংলা আউটকাম…'
+                    className='bg-slate-100 border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none flex-1'
+                    lang='bn'
+                  />
+                  <button
+                    type='button'
+                    onClick={() =>
+                      setWhatYouWillLearnBn(
+                        whatYouWillLearnBn.filter((_, i) => i !== idx),
+                      )
+                    }
+                    className='p-3 text-slate-400 hover:text-red-400 bg-slate-100 border border-slate-200 rounded-lg cursor-pointer'
+                  >
+                    <FiTrash2 className='h-5 w-5' />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className='space-y-3 pt-2 border-t border-slate-100'>
+              <div className='flex items-center justify-between'>
+                <h3 className='text-base font-bold text-slate-700'>
+                  Requirements (Bangla)
+                </h3>
+                <button
+                  type='button'
+                  onClick={() =>
+                    setRequirementsBn([...requirementsBn, { requirement: '' }])
+                  }
+                  className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#E61C24]/15 hover:bg-[#E61C24]/25 text-[#E61C24] border border-[#E61C24]/20 rounded-lg text-base font-bold transition-colors cursor-pointer'
+                >
+                  <FiPlus className='h-4.5 w-4.5' /> Add
+                </button>
+              </div>
+              {requirementsBn.map((item, idx) => (
+                <div key={idx} className='flex items-center gap-3'>
+                  <input
+                    type='text'
+                    value={item.requirement}
+                    onChange={(e) => {
+                      const updated = [...requirementsBn]
+                      updated[idx] = { requirement: e.target.value }
+                      setRequirementsBn(updated)
+                    }}
+                    placeholder='বাংলা প্রয়োজনীয়তা…'
+                    className='bg-slate-100 border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none flex-1'
+                    lang='bn'
+                  />
+                  <button
+                    type='button'
+                    onClick={() =>
+                      setRequirementsBn(
+                        requirementsBn.filter((_, i) => i !== idx),
+                      )
+                    }
+                    className='p-3 text-slate-400 hover:text-red-400 bg-slate-100 border border-slate-200 rounded-lg cursor-pointer'
+                  >
+                    <FiTrash2 className='h-5 w-5' />
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Outcomes list card */}
@@ -1385,6 +1581,34 @@ export default function CourseFormClient({
                         </div>
                         <input
                           type='text'
+                          value={item.questionBn || ''}
+                          onChange={(e) =>
+                            handleCourseFaqChange(
+                              idx,
+                              'questionBn',
+                              e.target.value,
+                            )
+                          }
+                          placeholder='প্রশ্ন (বাংলা) — primary'
+                          className='w-full bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none focus:border-[#E61C24]/80'
+                          lang='bn'
+                        />
+                        <textarea
+                          value={item.answerBn || ''}
+                          onChange={(e) =>
+                            handleCourseFaqChange(
+                              idx,
+                              'answerBn',
+                              e.target.value,
+                            )
+                          }
+                          rows={2}
+                          placeholder='উত্তর (বাংলা) — primary'
+                          className='w-full bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none focus:border-[#E61C24]/80 resize-y'
+                          lang='bn'
+                        />
+                        <input
+                          type='text'
                           value={item.question}
                           onChange={(e) =>
                             handleCourseFaqChange(
@@ -1393,7 +1617,7 @@ export default function CourseFormClient({
                               e.target.value,
                             )
                           }
-                          placeholder='e.g. How do I pay for this course?'
+                          placeholder='Question (English) — optional; falls back to Bangla'
                           className='w-full bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none focus:border-[#E61C24]/80'
                         />
                         <textarea
@@ -1402,7 +1626,7 @@ export default function CourseFormClient({
                             handleCourseFaqChange(idx, 'answer', e.target.value)
                           }
                           rows={3}
-                          placeholder='Answer…'
+                          placeholder='Answer (English) — optional; falls back to Bangla'
                           className='w-full bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none focus:border-[#E61C24]/80 resize-y'
                         />
                       </div>

@@ -1,5 +1,6 @@
 'use client';
 
+import { useLocale } from '@/context/LocaleContext';
 import { AnimatePresence, motion, useInView } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -80,22 +81,15 @@ function getImageUrl(thumbnail: CourseDoc['thumbnail']): string {
 function formatPrice(
   price?: number | null,
   billingType?: 'one_time' | 'monthly' | 'quarterly',
+  freeLabel = 'Free',
+  perMonth = '/mo',
+  perQuarter = '/qtr',
 ): string {
-  if (!price || price === 0) return 'Free';
+  if (!price || price === 0) return freeLabel;
   const base = `৳${price.toLocaleString('en-BD')}`;
-  if (billingType === 'monthly') return `${base}/mo`;
-  if (billingType === 'quarterly') return `${base}/qtr`;
+  if (billingType === 'monthly') return `${base}${perMonth}`;
+  if (billingType === 'quarterly') return `${base}${perQuarter}`;
   return base;
-}
-
-function getLevelLabel(level: CourseDoc['level']): string {
-  const map: Record<string, string> = {
-    all: 'All Levels',
-    beginner: 'Beginner',
-    intermediate: 'Intermediate',
-    advanced: 'Advanced',
-  };
-  return map[level] ?? 'All Levels';
 }
 
 function getCategoryName(category: CourseDoc['category']): string {
@@ -159,6 +153,8 @@ const sectionHeadVariants = {
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export default function Courses({ initialCourses, categories }: CoursesProps) {
+  const { messages, href } = useLocale();
+  const t = messages.courses;
   const [activeTab, setActiveTab] = useState('all');
 
   // Scroll-triggered gate: cards only animate when section enters viewport
@@ -169,9 +165,12 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
   const headRef = useRef<HTMLDivElement>(null);
   const headInView = useInView(headRef, { once: true, amount: 0.3 });
 
+  const getLevelLabel = (level: CourseDoc['level']) =>
+    t.levels[level] ?? t.levels.all;
+
   // Build dynamic tabs: "All" always first, then DB categories
   const tabs = [
-    { id: 'all', label: 'All Courses', icon: FiGrid },
+    { id: 'all', label: t.filterAll, icon: FiGrid },
     ...categories.map((cat) => ({
       id: cat.slug,
       label: cat.name,
@@ -207,7 +206,7 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
             animate={headInView ? 'visible' : 'hidden'}
             className='text-base font-bold text-[#E61C24] mb-3 tracking-wide uppercase'
           >
-            Featured Courses
+            {t.sectionTitle}
           </motion.p>
           <motion.h2
             custom={0.12}
@@ -216,8 +215,7 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
             animate={headInView ? 'visible' : 'hidden'}
             className='text-2xl sm:text-3xl md:text-4xl font-bold font-sans text-[#0A163A] tracking-tight leading-[1.2]'
           >
-            Our Most Favourite{' '}
-            <span className='text-[#E61C24]'>English Programs</span>
+            {t.sectionSubtitle}
           </motion.h2>
         </div>
 
@@ -410,13 +408,15 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                           {formatPrice(
                             featuredCourse.price,
                             featuredCourse.billingType,
+                            t.free,
+                            t.perMonth,
                           )}
                         </span>
                         <Link
-                          href={`/courses/${featuredCourse.slug}`}
+                          href={href(`/courses/${featuredCourse.slug}`)}
                           className='px-6 py-3 bg-[#E61C24] hover:bg-[#c3131a] text-white rounded-lg font-bold text-base transition-all duration-300 flex items-center gap-3 shadow-md shadow-[#E61C24]/10 hover:shadow-[#E61C24]/20 group border-none cursor-pointer'
                         >
-                          <span>View Details</span>
+                          <span>{messages.common.learnMore}</span>
                           <span className='h-7 w-7 rounded-full bg-white/20 group-hover:bg-white flex items-center justify-center text-white group-hover:text-[#E61C24] transition-colors duration-300'>
                             <FiArrowUpRight className='h-4 w-4' />
                           </span>
@@ -442,7 +442,7 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                       }`}
                     >
                       <Link
-                        href={`/courses/${course.slug}`}
+                        href={href(`/courses/${course.slug}`)}
                         className='bg-white rounded-lg overflow-hidden border-0 border-transparent shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(230,28,36,0.06)] hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full w-full max-w-95'
                       >
                         {/* Aspect-ratio constrained image wrapper */}
@@ -547,12 +547,14 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                                   {formatPrice(
                                     course.price,
                                     course.billingType,
+                                    t.free,
+                                    t.perMonth,
                                   )}
                                 </span>
                               </div>
 
                               <div className='px-4 py-2 bg-[#E61C24] group-hover:bg-[#c3131a] rounded-lg text-base font-bold text-white shadow-md shadow-[#E61C24]/10 transition-all duration-300 flex items-center gap-2 shrink-0 whitespace-nowrap'>
-                                <span>Enroll Now</span>
+                                <span>{t.enroll}</span>
                                 <FiArrowRight className='h-4.5 w-4.5 text-white transition-transform duration-300 group-hover:translate-x-0.5 shrink-0' />
                               </div>
                             </div>
@@ -576,10 +578,10 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
           className='flex justify-center mt-16'
         >
           <Link
-            href='/courses'
+            href={href('/courses')}
             className='px-6 py-4 bg-[#E61C24] hover:bg-[#c3131a] text-white font-bold text-base rounded-lg shadow-lg shadow-[#E61C24]/15 hover:shadow-[#E61C24]/25 transition-all duration-300 flex items-center justify-center gap-3 group cursor-pointer border-none'
           >
-            <span>View All Courses</span>
+            <span>{t.viewAll}</span>
             <span className='h-7 w-7 rounded-full bg-white flex items-center justify-center text-[#E61C24] transition-colors duration-300'>
               <FiArrowUpRight className='h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5' />
             </span>

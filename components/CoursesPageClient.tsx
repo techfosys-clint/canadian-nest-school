@@ -1,5 +1,6 @@
 'use client';
 import type { CategoryDoc, CourseDoc } from '@/components/Courses';
+import { useLocale } from '@/context/LocaleContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -28,11 +29,14 @@ function getImageUrl(thumbnail: CourseDoc['thumbnail']): string {
 function formatPrice(
   price?: number | null,
   billingType?: 'one_time' | 'monthly' | 'quarterly',
+  freeLabel = 'Free',
+  perMonth = '/mo',
+  perQuarter = '/qtr',
 ): string {
-  if (!price || price === 0) return 'Free';
+  if (!price || price === 0) return freeLabel;
   const base = `৳${price.toLocaleString('en-BD')}`;
-  if (billingType === 'monthly') return `${base}/mo`;
-  if (billingType === 'quarterly') return `${base}/qtr`;
+  if (billingType === 'monthly') return `${base}${perMonth}`;
+  if (billingType === 'quarterly') return `${base}${perQuarter}`;
   return base;
 }
 
@@ -82,12 +86,14 @@ function CourseCard({
   course: CourseDoc;
   view: 'grid' | 'list';
 }) {
+  const { href, messages } = useLocale();
+  const t = messages.courses;
   const imgUrl = getImageUrl(course.thumbnail);
 
   if (view === 'list') {
     return (
       <Link
-        href={`/courses/${course.slug}`}
+        href={href(`/courses/${course.slug}`)}
         className='flex flex-col md:flex-row gap-6 bg-white rounded-lg p-5 border border-[#E61C24]/20 hover:border-[#E61C24]/50 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(230,28,36,0.10)] hover:-translate-y-1 transition-all duration-300 group w-full'
       >
         {/* Aspect-ratio constrained image wrapper */}
@@ -166,12 +172,17 @@ function CourseCard({
               <span
                 className={`text-lg sm:text-xl font-bold ${course.price === 0 ? 'text-emerald-600' : 'text-zinc-900'} truncate`}
               >
-                {formatPrice(course.price, course.billingType)}
+                {formatPrice(
+                  course.price,
+                  course.billingType,
+                  t.free,
+                  t.perMonth,
+                )}
               </span>
             </div>
 
             <div className='px-4 py-2 border border-[#E61C24] bg-[#E61C24] group-hover:bg-[#c3131a] group-hover:border-[#c3131a] rounded-lg text-base font-semibold text-white transition-all duration-300 flex items-center gap-1.5 shrink-0 whitespace-nowrap'>
-              <span>Enroll Now</span>
+              <span>{t.enroll}</span>
               <FiArrowRight className='h-4 w-4 text-white transition-transform duration-300 group-hover:translate-x-0.5 shrink-0' />
             </div>
           </div>
@@ -269,12 +280,17 @@ function CourseCard({
                 <span
                   className={`text-xl font-bold ${course.price === 0 ? 'text-emerald-600' : 'text-zinc-900'} truncate`}
                 >
-                  {formatPrice(course.price, course.billingType)}
+                  {formatPrice(
+                    course.price,
+                    course.billingType,
+                    t.free,
+                    t.perMonth,
+                  )}
                 </span>
               </div>
 
               <div className='px-4 py-2 border border-[#E61C24] bg-[#E61C24] group-hover:bg-[#c3131a] group-hover:border-[#c3131a] rounded-lg text-base font-semibold text-white transition-all duration-300 flex items-center gap-2 shrink-0 whitespace-nowrap'>
-                <span>Enroll Now</span>
+                <span>{t.enroll}</span>
                 <FiArrowRight className='h-4.5 w-4.5 text-white transition-transform duration-300 group-hover:translate-x-0.5 shrink-0' />
               </div>
             </div>

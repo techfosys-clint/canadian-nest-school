@@ -21,6 +21,15 @@ body {
   font-family: var(--font-nunito), sans-serif;
 }
 
+/* Bangla locale: prefer Noto Sans Bengali for readable glyphs */
+body.font-bengali {
+  font-family: var(--font-noto-bengali), var(--font-nunito), sans-serif;
+}
+
+body.font-bengali .font-display {
+  font-family: var(--font-noto-bengali), var(--font-plus-jakarta), sans-serif;
+}
+
 @keyframes marquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }

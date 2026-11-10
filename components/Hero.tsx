@@ -1,5 +1,6 @@
 'use client';
 
+import { useLocale } from '@/context/LocaleContext';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -7,6 +8,9 @@ import Link from 'next/link';
 const MotionImage = motion.create(Image);
 
 export default function Hero({ children }: { children?: React.ReactNode }) {
+  const { messages, href } = useLocale();
+  const t = messages.hero;
+
   return (
     <section className='w-full min-h-[96vh] relative flex flex-col justify-between pt-36 md:pt-44 overflow-hidden'>
       {/* Centered Hero Content */}
@@ -36,7 +40,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
               />
             </motion.span>
 
-            <span className='align-middle'>Master </span>
+            <span className='align-middle'>{t.master} </span>
 
             <span className='inline-block whitespace-nowrap align-middle'>
               {/* Golden Pill Highlighter - Smooth Zoom in */}
@@ -50,7 +54,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
                 }}
                 className='inline-flex items-center bg-[#FDBF2D] text-[#0A163A] px-4 md:px-8 py-0.5 md:py-1 rounded-full mx-1 md:mx-2 align-middle relative '
               >
-                Authentic
+                {t.authentic}
               </motion.span>
 
               {/* Avatar right next to Easily - Animated Pop-In */}
@@ -76,7 +80,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
               </motion.span>
             </span>
 
-            <span className='align-middle ml-1.5 md:ml-3'>English</span>
+            <span className='align-middle ml-1.5 md:ml-3'>{t.english}</span>
 
             {/* Purple Lines Spark (heading-svg2.svg) - Animated Zoom */}
             <motion.span
@@ -98,7 +102,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
           {/* Row 2: Anywhere [Avatars] and Anytime */}
           <span className='block'>
             <span className='inline-block whitespace-nowrap align-middle'>
-              <span className='align-middle'>from Anywhere </span>
+              <span className='align-middle'>{t.fromAnywhere} </span>
 
               {/* Double Overlapping Avatars - Staggered entrance */}
               <span className='inline-flex items-center justify-center align-middle mx-1.5 md:mx-3 translate-y-0.5'>
@@ -125,7 +129,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
               </span>
             </span>
 
-            <span className='align-middle'> in the World</span>
+            <span className='align-middle'> {t.inTheWorld}</span>
           </span>
         </motion.h1>
 
@@ -136,13 +140,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
           transition={{ duration: 0.8, delay: 0.25, ease: 'easeOut' }}
           className='text-base md:text-lg text-[#4F5B7C] font-semibold text-center max-w-3xl mx-auto mb-10 leading-relaxed font-sans'
         >
-          {
-            'Discover premium Phonics, Spoken English, IELTS, Online Schooling, and Teacher Training programs built on international educational standards.'
-          }{' '}
-          <br className='hidden md:block' />{' '}
-          {
-            'Empowering learners and educators to communicate with absolute confidence.'
-          }
+          {t.subtitle1} <br className='hidden md:block' /> {t.subtitle2}
         </motion.p>
 
         {/* Action Button - Zoom pop in */}
@@ -152,10 +150,10 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
           transition={{ duration: 0.8, delay: 0.35, ease: 'easeOut' }}
         >
           <Link
-            href='/courses'
+            href={href('/courses')}
             className='inline-block px-8 py-4 rounded-lg bg-[#E61C24] hover:bg-[#c3131a] text-white font-bold text-base shadow-lg shadow-[#E61C24]/25 hover:shadow-[#E61C24]/35 transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer text-center'
           >
-            Start Learning Today
+            {t.cta}
           </Link>
         </motion.div>
       </div>

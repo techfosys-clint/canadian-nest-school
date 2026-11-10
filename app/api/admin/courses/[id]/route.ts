@@ -299,9 +299,12 @@ export async function PUT(
     const body = await request.json()
     const {
       title,
+      titleBn,
       slug,
       summary,
+      summaryBn,
       description,
+      descriptionBn,
       price,
       billingType,
       monthlyFee,
@@ -320,7 +323,9 @@ export async function PUT(
       duration,
       level,
       whatYouWillLearn,
+      whatYouWillLearnBn,
       requirements,
+      requirementsBn,
       seo,
       studyMaterials,
       modules,
@@ -387,9 +392,12 @@ export async function PUT(
       billingType === 'monthly' ? 'monthly' : 'one_time'
 
     course.title = title
+    course.titleBn = typeof titleBn === 'string' ? titleBn.trim() : ''
     course.slug = slug
     course.summary = summary
+    course.summaryBn = typeof summaryBn === 'string' ? summaryBn.trim() : ''
     course.description = description
+    course.descriptionBn = descriptionBn ?? ''
     course.price = price ? Number(price) : undefined
     course.billingType = resolvedBillingType
     course.monthlyFee =
@@ -425,7 +433,9 @@ export async function PUT(
     course.duration = duration
     course.level = level || course.level
     course.whatYouWillLearn = whatYouWillLearn || []
+    course.whatYouWillLearnBn = whatYouWillLearnBn || []
     course.requirements = requirements || []
+    course.requirementsBn = requirementsBn || []
     course.seo = seo || {}
     course.studyMaterials = studyMaterials || []
     course.modules = modules || []
@@ -445,6 +455,8 @@ export async function PUT(
             .map((f: any) => ({
               question: String(f.question).trim(),
               answer: String(f.answer).trim(),
+              questionBn: String(f.questionBn || '').trim(),
+              answerBn: String(f.answerBn || '').trim(),
             }))
         : []
     }

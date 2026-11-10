@@ -15,10 +15,13 @@ import { Course } from '@/lib/db/models/Course';
 import { Enrollment } from '@/lib/db/models/Enrollment';
 import { Review } from '@/lib/db/models/Review';
 import { connectToDatabase } from '@/lib/db/mongodb';
+import { getLocale } from '@/lib/i18n/getLocale';
+import { localizeCourseDoc } from '@/lib/i18n/localizeCourse';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
+  const locale = await getLocale();
   await connectToDatabase();
 
   const [coursesDocs, categoriesDocs, reviewsDocs, blogsDocs] =
@@ -81,11 +84,12 @@ export default async function Home() {
   // Clean serialization for client components to prevent ObjectID or Date serialization errors
   const courses: CourseDoc[] = coursesDocs.map((doc: any) => {
     const cid = doc._id.toString();
+    const localized = localizeCourseDoc(doc, locale);
     return {
       id: cid,
-      title: doc.title,
+      title: localized.title,
       slug: doc.slug,
-      summary: doc.summary,
+      summary: localized.summary,
       price:
         doc.billingType === 'monthly'
           ? Number(doc.monthlyFee || 0)

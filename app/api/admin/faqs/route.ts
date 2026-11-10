@@ -19,10 +19,18 @@ export async function POST(request: Request) {
     const user = await getAuthorizedUser(['admin', 'staff'], 'faqs')
     if (!user) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
 
-    const { question, answer, order, isActive } = await request.json()
+    const { question, answer, questionBn, answerBn, order, isActive } =
+      await request.json()
     if (!question || !answer) return NextResponse.json({ error: 'Question and answer are required.' }, { status: 400 })
 
-    const faq = new FAQ({ question, answer, order: order || 0, isActive: isActive !== false })
+    const faq = new FAQ({
+      question,
+      answer,
+      questionBn: typeof questionBn === 'string' ? questionBn.trim() : '',
+      answerBn: typeof answerBn === 'string' ? answerBn.trim() : '',
+      order: order || 0,
+      isActive: isActive !== false,
+    })
     await faq.save()
     return NextResponse.json({ success: true, faq }, { status: 201 })
   } catch (error: any) {
@@ -36,7 +44,8 @@ export async function PUT(request: Request) {
     const user = await getAuthorizedUser(['admin', 'staff'], 'faqs')
     if (!user) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
 
-    const { id, question, answer, order, isActive } = await request.json()
+    const { id, question, answer, questionBn, answerBn, order, isActive } =
+      await request.json()
     if (!id) return NextResponse.json({ error: 'ID required.' }, { status: 400 })
 
     const faq = await FAQ.findById(id)
@@ -44,6 +53,8 @@ export async function PUT(request: Request) {
 
     if (question !== undefined) faq.question = question
     if (answer !== undefined) faq.answer = answer
+    if (questionBn !== undefined) faq.questionBn = String(questionBn).trim()
+    if (answerBn !== undefined) faq.answerBn = String(answerBn).trim()
     if (order !== undefined) faq.order = order
     if (isActive !== undefined) faq.isActive = isActive
     await faq.save()

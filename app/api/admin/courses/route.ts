@@ -137,9 +137,12 @@ export async function POST(request: Request) {
     const body = await request.json()
     const {
       title,
+      titleBn,
       slug,
       summary,
+      summaryBn,
       description,
+      descriptionBn,
       price,
       billingType,
       monthlyFee,
@@ -158,7 +161,9 @@ export async function POST(request: Request) {
       duration,
       level,
       whatYouWillLearn,
+      whatYouWillLearnBn,
       requirements,
+      requirementsBn,
       seo,
       studyMaterials,
       modules,
@@ -226,9 +231,12 @@ export async function POST(request: Request) {
 
     const newCourse = new Course({
       title,
+      titleBn: typeof titleBn === 'string' ? titleBn.trim() : '',
       slug,
       summary,
+      summaryBn: typeof summaryBn === 'string' ? summaryBn.trim() : '',
       description,
+      descriptionBn: descriptionBn ?? '',
       price: price ? Number(price) : undefined,
       billingType: resolvedBillingType,
       monthlyFee:
@@ -266,6 +274,8 @@ export async function POST(request: Request) {
             .map((f: any) => ({
               question: String(f.question).trim(),
               answer: String(f.answer).trim(),
+              questionBn: String(f.questionBn || '').trim(),
+              answerBn: String(f.answerBn || '').trim(),
             }))
         : [],
       thumbnail,
@@ -277,7 +287,9 @@ export async function POST(request: Request) {
       duration,
       level: level || 'all',
       whatYouWillLearn: whatYouWillLearn || [],
+      whatYouWillLearnBn: whatYouWillLearnBn || [],
       requirements: requirements || [],
+      requirementsBn: requirementsBn || [],
       seo: seo || {},
       studyMaterials: studyMaterials || [],
       modules: modules || [],

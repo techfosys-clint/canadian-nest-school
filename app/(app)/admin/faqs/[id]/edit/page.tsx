@@ -48,6 +48,8 @@ export default async function EditFAQPage({ params }: Props) {
     id: faqDoc._id.toString(),
     question: faqDoc.question,
     answer: faqDoc.answer,
+    questionBn: (faqDoc as any).questionBn || '',
+    answerBn: (faqDoc as any).answerBn || '',
     order: faqDoc.order || 0,
     isActive: faqDoc.isActive ?? true,
   }

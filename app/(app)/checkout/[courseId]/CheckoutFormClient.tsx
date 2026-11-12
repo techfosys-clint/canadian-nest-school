@@ -94,9 +94,13 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [checkoutSuccess, setCheckoutSuccess] = useState<string | null>(null);
 
-  /** The single batch whose join window is open (if any). */
-  const [openBatch, setOpenBatch] = useState<OpenBatchInfo | null>(null);
+  /** Every batch whose join window is currently open. */
+  const [openBatches, setOpenBatches] = useState<OpenBatchInfo[]>([]);
+  const [selectedBatchId, setSelectedBatchId] = useState('');
   const [batchesLoading, setBatchesLoading] = useState(!!course.requiresBatch);
+
+  const selectedBatch =
+    openBatches.find((b) => b.id === selectedBatchId) || null;
 
   useEffect(() => {
     if (!course.requiresBatch) {
@@ -109,12 +113,17 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
       .then((r) => r.json())
       .then((data) => {
         if (cancelled) return;
-        const list = data.batches || [];
-        // Join windows do not overlap — take the open batch if present.
-        setOpenBatch(list[0] || null);
+        const list: OpenBatchInfo[] = data.batches || [];
+        setOpenBatches(list);
+        setSelectedBatchId((current) =>
+          list.some((b) => b.id === current) ? current : list[0]?.id || '',
+        );
       })
       .catch(() => {
-        if (!cancelled) setOpenBatch(null);
+        if (!cancelled) {
+          setOpenBatches([]);
+          setSelectedBatchId('');
+        }
       })
       .finally(() => {
         if (!cancelled) setBatchesLoading(false);
@@ -264,9 +273,11 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
     setCheckoutError(null);
     setCheckoutSuccess(null);
 
-    if (course.requiresBatch && !openBatch) {
+    if (course.requiresBatch && !selectedBatch) {
       setCheckoutError(
-        'Enrollment is closed. No batch join window is open right now. Please check back when the admin opens a batch.',
+        openBatches.length > 1
+          ? 'Choose the batch you want to join before paying.'
+          : 'Enrollment is closed. No batch join window is open right now. Please check back when the admin opens a batch.',
       );
       return;
     }
@@ -278,6 +289,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           courseId: course.id,
+          batchId: selectedBatch?.id,
           couponCode: appliedCoupon ? appliedCoupon.code : undefined,
         }),
       });
@@ -474,30 +486,68 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                 </div>
 
                 {course.requiresBatch && (
-                  <div className='space-y-2 border border-zinc-200/80 rounded-lg p-4 bg-zinc-50'>
+                  <div className='space-y-3 border border-zinc-200/80 rounded-lg p-4 bg-zinc-50'>
                     {batchesLoading ? (
                       <p className='text-base font-semibold text-zinc-500'>
                         Checking batch availability…
                       </p>
-                    ) : openBatch ? (
-                      <>
-                        <p className='text-base font-bold text-zinc-800'>
-                          Joining: {openBatch.name}
-                        </p>
-                        <p className='text-base font-semibold text-zinc-500'>
-                          Class:{' '}
-                          {new Date(openBatch.startDate).toLocaleDateString()} –{' '}
-                          {new Date(openBatch.endDate).toLocaleDateString()}
-                          {openBatch.joinClosesAt
-                            ? ` · Join closes ${new Date(openBatch.joinClosesAt).toLocaleString()}`
-                            : ''}
-                        </p>
-                      </>
-                    ) : (
+                    ) : openBatches.length === 0 ? (
                       <p className='text-base font-semibold text-rose-600'>
                         Enrollment is closed. No batch join window is open
                         right now.
                       </p>
+                    ) : (
+                      <>
+                        <p className='text-base font-bold text-zinc-800'>
+                          {openBatches.length > 1
+                            ? 'Choose your batch'
+                            : 'Joining'}
+                        </p>
+                        <div className='space-y-2'>
+                          {openBatches.map((batch) => {
+                            const selected = batch.id === selectedBatchId;
+                            return (
+                              <label
+                                key={batch.id}
+                                className={`flex items-start gap-3 rounded-lg border p-3 cursor-pointer ${
+                                  selected
+                                    ? 'border-[#E61C24]/60 bg-white'
+                                    : 'border-zinc-200/80 bg-white'
+                                }`}
+                              >
+                                <input
+                                  type='radio'
+                                  name='checkout-batch'
+                                  value={batch.id}
+                                  checked={selected}
+                                  onChange={() => setSelectedBatchId(batch.id)}
+                                  className='mt-1 h-4 w-4 accent-[#E61C24]'
+                                />
+                                <span className='min-w-0'>
+                                  <span className='block text-base font-bold text-zinc-800'>
+                                    {batch.name}
+                                  </span>
+                                  <span className='block text-base font-semibold text-zinc-500'>
+                                    {new Date(
+                                      batch.startDate,
+                                    ).toLocaleDateString()}{' '}
+                                    –{' '}
+                                    {new Date(
+                                      batch.endDate,
+                                    ).toLocaleDateString()}
+                                    {batch.joinClosesAt
+                                      ? ` · Join closes ${new Date(batch.joinClosesAt).toLocaleString()}`
+                                      : ''}
+                                    {batch.seatsLeft !== null
+                                      ? ` · ${batch.seatsLeft} seat${batch.seatsLeft === 1 ? '' : 's'} left`
+                                      : ''}
+                                  </span>
+                                </span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </>
                     )}
                   </div>
                 )}
@@ -507,7 +557,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                   disabled={
                     purchaseLoading ||
                     (course.requiresBatch &&
-                      (batchesLoading || !openBatch))
+                      (batchesLoading || !selectedBatch))
                   }
                   className='w-full flex items-center justify-center gap-2 py-4 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all select-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
                 >

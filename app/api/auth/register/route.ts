@@ -205,6 +205,8 @@ export async function POST(request: Request) {
         profilePic: profilePicId || undefined,
         role: targetRole,
         designation: designation || undefined,
+        showOnInstructorsPage:
+          body.showOnInstructorsPage === true || targetRole === 'instructor',
         permissions: permissions || [],
         isSuperAdmin: isFirstAdmin,
       })

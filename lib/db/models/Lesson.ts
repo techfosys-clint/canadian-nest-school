@@ -12,6 +12,11 @@ export interface ILesson extends Document {
   title: string
   slug: string
   course: mongoose.Types.ObjectId | string
+  /**
+   * Optional batch scope. When set, only students enrolled in this batch
+   * see the lesson/recording. Leave empty for all batches.
+   */
+  batch?: mongoose.Types.ObjectId | string
   order: number
   moduleOrder?: number
   moduleName?: string
@@ -48,6 +53,7 @@ const LessonSchema = new Schema<ILesson>(
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
     course: { type: Schema.Types.ObjectId, ref: 'Course', required: true },
+    batch: { type: Schema.Types.ObjectId, ref: 'Batch', default: null },
     // Course-wide serial number — assigned automatically on the server,
     // never editable from the admin form.
     order: { type: Number, required: true, min: 1 },
@@ -77,7 +83,12 @@ const LessonSchema = new Schema<ILesson>(
 )
 
 // Clear old model cache in development if newly added fields are not registered in compiled schema paths
-if (mongoose.models.Lesson && (!mongoose.models.Lesson.schema.paths.moduleName || !mongoose.models.Lesson.schema.paths.moduleOrder)) {
+if (
+  mongoose.models.Lesson &&
+  (!mongoose.models.Lesson.schema.paths.moduleName ||
+    !mongoose.models.Lesson.schema.paths.moduleOrder ||
+    !mongoose.models.Lesson.schema.paths.batch)
+) {
   delete mongoose.models.Lesson
 }
 

@@ -98,6 +98,7 @@ export async function PUT(
       password,
       designation,
       bio,
+      showOnInstructorsPage,
     } = body
 
     if (!name || !email || !role) {
@@ -135,6 +136,12 @@ export async function PUT(
     staffToEdit.designation = designation || undefined
     if (bio !== undefined) {
       staffToEdit.bio = typeof bio === 'string' ? bio : ''
+    }
+    if (showOnInstructorsPage !== undefined) {
+      staffToEdit.showOnInstructorsPage = !!showOnInstructorsPage
+    } else if (role === 'instructor') {
+      // Instructors appear on the mentors page by default
+      staffToEdit.showOnInstructorsPage = true
     }
 
     if (password && password.trim().length >= 6) {

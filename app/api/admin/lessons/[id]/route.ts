@@ -79,6 +79,12 @@ export async function PUT(
       moduleOrder: body.moduleOrder ? Number(body.moduleOrder) : lesson.moduleOrder,
       moduleName: body.moduleName ?? lesson.moduleName,
       lessonType: finalLessonType,
+      batch:
+        body.batch === undefined
+          ? lesson.batch
+          : body.batch
+            ? body.batch
+            : null,
       videoUrl: body.videoUrl ?? lesson.videoUrl,
       livePlatform: finalLivePlatform,
       liveUrl: finalLiveUrl,

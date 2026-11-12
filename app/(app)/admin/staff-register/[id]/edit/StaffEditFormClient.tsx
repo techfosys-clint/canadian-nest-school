@@ -28,6 +28,7 @@ interface StaffEditFormClientProps {
     role: 'admin' | 'staff' | 'instructor';
     designation?: string;
     bio?: string;
+    showOnInstructorsPage?: boolean;
     permissions?: string[];
     profilePicId?: string;
     profilePicUrl?: string;
@@ -45,6 +46,9 @@ export default function StaffEditFormClient({
     initialStaff.designation || '',
   );
   const [bio, setBio] = useState(initialStaff.bio || '');
+  const [showOnInstructorsPage, setShowOnInstructorsPage] = useState(
+    !!initialStaff.showOnInstructorsPage || initialStaff.role === 'instructor',
+  );
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<'staff' | 'instructor' | 'admin'>(
     initialStaff.role,
@@ -71,6 +75,7 @@ export default function StaffEditFormClient({
       setPermissions(['reviews', 'categories', 'faqs', 'blogs', 'media']);
     } else if (newRole === 'instructor') {
       setPermissions(['courses', 'lessons']);
+      setShowOnInstructorsPage(true);
     } else if (newRole === 'admin') {
       setPermissions([
         'courses',
@@ -144,6 +149,7 @@ export default function StaffEditFormClient({
           role,
           designation: designation || undefined,
           bio,
+          showOnInstructorsPage,
           permissions:
             role === 'admin'
               ? [
@@ -310,6 +316,25 @@ export default function StaffEditFormClient({
               page).
             </p>
           </div>
+
+          <label className='flex items-start gap-3 p-4 rounded-lg border border-slate-200 bg-slate-50 cursor-pointer'>
+            <input
+              type='checkbox'
+              checked={showOnInstructorsPage}
+              onChange={(e) => setShowOnInstructorsPage(e.target.checked)}
+              className='mt-1 h-5 w-5 rounded border-slate-300 text-[#E61C24] focus:ring-[#E61C24]'
+            />
+            <span>
+              <span className='block text-base font-bold text-slate-800'>
+                Show on public Instructors page
+              </span>
+              <span className='block text-base font-semibold text-slate-500 mt-1'>
+                Enable for founders, managing directors, or chief instructors
+                who use an admin/staff account but should still appear as
+                mentors. Their designation (not role) is shown publicly.
+              </span>
+            </span>
+          </label>
 
           <div className='flex flex-col gap-2'>
             <label className='text-sm font-bold text-slate-700'>

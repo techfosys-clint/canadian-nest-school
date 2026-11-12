@@ -27,7 +27,10 @@ export default async function InstructorsPage() {
 
   // Fetch all registered instructors, published courses, categories, and approved reviews from database
   const [instructorDocs, coursesDocs, categoriesDocs, reviewsDocs] = await Promise.all([
-    User.find({ role: 'instructor' })
+    User.find({
+      status: { $ne: 'suspended' },
+      $or: [{ role: 'instructor' }, { showOnInstructorsPage: true }],
+    })
       .populate('profilePic')
       .sort({ name: 1 })
       .lean(),

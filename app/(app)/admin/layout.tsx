@@ -17,7 +17,6 @@ import {
   FiList,
   FiLogOut,
   FiMenu,
-  FiMessageSquare,
   FiPackage,
   FiRadio,
   FiShoppingBag,
@@ -174,13 +173,6 @@ const NAV_GROUPS: SidebarGroup[] = [
         href: '/admin/coupons',
         icon: FiTag,
         roles: ['admin', 'staff'],
-        permission: 'coupons',
-      },
-      {
-        label: 'Fee SMS Reminders',
-        href: '/admin/sms-reminders',
-        icon: FiMessageSquare,
-        roles: ['admin'],
         permission: 'coupons',
       },
       {

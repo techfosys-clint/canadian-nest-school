@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FiArrowRight, FiBook, FiBookOpen } from 'react-icons/fi';
+import Swal from 'sweetalert2';
 import CompletedCourseActions from '@/components/CompletedCourseActions';
 import { fetchReviewGatesForCourses } from '@/lib/certificates/downloadClient';
 import type { CompletionReviewState } from '@/lib/reviews/completionGate';
@@ -44,6 +45,14 @@ interface EnrollmentItem {
   createdAt: string;
 }
 
+interface FeeNotice {
+  enrollmentId: string;
+  courseId: string;
+  courseTitle: string;
+  monthlyFee: number;
+  isBlocked: boolean;
+}
+
 export default function MyCoursesPage() {
   const router = useRouter();
   const [user, setUser] = useState<UserSession | null>(null);
@@ -56,6 +65,10 @@ export default function MyCoursesPage() {
     Record<string, CompletionReviewState>
   >({});
   const [gatesLoading, setGatesLoading] = useState(false);
+  const [feeNotices, setFeeNotices] = useState<FeeNotice[]>([]);
+  const [payingEnrollmentId, setPayingEnrollmentId] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     async function checkSessionAndFetchData() {
@@ -118,6 +131,20 @@ export default function MyCoursesPage() {
               .finally(() => setGatesLoading(false));
           }
         }
+
+        try {
+          const noticesRes = await fetch('/api/subscriptions/notices', {
+            cache: 'no-store',
+          });
+          if (noticesRes.ok) {
+            const noticesData = await noticesRes.json();
+            if (noticesData.success && Array.isArray(noticesData.notices)) {
+              setFeeNotices(noticesData.notices);
+            }
+          }
+        } catch {
+          /* ignore */
+        }
       } catch (error) {
         console.error('Error fetching course data:', error);
       } finally {
@@ -128,8 +155,60 @@ export default function MyCoursesPage() {
     checkSessionAndFetchData();
   }, [router]);
 
-  const handleResumeLearning = (courseId: string, slug: string) => {
+  const handleResumeLearning = (_courseId: string, slug: string) => {
+    if (!slug) return;
     router.push(`/courses/${slug}/watch`);
+  };
+
+  const handlePayNow = async (notice: FeeNotice) => {
+    const { value: couponCode } = await Swal.fire({
+      title: `Renew — ${notice.courseTitle}`,
+      html: `
+        <p class="text-base text-slate-600 mb-3">
+          Fee: <strong>BDT ${notice.monthlyFee}</strong>
+        </p>
+        <input id="courses-sub-coupon" class="swal2-input" placeholder="Extension coupon (optional)" />
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Pay with EPS',
+      confirmButtonColor: '#E61C24',
+      cancelButtonText: 'Cancel',
+      preConfirm: () => {
+        const el = document.getElementById(
+          'courses-sub-coupon',
+        ) as HTMLInputElement | null;
+        return el?.value?.trim() || '';
+      },
+    });
+
+    if (couponCode === undefined) return;
+
+    setPayingEnrollmentId(notice.enrollmentId);
+    try {
+      const res = await fetch('/api/subscriptions/renew', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          enrollmentId: notice.enrollmentId,
+          couponCode: couponCode || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success && data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+        return;
+      }
+      throw new Error(data.error || 'Renewal failed.');
+    } catch (err: any) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Could not start payment',
+        text: err.message || 'Please try again.',
+        confirmButtonColor: '#E61C24',
+      });
+    } finally {
+      setPayingEnrollmentId(null);
+    }
   };
 
   if (loading) {
@@ -311,34 +390,62 @@ export default function MyCoursesPage() {
                       </div>
                     </div>
 
-                    {progress === 100 ? (
-                      <CompletedCourseActions
-                        courseId={course.id}
-                        courseTitle={course.title}
-                        courseSlug={course.slug}
-                        gate={reviewGates[course.id]}
-                        gateLoading={gatesLoading && !reviewGates[course.id]}
-                      />
-                    ) : (
-                      <div className='space-y-3'>
-                        <button
-                          type='button'
-                          onClick={() =>
-                            handleResumeLearning(course.id, course.slug)
-                          }
-                          className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all duration-200 cursor-pointer border-none active:scale-[0.99]'
-                        >
-                          <span>Resume Learning</span>
-                          <FiArrowRight className='h-5 w-5 group-hover:translate-x-0.5 transition-transform' />
-                        </button>
-                        <Link
-                          href={`/dashboard/courses/${course.id}/complete`}
-                          className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-white border border-zinc-200/80 hover:border-[#E61C24]/40 text-zinc-700 hover:text-[#E61C24] font-bold text-base transition-all duration-200'
-                        >
-                          Leave Reviews
-                        </Link>
-                      </div>
-                    )}
+                    {(() => {
+                      const feeNotice = feeNotices.find(
+                        (n) => n.courseId === course.id,
+                      );
+                      return (
+                        <>
+                          {feeNotice && (
+                            <button
+                              type='button'
+                              onClick={() => void handlePayNow(feeNotice)}
+                              disabled={
+                                payingEnrollmentId === feeNotice.enrollmentId
+                              }
+                              className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-base transition-all duration-200 cursor-pointer border-none disabled:opacity-60'
+                            >
+                              {payingEnrollmentId === feeNotice.enrollmentId
+                                ? 'Starting…'
+                                : feeNotice.isBlocked
+                                  ? `Pay Now — BDT ${feeNotice.monthlyFee}`
+                                  : `Renew Fee — BDT ${feeNotice.monthlyFee}`}
+                            </button>
+                          )}
+                          {progress === 100 ? (
+                            <CompletedCourseActions
+                              courseId={course.id}
+                              courseTitle={course.title}
+                              courseSlug={course.slug}
+                              gate={reviewGates[course.id]}
+                              gateLoading={
+                                gatesLoading && !reviewGates[course.id]
+                              }
+                            />
+                          ) : (
+                            <div className='space-y-3'>
+                              <button
+                                type='button'
+                                onClick={() =>
+                                  handleResumeLearning(course.id, course.slug)
+                                }
+                                disabled={!!feeNotice?.isBlocked}
+                                className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all duration-200 cursor-pointer border-none active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed'
+                              >
+                                <span>Resume Learning</span>
+                                <FiArrowRight className='h-5 w-5 group-hover:translate-x-0.5 transition-transform' />
+                              </button>
+                              <Link
+                                href={`/dashboard/courses/${course.id}/complete`}
+                                className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-white border border-zinc-200/80 hover:border-[#E61C24]/40 text-zinc-700 hover:text-[#E61C24] font-bold text-base transition-all duration-200'
+                              >
+                                Leave Reviews
+                              </Link>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
               );

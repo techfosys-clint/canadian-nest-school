@@ -52,7 +52,7 @@ export async function GET() {
         paymentStatus: 'completed',
       })
         .select(
-          'course billingType paidUntil accessStatus paymentStatus',
+          'course batch billingType paidUntil accessStatus paymentStatus',
         )
         .lean()
 
@@ -62,6 +62,7 @@ export async function GET() {
       const { Course } = await import('@/lib/db/models/Course')
 
       const courseIds: any[] = []
+      const batchByCourse = new Map<string, string | null>()
       for (const e of enrollments as any[]) {
         const courseId = e.course?.toString?.() || String(e.course)
         if (e.billingType === 'monthly' || e.billingType === 'quarterly') {
@@ -86,12 +87,44 @@ export async function GET() {
           }
         }
         courseIds.push(e.course)
+        batchByCourse.set(
+          courseId,
+          e.batch ? e.batch.toString?.() || String(e.batch) : null,
+        )
       }
 
       lessonsQuery.course = { $in: courseIds }
+
+      // Find upcoming live webinars
+      const liveLessons = await Lesson.find(lessonsQuery)
+        .populate({ path: 'course', select: 'title' })
+        .sort({ liveDate: 1 })
+        .lean()
+
+      const serializedLessons = (liveLessons as any[])
+        .filter((l: any) => {
+          const cid = l.course?._id?.toString?.() || l.course?.toString?.()
+          if (!cid || blockedCourseIds.has(cid)) return false
+          const lessonBatch = l.batch?.toString?.() || null
+          if (!lessonBatch) return true
+          const studentBatch = batchByCourse.get(cid) || null
+          return !!studentBatch && studentBatch === lessonBatch
+        })
+        .map((l: any) => ({
+          id: l._id.toString(),
+          title: l.title,
+          slug: l.slug,
+          courseTitle: l.course?.title || 'Unknown Course',
+          livePlatform: l.livePlatform || 'zoom',
+          liveUrl: l.liveUrl || '',
+          liveDate: l.liveDate ? l.liveDate.toISOString() : null,
+          duration: l.duration || 60,
+        }))
+
+      return NextResponse.json({ success: true, liveLessons: serializedLessons })
     }
 
-    // Find upcoming live webinars
+    // Find upcoming live webinars (admin sees all)
     const liveLessons = await Lesson.find(lessonsQuery)
       .populate({ path: 'course', select: 'title' })
       .sort({ liveDate: 1 })

@@ -24,6 +24,7 @@ export default function StaffRegisterFormClient() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [designation, setDesignation] = useState('');
+  const [showOnInstructorsPage, setShowOnInstructorsPage] = useState(false);
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<'staff' | 'instructor' | 'admin'>('staff');
   const [permissions, setPermissions] = useState<string[]>([
@@ -48,6 +49,7 @@ export default function StaffRegisterFormClient() {
       setPermissions(['reviews', 'categories', 'faqs', 'blogs', 'media']);
     } else if (newRole === 'instructor') {
       setPermissions(['courses', 'lessons']);
+      setShowOnInstructorsPage(true);
     } else if (newRole === 'admin') {
       setPermissions([
         'courses',
@@ -120,6 +122,8 @@ export default function StaffRegisterFormClient() {
           password,
           role,
           designation: designation || undefined,
+          showOnInstructorsPage:
+            showOnInstructorsPage || role === 'instructor',
           permissions:
             role === 'admin'
               ? [
@@ -285,6 +289,24 @@ export default function StaffRegisterFormClient() {
               page).
             </p>
           </div>
+
+          <label className='flex items-start gap-3 p-4 rounded-lg border border-slate-200/80 bg-slate-50 cursor-pointer'>
+            <input
+              type='checkbox'
+              checked={showOnInstructorsPage || role === 'instructor'}
+              onChange={(e) => setShowOnInstructorsPage(e.target.checked)}
+              className='mt-1 h-5 w-5 rounded border-slate-300 text-[#E61C24] focus:ring-[#E61C24]'
+            />
+            <span>
+              <span className='block text-base font-bold text-slate-800'>
+                Show on public Instructors page
+              </span>
+              <span className='block text-base font-semibold text-slate-500 mt-1'>
+                Use for founders / managing directors / chief instructors who
+                should appear on Mentors with their designation.
+              </span>
+            </span>
+          </label>
 
           {/* Profile Picture Upload row */}
           <div className='flex flex-col gap-2 pt-2'>

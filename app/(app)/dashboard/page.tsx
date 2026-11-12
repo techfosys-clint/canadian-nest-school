@@ -70,6 +70,19 @@ interface LiveWebinar {
   duration: number;
 }
 
+interface FeeNotice {
+  enrollmentId: string;
+  courseId: string;
+  courseTitle: string;
+  courseSlug: string;
+  paidUntil: string;
+  isBlocked: boolean;
+  showOverdueNotice: boolean;
+  daysPastDue: number;
+  daysUntilDue: number;
+  monthlyFee: number;
+}
+
 export default function StudentDashboard() {
   const router = useRouter();
   const [user, setUser] = useState<UserSession | null>(null);
@@ -87,6 +100,10 @@ export default function StudentDashboard() {
     Record<string, CompletionReviewState>
   >({});
   const [gatesLoading, setGatesLoading] = useState(false);
+  const [feeNotices, setFeeNotices] = useState<FeeNotice[]>([]);
+  const [payingEnrollmentId, setPayingEnrollmentId] = useState<string | null>(
+    null,
+  );
 
   // Academic submissions and grading stats
   const [submissions, setSubmissions] = useState<any[]>([]);
@@ -362,6 +379,21 @@ export default function StudentDashboard() {
           }
         }
 
+        // Fee notices for per-card Pay Now
+        try {
+          const noticesRes = await fetch('/api/subscriptions/notices', {
+            cache: 'no-store',
+          });
+          if (noticesRes.ok) {
+            const noticesData = await noticesRes.json();
+            if (noticesData.success && Array.isArray(noticesData.notices)) {
+              setFeeNotices(noticesData.notices);
+            }
+          }
+        } catch {
+          /* ignore */
+        }
+
         // Fetch real progress data from API (DB-backed, cross-device)
         const progressRes = await fetch('/api/progress');
         if (progressRes.ok) {
@@ -443,8 +475,68 @@ export default function StudentDashboard() {
     checkSessionAndFetchData();
   }, [router]);
 
-  const handleResumeLearning = (courseId: string, slug: string) => {
+  const handleResumeLearning = (_courseId: string, slug: string) => {
+    if (!slug) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Course unavailable',
+        text: 'Could not open the course player. Please refresh and try again.',
+        confirmButtonColor: '#E61C24',
+      });
+      return;
+    }
     router.push(`/courses/${slug}/watch`);
+  };
+
+  const handlePayNow = async (notice: FeeNotice) => {
+    const { value: couponCode } = await Swal.fire({
+      title: `Renew — ${notice.courseTitle}`,
+      html: `
+        <p class="text-base text-slate-600 mb-3">
+          Fee: <strong>BDT ${notice.monthlyFee}</strong>
+        </p>
+        <input id="dash-sub-coupon" class="swal2-input" placeholder="Extension coupon (optional)" />
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Pay with EPS',
+      confirmButtonColor: '#E61C24',
+      cancelButtonText: 'Cancel',
+      preConfirm: () => {
+        const el = document.getElementById(
+          'dash-sub-coupon',
+        ) as HTMLInputElement | null;
+        return el?.value?.trim() || '';
+      },
+    });
+
+    if (couponCode === undefined) return;
+
+    setPayingEnrollmentId(notice.enrollmentId);
+    try {
+      const res = await fetch('/api/subscriptions/renew', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          enrollmentId: notice.enrollmentId,
+          couponCode: couponCode || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success && data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+        return;
+      }
+      throw new Error(data.error || 'Renewal failed.');
+    } catch (err: any) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Could not start payment',
+        text: err.message || 'Please try again.',
+        confirmButtonColor: '#E61C24',
+      });
+    } finally {
+      setPayingEnrollmentId(null);
+    }
   };
 
   const handleRegisterSeat = (webinarTitle: string) => {
@@ -455,6 +547,28 @@ export default function StudentDashboard() {
       confirmButtonColor: '#E61C24',
     });
   };
+
+  /** Today's class if any; otherwise the next upcoming live session. */
+  const featuredLiveClass = (() => {
+    const now = Date.now();
+    const withDate = webinars
+      .filter((w) => w.liveDate)
+      .map((w) => ({ ...w, ts: new Date(w.liveDate!).getTime() }))
+      .sort((a, b) => a.ts - b.ts);
+
+    const bdToday = new Date().toLocaleDateString('en-CA', {
+      timeZone: 'Asia/Dhaka',
+    });
+    const todayClass = withDate.find((w) => {
+      const ymd = new Date(w.ts).toLocaleDateString('en-CA', {
+        timeZone: 'Asia/Dhaka',
+      });
+      return ymd === bdToday;
+    });
+    if (todayClass) return todayClass;
+
+    return withDate.find((w) => w.ts >= now - 60 * 60 * 1000) || null;
+  })();
 
   // Calculate dynamic stats based on actual course progress from DB
   const totalCompletedLessons = enrollments.reduce((sum, e) => {
@@ -536,6 +650,68 @@ export default function StudentDashboard() {
           </p>
         </div>
       </div>
+
+      {/* Today's / Latest Class shortcut */}
+      {featuredLiveClass && (
+        <div className='mb-8 rounded-lg border border-[#E61C24]/30 bg-white p-5 sm:p-6'>
+          <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+            <div className='min-w-0 space-y-1'>
+              <p className='text-base font-bold uppercase tracking-wider text-[#E61C24]'>
+                {(() => {
+                  const ymd = new Date(
+                    featuredLiveClass.liveDate!,
+                  ).toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
+                  const bdToday = new Date().toLocaleDateString('en-CA', {
+                    timeZone: 'Asia/Dhaka',
+                  });
+                  return ymd === bdToday
+                    ? "Today's Class"
+                    : 'Upcoming Class';
+                })()}
+              </p>
+              <h2 className='text-xl font-bold text-zinc-800 truncate'>
+                {featuredLiveClass.title}
+              </h2>
+              <p className='text-base font-semibold text-zinc-500 truncate'>
+                {featuredLiveClass.courseTitle} ·{' '}
+                {new Date(featuredLiveClass.liveDate!).toLocaleString('en-BD', {
+                  month: 'short',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: true,
+                  timeZone: 'Asia/Dhaka',
+                })}{' '}
+                ({featuredLiveClass.livePlatform.toUpperCase()})
+              </p>
+            </div>
+            <div className='flex flex-wrap items-center gap-3 shrink-0'>
+              <Link
+                href='/dashboard/live-classes'
+                className='inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200/80 bg-white px-4 py-2.5 text-base font-bold text-zinc-700 hover:border-[#E61C24]/40 hover:text-[#E61C24] transition-colors'
+              >
+                All live classes
+              </Link>
+              {featuredLiveClass.liveUrl &&
+              new Date(featuredLiveClass.liveDate!).getTime() <= Date.now() ? (
+                <a
+                  href={featuredLiveClass.liveUrl}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='inline-flex items-center justify-center gap-2 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] px-5 py-2.5 text-base font-bold text-white transition-colors'
+                >
+                  Join class
+                  <FiExternalLink className='h-4 w-4' />
+                </a>
+              ) : (
+                <span className='inline-flex items-center justify-center rounded-lg bg-zinc-100 px-4 py-2.5 text-base font-bold text-zinc-500'>
+                  Unlocks at class time
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Quick Stats Grid - Completely borderless and shadowless */}
       <div className='grid grid-cols-1 md:grid-cols-4 gap-6 mb-10'>
@@ -659,6 +835,9 @@ export default function StudentDashboard() {
                     : 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop';
 
                 const progress = courseProgress[course.id] ?? 0;
+                const feeNotice = feeNotices.find(
+                  (n) => n.courseId === course.id,
+                );
 
                 // Course evaluation marks calculations
                 const courseSubmissions = submissions.filter((s: any) => {
@@ -782,6 +961,23 @@ export default function StudentDashboard() {
                         </div>
                       </div>
 
+                      {feeNotice && (
+                        <button
+                          type='button'
+                          onClick={() => void handlePayNow(feeNotice)}
+                          disabled={
+                            payingEnrollmentId === feeNotice.enrollmentId
+                          }
+                          className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-base transition-all duration-200 cursor-pointer border-none disabled:opacity-60'
+                        >
+                          {payingEnrollmentId === feeNotice.enrollmentId
+                            ? 'Starting…'
+                            : feeNotice.isBlocked
+                              ? `Pay Now — BDT ${feeNotice.monthlyFee}`
+                              : `Renew Fee — BDT ${feeNotice.monthlyFee}`}
+                        </button>
+                      )}
+
                       {progress === 100 ? (
                         <CompletedCourseActions
                           courseId={course.id}
@@ -797,7 +993,8 @@ export default function StudentDashboard() {
                             onClick={() =>
                               handleResumeLearning(course.id, course.slug)
                             }
-                            className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all duration-200 cursor-pointer border-none active:scale-[0.99]'
+                            disabled={!!feeNotice?.isBlocked}
+                            className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all duration-200 cursor-pointer border-none active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed'
                           >
                             <span>Resume Learning</span>
                             <FiArrowRight className='h-5 w-5 group-hover:translate-x-0.5 transition-transform' />

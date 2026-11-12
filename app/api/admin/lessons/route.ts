@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { title, slug, course: courseId, moduleOrder, moduleName, lessonType, videoUrl, livePlatform, liveUrl, liveDate, content, duration, isPreviewable, autoGenerateZoom, quizQuestions } = body
+    const { title, slug, course: courseId, batch, moduleOrder, moduleName, lessonType, videoUrl, livePlatform, liveUrl, liveDate, content, duration, isPreviewable, autoGenerateZoom, quizQuestions } = body
 
     if (!title || !slug || !courseId || !duration) {
       return NextResponse.json(
@@ -198,6 +198,7 @@ export async function POST(request: Request) {
 
     const newLesson = new Lesson({
       title, slug, course: courseId, order: finalOrder, moduleOrder: finalModuleOrder, moduleName, lessonType: lessonType || 'recorded',
+      batch: batch || null,
       videoUrl, livePlatform, liveUrl: actualLiveUrl,
       liveDate: liveDate ? parseBdDate(liveDate) : undefined,
       content, duration: Number(duration),

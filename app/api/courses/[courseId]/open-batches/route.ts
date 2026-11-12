@@ -12,8 +12,8 @@ type Props = {
 export const dynamic = 'force-dynamic'
 
 /**
- * Public: the batch(es) currently in an open join window for a monthly/quarterly course.
- * Join windows are expected not to overlap — typically 0 or 1 result.
+ * Public: every batch currently in an open join window for a monthly/quarterly course.
+ * Several batches may be open at the same time; checkout lets the student pick one.
  */
 export async function GET(_request: Request, { params }: Props) {
   try {

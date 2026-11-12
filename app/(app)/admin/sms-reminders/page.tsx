@@ -1,7 +1,6 @@
-import SmsRemindersClient from './SmsRemindersClient'
+import { redirect } from 'next/navigation'
 
-export const dynamic = 'force-dynamic'
-
+/** Fee SMS reminders now live inside each course's billing settings. */
 export default function SmsRemindersPage() {
-  return <SmsRemindersClient />
+  redirect('/admin/courses')
 }

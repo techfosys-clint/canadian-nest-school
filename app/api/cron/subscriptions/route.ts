@@ -78,7 +78,7 @@ async function run(request: Request) {
     }
   }
 
-  // ── SMS reminders ───────────────────────────────────────────
+  // ── SMS reminders (prefer per-course settings; fall back to global) ──
   let settings = await SmsReminderSettings.findOne().lean();
   if (!settings) {
     const created = await SmsReminderSettings.create({});
@@ -88,17 +88,7 @@ async function run(request: Request) {
   let smsSent = 0;
   let smsSkipped = 0;
 
-  if (settings?.enabled) {
-    const rawOffsets = (settings.offsetDaysBeforeEnd || [5, 3, 1])
-      .map((n: number) => Math.max(0, Number(n)))
-      .filter((n: number) => Number.isFinite(n));
-    const offsets = [...new Set<number>(rawOffsets)].sort((a, b) => b - a);
-
-    const maxPerPeriod = Math.max(
-      0,
-      Number(settings.maxMessagesPerPeriod ?? 3),
-    );
-
+  {
     const candidates = await Enrollment.find({
       paymentStatus: 'completed',
       billingType: { $in: ['monthly', 'quarterly'] },
@@ -107,13 +97,42 @@ async function run(request: Request) {
     })
       .populate({
         path: 'course',
-        select: 'title monthlyFee quarterlyFee billingType',
+        select:
+          'title monthlyFee quarterlyFee billingType smsReminderEnabled smsOffsetDaysBeforeEnd smsMaxMessagesPerPeriod',
       })
       .lean();
 
     for (const e of candidates as any[]) {
       const course = e.course;
       if (!course || !e.paidUntil) continue;
+
+      const courseSmsEnabled =
+        course.smsReminderEnabled !== undefined
+          ? !!course.smsReminderEnabled
+          : !!settings?.enabled;
+      if (!courseSmsEnabled) {
+        smsSkipped += 1;
+        continue;
+      }
+
+      const rawOffsets = (
+        Array.isArray(course.smsOffsetDaysBeforeEnd) &&
+        course.smsOffsetDaysBeforeEnd.length > 0
+          ? course.smsOffsetDaysBeforeEnd
+          : settings?.offsetDaysBeforeEnd || [5, 3, 1]
+      )
+        .map((n: number) => Math.max(0, Number(n)))
+        .filter((n: number) => Number.isFinite(n));
+      const offsets = [...new Set<number>(rawOffsets)].sort((a, b) => b - a);
+
+      const maxPerPeriod = Math.max(
+        0,
+        Number(
+          course.smsMaxMessagesPerPeriod ??
+            settings?.maxMessagesPerPeriod ??
+            3,
+        ),
+      );
 
       const paidUntil = new Date(e.paidUntil);
       const daysUntil = daysBetweenBd(todayStart, paidUntil);

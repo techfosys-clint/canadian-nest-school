@@ -110,6 +110,17 @@ export default function CourseFormClient({
   const [noticeStartOffsetDays, setNoticeStartOffsetDays] = useState(
     initialData?.noticeStartOffsetDays ?? 5,
   );
+  const [smsReminderEnabled, setSmsReminderEnabled] = useState(
+    initialData?.smsReminderEnabled !== false,
+  );
+  const [smsOffsetsText, setSmsOffsetsText] = useState(
+    Array.isArray(initialData?.smsOffsetDaysBeforeEnd)
+      ? initialData.smsOffsetDaysBeforeEnd.join(', ')
+      : '5, 3, 1',
+  );
+  const [smsMaxMessages, setSmsMaxMessages] = useState(
+    initialData?.smsMaxMessagesPerPeriod ?? 3,
+  );
   const [noticeEndOffsetDays, setNoticeEndOffsetDays] = useState(
     initialData?.noticeEndOffsetDays ?? 2,
   );
@@ -974,6 +985,18 @@ export default function CourseFormClient({
       ? Number(noticeEndOffsetDays) || 0
       : 2,
     blockOffsetDays: isRecurringBilling ? Number(blockOffsetDays) || 0 : 2,
+    smsReminderEnabled: isRecurringBilling ? smsReminderEnabled : false,
+    smsOffsetDaysBeforeEnd: isRecurringBilling
+      ? smsOffsetsText
+          .split(/[,\s]+/)
+          .map((s: string) => s.trim())
+          .filter(Boolean)
+          .map((s: string) => Number(s))
+          .filter((n: number) => Number.isFinite(n) && n >= 0)
+      : [],
+    smsMaxMessagesPerPeriod: isRecurringBilling
+      ? Number(smsMaxMessages) || 0
+      : 0,
     thumbnail: thumbnailId || null,
     trailerVideoUrl: trailerVideoUrl.trim(),
     categories,
@@ -2899,6 +2922,57 @@ export default function CourseFormClient({
                       className='bg-slate-100 border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none'
                     />
                   </div>
+                </div>
+
+                <div className='rounded-lg border border-slate-200 bg-slate-50 p-4 space-y-4'>
+                  <div className='flex items-start gap-3'>
+                    <input
+                      id='smsReminderEnabled'
+                      type='checkbox'
+                      checked={smsReminderEnabled}
+                      onChange={(e) => setSmsReminderEnabled(e.target.checked)}
+                      className='mt-1 h-5 w-5 rounded border-slate-300 text-[#E61C24] focus:ring-[#E61C24]'
+                    />
+                    <label htmlFor='smsReminderEnabled' className='cursor-pointer'>
+                      <span className='block text-base font-bold text-slate-800'>
+                        Fee SMS reminders for this course
+                      </span>
+                      <span className='block text-base font-semibold text-slate-500 mt-1'>
+                        Sends SMS before each period ends (paidUntil). Offsets
+                        are days before due, e.g. 5, 3, 1.
+                      </span>
+                    </label>
+                  </div>
+                  {smsReminderEnabled && (
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+                      <div className='flex flex-col gap-2'>
+                        <label className='text-base font-bold text-slate-600'>
+                          Offset days (comma-separated)
+                        </label>
+                        <input
+                          type='text'
+                          value={smsOffsetsText}
+                          onChange={(e) => setSmsOffsetsText(e.target.value)}
+                          placeholder='5, 3, 1'
+                          className='bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none'
+                        />
+                      </div>
+                      <div className='flex flex-col gap-2'>
+                        <label className='text-base font-bold text-slate-600'>
+                          Max SMS per billing period
+                        </label>
+                        <input
+                          type='number'
+                          min={0}
+                          value={smsMaxMessages}
+                          onChange={(e) =>
+                            setSmsMaxMessages(Number(e.target.value) || 0)
+                          }
+                          className='bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none'
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import {
   FiChevronRight,
+  FiDownload,
   FiLock,
   FiSearch,
   FiShield,
@@ -17,6 +18,16 @@ import Swal from 'sweetalert2';
 
 type CourseOption = { id: string; title: string };
 type BatchOption = { id: string; name: string };
+type EnrolledStudentRow = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  status: string;
+  feeStatus: 'paid' | 'due';
+  billingType: string;
+  paidUntil: string | null;
+};
 
 export default function UsersDatabaseClient() {
   const router = useRouter();
@@ -35,7 +46,14 @@ export default function UsersDatabaseClient() {
 
   const [enrolledStudentIds, setEnrolledStudentIds] =
     useState<Set<string> | null>(null);
+  const [enrolledStudents, setEnrolledStudents] = useState<
+    EnrolledStudentRow[]
+  >([]);
+  const [enrolledCourseTitle, setEnrolledCourseTitle] = useState('');
   const [enrolledLoading, setEnrolledLoading] = useState(false);
+  const [paymentFilter, setPaymentFilter] = useState<'all' | 'paid' | 'due'>(
+    'all',
+  );
 
   const fetchUsers = async () => {
     try {
@@ -62,6 +80,9 @@ export default function UsersDatabaseClient() {
       setBatchId('');
       setBatches([]);
       setEnrolledStudentIds(null);
+      setEnrolledStudents([]);
+      setEnrolledCourseTitle('');
+      setPaymentFilter('all');
       return;
     }
 
@@ -150,6 +171,9 @@ export default function UsersDatabaseClient() {
   useEffect(() => {
     if (roleFilter !== 'student' || !courseId) {
       setEnrolledStudentIds(null);
+      setEnrolledStudents([]);
+      setEnrolledCourseTitle('');
+      setPaymentFilter('all');
       setEnrolledLoading(false);
       return;
     }
@@ -167,10 +191,13 @@ export default function UsersDatabaseClient() {
         }
         if (cancelled) return;
         setEnrolledStudentIds(new Set(data.studentIds || []));
+        setEnrolledStudents(data.students || []);
+        setEnrolledCourseTitle(data.courseTitle || '');
       } catch (err) {
         console.error(err);
         if (!cancelled) {
           setEnrolledStudentIds(new Set());
+          setEnrolledStudents([]);
           Swal.fire('Error', 'Failed to filter students by course.', 'error');
         }
       } finally {
@@ -191,8 +218,17 @@ export default function UsersDatabaseClient() {
       setBatchId('');
       setBatches([]);
       setEnrolledStudentIds(null);
+      setEnrolledStudents([]);
+      setEnrolledCourseTitle('');
+      setPaymentFilter('all');
     }
   };
+
+  const feeStatusById = useMemo(() => {
+    const map = new Map<string, 'paid' | 'due'>();
+    for (const row of enrolledStudents) map.set(row.id, row.feeStatus);
+    return map;
+  }, [enrolledStudents]);
 
   const handleDelete = async (id: string, type: string) => {
     const result = await Swal.fire({
@@ -299,6 +335,9 @@ export default function UsersDatabaseClient() {
     !batchesLoading &&
     batches.length > 0;
 
+  const showPaymentFilter = roleFilter === 'student' && !!courseId;
+  const showFeeColumn = showPaymentFilter;
+
   const filteredUsers = useMemo(() => {
     return users.filter((u) => {
       const matchesSearch =
@@ -308,11 +347,144 @@ export default function UsersDatabaseClient() {
       if (!matchesSearch || !matchesRole) return false;
 
       if (roleFilter === 'student' && courseId && enrolledStudentIds) {
-        return enrolledStudentIds.has(u._id);
+        if (!enrolledStudentIds.has(u._id)) return false;
+        if (paymentFilter !== 'all') {
+          const fee = feeStatusById.get(u._id);
+          if (fee !== paymentFilter) return false;
+        }
       }
       return true;
     });
-  }, [users, search, roleFilter, courseId, enrolledStudentIds]);
+  }, [
+    users,
+    search,
+    roleFilter,
+    courseId,
+    enrolledStudentIds,
+    paymentFilter,
+    feeStatusById,
+  ]);
+
+  const exportRows = useMemo(() => {
+    if (!courseId || enrolledStudents.length === 0) return [];
+    const idSet = new Set(filteredUsers.map((u) => u._id));
+    return enrolledStudents.filter((row) => {
+      if (!idSet.has(row.id)) return false;
+      if (paymentFilter !== 'all' && row.feeStatus !== paymentFilter)
+        return false;
+      const q = search.trim().toLowerCase();
+      if (!q) return true;
+      return (
+        row.name.toLowerCase().includes(q) ||
+        row.email.toLowerCase().includes(q) ||
+        row.phone.toLowerCase().includes(q)
+      );
+    });
+  }, [courseId, enrolledStudents, filteredUsers, paymentFilter, search]);
+
+  const batchLabel =
+    batches.find((b) => b.id === batchId)?.name ||
+    (batchId ? 'Selected batch' : 'All batches');
+
+  const downloadCsv = () => {
+    if (exportRows.length === 0) {
+      Swal.fire(
+        'Nothing to export',
+        'No students match the current filters.',
+        'info',
+      );
+      return;
+    }
+    const header = [
+      'Name',
+      'Email',
+      'Phone',
+      'Account Status',
+      'Fee Status',
+      'Billing Type',
+      'Paid Until',
+      'Course',
+      'Batch',
+    ];
+    const lines = [
+      header.join(','),
+      ...exportRows.map((row) =>
+        [
+          row.name,
+          row.email,
+          row.phone,
+          row.status,
+          row.feeStatus,
+          row.billingType,
+          row.paidUntil ? new Date(row.paidUntil).toLocaleString() : '',
+          enrolledCourseTitle,
+          batchLabel,
+        ]
+          .map((cell) => `"${String(cell).replace(/"/g, '""')}"`)
+          .join(','),
+      ),
+    ];
+    const blob = new Blob([lines.join('\n')], {
+      type: 'text/csv;charset=utf-8;',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `students-${courseId}${batchId ? `-${batchId}` : ''}-${paymentFilter}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const downloadPdf = () => {
+    if (exportRows.length === 0) {
+      Swal.fire(
+        'Nothing to export',
+        'No students match the current filters.',
+        'info',
+      );
+      return;
+    }
+    const escapeHtml = (value: string) =>
+      String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    const rowsHtml = exportRows
+      .map(
+        (row) => `<tr>
+          <td>${escapeHtml(row.name)}</td>
+          <td>${escapeHtml(row.email)}</td>
+          <td>${escapeHtml(row.phone)}</td>
+          <td>${escapeHtml(row.feeStatus.toUpperCase())}</td>
+          <td>${escapeHtml(row.billingType)}</td>
+          <td>${escapeHtml(row.paidUntil ? new Date(row.paidUntil).toLocaleDateString() : '—')}</td>
+        </tr>`,
+      )
+      .join('');
+    const html = `<!DOCTYPE html><html><head><title>Student Export</title>
+      <style>
+        body{font-family:Arial,sans-serif;padding:24px;color:#0f172a}
+        h1{font-size:20px;margin:0 0 8px}
+        p{font-size:13px;color:#475569;margin:0 0 16px}
+        table{width:100%;border-collapse:collapse;font-size:12px}
+        th,td{border:1px solid #cbd5e1;padding:8px;text-align:left}
+        th{background:#f8fafc}
+      </style></head><body>
+      <h1>${escapeHtml(enrolledCourseTitle || 'Course')} — Students</h1>
+      <p>Batch: ${escapeHtml(batchLabel)} · Fee filter: ${paymentFilter.toUpperCase()} · Exported ${new Date().toLocaleString()}</p>
+      <table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Fee</th><th>Billing</th><th>Paid Until</th></tr></thead>
+      <tbody>${rowsHtml}</tbody></table>
+      <script>window.onload=function(){window.print()}</script>
+      </body></html>`;
+    const w = window.open('', '_blank');
+    if (!w) {
+      Swal.fire('Popup blocked', 'Allow popups to export PDF.', 'warning');
+      return;
+    }
+    w.document.write(html);
+    w.document.close();
+  };
 
   const tableBusy = loading || enrolledLoading;
 
@@ -426,6 +598,54 @@ export default function UsersDatabaseClient() {
                 </p>
               </div>
             )}
+
+            {showPaymentFilter && (
+              <div className='flex-1 min-w-0'>
+                <label
+                  htmlFor='users-db-payment-filter'
+                  className='block text-base font-bold text-slate-700 mb-1.5'
+                >
+                  Fee status
+                </label>
+                <select
+                  id='users-db-payment-filter'
+                  value={paymentFilter}
+                  onChange={(e) =>
+                    setPaymentFilter(e.target.value as 'all' | 'paid' | 'due')
+                  }
+                  className='w-full h-11 bg-slate-50 border border-slate-200 rounded-lg text-base text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#E61C24]/20 focus:border-[#E61C24] transition-all'
+                >
+                  <option value='all'>All (paid + due)</option>
+                  <option value='paid'>Paid / current</option>
+                  <option value='due'>Due / overdue</option>
+                </select>
+              </div>
+            )}
+          </div>
+        )}
+
+        {showPaymentFilter && (
+          <div className='flex flex-wrap items-center gap-2 pt-1'>
+            <button
+              type='button'
+              onClick={downloadCsv}
+              className='inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white border border-slate-200 hover:border-[#E61C24]/40 text-slate-700 hover:text-[#E61C24] font-bold text-base transition-colors'
+            >
+              <FiDownload className='h-4 w-4' />
+              Export Excel/CSV
+            </button>
+            <button
+              type='button'
+              onClick={downloadPdf}
+              className='inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white border border-slate-200 hover:border-[#E61C24]/40 text-slate-700 hover:text-[#E61C24] font-bold text-base transition-colors'
+            >
+              <FiDownload className='h-4 w-4' />
+              Export PDF
+            </button>
+            <p className='text-base font-semibold text-slate-500'>
+              {exportRows.length} student{exportRows.length === 1 ? '' : 's'} in
+              export
+            </p>
           </div>
         )}
       </div>
@@ -445,6 +665,11 @@ export default function UsersDatabaseClient() {
                 <th className='px-6 py-4 text-base font-bold text-slate-600 uppercase tracking-wider'>
                   Status
                 </th>
+                {showFeeColumn && (
+                  <th className='px-6 py-4 text-base font-bold text-slate-600 uppercase tracking-wider'>
+                    Fee
+                  </th>
+                )}
                 <th className='px-6 py-4 text-base font-bold text-slate-600 uppercase tracking-wider text-right'>
                   Actions
                 </th>
@@ -453,7 +678,10 @@ export default function UsersDatabaseClient() {
             <tbody className='divide-y divide-slate-100'>
               {tableBusy ? (
                 <tr>
-                  <td colSpan={4} className='px-6 py-12 text-center'>
+                  <td
+                    colSpan={showFeeColumn ? 5 : 4}
+                    className='px-6 py-12 text-center'
+                  >
                     <div className='flex flex-col items-center justify-center gap-3'>
                       <div className='h-8 w-8 border-4 border-[#E61C24] border-t-transparent rounded-full animate-spin' />
                       <span className='text-base font-bold text-slate-500'>
@@ -466,7 +694,10 @@ export default function UsersDatabaseClient() {
                 </tr>
               ) : filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className='px-6 py-12 text-center'>
+                  <td
+                    colSpan={showFeeColumn ? 5 : 4}
+                    className='px-6 py-12 text-center'
+                  >
                     <div className='flex flex-col items-center justify-center gap-3'>
                       <FiSearch className='h-8 w-8 text-slate-300' />
                       <span className='text-base font-bold text-slate-500'>
@@ -540,6 +771,31 @@ export default function UsersDatabaseClient() {
                         {user.status || 'active'}
                       </span>
                     </td>
+                    {showFeeColumn && (
+                      <td className='px-6 py-4'>
+                        {(() => {
+                          const fee = feeStatusById.get(user._id);
+                          if (!fee) {
+                            return (
+                              <span className='text-base font-semibold text-slate-400'>
+                                —
+                              </span>
+                            );
+                          }
+                          return (
+                            <span
+                              className={`inline-flex items-center px-2.5 py-1 rounded-full text-base font-bold uppercase tracking-wider ${
+                                fee === 'paid'
+                                  ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+                                  : 'bg-amber-100 text-amber-700 border border-amber-200'
+                              }`}
+                            >
+                              {fee}
+                            </span>
+                          );
+                        })()}
+                      </td>
+                    )}
                     <td className='px-6 py-4'>
                       <div className='flex items-center justify-end gap-2'>
                         <button

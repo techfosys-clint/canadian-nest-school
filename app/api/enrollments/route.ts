@@ -234,6 +234,8 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { courseId, couponCode, billingName, billingPhone, billingAddress } =
       body
+    const requestedBatchId =
+      typeof body.batchId === 'string' ? body.batchId.trim() : ''
 
     if (!courseId) {
       return NextResponse.json(
@@ -269,23 +271,48 @@ export async function POST(request: Request) {
           ? 'monthly'
           : 'one_time'
 
-    // Monthly/quarterly: only one batch should have an open join window at a
-    // time. Auto-assign that batch — students do not pick.
+    // Monthly/quarterly: several batches may be open at once. The student
+    // picks one. A single open batch is accepted even if the client omits it.
     let selectedBatch: any = null
     if (isRecurring) {
       const candidates = await Batch.find({
         course: courseId,
         status: { $ne: 'completed' },
       })
-      selectedBatch =
-        candidates.find((b) => canStudentJoinBatch(b)) || null
+      const openBatches = candidates.filter((b) => canStudentJoinBatch(b))
 
-      if (!selectedBatch) {
+      if (openBatches.length === 0) {
         return NextResponse.json(
           {
             success: false,
             error:
               'Enrollment is closed. No batch join window is open right now. Please wait until the admin opens a batch.',
+          },
+          { status: 400 },
+        )
+      }
+
+      if (requestedBatchId) {
+        selectedBatch =
+          openBatches.find((b) => b._id.toString() === requestedBatchId) ||
+          null
+        if (!selectedBatch) {
+          return NextResponse.json(
+            {
+              success: false,
+              error:
+                'That batch is not open for enrollment. Choose another batch.',
+            },
+            { status: 400 },
+          )
+        }
+      } else if (openBatches.length === 1) {
+        selectedBatch = openBatches[0]
+      } else {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Choose a batch to join before paying.',
           },
           { status: 400 },
         )

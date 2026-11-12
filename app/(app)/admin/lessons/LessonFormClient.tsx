@@ -48,6 +48,7 @@ interface LessonFormProps {
     duration: number;
     isPreviewable: boolean;
     courseId: string;
+    batchId?: string;
     autoGenerateZoom?: boolean;
     quizQuestions?: QuizQuestion[];
     totalMarks?: number;
@@ -111,6 +112,8 @@ export default function LessonFormClient({
   const [autoGenerateZoom, setAutoGenerateZoom] = useState(
     initialData?.autoGenerateZoom || false,
   );
+  const [batchId, setBatchId] = useState(initialData?.batchId || '');
+  const [batches, setBatches] = useState<{ id: string; name: string }[]>([]);
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(
     initialData?.quizQuestions || [
       { questionText: '', options: ['', '', '', ''], correctAnswerIndex: 0 },
@@ -122,6 +125,29 @@ export default function LessonFormClient({
   const [showMediaPickerForQuestion, setShowMediaPickerForQuestion] = useState<
     number | null
   >(null);
+
+  // Load batches for the selected course (batch-scoped recordings)
+  React.useEffect(() => {
+    if (!courseId) {
+      setBatches([]);
+      return;
+    }
+    fetch(`/api/admin/batches?course=${courseId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const list = (data.batches || []).map((b: any) => ({
+          id: b._id?.toString?.() || b.id,
+          name: b.name || b.title || 'Untitled batch',
+        }));
+        setBatches(list);
+        setBatchId((prev) =>
+          prev && list.length > 0 && !list.some((b: { id: string }) => b.id === prev)
+            ? ''
+            : prev,
+        );
+      })
+      .catch(() => setBatches([]));
+  }, [courseId]);
 
   // Fetch unique module names of the selected course
   React.useEffect(() => {
@@ -241,6 +267,7 @@ export default function LessonFormClient({
         title,
         slug,
         course: courseId,
+        batch: batchId || null,
         moduleOrder,
         moduleName,
         lessonType,
@@ -347,7 +374,10 @@ export default function LessonFormClient({
                 <select
                   required
                   value={courseId}
-                  onChange={(e) => setCourseId(e.target.value)}
+                  onChange={(e) => {
+                    setCourseId(e.target.value);
+                    setBatchId('');
+                  }}
                   className='bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer'
                 >
                   <option value=''>-- Select Course --</option>
@@ -357,6 +387,31 @@ export default function LessonFormClient({
                     </option>
                   ))}
                 </select>
+              </div>
+
+              {/* Batch scope — optional; empty = visible to all batches */}
+              <div className='flex flex-col gap-2'>
+                <label className='text-base font-bold text-slate-600'>
+                  Batch (recording visibility)
+                </label>
+                <select
+                  value={batchId}
+                  onChange={(e) => setBatchId(e.target.value)}
+                  disabled={!courseId}
+                  className='bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer disabled:opacity-60'
+                >
+                  <option value=''>All batches (shared)</option>
+                  {batches.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.name}
+                    </option>
+                  ))}
+                </select>
+                <p className='text-base font-medium text-slate-400 leading-relaxed'>
+                  Leave as &quot;All batches&quot; for shared lessons. Pick a
+                  batch so only students in that batch see this recording or
+                  live class.
+                </p>
               </div>
 
               {/* Title */}

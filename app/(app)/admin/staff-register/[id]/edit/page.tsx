@@ -49,6 +49,9 @@ export default async function EditStaffPage({ params }: Props) {
     role: staffDoc.role,
     designation: staffDoc.designation || '',
     bio: staffDoc.bio || '',
+    showOnInstructorsPage:
+      staffDoc.showOnInstructorsPage === true ||
+      staffDoc.role === 'instructor',
     permissions: staffDoc.permissions || [],
     profilePicId: staffDoc.profilePic?._id?.toString() || '',
     profilePicUrl: staffDoc.profilePic?.url || '',

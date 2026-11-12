@@ -69,6 +69,7 @@ export default async function EditLessonPage({ params }: Props) {
     duration: lessonDoc.duration || 60,
     isPreviewable: lessonDoc.isPreviewable ?? false,
     courseId: lessonDoc.course ? lessonDoc.course.toString() : '',
+    batchId: lessonDoc.batch ? lessonDoc.batch.toString() : '',
     autoGenerateZoom: lessonDoc.autoGenerateZoom ?? false,
     quizQuestions: lessonDoc.quizQuestions ? JSON.parse(JSON.stringify(lessonDoc.quizQuestions)) : [],
   }

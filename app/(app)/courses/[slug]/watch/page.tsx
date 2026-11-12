@@ -76,8 +76,25 @@ export default async function CourseWatchPage({ params }: Props) {
     redirect('/dashboard?subscription=blocked')
   }
 
-  // Fetch all lessons belonging to the course
-  const lessonsDocs = await Lesson.find({ course: course._id }).sort({ order: 1 }).lean()
+  // Resolve student's batch for this course (batch-scoped recordings)
+  const enrollment = await Enrollment.findOne({
+    student: userId,
+    course: course._id,
+    paymentStatus: 'completed',
+  })
+    .select('batch')
+    .lean()
+  const studentBatchId = (enrollment as any)?.batch?.toString?.() || null
+
+  // Shared lessons (no batch) + lessons for this student's batch only
+  const lessonsDocs = await Lesson.find({
+    course: course._id,
+    $or: studentBatchId
+      ? [{ batch: null }, { batch: { $exists: false } }, { batch: studentBatchId }]
+      : [{ batch: null }, { batch: { $exists: false } }],
+  })
+    .sort({ order: 1 })
+    .lean()
 
   // Load student details for DRM watermark overlays
   let studentDoc: any = null

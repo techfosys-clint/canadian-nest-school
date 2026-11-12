@@ -152,6 +152,9 @@ export async function POST(request: Request) {
       noticeStartOffsetDays,
       noticeEndOffsetDays,
       blockOffsetDays,
+      smsReminderEnabled,
+      smsOffsetDaysBeforeEnd,
+      smsMaxMessagesPerPeriod,
       thumbnail,
       trailerVideoUrl,
       faqSource,
@@ -268,6 +271,17 @@ export async function POST(request: Request) {
         ? Number(noticeEndOffsetDays ?? 2)
         : 2,
       blockOffsetDays: isRecurring ? Number(blockOffsetDays ?? 2) : 2,
+      smsReminderEnabled: isRecurring ? smsReminderEnabled !== false : false,
+      smsOffsetDaysBeforeEnd: isRecurring
+        ? Array.isArray(smsOffsetDaysBeforeEnd)
+          ? smsOffsetDaysBeforeEnd
+              .map((n: any) => Number(n))
+              .filter((n: number) => Number.isFinite(n) && n >= 0)
+          : [5, 3, 1]
+        : [],
+      smsMaxMessagesPerPeriod: isRecurring
+        ? Number(smsMaxMessagesPerPeriod ?? 3)
+        : 0,
       trailerVideoUrl:
         typeof trailerVideoUrl === 'string' ? trailerVideoUrl.trim() : '',
       faqSource: faqSource === 'course' ? 'course' : 'global',

@@ -49,6 +49,10 @@ export interface ICourse extends Document {
   noticeEndOffsetDays?: number
   /** Days after paidUntil when course access is blocked. */
   blockOffsetDays?: number
+  /** Per-course fee SMS reminders (overrides global settings when set). */
+  smsReminderEnabled?: boolean
+  smsOffsetDaysBeforeEnd?: number[]
+  smsMaxMessagesPerPeriod?: number
   /** Optional YouTube/Vimeo trailer URL for the public course page. */
   trailerVideoUrl?: string
   /**
@@ -131,6 +135,9 @@ const CourseSchema = new Schema<ICourse>(
     noticeStartOffsetDays: { type: Number, min: 0, default: 5 },
     noticeEndOffsetDays: { type: Number, min: 0, default: 2 },
     blockOffsetDays: { type: Number, min: 0, default: 2 },
+    smsReminderEnabled: { type: Boolean, default: true },
+    smsOffsetDaysBeforeEnd: { type: [Number], default: [5, 3, 1] },
+    smsMaxMessagesPerPeriod: { type: Number, min: 0, default: 3 },
     trailerVideoUrl: { type: String, default: '' },
     faqSource: {
       type: String,
@@ -159,7 +166,8 @@ if (
     !mongoose.models.Course.schema.paths.trailerVideoUrl ||
     !mongoose.models.Course.schema.paths.faqSource ||
     !mongoose.models.Course.schema.paths.quarterlyFee ||
-    !mongoose.models.Course.schema.paths.titleBn)
+    !mongoose.models.Course.schema.paths.titleBn ||
+    !mongoose.models.Course.schema.paths.smsReminderEnabled)
 ) {
   delete mongoose.models.Course
 }

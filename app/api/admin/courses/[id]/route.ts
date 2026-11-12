@@ -312,6 +312,9 @@ export async function PUT(
       lateFeeEnabled,
       lateFeeAmount,
       noticeStartOffsetDays,
+      smsReminderEnabled,
+      smsOffsetDaysBeforeEnd,
+      smsMaxMessagesPerPeriod,
       noticeEndOffsetDays,
       blockOffsetDays,
       thumbnail,
@@ -427,6 +430,19 @@ export async function PUT(
     course.blockOffsetDays = isRecurring
       ? Number(blockOffsetDays ?? 2)
       : 2
+    course.smsReminderEnabled = isRecurring
+      ? smsReminderEnabled !== false
+      : false
+    course.smsOffsetDaysBeforeEnd = isRecurring
+      ? Array.isArray(smsOffsetDaysBeforeEnd)
+        ? smsOffsetDaysBeforeEnd
+            .map((n: any) => Number(n))
+            .filter((n: number) => Number.isFinite(n) && n >= 0)
+        : [5, 3, 1]
+      : []
+    course.smsMaxMessagesPerPeriod = isRecurring
+      ? Number(smsMaxMessagesPerPeriod ?? 3)
+      : 0
     if (trailerVideoUrl !== undefined) {
       course.trailerVideoUrl =
         typeof trailerVideoUrl === 'string' ? trailerVideoUrl.trim() : ''

@@ -12,6 +12,11 @@ export interface IUser extends Document {
   bio?: string
   /** Bangla bio — used when locale is `bn` if set. */
   bioBn?: string
+  /**
+   * When true, this staff/admin/instructor appears on the public Instructors page
+   * (founders, MDs, chief instructors who may use the admin role).
+   */
+  showOnInstructorsPage?: boolean
   resetPasswordToken?: string
   resetPasswordExpiration?: Date
   permissions?: string[]
@@ -30,6 +35,7 @@ const UserSchema = new Schema<IUser>(
     designation: { type: String },
     bio: { type: String, default: '' },
     bioBn: { type: String, default: '' },
+    showOnInstructorsPage: { type: Boolean, default: false },
     resetPasswordToken: { type: String },
     resetPasswordExpiration: { type: Date },
     permissions: { type: [String], default: [] },
@@ -45,7 +51,8 @@ const UserSchema = new Schema<IUser>(
 if (
   mongoose.models.User &&
   (!mongoose.models.User.schema.paths.bio ||
-    !mongoose.models.User.schema.paths.bioBn)
+    !mongoose.models.User.schema.paths.bioBn ||
+    !mongoose.models.User.schema.paths.showOnInstructorsPage)
 ) {
   delete mongoose.models.User
 }

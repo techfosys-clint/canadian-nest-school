@@ -1,0 +1,23 @@
+.admin-day-picker {
+  --rdp-accent-color: #e61c24;
+  --rdp-accent-background-color: rgba(230, 28, 36, 0.1);
+  --rdp-day-height: 2.25rem;
+  --rdp-day-width: 2.25rem;
+  --rdp-day_button-border-radius: 0.5rem;
+  --rdp-selected-border: 2px solid #e61c24;
+}
+
+.admin-day-picker .rdp-root {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.admin-day-picker .rdp-caption_label {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.admin-day-picker .rdp-button_previous,
+.admin-day-picker .rdp-button_next {
+  border-radius: 0.5rem;
+}

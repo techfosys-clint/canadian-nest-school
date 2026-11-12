@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, afterEach } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
   canStudentJoinBatch,
   isBatchAcceptingStudents,
@@ -12,7 +12,6 @@ function baseBatch(overrides: Record<string, unknown> = {}) {
   return {
     maxStudents: 0,
     students: [] as string[],
-    reactivateDate: null as Date | null,
     joinOpensAt: opens,
     joinClosesAt: closes,
     status: 'upcoming' as const,
@@ -64,16 +63,11 @@ describe('isBatchJoinWindowOpen', () => {
 })
 
 describe('isBatchAcceptingStudents', () => {
-  afterEach(() => {
-    vi.useRealTimers()
-  })
-
   it('accepts when maxStudents is 0 (unlimited)', () => {
     expect(
       isBatchAcceptingStudents({
         maxStudents: 0,
         students: ['a', 'b', 'c'],
-        reactivateDate: null,
       }),
     ).toBe(true)
   })
@@ -83,41 +77,15 @@ describe('isBatchAcceptingStudents', () => {
       isBatchAcceptingStudents({
         maxStudents: 2,
         students: ['a'],
-        reactivateDate: null,
       }),
     ).toBe(true)
   })
 
-  it('rejects when full and not reactivated', () => {
+  it('rejects when full', () => {
     expect(
       isBatchAcceptingStudents({
         maxStudents: 2,
         students: ['a', 'b'],
-        reactivateDate: null,
-      }),
-    ).toBe(false)
-  })
-
-  it('reopens after reactivateDate even when full', () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-04-10T12:00:00+06:00'))
-    expect(
-      isBatchAcceptingStudents({
-        maxStudents: 1,
-        students: ['a'],
-        reactivateDate: new Date('2026-04-01T00:00:00+06:00'),
-      }),
-    ).toBe(true)
-  })
-
-  it('stays closed when reactivateDate is still in the future', () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-03-20T12:00:00+06:00'))
-    expect(
-      isBatchAcceptingStudents({
-        maxStudents: 1,
-        students: ['a'],
-        reactivateDate: new Date('2026-04-01T00:00:00+06:00'),
       }),
     ).toBe(false)
   })

@@ -13,8 +13,20 @@ export function parseBdDate(value: string): Date {
   if (!value) return new Date(NaN)
   // Already has an explicit offset or Z — trust it as-is.
   if (/[zZ]$|[+-]\d{2}:?\d{2}$/.test(value)) return new Date(value)
+  // Date-only YYYY-MM-DD → start of that Bangladesh day.
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return new Date(`${value}T00:00:00${DHAKA_OFFSET}`)
+  }
   const withSeconds = value.length === 16 ? `${value}:00` : value
   return new Date(`${withSeconds}${DHAKA_OFFSET}`)
+}
+
+/** End of a Bangladesh calendar day (23:59:59). */
+export function parseBdDateEndOfDay(value: string): Date {
+  if (!value) return new Date(NaN)
+  const ymd = value.slice(0, 10)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(ymd)) return new Date(NaN)
+  return new Date(`${ymd}T23:59:59${DHAKA_OFFSET}`)
 }
 
 /** Format a stored Date/ISO string back into a datetime-local value in BD time. */
@@ -35,6 +47,13 @@ function asDate(value: Date | string | null | undefined): Date | null {
   if (!value) return null
   const d = typeof value === 'string' ? new Date(value) : value
   return isNaN(d.getTime()) ? null : d
+}
+
+/** Stored Date/ISO → Bangladesh calendar day YYYY-MM-DD for date inputs. */
+export function toBdDateYmd(date: Date | string | null | undefined): string {
+  const d = asDate(date)
+  if (!d) return ''
+  return bdTodayYmd(d)
 }
 
 function cleanOptions(

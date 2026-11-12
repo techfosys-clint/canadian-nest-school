@@ -16,9 +16,8 @@ export interface IBatch extends Document {
   students: mongoose.Types.ObjectId[] | string[]
   // Maximum number of students who can join this batch. 0 = unlimited.
   // Once students.length reaches maxStudents, the batch stops accepting
-  // new joins until reactivateDate (if set) passes.
+  // new joins.
   maxStudents: number
-  reactivateDate?: Date | null
   createdAt: Date
   updatedAt: Date
 }
@@ -40,7 +39,6 @@ const BatchSchema = new Schema<IBatch>(
     },
     students: [{ type: Schema.Types.ObjectId, ref: 'Student' }],
     maxStudents: { type: Number, default: 0, min: 0 },
-    reactivateDate: { type: Date, default: null },
   },
   { collection: 'batches', timestamps: true }
 )

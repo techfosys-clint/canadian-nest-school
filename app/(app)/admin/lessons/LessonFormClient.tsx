@@ -1,5 +1,6 @@
 'use client';
 
+import AdminDateTimeField from '@/components/admin/AdminDateTimeField';
 import MediaPickerModal from '@/components/MediaPickerModal';
 import RichTextEditor from '@/components/RichTextEditor';
 import VideoUploadWidget from '@/components/VideoUploadWidget';
@@ -112,7 +113,9 @@ export default function LessonFormClient({
   const [autoGenerateZoom, setAutoGenerateZoom] = useState(
     initialData?.autoGenerateZoom || false,
   );
-  const [batchId, setBatchId] = useState(initialData?.batchId || '');
+  const [batchId, setBatchId] = useState(
+    initialData?.batchId || searchParams.get('batchId') || '',
+  );
   const [batches, setBatches] = useState<{ id: string; name: string }[]>([]);
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(
     initialData?.quizQuestions || [
@@ -625,15 +628,13 @@ export default function LessonFormClient({
                         <option value='other'>Other / Custom</option>
                       </select>
                     </div>
-                    <div className='flex flex-col gap-2'>
+                    <div className='flex flex-col gap-2 sm:col-span-2'>
                       <label className='text-base font-bold text-slate-600'>
                         Scheduled Time & Date (Bangladesh time)
                       </label>
-                      <input
-                        type='datetime-local'
+                      <AdminDateTimeField
                         value={liveDate}
-                        onChange={(e) => setLiveDate(e.target.value)}
-                        className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
+                        onChange={setLiveDate}
                       />
                     </div>
                   </div>

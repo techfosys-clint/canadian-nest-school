@@ -97,7 +97,6 @@ export async function POST(request: Request) {
       joinClosesAt,
       status,
       maxStudents,
-      reactivateDate,
     } = body
 
     if (!name || !course || !startDate || !endDate) {
@@ -134,7 +133,6 @@ export async function POST(request: Request) {
       status: status || 'upcoming',
       students: [],
       maxStudents: Number(maxStudents) || 0,
-      reactivateDate: reactivateDate ? new Date(reactivateDate) : null,
     })
 
     await newBatch.save()

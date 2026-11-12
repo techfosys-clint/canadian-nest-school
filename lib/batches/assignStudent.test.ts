@@ -23,7 +23,6 @@ function makeBatch(overrides: Record<string, unknown> = {}) {
     course: { toString: () => courseId },
     students: students.map((id) => ({ toString: () => id })),
     maxStudents: 10,
-    reactivateDate: null,
     joinOpensAt: new Date('2026-03-01T00:00:00+06:00'),
     joinClosesAt: new Date('2026-03-31T23:59:59.999+06:00'),
     status: 'upcoming',

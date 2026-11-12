@@ -1,19 +1,14 @@
 import type { IBatch } from './db/models/Batch'
 
 /**
- * A batch with maxStudents > 0 stops accepting new joins once it's full,
- * unless reactivateDate has passed — at which point it reopens regardless
- * of how many students are already in it (the cap is a one-time gate, not a
- * hard ceiling once reactivated).
+ * A batch with maxStudents > 0 stops accepting new joins once it's full.
+ * maxStudents = 0 means unlimited.
  */
 export function isBatchAcceptingStudents(
-  batch: Pick<IBatch, 'maxStudents' | 'students' | 'reactivateDate'>,
+  batch: Pick<IBatch, 'maxStudents' | 'students'>,
 ): boolean {
   if (!batch.maxStudents || batch.maxStudents <= 0) return true
-  if ((batch.students?.length || 0) < batch.maxStudents) return true
-  if (batch.reactivateDate && new Date() >= new Date(batch.reactivateDate))
-    return true
-  return false
+  return (batch.students?.length || 0) < batch.maxStudents
 }
 
 /** True when now is within the admin-configured join window. */
@@ -40,7 +35,6 @@ export function canStudentJoinBatch(
     IBatch,
     | 'maxStudents'
     | 'students'
-    | 'reactivateDate'
     | 'joinOpensAt'
     | 'joinClosesAt'
     | 'status'

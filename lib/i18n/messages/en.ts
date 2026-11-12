@@ -276,16 +276,17 @@ const en: Messages = {
     descriptionAfter: '.',
   },
   instructors: {
-    title: 'Our Instructors',
-    subtitle: 'Learn from experienced educators dedicated to your progress.',
-    metaTitle: 'Our Mentors - Canadian Nest School',
+    title: 'Our Team',
+    subtitle:
+      'Instructors, mentors, and the people who support your progress.',
+    metaTitle: 'Our Team - Canadian Nest School',
     metaDescription:
-      'Meet our expert educators dedicated to Canadian and international teaching standards.',
-    breadcrumb: 'Mentors',
-    badge: 'Instructor',
-    headingBefore: 'Meet Our Expert',
-    headingAccent: 'Educators',
-    defaultRole: 'Expert Mentor',
+      'Meet the instructors and team members who teach and support students at Canadian Nest School.',
+    breadcrumb: 'Team',
+    badge: 'Our Team',
+    headingBefore: 'Meet Our',
+    headingAccent: 'Team',
+    defaultRole: 'Team Member',
   },
   common: {
     loading: 'Loading…',

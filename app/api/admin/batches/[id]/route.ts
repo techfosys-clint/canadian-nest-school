@@ -95,7 +95,6 @@ export async function PUT(request: Request, { params }: Props) {
       status,
       students,
       maxStudents,
-      reactivateDate,
     } = body
 
     const batch = await Batch.findById(id)
@@ -130,14 +129,13 @@ export async function PUT(request: Request, { params }: Props) {
     }
     if (status) batch.status = status
     if (maxStudents !== undefined) batch.maxStudents = Number(maxStudents) || 0
-    if (reactivateDate !== undefined) batch.reactivateDate = reactivateDate ? new Date(reactivateDate) : null
 
     if (students) {
       // Only enforce the capacity gate when the roster is growing — removing
       // students should always be allowed regardless of capacity.
       if (students.length > batch.students.length && !isBatchAcceptingStudents(batch)) {
         return NextResponse.json(
-          { error: `This batch is full (max ${batch.maxStudents} students). Set a reactivate date or raise the limit to allow more joins.` },
+          { error: `This batch is full (max ${batch.maxStudents} students). Raise the limit to allow more joins.` },
           { status: 400 }
         )
       }

@@ -10,7 +10,7 @@ export async function assignStudentToBatch(params: {
   batchId: string
   studentId: string
   courseId: string
-  /** Skip join-window check (admin assign). Still blocks when full unless reactivated. */
+  /** Skip join-window check (admin assign). Still blocks when the batch is full. */
   force?: boolean
 }): Promise<{ ok: true } | { ok: false; error: string }> {
   const batch = await Batch.findById(params.batchId)

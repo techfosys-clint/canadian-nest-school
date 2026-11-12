@@ -1,9 +1,14 @@
 'use client';
 
+import AdminDateField from '@/components/admin/AdminDateField';
 import type { MediaItem } from '@/components/MediaPickerModal';
 import MediaPickerModal from '@/components/MediaPickerModal';
 import RichTextEditor from '@/components/RichTextEditor';
-import { formatBdDate } from '@/lib/bdTime';
+import {
+  formatBdDate,
+  parseBdDate,
+  parseBdDateEndOfDay,
+} from '@/lib/bdTime';
 import { parseJsonResponse } from '@/lib/safeJson';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -331,8 +336,9 @@ export default function CourseFormClient({
     id: string;
     title: string;
     order: number;
-    lessonType: 'recorded' | 'live' | 'quiz';
+    lessonType: 'recorded' | 'live' | 'quiz' | 'assignment';
     duration: number;
+    batchId: string | null;
   }
   const [lessons, setLessons] = useState<LessonSummary[]>([]);
   const [lessonsLoading, setLessonsLoading] = useState(false);
@@ -347,11 +353,12 @@ export default function CourseFormClient({
           setLessons(
             data.data.lessons
               .map((l: any) => ({
-                id: l._id,
+                id: l._id?.toString?.() || String(l._id),
                 title: l.title,
                 order: l.order,
                 lessonType: l.lessonType,
                 duration: l.duration,
+                batchId: l.batch ? l.batch.toString?.() || String(l.batch) : null,
               }))
               .sort((a: LessonSummary, b: LessonSummary) => a.order - b.order),
           );
@@ -378,7 +385,6 @@ export default function CourseFormClient({
     status: 'upcoming' | 'active' | 'completed';
     students: BatchStudent[];
     maxStudents: number;
-    reactivateDate: string | null;
     isAcceptingStudents: boolean;
     isJoinWindowOpen?: boolean;
     isOpenForEnrollment?: boolean;
@@ -397,7 +403,6 @@ export default function CourseFormClient({
   const [newBatchJoinOpens, setNewBatchJoinOpens] = useState('');
   const [newBatchJoinCloses, setNewBatchJoinCloses] = useState('');
   const [newBatchMax, setNewBatchMax] = useState<number | ''>(0);
-  const [newBatchReactivate, setNewBatchReactivate] = useState('');
 
   // Inline batch detail / student manager panel
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
@@ -423,7 +428,6 @@ export default function CourseFormClient({
               status: b.status,
               students: b.students || [],
               maxStudents: b.maxStudents || 0,
-              reactivateDate: b.reactivateDate || null,
               isAcceptingStudents: b.isAcceptingStudents,
               isJoinWindowOpen: b.isJoinWindowOpen,
               isOpenForEnrollment: b.isOpenForEnrollment,
@@ -485,6 +489,23 @@ export default function CourseFormClient({
       return;
     }
 
+    const joinOpens = parseBdDate(newBatchJoinOpens);
+    const joinCloses = parseBdDateEndOfDay(newBatchJoinCloses);
+    if (
+      Number.isNaN(joinOpens.getTime()) ||
+      Number.isNaN(joinCloses.getTime()) ||
+      joinOpens.getTime() > joinCloses.getTime()
+    ) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Join Window',
+        text: 'Join opens must be on or before join closes.',
+        background: '#ffffff',
+        color: '#1a1a1a',
+      });
+      return;
+    }
+
     try {
       const res = await fetch('/api/admin/batches', {
         method: 'POST',
@@ -495,10 +516,9 @@ export default function CourseFormClient({
           instructor: newBatchInstructor,
           startDate: newBatchStart,
           endDate: newBatchEnd,
-          joinOpensAt: newBatchJoinOpens,
-          joinClosesAt: newBatchJoinCloses,
+          joinOpensAt: joinOpens.toISOString(),
+          joinClosesAt: joinCloses.toISOString(),
           maxStudents: newBatchMax === '' ? 0 : Number(newBatchMax),
-          reactivateDate: newBatchReactivate || undefined,
         }),
       });
       const data = await res.json();
@@ -511,7 +531,6 @@ export default function CourseFormClient({
       setNewBatchJoinOpens('');
       setNewBatchJoinCloses('');
       setNewBatchMax(0);
-      setNewBatchReactivate('');
       setShowAddBatchForm(false);
       fetchBatches();
 
@@ -562,7 +581,7 @@ export default function CourseFormClient({
 
   const handleUpdateBatchField = async (
     batchId: string,
-    field: 'maxStudents' | 'reactivateDate' | 'status',
+    field: 'maxStudents' | 'status',
     value: any,
   ) => {
     try {
@@ -644,6 +663,28 @@ export default function CourseFormClient({
   };
 
   const selectedBatch = batches.find((b) => b._id === selectedBatchId) || null;
+
+  const moveLessonToBatch = async (lessonId: string, nextBatchId: string) => {
+    setBatchActionMsg('');
+    try {
+      const res = await fetch(`/api/admin/lessons/${lessonId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ batch: nextBatchId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || data.message || 'Failed to move lesson');
+      }
+      setLessons((prev) =>
+        prev.map((lesson) =>
+          lesson.id === lessonId ? { ...lesson, batchId: nextBatchId } : lesson,
+        ),
+      );
+    } catch (err: any) {
+      setBatchActionMsg(err.message || 'Failed to move lesson.');
+    }
+  };
   const availableStudentsForSelectedBatch = courseStudents.filter(
     (s) =>
       (s.name.toLowerCase().includes(studentSearchQuery.toLowerCase()) ||
@@ -1078,7 +1119,7 @@ export default function CourseFormClient({
 
   // Saves the course (if needed) and takes the admin to the lesson form for
   // it — lessons can only be created against a real, persisted course ID.
-  const handleAddLessonClick = async () => {
+  const handleAddLessonClick = async (forBatchId?: string) => {
     if (!titleBn.trim() || !slug) {
       Swal.fire({
         icon: 'warning',
@@ -1100,15 +1141,21 @@ export default function CourseFormClient({
       return;
     }
 
+    const lessonQuery = (courseIdForLesson: string) => {
+      const params = new URLSearchParams({ courseId: courseIdForLesson });
+      if (forBatchId) params.set('batchId', forBatchId);
+      return `/admin/lessons/new?${params.toString()}`;
+    };
+
     if (savedCourseId) {
-      router.push(`/admin/lessons/new?courseId=${savedCourseId}`);
+      router.push(lessonQuery(savedCourseId));
       return;
     }
 
     setIsSubmitting(true);
     try {
       const id = await saveCourse();
-      if (id) router.push(`/admin/lessons/new?courseId=${id}`);
+      if (id) router.push(lessonQuery(id));
     } catch (err: any) {
       Swal.fire({
         icon: 'error',
@@ -2018,7 +2065,8 @@ export default function CourseFormClient({
             )}
           </div>
 
-          {/* ── Course Curriculum ────────────────────── */}
+          {/* ── Course Curriculum (one-time courses only) ────────────────────── */}
+          {!isRecurringBilling && (
           <div className='bg-white border border-slate-200 rounded-lg p-6 space-y-4'>
             <div className='flex items-center justify-between border-b border-slate-100 pb-3'>
               <h2 className='text-xl font-bold text-slate-800 tracking-tight'>
@@ -2026,7 +2074,7 @@ export default function CourseFormClient({
               </h2>
               <button
                 type='button'
-                onClick={handleAddLessonClick}
+                onClick={() => void handleAddLessonClick()}
                 disabled={isSubmitting}
                 className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#E61C24]/15 hover:bg-[#E61C24]/25 text-[#E61C24] border border-[#E61C24]/20 rounded-lg text-base font-bold transition-colors cursor-pointer disabled:opacity-50'
               >
@@ -2055,7 +2103,7 @@ export default function CourseFormClient({
                 </p>
                 <button
                   type='button'
-                  onClick={handleAddLessonClick}
+                  onClick={() => void handleAddLessonClick()}
                   disabled={isSubmitting}
                   className='inline-flex items-center gap-2 px-4 py-2.5 bg-[#E61C24] hover:bg-[#CC181F] text-white rounded-lg font-bold text-base transition-all cursor-pointer disabled:opacity-50'
                 >
@@ -2118,6 +2166,7 @@ export default function CourseFormClient({
               </div>
             )}
           </div>
+          )}
 
           {/* ── Batches (Intake Groups) ────────────────────── */}
           <div className='bg-white border border-slate-200 rounded-lg p-6 space-y-4'>
@@ -2197,49 +2246,44 @@ export default function CourseFormClient({
                         <label className='text-base font-bold text-slate-600'>
                           Start Date *
                         </label>
-                        <input
-                          type='date'
+                        <AdminDateField
                           value={newBatchStart}
-                          onChange={(e) => setNewBatchStart(e.target.value)}
-                          className='bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none w-full cursor-pointer'
+                          onChange={setNewBatchStart}
+                          required
                         />
                       </div>
                       <div className='flex flex-col gap-1.5'>
                         <label className='text-base font-bold text-slate-600'>
                           End Date *
                         </label>
-                        <input
-                          type='date'
+                        <AdminDateField
                           value={newBatchEnd}
-                          onChange={(e) => setNewBatchEnd(e.target.value)}
-                          className='bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none w-full cursor-pointer'
+                          onChange={setNewBatchEnd}
+                          required
                         />
                       </div>
                       <div className='flex flex-col gap-1.5'>
                         <label className='text-base font-bold text-slate-600'>
                           Join opens *
                         </label>
-                        <input
-                          type='datetime-local'
+                        <AdminDateField
                           value={newBatchJoinOpens}
-                          onChange={(e) => setNewBatchJoinOpens(e.target.value)}
-                          className='bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none w-full cursor-pointer'
+                          onChange={setNewBatchJoinOpens}
+                          required
                         />
                       </div>
                       <div className='flex flex-col gap-1.5'>
                         <label className='text-base font-bold text-slate-600'>
                           Join closes *
                         </label>
-                        <input
-                          type='datetime-local'
+                        <AdminDateField
                           value={newBatchJoinCloses}
-                          onChange={(e) =>
-                            setNewBatchJoinCloses(e.target.value)
-                          }
-                          className='bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none w-full cursor-pointer'
+                          onChange={setNewBatchJoinCloses}
+                          required
                         />
-                        <p className='text-xs font-semibold text-slate-400'>
-                          Students can only enroll between these times.
+                        <p className='text-base font-medium text-slate-400'>
+                          Students can enroll from the open date through the
+                          end of the close date (Bangladesh time).
                         </p>
                       </div>
                       <div className='flex flex-col gap-1.5'>
@@ -2260,23 +2304,6 @@ export default function CourseFormClient({
                           placeholder='0'
                           className='bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none w-full'
                         />
-                      </div>
-                      <div className='flex flex-col gap-1.5'>
-                        <label className='text-base font-bold text-slate-600'>
-                          Reactivate Date (Optional)
-                        </label>
-                        <input
-                          type='date'
-                          value={newBatchReactivate}
-                          onChange={(e) =>
-                            setNewBatchReactivate(e.target.value)
-                          }
-                          className='bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none w-full cursor-pointer'
-                        />
-                        <p className='text-xs font-semibold text-slate-400'>
-                          Once the seat limit is reached, joins reopen
-                          automatically on this date.
-                        </p>
                       </div>
                     </div>
                     <div className='flex justify-end gap-3'>
@@ -2334,14 +2361,8 @@ export default function CourseFormClient({
                                 </span>
                                 {batch.joinOpensAt && batch.joinClosesAt && (
                                   <span className='flex items-center gap-1.5'>
-                                    Join:{' '}
-                                    {new Date(
-                                      batch.joinOpensAt,
-                                    ).toLocaleString()}{' '}
-                                    →{' '}
-                                    {new Date(
-                                      batch.joinClosesAt,
-                                    ).toLocaleString()}
+                                    Join: {formatBdDate(batch.joinOpensAt)} →{' '}
+                                    {formatBdDate(batch.joinClosesAt)}
                                   </span>
                                 )}
                               </div>
@@ -2429,27 +2450,6 @@ export default function CourseFormClient({
                                 </div>
                                 <div className='flex flex-col gap-1.5'>
                                   <label className='text-sm font-bold text-slate-600'>
-                                    Reactivate Date
-                                  </label>
-                                  <input
-                                    type='date'
-                                    defaultValue={
-                                      batch.reactivateDate
-                                        ? batch.reactivateDate.split('T')[0]
-                                        : ''
-                                    }
-                                    onBlur={(e) =>
-                                      handleUpdateBatchField(
-                                        batch._id,
-                                        'reactivateDate',
-                                        e.target.value || null,
-                                      )
-                                    }
-                                    className='bg-white border border-slate-200 rounded-lg p-2.5 text-base font-semibold outline-none w-full cursor-pointer'
-                                  />
-                                </div>
-                                <div className='flex flex-col gap-1.5'>
-                                  <label className='text-sm font-bold text-slate-600'>
                                     Status
                                   </label>
                                   <select
@@ -2468,6 +2468,117 @@ export default function CourseFormClient({
                                     <option value='completed'>Completed</option>
                                   </select>
                                 </div>
+                              </div>
+
+                              <div className='space-y-3'>
+                                <div className='flex items-center justify-between gap-3'>
+                                  <h4 className='text-base font-bold text-slate-800'>
+                                    Course Curriculum
+                                  </h4>
+                                  <button
+                                    type='button'
+                                    onClick={() =>
+                                      void handleAddLessonClick(batch._id)
+                                    }
+                                    disabled={isSubmitting}
+                                    className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#E61C24]/15 hover:bg-[#E61C24]/25 text-[#E61C24] border border-[#E61C24]/20 rounded-lg text-base font-bold transition-colors cursor-pointer disabled:opacity-50'
+                                  >
+                                    <FiPlus className='h-4 w-4' /> Add Lesson
+                                  </button>
+                                </div>
+                                <p className='text-base font-medium text-slate-500'>
+                                  Live classes and recordings added here are
+                                  only visible to students in {batch.name}.
+                                </p>
+                                {(() => {
+                                  const batchLessons = lessons.filter(
+                                    (lesson) => lesson.batchId === batch._id,
+                                  );
+                                  if (lessonsLoading) {
+                                    return (
+                                      <p className='text-base font-semibold text-slate-400 text-center py-6'>
+                                        Loading lessons…
+                                      </p>
+                                    );
+                                  }
+                                  if (batchLessons.length === 0) {
+                                    return (
+                                      <p className='text-base font-semibold text-slate-400 text-center py-6 border border-slate-200 rounded-lg bg-white'>
+                                        No lessons for this batch yet.
+                                      </p>
+                                    );
+                                  }
+                                  return (
+                                    <div className='space-y-2'>
+                                      {batchLessons.map((lesson) => (
+                                        <div
+                                          key={lesson.id}
+                                          className='flex items-center gap-3 bg-white border border-slate-200 rounded-lg px-4 py-3'
+                                        >
+                                          <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 font-bold text-base'>
+                                            {lesson.order}
+                                          </div>
+                                          <div className='flex-1 min-w-0'>
+                                            <p className='text-slate-800 font-bold text-base truncate'>
+                                              {lesson.title}
+                                            </p>
+                                            <p className='text-slate-500 text-base font-semibold'>
+                                              {lesson.duration} min
+                                            </p>
+                                          </div>
+                                          <span className='inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-100 text-slate-600 text-base font-bold capitalize'>
+                                            {lesson.lessonType === 'live' ? (
+                                              <FiRadio className='h-4 w-4' />
+                                            ) : (
+                                              <FiVideo className='h-4 w-4' />
+                                            )}
+                                            {lesson.lessonType === 'recorded'
+                                              ? 'Video'
+                                              : lesson.lessonType}
+                                          </span>
+                                          <Link
+                                            href={`/admin/lessons/${lesson.id}/edit`}
+                                            className='p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors'
+                                            title='Edit lesson'
+                                          >
+                                            <FiEdit2 className='h-4 w-4' />
+                                          </Link>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  );
+                                })()}
+                                {lessons.some((lesson) => !lesson.batchId) && (
+                                  <div className='space-y-2 pt-2'>
+                                    <p className='text-base font-bold text-slate-700'>
+                                      Not on a batch yet
+                                    </p>
+                                    {lessons
+                                      .filter((lesson) => !lesson.batchId)
+                                      .map((lesson) => (
+                                        <div
+                                          key={lesson.id}
+                                          className='flex items-center justify-between gap-3 bg-white border border-slate-200 rounded-lg px-4 py-3'
+                                        >
+                                          <p className='text-base font-bold text-slate-800 truncate'>
+                                            {lesson.title}
+                                          </p>
+                                          <button
+                                            type='button'
+                                            onClick={() =>
+                                              void moveLessonToBatch(
+                                                lesson.id,
+                                                batch._id,
+                                              )
+                                            }
+                                            className='shrink-0 px-3 py-2 rounded-lg border border-slate-200 text-base font-bold text-slate-700 hover:border-[#E61C24]/40 hover:text-[#E61C24]'
+                                          >
+                                            Add to this batch
+                                          </button>
+                                        </div>
+                                      ))}
+                                  </div>
+                                )}
                               </div>
 
                               <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 items-start'>
@@ -2575,10 +2686,9 @@ export default function CourseFormClient({
                                     )}
                                   </div>
                                   {!batch.isAcceptingStudents && (
-                                    <p className='text-xs font-semibold text-rose-500'>
-                                      This batch is full. Set a reactivate date
-                                      or raise the max students limit to allow
-                                      more joins.
+                                    <p className='text-base font-semibold text-rose-500'>
+                                      This batch is full. Raise the max students
+                                      limit to allow more joins.
                                     </p>
                                   )}
                                 </div>

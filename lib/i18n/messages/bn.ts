@@ -276,17 +276,17 @@ const bn: Messages = {
     descriptionAfter: ' পৌঁছে দেওয়া হয়।',
   },
   instructors: {
-    title: 'আমাদের ইনস্ট্রাক্টররা',
+    title: 'আমাদের টিম',
     subtitle:
-      'কানাডিয়ান ও আন্তর্জাতিক শিক্ষা মান বজায় রাখতে নিবেদিত যোগ্য পেশাদার ও সার্টিফাইড শিক্ষকদের কাছ থেকে সরাসরি শিখুন।',
-    metaTitle: 'আমাদের মেন্টররা - Canadian Nest School',
+      'ইনস্ট্রাক্টর, মেন্টর এবং যারা আপনার শেখায় সহায়তা করেন।',
+    metaTitle: 'আমাদের টিম - Canadian Nest School',
     metaDescription:
-      'কানাডিয়ান ও আন্তর্জাতিক শিক্ষা মানে নিবেদিত আমাদের এক্সপার্ট শিক্ষকদের সাথে পরিচিত হোন।',
-    breadcrumb: 'মেন্টর',
-    badge: 'ইনস্ট্রাক্টর',
-    headingBefore: 'পরিচয় করুন আমাদের এক্সপার্ট',
-    headingAccent: 'শিক্ষকদের সাথে',
-    defaultRole: 'এক্সপার্ট মেন্টর',
+      'Canadian Nest School-এর ইনস্ট্রাক্টর ও টিম মেম্বারদের সাথে পরিচিত হোন।',
+    breadcrumb: 'টিম',
+    badge: 'আমাদের টিম',
+    headingBefore: 'পরিচয় করুন আমাদের',
+    headingAccent: 'টিমের সাথে',
+    defaultRole: 'টিম মেম্বার',
   },
   common: {
     loading: 'লোড হচ্ছে…',

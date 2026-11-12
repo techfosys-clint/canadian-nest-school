@@ -365,32 +365,67 @@ export default function UsersDatabaseClient() {
     feeStatusById,
   ]);
 
-  const exportRows = useMemo(() => {
-    if (!courseId || enrolledStudents.length === 0) return [];
-    const idSet = new Set(filteredUsers.map((u) => u._id));
-    return enrolledStudents.filter((row) => {
-      if (!idSet.has(row.id)) return false;
-      if (paymentFilter !== 'all' && row.feeStatus !== paymentFilter)
-        return false;
-      const q = search.trim().toLowerCase();
-      if (!q) return true;
-      return (
-        row.name.toLowerCase().includes(q) ||
-        row.email.toLowerCase().includes(q) ||
-        row.phone.toLowerCase().includes(q)
-      );
-    });
-  }, [courseId, enrolledStudents, filteredUsers, paymentFilter, search]);
+  const enrolledById = useMemo(() => {
+    const map = new Map<string, EnrolledStudentRow>();
+    for (const row of enrolledStudents) map.set(row.id, row);
+    return map;
+  }, [enrolledStudents]);
 
   const batchLabel =
     batches.find((b) => b.id === batchId)?.name ||
     (batchId ? 'Selected batch' : 'All batches');
 
+  const courseLabel =
+    courses.find((c) => c.id === courseId)?.title ||
+    enrolledCourseTitle ||
+    'All courses';
+
+  const exportRows = useMemo(() => {
+    return filteredUsers.map((user) => {
+      const enrolled = enrolledById.get(user._id);
+      return {
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || enrolled?.phone || '',
+        role: user.role || '',
+        status: user.status || 'active',
+        studentId: user.studentId || '',
+        designation: user.designation || '',
+        feeStatus: enrolled?.feeStatus || '',
+        billingType: enrolled?.billingType || '',
+        paidUntil: enrolled?.paidUntil
+          ? new Date(enrolled.paidUntil).toLocaleString()
+          : '',
+        course: showPaymentFilter ? courseLabel : '',
+        batch: showPaymentFilter ? batchLabel : '',
+      };
+    });
+  }, [
+    filteredUsers,
+    enrolledById,
+    showPaymentFilter,
+    courseLabel,
+    batchLabel,
+  ]);
+
+  const exportFilterLabel = [
+    `Role: ${roleFilter}`,
+    search.trim() ? `Search: ${search.trim()}` : '',
+    roleFilter === 'student' ? `Course: ${courseLabel}` : '',
+    showPaymentFilter ? `Batch: ${batchLabel}` : '',
+    showPaymentFilter ? `Fee: ${paymentFilter}` : '',
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
+  const csvCell = (value: string) =>
+    `"${String(value).replace(/"/g, '""')}"`;
+
   const downloadCsv = () => {
     if (exportRows.length === 0) {
       Swal.fire(
         'Nothing to export',
-        'No students match the current filters.',
+        'No users match the current filters.',
         'info',
       );
       return;
@@ -399,7 +434,10 @@ export default function UsersDatabaseClient() {
       'Name',
       'Email',
       'Phone',
+      'Role',
       'Account Status',
+      'Student ID',
+      'Designation',
       'Fee Status',
       'Billing Type',
       'Paid Until',
@@ -413,24 +451,27 @@ export default function UsersDatabaseClient() {
           row.name,
           row.email,
           row.phone,
+          row.role,
           row.status,
+          row.studentId,
+          row.designation,
           row.feeStatus,
           row.billingType,
-          row.paidUntil ? new Date(row.paidUntil).toLocaleString() : '',
-          enrolledCourseTitle,
-          batchLabel,
+          row.paidUntil,
+          row.course,
+          row.batch,
         ]
-          .map((cell) => `"${String(cell).replace(/"/g, '""')}"`)
+          .map(csvCell)
           .join(','),
       ),
     ];
-    const blob = new Blob([lines.join('\n')], {
+    const blob = new Blob([`\uFEFF${lines.join('\n')}`], {
       type: 'text/csv;charset=utf-8;',
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `students-${courseId}${batchId ? `-${batchId}` : ''}-${paymentFilter}.csv`;
+    a.download = `users-${roleFilter}${courseId ? `-${courseId}` : ''}${batchId ? `-${batchId}` : ''}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -439,7 +480,7 @@ export default function UsersDatabaseClient() {
     if (exportRows.length === 0) {
       Swal.fire(
         'Nothing to export',
-        'No students match the current filters.',
+        'No users match the current filters.',
         'info',
       );
       return;
@@ -456,13 +497,15 @@ export default function UsersDatabaseClient() {
           <td>${escapeHtml(row.name)}</td>
           <td>${escapeHtml(row.email)}</td>
           <td>${escapeHtml(row.phone)}</td>
-          <td>${escapeHtml(row.feeStatus.toUpperCase())}</td>
-          <td>${escapeHtml(row.billingType)}</td>
-          <td>${escapeHtml(row.paidUntil ? new Date(row.paidUntil).toLocaleDateString() : '—')}</td>
+          <td>${escapeHtml(row.role)}</td>
+          <td>${escapeHtml(row.status)}</td>
+          <td>${escapeHtml(row.feeStatus ? row.feeStatus.toUpperCase() : '—')}</td>
+          <td>${escapeHtml(row.course || '—')}</td>
+          <td>${escapeHtml(row.batch || '—')}</td>
         </tr>`,
       )
       .join('');
-    const html = `<!DOCTYPE html><html><head><title>Student Export</title>
+    const html = `<!DOCTYPE html><html><head><title>User Export</title>
       <style>
         body{font-family:Arial,sans-serif;padding:24px;color:#0f172a}
         h1{font-size:20px;margin:0 0 8px}
@@ -471,9 +514,9 @@ export default function UsersDatabaseClient() {
         th,td{border:1px solid #cbd5e1;padding:8px;text-align:left}
         th{background:#f8fafc}
       </style></head><body>
-      <h1>${escapeHtml(enrolledCourseTitle || 'Course')} — Students</h1>
-      <p>Batch: ${escapeHtml(batchLabel)} · Fee filter: ${paymentFilter.toUpperCase()} · Exported ${new Date().toLocaleString()}</p>
-      <table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Fee</th><th>Billing</th><th>Paid Until</th></tr></thead>
+      <h1>User Database</h1>
+      <p>${escapeHtml(exportFilterLabel)} · ${exportRows.length} user${exportRows.length === 1 ? '' : 's'} · Exported ${escapeHtml(new Date().toLocaleString())}</p>
+      <table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Status</th><th>Fee</th><th>Course</th><th>Batch</th></tr></thead>
       <tbody>${rowsHtml}</tbody></table>
       <script>window.onload=function(){window.print()}</script>
       </body></html>`;
@@ -624,30 +667,28 @@ export default function UsersDatabaseClient() {
           </div>
         )}
 
-        {showPaymentFilter && (
-          <div className='flex flex-wrap items-center gap-2 pt-1'>
-            <button
-              type='button'
-              onClick={downloadCsv}
-              className='inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white border border-slate-200 hover:border-[#E61C24]/40 text-slate-700 hover:text-[#E61C24] font-bold text-base transition-colors'
-            >
-              <FiDownload className='h-4 w-4' />
-              Export Excel/CSV
-            </button>
-            <button
-              type='button'
-              onClick={downloadPdf}
-              className='inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white border border-slate-200 hover:border-[#E61C24]/40 text-slate-700 hover:text-[#E61C24] font-bold text-base transition-colors'
-            >
-              <FiDownload className='h-4 w-4' />
-              Export PDF
-            </button>
-            <p className='text-base font-semibold text-slate-500'>
-              {exportRows.length} student{exportRows.length === 1 ? '' : 's'} in
-              export
-            </p>
-          </div>
-        )}
+        <div className='flex flex-wrap items-center gap-2 pt-1'>
+          <button
+            type='button'
+            onClick={downloadCsv}
+            className='inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white border border-slate-200 hover:border-[#E61C24]/40 text-slate-700 hover:text-[#E61C24] font-bold text-base transition-colors'
+          >
+            <FiDownload className='h-4 w-4' />
+            Export Excel/CSV
+          </button>
+          <button
+            type='button'
+            onClick={downloadPdf}
+            className='inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white border border-slate-200 hover:border-[#E61C24]/40 text-slate-700 hover:text-[#E61C24] font-bold text-base transition-colors'
+          >
+            <FiDownload className='h-4 w-4' />
+            Export PDF
+          </button>
+          <p className='text-base font-semibold text-slate-500'>
+            {exportRows.length} user{exportRows.length === 1 ? '' : 's'} in
+            export
+          </p>
+        </div>
       </div>
 
       {/* Table */}

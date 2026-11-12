@@ -1,18 +1,11 @@
-import React from 'react'
+'use client'
+
+import { useLocale } from '@/context/LocaleContext'
 import MarqueeClient from './MarqueeClient'
 
 export default function Marquee() {
-  const items = [
-    'English for Kids',
-    'English for Teens',
-    'English for Adults',
-    'IELTS Preparation',
-    'Teacher Training',
-    'Educational Shop',
-    'Explore Courses'
-  ]
+  const { messages } = useLocale()
+  const items = messages.categories.items.map((item) => item.title)
 
   return <MarqueeClient items={items} />
 }
-
-

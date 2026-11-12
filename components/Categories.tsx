@@ -1,5 +1,6 @@
 'use client';
 
+import { useLocale } from '@/context/LocaleContext';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -14,11 +15,8 @@ import {
   FiUsers,
 } from 'react-icons/fi';
 
-const CARDS_DATA = [
+const CARD_META = [
   {
-    title: 'English for Kids',
-    description:
-      'Game based phonics with grammar, Reading, Speaking, Writing .',
     icon: <FiBookOpen className='h-6 w-6 text-[#3b82f6]' />,
     iconColor: 'text-[#3b82f6]',
     borderColor: 'border-[#3b82f6]',
@@ -26,8 +24,6 @@ const CARDS_DATA = [
     href: '/courses?category=kids-english',
   },
   {
-    title: 'English for Teens',
-    description: 'Academic English and communication skills.',
     icon: <FiLayers className='h-6 w-6 text-[#10b981]' />,
     iconColor: 'text-[#10b981]',
     borderColor: 'border-[#10b981]',
@@ -35,8 +31,6 @@ const CARDS_DATA = [
     href: '/courses?category=teens-english',
   },
   {
-    title: 'English for Adults',
-    description: 'Speak confidently in everyday situations.',
     icon: <FiMessageCircle className='h-6 w-6 text-[#f97316]' />,
     iconColor: 'text-[#f97316]',
     borderColor: 'border-[#f97316]',
@@ -44,8 +38,6 @@ const CARDS_DATA = [
     href: '/courses?category=spoken-english-for-adults',
   },
   {
-    title: 'IELTS Preparation',
-    description: 'Achieve your target IELTS score.',
     icon: <FiAward className='h-6 w-6 text-[#ef4444]' />,
     iconColor: 'text-[#ef4444]',
     borderColor: 'border-[#ef4444]',
@@ -53,8 +45,6 @@ const CARDS_DATA = [
     href: '/courses?category=ielts',
   },
   {
-    title: 'Teacher Training',
-    description: 'International teaching methods and strategies.',
     icon: <FiUsers className='h-6 w-6 text-[#a855f7]' />,
     iconColor: 'text-[#a855f7]',
     borderColor: 'border-[#a855f7]',
@@ -62,8 +52,6 @@ const CARDS_DATA = [
     href: '/courses?category=teacher-training',
   },
   {
-    title: 'Educational Shop',
-    description: 'Books, worksheets, courses, teaching resources.',
     icon: <FiShoppingBag className='h-6 w-6 text-[#eab308]' />,
     iconColor: 'text-[#eab308]',
     borderColor: 'border-[#eab308]',
@@ -71,8 +59,6 @@ const CARDS_DATA = [
     href: '/courses?category=educational-shop',
   },
   {
-    title: 'Explore Courses',
-    description: 'Browse all available learning programs and resources.',
     icon: <FiCompass className='h-6 w-6 text-[#6366f1]' />,
     iconColor: 'text-[#6366f1]',
     borderColor: 'border-[#6366f1]',
@@ -119,6 +105,15 @@ const cardVariants = {
 };
 
 export default function Categories() {
+  const { messages, href } = useLocale();
+  const t = messages.categories;
+
+  const cards = CARD_META.map((meta, i) => ({
+    ...meta,
+    title: t.items[i]?.title ?? '',
+    description: t.items[i]?.description ?? '',
+  }));
+
   return (
     <section className='py-20 md:py-28 px-6 bg-[#f9fafb] border-t border-zinc-100 relative overflow-hidden'>
       <style jsx>{`
@@ -200,8 +195,8 @@ export default function Categories() {
             viewport={{ once: true, amount: 0.2 }}
             className='text-2xl sm:text-3xl md:text-4xl font-bold text-[#0A163A] tracking-tight leading-[1.2] max-w-4xl mx-auto'
           >
-            Explore Our{' '}
-            <span className='text-[#E61C24]'>Specialized English Programs</span>
+            {t.headingBefore}{' '}
+            <span className='text-[#E61C24]'>{t.headingAccent}</span>
           </motion.h2>
 
           <motion.p
@@ -211,9 +206,7 @@ export default function Categories() {
             viewport={{ once: true, amount: 0.2 }}
             className='text-base md:text-lg font-semibold text-[#4F5B7C] max-w-3xl mx-auto pt-2 leading-relaxed'
           >
-            From foundational Phonics for kids to advanced Spoken English, IELTS
-            preparation, and professional Teacher Training, choose the perfect
-            program tailored to your learning goals.
+            {t.subtitle}
           </motion.p>
         </div>
 
@@ -225,14 +218,14 @@ export default function Categories() {
           whileInView='visible'
           viewport={{ once: true, amount: 0.1 }}
         >
-          {CARDS_DATA.map((card, index) => (
+          {cards.map((card, index) => (
             <motion.div
               key={index}
               variants={cardVariants}
               className='h-full relative pt-6'
             >
               <Link
-                href={card.href}
+                href={href(card.href)}
                 className={`flex flex-col h-full rounded-lg border-2 ${card.borderColor} ${card.bgColor} px-4 py-8 text-center shadow-md -translate-y-1 transition-all duration-300 group cursor-pointer hover:shadow-lg hover:-translate-y-1.5`}
               >
                 {/* Top Middle Icon Badge overlapping the border */}

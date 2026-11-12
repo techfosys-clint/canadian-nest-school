@@ -5,6 +5,7 @@ import type { CategoryDoc, CourseDoc } from '@/components/Courses';
 import Courses from '@/components/Courses';
 import type { ReviewDoc } from '@/components/Reviews';
 import Reviews from '@/components/Reviews';
+import { useLocale } from '@/context/LocaleContext';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -31,10 +32,14 @@ export default function InstructorsPageClient({
   categories,
   reviews,
 }: InstructorsPageClientProps) {
+  const { messages, href } = useLocale();
+  const t = messages.instructors;
+  const nav = messages.nav;
+
   // Format real database instructors
   const finalInstructors = realInstructors.map((ins, i) => ({
     name: ins.name,
-    role: ins.designation || 'Expert Mentor',
+    role: ins.designation || t.defaultRole,
     bg: ['bg-[#FDE2CA]', 'bg-[#C1F2E2]', 'bg-[#FDF0BE]', 'bg-[#FDCFDF]'][
       i % 4
     ],
@@ -70,31 +75,33 @@ export default function InstructorsPageClient({
         <div className='text-center max-w-3xl mx-auto space-y-5'>
           {/* Centered Breadcrumbs */}
           <div className='flex items-center justify-center gap-1.5 text-base font-semibold text-zinc-500 mb-2 select-none'>
-            <Link href='/' className='hover:text-[#E61C24] transition-colors'>
-              Home
+            <Link
+              href={href('/')}
+              className='hover:text-[#E61C24] transition-colors'
+            >
+              {nav.home}
             </Link>
             <span className='text-zinc-300 font-normal'>/</span>
-            <span className='text-[#0A163A]'>Mentors</span>
+            <span className='text-[#0A163A]'>{t.breadcrumb}</span>
           </div>
 
           {/* Centered Badge Pill */}
           <div className='inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#E61C24]/8 border border-[#E61C24]/15 rounded-full select-none shadow-sm shadow-[#E61C24]/5'>
             <span className='w-2 h-2 rounded-full bg-[#E61C24] animate-pulse' />
             <span className='text-sm font-bold text-[#E61C24] uppercase tracking-wider'>
-              Instructor
+              {t.badge}
             </span>
           </div>
 
           {/* Heading */}
           <h1 className='text-3xl sm:text-4xl md:text-5xl font-bold text-[#0A163A] tracking-tight leading-[1.2]'>
-            Meet Our Expert <span className='text-[#E61C24]'>Educators</span>
+            {t.headingBefore}{' '}
+            <span className='text-[#E61C24]'>{t.headingAccent}</span>
           </h1>
 
           {/* Description */}
           <p className='text-base md:text-lg font-semibold text-[#4F5B7C] leading-relaxed max-w-2xl mx-auto'>
-            Learn directly from highly qualified professionals and certified
-            educators dedicated to maintaining Canadian and International
-            teaching standards.
+            {t.subtitle}
           </p>
         </div>
 

@@ -18,6 +18,9 @@ interface FAQProps {
   faqs: FAQDoc[];
   /** Optional eyebrow above the heading */
   eyebrow?: string;
+  /** Optional heading parts — defaults keep English */
+  headingBefore?: string;
+  headingAccent?: string;
   /** Optional custom subtitle under the heading */
   subtitle?: string;
 }
@@ -68,6 +71,8 @@ const itemVariants = {
 export default function FAQ({
   faqs,
   eyebrow = 'Got Questions?',
+  headingBefore = 'Frequently Asked',
+  headingAccent = 'Questions',
   subtitle = "Everything you need to know about Canadian Nest. Can't find the answer you're looking for? Feel free to reach out to us.",
 }: FAQProps) {
   const [openId, setOpenId] = useState<string | null>(faqs[0]?.id ?? null);
@@ -101,7 +106,8 @@ export default function FAQ({
             viewport={{ once: true, amount: 0.3 }}
             className='text-3xl sm:text-4xl md:text-5xl font-bold text-zinc-900 tracking-tight leading-[1.2]'
           >
-            Frequently Asked <span className='text-[#E61C24]'>Questions</span>
+            {headingBefore}{' '}
+            <span className='text-[#E61C24]'>{headingAccent}</span>
           </motion.h2>
 
           <motion.p

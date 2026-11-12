@@ -1,5 +1,6 @@
 'use client'
 
+import { useLocale } from '@/context/LocaleContext'
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { FiMail, FiPhone, FiMapPin, FiClock, FiSend } from 'react-icons/fi'
@@ -26,6 +27,8 @@ const infoContainerVariants = {
 }
 
 export default function ContactFormClient() {
+  const { messages } = useLocale()
+  const t = messages.contact
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [subject, setSubject] = useState('')
@@ -93,11 +96,11 @@ export default function ContactFormClient() {
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#E61C24]/5 rounded-full blur-3xl pointer-events-none" />
 
             <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight pb-4 border-b border-zinc-200">
-              Contact Information
+              {t.infoTitle}
             </h2>
 
             <div className="space-y-6">
-              {/* Phone */}
+              {/* Phone — keep English label + Latin number */}
               <div className="flex items-start gap-4">
                 <div className="h-11 w-11 rounded-lg bg-[#E61C24]/10 flex items-center justify-center text-[#E61C24] shrink-0 border border-[#E61C24]/20">
                   <FiPhone className="h-5 w-5" />
@@ -111,7 +114,7 @@ export default function ContactFormClient() {
                 </div>
               </div>
 
-              {/* Email */}
+              {/* Email — keep English label + address */}
               <div className="flex items-start gap-4">
                 <div className="h-11 w-11 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-500 shrink-0 border border-sky-500/20">
                   <FiMail className="h-5 w-5" />
@@ -130,9 +133,9 @@ export default function ContactFormClient() {
                   <FiMapPin className="h-5 w-5" />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-base font-bold text-zinc-800">Our Office</p>
+                  <p className="text-base font-bold text-zinc-800">{t.officeLabel}</p>
                   <p className="text-base font-semibold text-zinc-550 leading-relaxed">
-                    Online Global Platform
+                    {t.officeValue}
                   </p>
                 </div>
               </div>
@@ -143,9 +146,9 @@ export default function ContactFormClient() {
                   <FiClock className="h-5 w-5" />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-base font-bold text-zinc-800">Support Hours</p>
+                  <p className="text-base font-bold text-zinc-800">{t.supportHoursLabel}</p>
                   <p className="text-base font-semibold text-zinc-550 leading-relaxed">
-                    Sunday through Thursday, 9:00 AM to 8:00 PM (GMT+6).
+                    {t.supportHours}
                   </p>
                 </div>
               </div>
@@ -168,10 +171,10 @@ export default function ContactFormClient() {
             {/* Form Header */}
             <div className="space-y-2">
               <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">
-                Send Us a Message
+                {t.formTitle}
               </h2>
               <p className="text-base font-semibold text-zinc-500">
-                Fill out the form below and we will get back to you within 24 hours.
+                {t.formSubtitle}
               </p>
             </div>
 

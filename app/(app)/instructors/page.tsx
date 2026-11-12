@@ -1,21 +1,26 @@
-import React from 'react'
-import { connectToDatabase } from '@/lib/db/mongodb'
-import { User } from '@/lib/db/models/User'
-import { Course } from '@/lib/db/models/Course'
-import { Category } from '@/lib/db/models/Category'
-import { Review } from '@/lib/db/models/Review'
-import { Enrollment } from '@/lib/db/models/Enrollment'
-import '@/lib/db/models/Media'
-import InstructorsPageClient from './InstructorsPageClient'
 import type { CourseDoc } from '@/components/Courses'
 import type { ReviewDoc } from '@/components/Reviews'
-
-export const metadata = {
-  title: 'Our Mentors - Canadian Nest School',
-  description: 'Meet our industry\'s leading expert mentors.',
-}
+import { Category } from '@/lib/db/models/Category'
+import { Course } from '@/lib/db/models/Course'
+import { Enrollment } from '@/lib/db/models/Enrollment'
+import '@/lib/db/models/Media'
+import { Review } from '@/lib/db/models/Review'
+import { User } from '@/lib/db/models/User'
+import { connectToDatabase } from '@/lib/db/mongodb'
+import { getLocale } from '@/lib/i18n/getLocale'
+import { getMessages } from '@/lib/i18n/getMessages'
+import InstructorsPageClient from './InstructorsPageClient'
 
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata() {
+  const locale = await getLocale()
+  const t = getMessages(locale).instructors
+  return {
+    title: t.metaTitle,
+    description: t.metaDescription,
+  }
+}
 
 export default async function InstructorsPage() {
   await connectToDatabase()

@@ -19,6 +19,7 @@ import { middleware } from './middleware'
 function makeRequest(pathname: string) {
   const url = new URL(`https://example.com${pathname}`)
   return {
+    headers: new Headers(),
     nextUrl: {
       pathname,
       clone() {
@@ -61,14 +62,18 @@ describe('middleware locale routing', () => {
     const res = middleware(makeRequest('/courses'))
     expect(nextMock).toHaveBeenCalledOnce()
     expect(res.headers.get('x-locale')).toBe('bn')
+    const nextOpts = nextMock.mock.calls[0][0]
+    expect(nextOpts.request.headers.get('x-locale')).toBe('bn')
   })
 
   it('rewrites /en/... to bare path and sets x-locale=en', () => {
     const res = middleware(makeRequest('/en/courses'))
     expect(rewriteMock).toHaveBeenCalledOnce()
     const rewrittenUrl = rewriteMock.mock.calls[0][0]
+    const rewriteOpts = rewriteMock.mock.calls[0][1]
     expect(rewrittenUrl.pathname).toBe('/courses')
     expect(res.headers.get('x-locale')).toBe('en')
+    expect(rewriteOpts.request.headers.get('x-locale')).toBe('en')
   })
 
   it('rewrites /en home to / with x-locale=en', () => {
@@ -76,6 +81,9 @@ describe('middleware locale routing', () => {
     expect(rewriteMock).toHaveBeenCalledOnce()
     expect(rewriteMock.mock.calls[0][0].pathname).toBe('/')
     expect(res.headers.get('x-locale')).toBe('en')
+    expect(rewriteMock.mock.calls[0][1].request.headers.get('x-locale')).toBe(
+      'en',
+    )
   })
 
   it('redirects /en-prefixed excluded routes to bare path', () => {

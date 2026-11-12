@@ -1,6 +1,7 @@
 'use client';
 
 import CTASection from '@/components/CTASection';
+import { useLocale } from '@/context/LocaleContext';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -13,10 +14,21 @@ import {
   FiShield,
 } from 'react-icons/fi';
 
-export default function AboutClient() {
-  // Framer Motion Animation Variants
+const PILLAR_ICONS = [FiBookOpen, FiShield, FiGlobe];
+const OFFER_ICONS = [
+  FiBookOpen,
+  FiLayers,
+  FiClock,
+  FiShield,
+  FiGlobe,
+  FiSettings,
+];
 
-  // Framer Motion Animation Variants
+export default function AboutClient() {
+  const { messages, href } = useLocale();
+  const t = messages.about;
+  const nav = messages.nav;
+
   const fadeInUp = {
     hidden: { opacity: 0, y: 35 },
     visible: {
@@ -64,11 +76,14 @@ export default function AboutClient() {
               variants={fadeInUp}
               className='flex items-center justify-center gap-1.5 text-base font-semibold text-zinc-500 mb-2 select-none'
             >
-              <Link href='/' className='hover:text-[#E61C24] transition-colors'>
-                Home
+              <Link
+                href={href('/')}
+                className='hover:text-[#E61C24] transition-colors'
+              >
+                {nav.home}
               </Link>
               <span className='text-zinc-300 font-normal'>/</span>
-              <span className='text-[#0A163A]'>About</span>
+              <span className='text-[#0A163A]'>{t.breadcrumb}</span>
             </motion.div>
 
             {/* Centered Badge Pill */}
@@ -78,7 +93,7 @@ export default function AboutClient() {
             >
               <span className='w-2 h-2 rounded-full bg-[#E61C24] animate-pulse' />
               <span className='text-sm font-bold text-[#E61C24] uppercase tracking-wider'>
-                About
+                {t.badge}
               </span>
             </motion.div>
 
@@ -87,7 +102,8 @@ export default function AboutClient() {
               variants={fadeInUp}
               className='text-4xl sm:text-5xl md:text-6xl font-bold text-[#0A163A] tracking-tight leading-[1.2]'
             >
-              About <span className='text-[#E61C24]'>Canadian Nest School</span>
+              {t.headingBefore}{' '}
+              <span className='text-[#E61C24]'>{t.headingAccent}</span>
             </motion.h1>
 
             {/* Description */}
@@ -95,9 +111,7 @@ export default function AboutClient() {
               variants={fadeInUp}
               className='text-base sm:text-lg font-semibold text-[#4F5B7C] leading-relaxed max-w-2xl mx-auto'
             >
-              Empowering learners of all ages to master authentic English, build
-              unshakeable confidence, and unlock global opportunities through
-              International-standard education.
+              {t.intro}
             </motion.p>
           </motion.div>
 
@@ -116,7 +130,7 @@ export default function AboutClient() {
             >
               <Image
                 src='https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80'
-                alt='Students collaborating'
+                alt={t.heroImageAlt}
                 className='w-full h-full object-cover pointer-events-none'
                 width={1800}
                 height={1800}
@@ -131,89 +145,27 @@ export default function AboutClient() {
               viewport={{ once: true, amount: 0.15 }}
               className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 pt-6'
             >
-              {/* Stat 1 */}
-              <motion.div
-                variants={statCardVariants}
-                whileHover={{
-                  y: -5,
-                  transition: { duration: 0.2, ease: 'easeOut' },
-                }}
-                className='p-5 bg-[#E61C24]/4 rounded-lg border border-[#E61C24]/15 flex flex-col gap-2 transition-all duration-300 hover:border-[#E61C24]/35 shadow-sm hover:shadow-md cursor-pointer'
-              >
-                <span className='text-[#E61C24] text-4xl md:text-5xl font-bold'>
-                  100%
-                </span>
-                <span className='text-[#0A163A] text-lg font-bold'>
-                  Practical Learning
-                </span>
-                <p className='text-[#4F5B7C] text-base font-semibold leading-relaxed'>
-                  Focus on real-life speaking, shadowing, and practical
-                  communication, not just textbook grammar rules.
-                </p>
-              </motion.div>
-
-              {/* Stat 2 */}
-              <motion.div
-                variants={statCardVariants}
-                whileHover={{
-                  y: -5,
-                  transition: { duration: 0.2, ease: 'easeOut' },
-                }}
-                className='p-5 bg-[#E61C24]/4 rounded-lg border border-[#E61C24]/15 flex flex-col gap-2 transition-all duration-300 hover:border-[#E61C24]/35 shadow-sm hover:shadow-md cursor-pointer'
-              >
-                <span className='text-[#E61C24] text-4xl md:text-5xl font-bold'>
-                  Immersive
-                </span>
-                <span className='text-[#0A163A] text-lg font-bold'>
-                  Interactive Classes
-                </span>
-                <p className='text-[#4F5B7C] text-base font-semibold leading-relaxed'>
-                  Comprehensive live sessions for every program, ensuring
-                  personalized attention and maximum engagement.
-                </p>
-              </motion.div>
-
-              {/* Stat 3 */}
-              <motion.div
-                variants={statCardVariants}
-                whileHover={{
-                  y: -5,
-                  transition: { duration: 0.2, ease: 'easeOut' },
-                }}
-                className='p-5 bg-[#E61C24]/4 rounded-lg border border-[#E61C24]/15 flex flex-col gap-2 transition-all duration-300 hover:border-[#E61C24]/35 shadow-sm hover:shadow-md cursor-pointer'
-              >
-                <span className='text-[#E61C24] text-4xl md:text-5xl font-bold'>
-                  Expert
-                </span>
-                <span className='text-[#0A163A] text-lg font-bold'>
-                  Instructors
-                </span>
-                <p className='text-[#4F5B7C] text-base font-semibold leading-relaxed'>
-                  Learn from certified professionals dedicated to maintaining
-                  the highest international teaching standards.
-                </p>
-              </motion.div>
-
-              {/* Stat 4 */}
-              <motion.div
-                variants={statCardVariants}
-                whileHover={{
-                  y: -5,
-                  transition: { duration: 0.2, ease: 'easeOut' },
-                }}
-                className='p-5 bg-[#E61C24]/4 rounded-lg border border-[#E61C24]/15 flex flex-col gap-2 transition-all duration-300 hover:border-[#E61C24]/35 shadow-sm hover:shadow-md cursor-pointer'
-              >
-                <span className='text-[#E61C24] text-4xl md:text-5xl font-bold'>
-                  98%
-                </span>
-                <span className='text-[#0A163A] text-lg font-bold'>
-                  Satisfaction
-                </span>
-                <p className='text-[#4F5B7C] text-base font-semibold leading-relaxed'>
-                  Our learners love the judgment-free environment, continuous
-                  support, and real-world results.
-                </p>
-              </motion.div>
+              {t.stats.map((stat) => (
+                <motion.div
+                  key={stat.label}
+                  variants={statCardVariants}
+                  whileHover={{
+                    y: -5,
+                    transition: { duration: 0.2, ease: 'easeOut' },
+                  }}
+                  className='p-5 bg-[#E61C24]/4 rounded-lg border border-[#E61C24]/15 flex flex-col gap-2 transition-all duration-300 hover:border-[#E61C24]/35 shadow-sm hover:shadow-md cursor-pointer'
+                >
+                  <span className='text-[#E61C24] text-4xl md:text-5xl font-bold'>
+                    {stat.value}
+                  </span>
+                  <span className='text-[#0A163A] text-lg font-bold'>
+                    {stat.label}
+                  </span>
+                  <p className='text-[#4F5B7C] text-base font-semibold leading-relaxed'>
+                    {stat.description}
+                  </p>
+                </motion.div>
+              ))}
             </motion.div>
           </div>
         </div>
@@ -249,7 +201,7 @@ export default function AboutClient() {
               <div className='relative w-4/5 aspect-4/3 rounded-lg overflow-hidden border border-slate-200 shadow-lg group'>
                 <Image
                   src='https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80'
-                  alt='Team collaboration'
+                  alt={t.teamImageAlt}
                   className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]'
                   width={700}
                   height={500}
@@ -267,10 +219,10 @@ export default function AboutClient() {
                   </div>
                   <div>
                     <p className='text-sm font-bold text-slate-400 uppercase tracking-wide'>
-                      Success Rate
+                      {t.floatingSuccessLabel}
                     </p>
                     <p className='text-lg font-bold text-[#0A163A]'>
-                      98% Satisfaction
+                      {t.floatingSuccessValue}
                     </p>
                   </div>
                 </div>
@@ -290,10 +242,10 @@ export default function AboutClient() {
                   </div>
                   <div>
                     <p className='text-sm font-bold text-slate-400 uppercase tracking-wide'>
-                      Live Classes
+                      {t.floatingLiveLabel}
                     </p>
                     <p className='text-lg font-bold text-[#0A163A]'>
-                      Interactive Space
+                      {t.floatingLiveValue}
                     </p>
                   </div>
                 </div>
@@ -304,77 +256,39 @@ export default function AboutClient() {
             <div className='lg:col-span-6 space-y-8'>
               <div className='space-y-4'>
                 <span className='text-[#E61C24] font-bold text-base uppercase tracking-wider'>
-                  Our Core Pillars
+                  {t.pillarsEyebrow}
                 </span>
                 <h2 className='text-3xl sm:text-4xl md:text-5xl font-bold text-[#0A163A] tracking-tight leading-[1.2]'>
-                  Empowering Learners to Shape the Future
+                  {t.pillarsTitle}
                 </h2>
                 <p className='text-base sm:text-lg text-slate-500 font-semibold leading-relaxed'>
-                  We don&apos;t just teach English. We cultivate communication
-                  skills, break language barriers, and build paths to absolute
-                  fluency.
+                  {t.pillarsSubtitle}
                 </p>
               </div>
 
               {/* Vertical Stack of Value Cards */}
               <div className='space-y-4'>
-                {/* Pillar 1: Our Story */}
-                <div className='bg-white border border-slate-200/80 rounded-lg p-5 flex gap-4 shadow-sm hover:shadow-md transition-shadow group'>
-                  <div className='h-12 w-12 rounded-lg bg-[#E61C24]/8 border border-[#E61C24]/15 flex items-center justify-center text-[#E61C24] shrink-0 mt-0.5'>
-                    <FiBookOpen className='h-6 w-6' />
-                  </div>
-                  <div className='space-y-1'>
-                    <h3 className='text-lg font-bold text-[#0A163A] group-hover:text-[#E61C24] transition-colors'>
-                      Our Story
-                    </h3>
-                    <p className='text-base text-slate-500 font-semibold leading-relaxed'>
-                      Canadian Nest School was founded with a clear goal: to
-                      eliminate the fear of speaking English. We realized that
-                      traditional grammar-heavy methods were not helping people
-                      actually communicate. So, we built a platform focused on
-                      phonics, pronunciation, and practical speaking, bringing
-                      interactive international educational standards directly
-                      to your screen.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Pillar 2: Our Mission */}
-                <div className='bg-white border border-slate-200/80 rounded-lg p-5 flex gap-4 shadow-sm hover:shadow-md transition-shadow group'>
-                  <div className='h-12 w-12 rounded-lg bg-[#E61C24]/8 border border-[#E61C24]/15 flex items-center justify-center text-[#E61C24] shrink-0 mt-0.5'>
-                    <FiShield className='h-6 w-6' />
-                  </div>
-                  <div className='space-y-1'>
-                    <h3 className='text-lg font-bold text-[#0A163A] group-hover:text-[#E61C24] transition-colors'>
-                      Our Mission
-                    </h3>
-                    <p className='text-base text-slate-500 font-semibold leading-relaxed'>
-                      To bridge the gap between simply understanding English and
-                      speaking it fluently. We provide accessible, interactive,
-                      and hands-on language training tailored for everyday life,
-                      academic success, and professional workplace
-                      communication.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Pillar 3: Our Vision */}
-                <div className='bg-white border border-slate-200/80 rounded-lg p-5 flex gap-4 shadow-sm hover:shadow-md transition-shadow group'>
-                  <div className='h-12 w-12 rounded-lg bg-[#E61C24]/8 border border-[#E61C24]/15 flex items-center justify-center text-[#E61C24] shrink-0 mt-0.5'>
-                    <FiGlobe className='h-6 w-6' />
-                  </div>
-                  <div className='space-y-1'>
-                    <h3 className='text-lg font-bold text-[#0A163A] group-hover:text-[#E61C24] transition-colors'>
-                      Our Vision
-                    </h3>
-                    <p className='text-base text-slate-500 font-semibold leading-relaxed'>
-                      To build the world&apos;s most supportive and engaging
-                      language learning network, where anyone, regardless of
-                      their age or background, can conquer their fear of English
-                      and speak to the world with absolute confidence.
-                    </p>
-                  </div>
-                </div>
+                {t.pillars.map((pillar, index) => {
+                  const Icon = PILLAR_ICONS[index] ?? FiBookOpen;
+                  return (
+                    <div
+                      key={pillar.title}
+                      className='bg-white border border-slate-200/80 rounded-lg p-5 flex gap-4 shadow-sm hover:shadow-md transition-shadow group'
+                    >
+                      <div className='h-12 w-12 rounded-lg bg-[#E61C24]/8 border border-[#E61C24]/15 flex items-center justify-center text-[#E61C24] shrink-0 mt-0.5'>
+                        <Icon className='h-6 w-6' />
+                      </div>
+                      <div className='space-y-1'>
+                        <h3 className='text-lg font-bold text-[#0A163A] group-hover:text-[#E61C24] transition-colors'>
+                          {pillar.title}
+                        </h3>
+                        <p className='text-base text-slate-500 font-semibold leading-relaxed'>
+                          {pillar.description}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -399,16 +313,13 @@ export default function AboutClient() {
               variants={fadeInUp}
               className='text-3xl sm:text-4xl md:text-5xl font-bold text-[#0A163A] tracking-tight leading-[1.2]'
             >
-              What We Offer
+              {t.offerTitle}
             </motion.h2>
             <motion.p
               variants={fadeInUp}
               className='text-base sm:text-lg font-semibold text-[#4F5B7C] leading-relaxed max-w-2xl mx-auto'
             >
-              Discover a platform built to make English learning simple,
-              interactive, and highly effective — with real-world conversation
-              practice, immersive live sessions, and expert-led lessons designed
-              to help you communicate with absolute confidence.
+              {t.offerSubtitle}
             </motion.p>
           </motion.div>
 
@@ -420,133 +331,30 @@ export default function AboutClient() {
             viewport={{ once: true, amount: 0.15 }}
             className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
           >
-            {/* Card 1 */}
-            <motion.div
-              variants={statCardVariants}
-              whileHover={{
-                y: -5,
-                transition: { duration: 0.2, ease: 'easeOut' as const },
-              }}
-              className='p-6 bg-linear-to-br from-[#E61C24]/4 to-[#E61C24]/8 border border-[#E61C24]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#E61C24]/30 transition-all duration-300 group cursor-pointer'
-            >
-              <div className='w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#E61C24] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300'>
-                <FiBookOpen className='h-6 w-6' />
-              </div>
-              <h3 className='text-xl font-bold text-[#0A163A] mb-2.5'>
-                Expert-Led Live Classes
-              </h3>
-              <p className='text-base font-semibold text-[#4F5B7C] leading-relaxed'>
-                Learn directly from highly qualified instructors who bring
-                practical, real-world communication skills into every
-                interactive session.
-              </p>
-            </motion.div>
-
-            {/* Card 2 */}
-            <motion.div
-              variants={statCardVariants}
-              whileHover={{
-                y: -5,
-                transition: { duration: 0.2, ease: 'easeOut' as const },
-              }}
-              className='p-6 bg-linear-to-br from-[#E61C24]/4 to-[#E61C24]/8 border border-[#E61C24]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#E61C24]/30 transition-all duration-300 group cursor-pointer'
-            >
-              <div className='w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#E61C24] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300'>
-                <FiLayers className='h-6 w-6' />
-              </div>
-              <h3 className='text-xl font-bold text-[#0A163A] mb-2.5'>
-                Interactive &amp; Practical Method
-              </h3>
-              <p className='text-base font-semibold text-[#4F5B7C] leading-relaxed'>
-                Forget boring textbook memorization. Engage in role-plays,
-                shadowing, and everyday conversation practice to speak fluently.
-              </p>
-            </motion.div>
-
-            {/* Card 3 */}
-            <motion.div
-              variants={statCardVariants}
-              whileHover={{
-                y: -5,
-                transition: { duration: 0.2, ease: 'easeOut' as const },
-              }}
-              className='p-6 bg-linear-to-br from-[#E61C24]/4 to-[#E61C24]/8 border border-[#E61C24]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#E61C24]/30 transition-all duration-300 group cursor-pointer'
-            >
-              <div className='w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#E61C24] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300'>
-                <FiClock className='h-6 w-6' />
-              </div>
-              <h3 className='text-xl font-bold text-[#0A163A] mb-2.5'>
-                Programs for Every Age
-              </h3>
-              <p className='text-base font-semibold text-[#4F5B7C] leading-relaxed'>
-                From foundational Phonics for kids to professional Spoken
-                English for adults and advanced IELTS preparation, we have you
-                covered.
-              </p>
-            </motion.div>
-
-            {/* Card 4 */}
-            <motion.div
-              variants={statCardVariants}
-              whileHover={{
-                y: -5,
-                transition: { duration: 0.2, ease: 'easeOut' as const },
-              }}
-              className='p-6 bg-linear-to-br from-[#E61C24]/4 to-[#E61C24]/8 border border-[#E61C24]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#E61C24]/30 transition-all duration-300 group cursor-pointer'
-            >
-              <div className='w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#E61C24] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300'>
-                <FiShield className='h-6 w-6' />
-              </div>
-              <h3 className='text-xl font-bold text-[#0A163A] mb-2.5'>
-                Verified Certificates
-              </h3>
-              <p className='text-base font-semibold text-[#4F5B7C] leading-relaxed'>
-                Earn recognized certificates of completion to showcase your
-                English fluency and boost your career opportunities globally.
-              </p>
-            </motion.div>
-
-            {/* Card 5 */}
-            <motion.div
-              variants={statCardVariants}
-              whileHover={{
-                y: -5,
-                transition: { duration: 0.2, ease: 'easeOut' as const },
-              }}
-              className='p-6 bg-linear-to-br from-[#E61C24]/4 to-[#E61C24]/8 border border-[#E61C24]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#E61C24]/30 transition-all duration-300 group cursor-pointer'
-            >
-              <div className='w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#E61C24] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300'>
-                <FiGlobe className='h-6 w-6' />
-              </div>
-              <h3 className='text-xl font-bold text-[#0A163A] mb-2.5'>
-                Supportive Community
-              </h3>
-              <p className='text-base font-semibold text-[#4F5B7C] leading-relaxed'>
-                Connect, practice, and grow in a judgment-free environment with
-                passionate learners from around the world.
-              </p>
-            </motion.div>
-
-            {/* Card 6 */}
-            <motion.div
-              variants={statCardVariants}
-              whileHover={{
-                y: -5,
-                transition: { duration: 0.2, ease: 'easeOut' as const },
-              }}
-              className='p-6 bg-linear-to-br from-[#E61C24]/4 to-[#E61C24]/8 border border-[#E61C24]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#E61C24]/30 transition-all duration-300 group cursor-pointer'
-            >
-              <div className='w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#E61C24] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300'>
-                <FiSettings className='h-6 w-6' />
-              </div>
-              <h3 className='text-xl font-bold text-[#0A163A] mb-2.5'>
-                Personalized Feedback
-              </h3>
-              <p className='text-base font-semibold text-[#4F5B7C] leading-relaxed'>
-                Receive direct, individual feedback from your mentors to
-                continuously improve your pronunciation and natural intonation.
-              </p>
-            </motion.div>
+            {t.offers.map((offer, index) => {
+              const Icon = OFFER_ICONS[index] ?? FiBookOpen;
+              return (
+                <motion.div
+                  key={offer.title}
+                  variants={statCardVariants}
+                  whileHover={{
+                    y: -5,
+                    transition: { duration: 0.2, ease: 'easeOut' as const },
+                  }}
+                  className='p-6 bg-linear-to-br from-[#E61C24]/4 to-[#E61C24]/8 border border-[#E61C24]/10 rounded-lg shadow-sm hover:shadow-md hover:border-[#E61C24]/30 transition-all duration-300 group cursor-pointer'
+                >
+                  <div className='w-12 h-12 rounded-lg bg-white flex items-center justify-center text-[#E61C24] shadow-sm mb-5 transition-transform group-hover:scale-105 duration-300'>
+                    <Icon className='h-6 w-6' />
+                  </div>
+                  <h3 className='text-xl font-bold text-[#0A163A] mb-2.5'>
+                    {offer.title}
+                  </h3>
+                  <p className='text-base font-semibold text-[#4F5B7C] leading-relaxed'>
+                    {offer.description}
+                  </p>
+                </motion.div>
+              );
+            })}
           </motion.div>
         </div>
       </section>

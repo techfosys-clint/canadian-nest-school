@@ -1,14 +1,19 @@
-import React from 'react'
-import { connectToDatabase } from '@/lib/db/mongodb'
 import { Product } from '@/lib/db/models/Product'
+import { connectToDatabase } from '@/lib/db/mongodb'
+import { getLocale } from '@/lib/i18n/getLocale'
+import { getMessages } from '@/lib/i18n/getMessages'
 import ShopPageClient from './ShopPageClient'
 
-export const metadata = {
-  title: 'Shop - Canadian Nest School',
-  description: 'Browse books and learning materials sold by Canadian Nest School.',
-}
-
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata() {
+  const locale = await getLocale()
+  const t = getMessages(locale).shop
+  return {
+    title: t.metaTitle,
+    description: t.metaDescription,
+  }
+}
 
 export default async function ShopPage() {
   await connectToDatabase()
@@ -32,7 +37,7 @@ export default async function ShopPage() {
   }))
 
   const categories = Array.from(
-    new Set(products.map((p) => p.category).filter(Boolean))
+    new Set(products.map((p) => p.category).filter(Boolean)),
   ) as string[]
 
   return <ShopPageClient products={products} categories={categories} />

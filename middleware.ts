@@ -27,6 +27,13 @@ function applyNoStore(response: NextResponse) {
   response.headers.set('Expires', '0')
 }
 
+/** Locale must be on the *request* so RSC `headers().get('x-locale')` works. */
+function withLocaleRequest(request: NextRequest, locale: 'bn' | 'en') {
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set('x-locale', locale)
+  return requestHeaders
+}
+
 /**
  * Locale routing (10MS-style):
  * - Bangla (default): `/courses/...`
@@ -48,13 +55,17 @@ export function middleware(request: NextRequest) {
 
     const url = request.nextUrl.clone()
     url.pathname = bare
-    const response = NextResponse.rewrite(url)
+    const response = NextResponse.rewrite(url, {
+      request: { headers: withLocaleRequest(request, 'en') },
+    })
     response.headers.set('x-locale', 'en')
     if (needsNoStore(bare)) applyNoStore(response)
     return response
   }
 
-  const response = NextResponse.next()
+  const response = NextResponse.next({
+    request: { headers: withLocaleRequest(request, 'bn') },
+  })
   response.headers.set('x-locale', 'bn')
   if (needsNoStore(pathname)) applyNoStore(response)
   return response

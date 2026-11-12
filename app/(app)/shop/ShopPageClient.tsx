@@ -1,6 +1,7 @@
 'use client';
 
 import PageHeroSection from '@/components/PageHeroSection';
+import { useLocale } from '@/context/LocaleContext';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
@@ -31,6 +32,8 @@ export default function ShopPageClient({
   products: ShopProduct[];
   categories: string[];
 }) {
+  const { messages, href } = useLocale();
+  const t = messages.shop;
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('all');
 
@@ -49,14 +52,19 @@ export default function ShopPageClient({
   return (
     <div className='min-h-screen pt-22'>
       <PageHeroSection
-        tag='Canadian Nest Shop'
-        title='Books & Learning Materials'
+        tag={t.tag}
+        title={t.title}
         description={
           <>
-            Physical books, guides, and other learning materials to support your{' '}
-            <span className='text-[#E61C24] font-bold'>study journey</span> —
-            delivered right to your{' '}
-            <span className='text-[#E61C24] font-bold'>door</span>.
+            {t.descriptionBefore}
+            <span className='text-[#E61C24] font-bold'>
+              {t.descriptionAccent1}
+            </span>
+            {t.descriptionMiddle}
+            <span className='text-[#E61C24] font-bold'>
+              {t.descriptionAccent2}
+            </span>
+            {t.descriptionAfter}
           </>
         }
       />
@@ -129,7 +137,7 @@ export default function ShopPageClient({
               {filtered.map((product) => (
                 <Link
                   key={product.id}
-                  href={`/shop/${product.slug}`}
+                  href={href(`/shop/${product.slug}`)}
                   className='bg-white rounded-lg border border-[#E61C24]/15 hover:border-[#E61C24]/50 shadow-[0_4px_16px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_28px_rgba(230,28,36,0.08)] hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group'
                 >
                   <div className='aspect-3/4 bg-zinc-50 overflow-hidden relative'>

@@ -1,10 +1,14 @@
-import React from 'react'
 import AboutClient from './AboutClient'
+import { getLocale } from '@/lib/i18n/getLocale'
+import { getMessages } from '@/lib/i18n/getMessages'
 
-export const metadata = {
-  title: 'About Us - Canadian Nest School',
-  description:
-    'Empowering learners of all ages to master authentic English, build confidence, and unlock global opportunities through international-standard education.',
+export async function generateMetadata() {
+  const locale = await getLocale()
+  const t = getMessages(locale).about
+  return {
+    title: t.metaTitle,
+    description: t.metaDescription,
+  }
 }
 
 export default function AboutPage() {

@@ -28,6 +28,12 @@ export type Messages = {
     subtitle: string
     items: Array<{ title: string; description: string }>
   }
+  categories: {
+    headingBefore: string
+    headingAccent: string
+    subtitle: string
+    items: Array<{ title: string; description: string }>
+  }
   courses: {
     sectionTitle: string
     sectionSubtitle: string
@@ -77,9 +83,72 @@ export type Messages = {
     refund: string
     rights: string
   }
-  about: { title: string }
-  contact: { title: string }
-  instructors: { title: string; subtitle: string }
+  about: {
+    title: string
+    metaTitle: string
+    metaDescription: string
+    breadcrumb: string
+    badge: string
+    headingBefore: string
+    headingAccent: string
+    intro: string
+    heroImageAlt: string
+    stats: Array<{ value: string; label: string; description: string }>
+    floatingSuccessLabel: string
+    floatingSuccessValue: string
+    floatingLiveLabel: string
+    floatingLiveValue: string
+    teamImageAlt: string
+    pillarsEyebrow: string
+    pillarsTitle: string
+    pillarsSubtitle: string
+    pillars: Array<{ title: string; description: string }>
+    offerTitle: string
+    offerSubtitle: string
+    offers: Array<{ title: string; description: string }>
+  }
+  contact: {
+    title: string
+    metaTitle: string
+    metaDescription: string
+    eyebrow: string
+    headingBefore: string
+    headingAccent: string
+    subtitle: string
+    infoTitle: string
+    officeLabel: string
+    officeValue: string
+    supportHoursLabel: string
+    supportHours: string
+    formTitle: string
+    formSubtitle: string
+    faqEyebrow: string
+    faqHeadingBefore: string
+    faqHeadingAccent: string
+    faqSubtitle: string
+  }
+  shop: {
+    metaTitle: string
+    metaDescription: string
+    tag: string
+    title: string
+    descriptionBefore: string
+    descriptionAccent1: string
+    descriptionMiddle: string
+    descriptionAccent2: string
+    descriptionAfter: string
+  }
+  instructors: {
+    title: string
+    subtitle: string
+    metaTitle: string
+    metaDescription: string
+    breadcrumb: string
+    badge: string
+    headingBefore: string
+    headingAccent: string
+    defaultRole: string
+  }
   common: { loading: string; learnMore: string }
   lang: { bn: string; en: string; switchTo: string }
 }

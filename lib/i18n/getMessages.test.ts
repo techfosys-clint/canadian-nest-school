@@ -53,6 +53,7 @@ describe('getMessages', () => {
     expect(Object.keys(messages).sort()).toEqual(
       [
         'about',
+        'categories',
         'common',
         'contact',
         'courses',
@@ -63,6 +64,7 @@ describe('getMessages', () => {
         'instructors',
         'lang',
         'nav',
+        'shop',
       ].sort(),
     )
   })
@@ -71,5 +73,23 @@ describe('getMessages', () => {
     expect(getMessages('bn').features.items).toHaveLength(
       getMessages('en').features.items.length,
     )
+  })
+
+  it('keeps category item counts aligned across locales', () => {
+    expect(getMessages('bn').categories.items).toHaveLength(
+      getMessages('en').categories.items.length,
+    )
+    expect(getMessages('en').categories.items).toHaveLength(7)
+  })
+
+  it('keeps about section list counts aligned across locales', () => {
+    const bn = getMessages('bn').about
+    const en = getMessages('en').about
+    expect(bn.stats).toHaveLength(en.stats.length)
+    expect(bn.pillars).toHaveLength(en.pillars.length)
+    expect(bn.offers).toHaveLength(en.offers.length)
+    expect(en.stats).toHaveLength(4)
+    expect(en.pillars).toHaveLength(3)
+    expect(en.offers).toHaveLength(6)
   })
 })

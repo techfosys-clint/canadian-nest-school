@@ -97,6 +97,8 @@ export async function completePaidEnrollment(
                 billingType,
                 paidUntil,
                 billingCycleAnchor: now,
+                initialPaymentAmount: enrollment.pricePaid,
+                initialPaymentPeriodEnd: paidUntil,
                 accessStatus: 'active',
               }
             : { billingType: 'one_time', accessStatus: 'active' }),
@@ -116,6 +118,8 @@ export async function completePaidEnrollment(
       enrollment.billingType = billingType as 'monthly' | 'quarterly'
       enrollment.paidUntil = paidUntil
       enrollment.billingCycleAnchor = now
+      enrollment.initialPaymentAmount = claimed.initialPaymentAmount
+      enrollment.initialPaymentPeriodEnd = claimed.initialPaymentPeriodEnd
       enrollment.accessStatus = 'active'
     }
 

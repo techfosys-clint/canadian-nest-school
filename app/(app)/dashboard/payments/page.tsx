@@ -1,67 +1,69 @@
-'use client'
+'use client';
 
-import { formatBdDate, formatBdDateTime } from '@/lib/bdTime'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { FiCreditCard } from 'react-icons/fi'
+import { formatBdDate, formatBdDateTime } from '@/lib/bdTime';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { FiCreditCard } from 'react-icons/fi';
 
 type PaymentRow = {
-  id: string
-  kind: 'enrollment' | 'renewal'
-  courseTitle: string
-  billingType: string
-  amount: number
-  lateFee: number
-  periodStart: string | null
-  periodEnd: string | null
-  paymentStatus: string
-  paymentReference: string
-  paidAt: string
-}
+  id: string;
+  kind: 'enrollment' | 'renewal';
+  courseTitle: string;
+  billingType: string;
+  amount: number | null;
+  lateFee: number;
+  periodStart: string | null;
+  periodEnd: string | null;
+  paymentStatus: string;
+  paymentReference: string;
+  paidAt: string;
+};
 
 const STATUS_STYLES: Record<string, string> = {
   completed: 'bg-emerald-50 border-emerald-200 text-emerald-700',
   pending: 'bg-amber-50 border-amber-200 text-amber-700',
   failed: 'bg-rose-50 border-rose-200 text-rose-700',
-}
+};
 
 export default function PaymentHistoryPage() {
-  const router = useRouter()
-  const [loading, setLoading] = useState(true)
-  const [payments, setPayments] = useState<PaymentRow[]>([])
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
+  const [payments, setPayments] = useState<PaymentRow[]>([]);
 
   useEffect(() => {
     async function load() {
       try {
-        const sessionRes = await fetch('/api/auth/me')
-        const sessionData = await sessionRes.json()
+        const sessionRes = await fetch('/api/auth/me');
+        const sessionData = await sessionRes.json();
         if (
           !sessionRes.ok ||
           !sessionData.authenticated ||
           (sessionData.user.role !== 'student' &&
             sessionData.user.role !== 'admin')
         ) {
-          router.push('/login')
-          return
+          router.push('/login');
+          return;
         }
 
         const res = await fetch('/api/subscriptions/history', {
           cache: 'no-store',
-        })
-        if (res.ok) {
-          const data = await res.json()
-          if (data.success && Array.isArray(data.payments)) {
-            setPayments(data.payments)
-          }
+        });
+        if (!res.ok) throw new Error('Payment history request failed');
+        const data = await res.json();
+        if (!data.success || !Array.isArray(data.payments)) {
+          throw new Error('Invalid payment history response');
         }
+        setPayments(data.payments);
       } catch (err) {
-        console.error('Failed to load payment history:', err)
+        console.error('Failed to load payment history:', err);
+        setFailed(true);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
-    void load()
-  }, [router])
+    void load();
+  }, [router]);
 
   if (loading) {
     return (
@@ -73,7 +75,7 @@ export default function PaymentHistoryPage() {
           </p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -94,7 +96,14 @@ export default function PaymentHistoryPage() {
         </div>
       </div>
 
-      {payments.length === 0 ? (
+      {failed ? (
+        <p
+          role='alert'
+          className='bg-white rounded-lg border border-zinc-200 p-6 text-base text-zinc-700'
+        >
+          Payment history could not be loaded. Please refresh to try again.
+        </p>
+      ) : payments.length === 0 ? (
         <div className='bg-white rounded-lg border border-zinc-200 p-12 text-center'>
           <div className='h-14 w-14 rounded-full bg-[#E61C24]/5 flex items-center justify-center text-[#E61C24] mx-auto mb-5'>
             <FiCreditCard className='h-7 w-7' />
@@ -110,7 +119,7 @@ export default function PaymentHistoryPage() {
       ) : (
         <div className='bg-white rounded-lg border border-zinc-200 overflow-hidden'>
           <div className='overflow-x-auto'>
-            <table className='w-full text-left border-collapse min-w-[720px]'>
+            <table className='w-full text-left border-collapse min-w-180'>
               <thead>
                 <tr className='bg-zinc-50 border-b border-zinc-200'>
                   <th className='px-5 py-4 text-base font-bold text-zinc-600'>
@@ -135,7 +144,6 @@ export default function PaymentHistoryPage() {
               </thead>
               <tbody>
                 {payments.map((row) => {
-                  const total = row.amount + (row.lateFee || 0)
                   return (
                     <tr
                       key={row.id}
@@ -158,7 +166,9 @@ export default function PaymentHistoryPage() {
                           : '—'}
                       </td>
                       <td className='px-5 py-4 text-base font-bold text-zinc-800'>
-                        BDT {total.toLocaleString()}
+                        {row.amount === null
+                          ? 'Unavailable'
+                          : `BDT ${row.amount.toLocaleString()}`}
                         {row.lateFee > 0 ? (
                           <span className='block text-base font-semibold text-zinc-500'>
                             incl. late fee {row.lateFee.toLocaleString()}
@@ -176,7 +186,7 @@ export default function PaymentHistoryPage() {
                         </span>
                       </td>
                     </tr>
-                  )
+                  );
                 })}
               </tbody>
             </table>
@@ -184,5 +194,5 @@ export default function PaymentHistoryPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -2,6 +2,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Enrollment } from '@/lib/db/models/Enrollment'
 import { SubscriptionPayment } from '@/lib/db/models/SubscriptionPayment'
+import { initialPaidUntil, nextPaidUntil } from '@/lib/subscriptions/billing'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
@@ -13,7 +14,7 @@ type HistoryRow = {
   courseId: string
   courseTitle: string
   billingType: string
-  amount: number
+  amount: number | null
   lateFee: number
   periodStart: string | null
   periodEnd: string | null
@@ -24,8 +25,6 @@ type HistoryRow = {
 
 export async function GET() {
   try {
-    await connectToDatabase()
-
     const cookieStore = await cookies()
     const studentToken = cookieStore.get('student-token')?.value
     const payloadToken = cookieStore.get('payload-token')?.value
@@ -47,6 +46,7 @@ export async function GET() {
       )
     }
 
+    await connectToDatabase()
     const [enrollments, renewals] = await Promise.all([
       Enrollment.find({
         student: userId,
@@ -61,41 +61,72 @@ export async function GET() {
         paymentStatus: { $in: ['completed', 'pending', 'failed'] },
       })
         .populate({ path: 'course', select: 'title' })
-        .populate({ path: 'enrollment', select: 'billingType' })
         .sort({ createdAt: -1 })
         .lean(),
     ])
 
     const rows: HistoryRow[] = []
+    const enrollmentById = new Map(
+      enrollments.map((enrollment) => [String(enrollment._id), enrollment]),
+    )
+    const firstRenewalStart = new Map<string, number>()
+    const renewedEnrollmentIds = new Set<string>()
+    for (const renewal of renewals) {
+      const enrollmentId = String(renewal.enrollment)
+      const start = new Date(renewal.periodStart).getTime()
+      firstRenewalStart.set(
+        enrollmentId,
+        Math.min(firstRenewalStart.get(enrollmentId) ?? Infinity, start),
+      )
+      if (renewal.paymentStatus === 'completed') {
+        renewedEnrollmentIds.add(enrollmentId)
+      }
+    }
 
     for (const e of enrollments as any[]) {
       const course = e.course
+      const enrollmentId = String(e._id)
+      const anchor = e.billingCycleAnchor ? new Date(e.billingCycleAnchor) : null
+      // Legacy renewals could set a missing anchor to the renewal start.
+      const originalStart =
+        anchor && anchor.getTime() < (firstRenewalStart.get(enrollmentId) ?? Infinity)
+          ? anchor
+          : null
+      const periodEnd = e.initialPaymentPeriodEnd
+        ? new Date(e.initialPaymentPeriodEnd)
+        : e.billingType === 'monthly' && originalStart
+          ? initialPaidUntil(originalStart)
+          : null
       rows.push({
         id: `enroll-${e._id.toString()}`,
         kind: 'enrollment',
         courseId: course?._id?.toString?.() || String(e.course || ''),
         courseTitle: course?.title || 'Course',
         billingType: e.billingType || 'monthly',
-        amount: Number(e.pricePaid || 0),
+        // Older paid renewals overwrote pricePaid on the enrollment.
+        amount: e.initialPaymentAmount ??
+          (renewedEnrollmentIds.has(enrollmentId) ? null : e.pricePaid ?? null),
         lateFee: 0,
-        periodStart: e.billingCycleAnchor
-          ? new Date(e.billingCycleAnchor).toISOString()
-          : e.createdAt
-            ? new Date(e.createdAt).toISOString()
-            : null,
-        periodEnd: e.paidUntil ? new Date(e.paidUntil).toISOString() : null,
+        periodStart: originalStart?.toISOString() ?? null,
+        periodEnd: periodEnd?.toISOString() ?? null,
         paymentStatus: 'completed',
         paymentReference: e.paymentReference || e.merchantTransactionId || '',
-        paidAt: e.createdAt
+        paidAt: originalStart?.toISOString() ?? (e.createdAt
           ? new Date(e.createdAt).toISOString()
-          : new Date().toISOString(),
+          : new Date().toISOString()),
       })
     }
 
     for (const p of renewals as any[]) {
       const course = p.course
       const billingType =
-        p.enrollment?.billingType === 'quarterly' ? 'quarterly' : 'monthly'
+        enrollmentById.get(String(p.enrollment))?.billingType === 'quarterly'
+          ? 'quarterly'
+          : 'monthly'
+      // Older quarterly checkout records used the monthly period formula.
+      const periodEnd = billingType === 'quarterly' && p.periodStart
+        ? nextPaidUntil(new Date(p.periodStart), p.extensionDays || 0, billingType)
+        : p.periodEnd ? new Date(p.periodEnd) : null
       rows.push({
         id: `renew-${p._id.toString()}`,
         kind: 'renewal',
@@ -107,7 +138,7 @@ export async function GET() {
         periodStart: p.periodStart
           ? new Date(p.periodStart).toISOString()
           : null,
-        periodEnd: p.periodEnd ? new Date(p.periodEnd).toISOString() : null,
+        periodEnd: periodEnd?.toISOString() ?? null,
         paymentStatus: p.paymentStatus || 'pending',
         paymentReference: p.paymentReference || p.merchantTransactionId || '',
         paidAt:
@@ -124,10 +155,10 @@ export async function GET() {
     )
 
     return NextResponse.json({ success: true, payments: rows })
-  } catch (error: any) {
+  } catch (error) {
     console.error('Subscription history error:', error)
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to load payment history.' },
+      { success: false, error: 'Failed to load payment history.' },
       { status: 500 },
     )
   }

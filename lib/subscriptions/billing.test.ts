@@ -156,7 +156,7 @@ describe('getSubscriptionAccessSnapshot', () => {
     const snap = getSubscriptionAccessSnapshot(
       {
         billingType: 'one_time',
-        paidUntil: null,
+        paidUntil: undefined,
         accessStatus: 'active',
         paymentStatus: 'completed',
       },

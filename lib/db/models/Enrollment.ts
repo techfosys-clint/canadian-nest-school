@@ -18,6 +18,9 @@ export interface IEnrollment extends Document {
   paidUntil?: Date
   /** Join date used as billing cycle anchor (recurring only). */
   billingCycleAnchor?: Date
+  /** Original charge and coverage, captured at recurring enrollment. */
+  initialPaymentAmount?: number
+  initialPaymentPeriodEnd?: Date
   /** Batch this student joined (required for monthly/quarterly). */
   batch?: mongoose.Types.ObjectId | string
   accessStatus?: 'active' | 'blocked'
@@ -45,6 +48,8 @@ const EnrollmentSchema = new Schema<IEnrollment>(
     },
     paidUntil: { type: Date },
     billingCycleAnchor: { type: Date },
+    initialPaymentAmount: { type: Number, min: 0 },
+    initialPaymentPeriodEnd: { type: Date },
     batch: { type: Schema.Types.ObjectId, ref: 'Batch' },
     accessStatus: {
       type: String,
@@ -58,7 +63,8 @@ const EnrollmentSchema = new Schema<IEnrollment>(
 if (
   mongoose.models.Enrollment &&
   (!mongoose.models.Enrollment.schema.paths.billingType ||
-    !mongoose.models.Enrollment.schema.paths.batch)
+    !mongoose.models.Enrollment.schema.paths.batch ||
+    !mongoose.models.Enrollment.schema.paths.initialPaymentPeriodEnd)
 ) {
   delete mongoose.models.Enrollment
 }

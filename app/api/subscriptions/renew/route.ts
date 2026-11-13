@@ -8,10 +8,9 @@ import { SubscriptionPayment } from '@/lib/db/models/SubscriptionPayment'
 import { User } from '@/lib/db/models/User'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import {
-  BILLING_PERIOD_DAYS,
-  addDays,
   computeRenewalAmount,
   isRecurringCourse,
+  nextPaidUntil,
 } from '@/lib/subscriptions/billing'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -154,7 +153,6 @@ export async function POST(request: Request) {
         enrollment.paidUntil && new Date(enrollment.paidUntil).getTime() > 0
           ? new Date(enrollment.paidUntil)
           : new Date()
-      const { nextPaidUntil } = await import('@/lib/subscriptions/billing')
       enrollment.paidUntil = nextPaidUntil(
         previousEnd,
         extensionDays,
@@ -189,7 +187,7 @@ export async function POST(request: Request) {
       enrollment.paidUntil && new Date(enrollment.paidUntil).getTime() > 0
         ? new Date(enrollment.paidUntil)
         : new Date()
-    const periodEnd = addDays(periodStart, BILLING_PERIOD_DAYS + extensionDays)
+    const periodEnd = nextPaidUntil(periodStart, extensionDays, enrollment.billingType)
 
     const merchantTransactionId = `SUB${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 6).toUpperCase()}`
 

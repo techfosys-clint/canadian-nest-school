@@ -468,6 +468,8 @@ export async function POST(request: Request) {
                 batch: selectedBatch._id,
                 paidUntil,
                 billingCycleAnchor: now,
+                initialPaymentAmount: pricePaid,
+                initialPaymentPeriodEnd: paidUntil,
               }
             : {}),
         })

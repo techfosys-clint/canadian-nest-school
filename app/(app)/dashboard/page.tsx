@@ -91,8 +91,6 @@ export default function StudentDashboard() {
 
   // Interactive Live Data State
   const [webinars, setWebinars] = useState<LiveWebinar[]>([]);
-  const [streakCount, setStreakCount] = useState(5);
-  const [loginDates, setLoginDates] = useState<string[]>([]);
   const [courseProgress, setCourseProgress] = useState<Record<string, number>>(
     {},
   );
@@ -400,7 +398,6 @@ export default function StudentDashboard() {
           const progressData = await progressRes.json();
           const completedLessonsMap: Record<string, string[]> =
             progressData.completedLessons || {};
-          const loginDatesFromAPI: string[] = progressData.loginDates || [];
 
           // Build progress percentage map from DB data
           const progressMap: Record<string, number> = {};
@@ -426,21 +423,6 @@ export default function StudentDashboard() {
               .then(setReviewGates)
               .finally(() => setGatesLoading(false));
           }
-
-          // Set login streak from DB
-          setLoginDates(loginDatesFromAPI);
-          let streak = 0;
-          const checkDate = new Date();
-          while (true) {
-            const checkStr = checkDate.toISOString().split('T')[0];
-            if (loginDatesFromAPI.includes(checkStr)) {
-              streak++;
-              checkDate.setDate(checkDate.getDate() - 1);
-            } else {
-              break;
-            }
-          }
-          setStreakCount(streak || 1);
         }
 
         // Fetch student's submissions and evaluate marks
@@ -585,21 +567,6 @@ export default function StudentDashboard() {
     const completedCount = Math.round((progress / 100) * totalLessons);
     return sum + Number((completedCount * 1.25).toFixed(1));
   }, 0);
-
-  const getWeekDays = () => {
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const result = [];
-    const today = new Date();
-
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(today.getDate() - i);
-      const dateStr = d.toISOString().split('T')[0];
-      const label = days[d.getDay()];
-      result.push({ dateStr, label });
-    }
-    return result;
-  };
 
   if (loading) {
     return (
@@ -1024,39 +991,92 @@ export default function StudentDashboard() {
             Study Hub
           </h2>
 
-          {/* Study Streak Card - Completely borderless and shadowless */}
+          {/* Latest / Join Class — replaces study streak */}
           <div className='bg-white p-6 border border-zinc-200 rounded-lg space-y-4'>
             <h3 className='text-lg font-bold text-zinc-800 flex items-center gap-2'>
-              <span className='text-orange-500'>🔥</span> Study Streak
+              <FiCalendar className='text-[#E61C24]' />
+              {featuredLiveClass
+                ? (() => {
+                    const ymd = new Date(
+                      featuredLiveClass.liveDate!,
+                    ).toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
+                    const bdToday = new Date().toLocaleDateString('en-CA', {
+                      timeZone: 'Asia/Dhaka',
+                    });
+                    return ymd === bdToday
+                      ? "Today's Class"
+                      : 'Latest Class';
+                  })()
+                : 'Live Class'}
             </h3>
-            <p className='text-base font-semibold text-zinc-500 leading-relaxed'>
-              You have logged in {streakCount}{' '}
-              {streakCount === 1 ? 'day' : 'days'} in a row! Keep up the
-              momentum to build consistency.
-            </p>
-            <div className='flex justify-between items-center bg-zinc-50 p-4 rounded-lg'>
-              {getWeekDays().map((day, idx) => {
-                const isActive = loginDates.includes(day.dateStr);
-                return (
-                  <div key={idx} className='flex flex-col items-center gap-1.5'>
-                    <span className='text-sm font-bold text-zinc-500'>
-                      {day.label}
-                    </span>
-                    <div
-                      className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${isActive ? 'bg-orange-500 text-white font-bold' : 'bg-zinc-200 text-zinc-400 font-bold'}`}
-                    >
-                      {isActive ? '✓' : ''}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+
+            {!featuredLiveClass ? (
+              <div className='space-y-4'>
+                <p className='text-base font-semibold text-zinc-500 leading-relaxed'>
+                  No live class is scheduled for your courses right now.
+                </p>
+                <Link
+                  href='/dashboard/live-classes'
+                  className='inline-flex items-center justify-center gap-2 w-full py-3 rounded-lg border border-zinc-200/80 text-zinc-700 hover:border-[#E61C24]/40 hover:text-[#E61C24] font-bold text-base transition-colors'
+                >
+                  View live classes
+                </Link>
+              </div>
+            ) : (
+              <div className='space-y-4'>
+                <div className='rounded-lg bg-zinc-50 border border-zinc-100 p-4 space-y-2'>
+                  <p className='text-base font-bold text-zinc-800 leading-snug'>
+                    {featuredLiveClass.title}
+                  </p>
+                  <p className='text-base font-semibold text-zinc-500'>
+                    {featuredLiveClass.courseTitle}
+                  </p>
+                  <p className='text-base font-bold text-[#E61C24]'>
+                    {new Date(featuredLiveClass.liveDate!).toLocaleString(
+                      'en-BD',
+                      {
+                        month: 'short',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true,
+                        timeZone: 'Asia/Dhaka',
+                      },
+                    )}{' '}
+                    · {featuredLiveClass.livePlatform.toUpperCase()}
+                  </p>
+                </div>
+                {featuredLiveClass.liveUrl &&
+                new Date(featuredLiveClass.liveDate!).getTime() <=
+                  Date.now() ? (
+                  <a
+                    href={featuredLiveClass.liveUrl}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='w-full inline-flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-colors'
+                  >
+                    Join class
+                    <FiExternalLink className='h-4 w-4' />
+                  </a>
+                ) : (
+                  <span className='w-full inline-flex items-center justify-center py-3 rounded-lg bg-zinc-100 text-zinc-500 font-bold text-base'>
+                    Unlocks at class time
+                  </span>
+                )}
+                <Link
+                  href='/dashboard/live-classes'
+                  className='inline-flex items-center justify-center gap-2 w-full py-3 rounded-lg border border-zinc-200/80 text-zinc-700 hover:border-[#E61C24]/40 hover:text-[#E61C24] font-bold text-base transition-colors'
+                >
+                  All live classes
+                </Link>
+              </div>
+            )}
           </div>
 
-          {/* Upcoming Live Classes - Completely dynamic and shadowless */}
+          {/* Upcoming Live Classes list */}
           <div className='bg-white p-6 border border-zinc-200 rounded-lg space-y-4'>
             <h3 className='text-lg font-bold text-zinc-800 flex items-center gap-2'>
-              <FiCalendar className='text-[#E61C24]' /> Live Webinars
+              <FiCalendar className='text-[#E61C24]' /> Upcoming Sessions
             </h3>
 
             <div className='space-y-4'>

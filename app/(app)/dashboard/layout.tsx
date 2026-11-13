@@ -10,6 +10,7 @@ import {
   FiBell,
   FiBook,
   FiBookOpen,
+  FiCreditCard,
   FiLayout,
   FiLogOut,
   FiMenu,
@@ -127,6 +128,11 @@ export default function DashboardLayout({
       icon: FiAward,
     },
     { label: 'My Orders', href: '/dashboard/orders', icon: FiPackage },
+    {
+      label: 'Fee History',
+      href: '/dashboard/payments',
+      icon: FiCreditCard,
+    },
     { label: 'My Reviews', href: '/dashboard/reviews', icon: FiStar },
     { label: 'Profile Settings', href: '/dashboard/profile', icon: FiUser },
   ];
@@ -367,7 +373,7 @@ export default function DashboardLayout({
             <FiSearch className='h-4.5 w-4.5 text-zinc-400' />
             <input
               type='text'
-              placeholder='Search courses, streak, assignments...'
+              placeholder='Search courses, live classes, materials...'
               className='bg-transparent border-none outline-none w-full text-base font-semibold text-zinc-800 placeholder-zinc-400'
             />
           </div>

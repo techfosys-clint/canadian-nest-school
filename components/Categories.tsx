@@ -222,11 +222,11 @@ export default function Categories() {
             <motion.div
               key={index}
               variants={cardVariants}
-              className='h-full relative pt-6'
+              className='h-full relative pt-6 z-10'
             >
               <Link
                 href={href(card.href)}
-                className={`flex flex-col h-full rounded-lg border-2 ${card.borderColor} ${card.bgColor} px-4 py-8 text-center shadow-md -translate-y-1 transition-all duration-300 group cursor-pointer hover:shadow-lg hover:-translate-y-1.5`}
+                className={`flex flex-col h-full rounded-lg border-2 ${card.borderColor} ${card.bgColor} px-4 py-8 text-center shadow-md -translate-y-1 transition-all duration-300 group cursor-pointer hover:shadow-lg hover:-translate-y-1.5 z-10`}
               >
                 {/* Top Middle Icon Badge overlapping the border */}
                 <div

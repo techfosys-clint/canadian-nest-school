@@ -26,8 +26,6 @@ export default function StudyHubPage() {
   const [user, setUser] = useState<UserSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [webinars, setWebinars] = useState<any[]>([]);
-  const [streakCount, setStreakCount] = useState(5);
-  const [loginDates, setLoginDates] = useState<string[]>([]);
   const [enrollments, setEnrollments] = useState<any[]>([]);
 
   useEffect(() => {
@@ -57,27 +55,6 @@ export default function StudyHubPage() {
           }
         }
 
-        // Fetch real login streak from DB API
-        const progressRes = await fetch('/api/progress');
-        if (progressRes.ok) {
-          const progressData = await progressRes.json();
-          const loginDatesFromAPI: string[] = progressData.loginDates || [];
-          setLoginDates(loginDatesFromAPI);
-
-          let streak = 0;
-          const checkDate = new Date();
-          while (true) {
-            const checkStr = checkDate.toISOString().split('T')[0];
-            if (loginDatesFromAPI.includes(checkStr)) {
-              streak++;
-              checkDate.setDate(checkDate.getDate() - 1);
-            } else {
-              break;
-            }
-          }
-          setStreakCount(streak || 1);
-        }
-
         // Fetch student's enrollments containing course study materials
         const enrollmentsRes = await fetch('/api/enrollments?depth=2', {
           cache: 'no-store',
@@ -98,20 +75,24 @@ export default function StudyHubPage() {
     checkSessionAndFetchData();
   }, [router]);
 
-  const getWeekDays = () => {
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const result = [];
-    const today = new Date();
-
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(today.getDate() - i);
-      const dateStr = d.toISOString().split('T')[0];
-      const label = days[d.getDay()];
-      result.push({ dateStr, label });
-    }
-    return result;
-  };
+  const featuredLiveClass = (() => {
+    const now = Date.now();
+    const withDate = webinars
+      .filter((w) => w.liveDate)
+      .map((w) => ({ ...w, ts: new Date(w.liveDate).getTime() }))
+      .sort((a, b) => a.ts - b.ts);
+    const bdToday = new Date().toLocaleDateString('en-CA', {
+      timeZone: 'Asia/Dhaka',
+    });
+    const todayClass = withDate.find((w) => {
+      const ymd = new Date(w.ts).toLocaleDateString('en-CA', {
+        timeZone: 'Asia/Dhaka',
+      });
+      return ymd === bdToday;
+    });
+    if (todayClass) return todayClass;
+    return withDate.find((w) => w.ts >= now - 60 * 60 * 1000) || null;
+  })();
 
   if (loading) {
     return (
@@ -162,53 +143,73 @@ export default function StudyHubPage() {
             ⚡
           </h1>
           <p className='text-zinc-400 text-base md:text-lg font-semibold leading-relaxed'>
-            Monitor your daily study streaks, participate in live webinar
-            streams, and manage interactive lessons.
+            Join live classes, open study materials, and keep your learning
+            moving.
           </p>
         </div>
       </div>
 
       <div className='grid grid-cols-1 lg:grid-cols-12 gap-8 items-start'>
-        {/* Study Streak */}
+        {/* Latest / Join Class */}
         <div className='lg:col-span-5'>
-          <div className='bg-white p-6 border border-zinc-200/80 rounded-lg space-y-6'>
+          <div className='bg-white p-6 border border-zinc-200/80 rounded-lg space-y-5'>
             <div>
               <h3 className='text-xl font-bold text-zinc-800 flex items-center gap-2'>
-                <span className='text-orange-500'>🔥</span> Study Streak
-                Calendar
+                <FiRadio className='text-[#E61C24]' />
+                {featuredLiveClass ? 'Join Class' : 'Live Class'}
               </h3>
-              <p className='text-base font-semibold text-zinc-450 mt-1 leading-relaxed'>
-                Log in and watch course lessons daily to build consistency. You
-                have kept this streak active!
+              <p className='text-base font-semibold text-zinc-500 mt-1 leading-relaxed'>
+                {featuredLiveClass
+                  ? 'Your next live session is ready below.'
+                  : 'When a live class is scheduled, you can join it from here.'}
               </p>
             </div>
 
-            <div className='flex flex-col items-center justify-center py-6 bg-zinc-50/50 rounded-lg border border-zinc-100'>
-              <span className='text-sm font-bold text-zinc-400 uppercase tracking-widest'>
-                Active Streak
-              </span>
-              <span className='text-5xl font-bold text-orange-500 mt-2 font-display'>
-                {streakCount} Days
-              </span>
-            </div>
-
-            <div className='flex justify-between items-center bg-zinc-50 p-4 rounded-lg border border-zinc-100'>
-              {getWeekDays().map((day, idx) => {
-                const isActive = loginDates.includes(day.dateStr);
-                return (
-                  <div key={idx} className='flex flex-col items-center gap-2'>
-                    <span className='text-xs font-bold text-zinc-450 uppercase'>
-                      {day.label}
-                    </span>
-                    <div
-                      className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${isActive ? 'bg-orange-500 text-white' : 'bg-zinc-200 text-zinc-400'}`}
-                    >
-                      {isActive ? '✓' : ''}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            {!featuredLiveClass ? (
+              <p className='text-base font-semibold text-zinc-400 py-4'>
+                No upcoming live class right now.
+              </p>
+            ) : (
+              <div className='space-y-4'>
+                <div className='rounded-lg bg-zinc-50 border border-zinc-100 p-4 space-y-2'>
+                  <p className='text-base font-bold text-zinc-800'>
+                    {featuredLiveClass.title}
+                  </p>
+                  <p className='text-base font-semibold text-zinc-500'>
+                    {featuredLiveClass.courseTitle}
+                  </p>
+                  <p className='text-base font-bold text-[#E61C24]'>
+                    {new Date(featuredLiveClass.liveDate).toLocaleString(
+                      'en-BD',
+                      {
+                        month: 'short',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true,
+                        timeZone: 'Asia/Dhaka',
+                      },
+                    )}
+                  </p>
+                </div>
+                {featuredLiveClass.liveUrl &&
+                new Date(featuredLiveClass.liveDate).getTime() <= Date.now() ? (
+                  <a
+                    href={featuredLiveClass.liveUrl}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='w-full inline-flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-colors'
+                  >
+                    Join class
+                    <FiExternalLink className='h-4 w-4' />
+                  </a>
+                ) : (
+                  <span className='w-full inline-flex items-center justify-center py-3 rounded-lg bg-zinc-100 text-zinc-500 font-bold text-base'>
+                    Unlocks at class time
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
 

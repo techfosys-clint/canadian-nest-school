@@ -6,6 +6,7 @@ import { FiLock, FiAlertTriangle } from 'react-icons/fi'
 interface SecureVideoPlayerProps {
   lessonId: string
   title: string
+  previewEnrollmentId?: string
 }
 
 // Persistent per-browser device id used for the concurrent-device limit.
@@ -31,7 +32,7 @@ function getDeviceId(): string {
  * 2. Points <video> at the same-origin byte proxy `/api/stream/<id>/play`, so
  *    the real Cloudflare R2 URL is NEVER visible in devtools / Network tab.
  */
-export default function SecureVideoPlayer({ lessonId, title }: SecureVideoPlayerProps) {
+export default function SecureVideoPlayer({ lessonId, title, previewEnrollmentId }: SecureVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -41,7 +42,9 @@ export default function SecureVideoPlayer({ lessonId, title }: SecureVideoPlayer
     setError(null)
     try {
       const deviceId = getDeviceId()
-      const res = await fetch(`/api/stream/${lessonId}?d=${encodeURIComponent(deviceId)}`, {
+      const query = new URLSearchParams({ d: deviceId })
+      if (previewEnrollmentId) query.set('preview', previewEnrollmentId)
+      const res = await fetch(`/api/stream/${lessonId}?${query}`, {
         credentials: 'include',
         headers: { 'x-device-id': deviceId },
         cache: 'no-store',
@@ -55,14 +58,14 @@ export default function SecureVideoPlayer({ lessonId, title }: SecureVideoPlayer
       if (!video) return
       // Same-origin proxy — the R2 URL stays server-side. deviceId is passed so
       // the proxy can keep the session fresh on reload.
-      video.src = `/api/stream/${lessonId}/play?d=${encodeURIComponent(deviceId)}`
+      video.src = `/api/stream/${lessonId}/play?${query}`
       video.load()
       setLoading(false)
     } catch (err: any) {
       setLoading(false)
       setError(err.message || 'Unable to load this video.')
     }
-  }, [lessonId])
+  }, [lessonId, previewEnrollmentId])
 
   useEffect(() => {
     authorizeAndLoad()

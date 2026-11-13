@@ -45,7 +45,7 @@ export default function NewReviewPage() {
         }
 
         const [enrollRes, progressRes, reviewRes] = await Promise.all([
-          fetch('/api/enrollments?depth=2&limit=100'),
+          fetch('/api/enrollments?depth=2&scope=mine&limit=100'),
           fetch('/api/progress'),
           fetch(
             `/api/reviews?where[student][equals]=${encodeURIComponent(sessionData.user.id)}&depth=1&limit=100`,

@@ -21,6 +21,7 @@ interface Enrollment {
   studentName: string
   studentEmail: string
   courseTitle: string
+  previewSlug?: string | null
   pricePaid: number
   paymentStatus: 'completed' | 'pending' | 'failed' | 'refunded'
   createdAt: string
@@ -502,6 +503,15 @@ export default function ManageEnrollmentsPage() {
                     {/* Actions */}
                     <td className="px-6 py-4 text-center">
                       <div className="inline-flex items-center gap-1">
+                        {e.previewSlug && e.paymentStatus === 'completed' && (
+                          <Link
+                            href={`/courses/${encodeURIComponent(e.previewSlug)}/watch?preview=${encodeURIComponent(e.id)}`}
+                            prefetch={false}
+                            className="px-3 py-2 rounded-lg border border-slate-200 text-base font-semibold text-slate-700 hover:bg-slate-50"
+                          >
+                            Preview
+                          </Link>
+                        )}
                         {(e.paymentStatus === 'pending' || e.paymentStatus === 'failed') && (
                           <button
                             type="button"

@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
-import { Student } from '@/lib/db/models/Student'
-import { User } from '@/lib/db/models/User'
-import { verifyToken } from '@/lib/auth/auth'
-import { cookies } from 'next/headers'
+import { getLearningSession } from '@/lib/auth/learningSession'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,38 +12,16 @@ export async function GET() {
   try {
     await connectToDatabase()
     
-    const cookieStore = await cookies()
-    const studentToken = cookieStore.get('student-token')?.value
-    const payloadToken = cookieStore.get('payload-token')?.value
-
-    let verifiedDoc: any = null
-    let role = 'student'
-
-    // 1. Try student token first
-    if (studentToken) {
-      const decoded = verifyToken(studentToken)
-      if (decoded && decoded.id) {
-        verifiedDoc = await Student.findById(decoded.id).populate('profilePic')
-        role = 'student'
-      }
-    }
-
-    // 2. Try staff/admin token if student not resolved
-    if (!verifiedDoc && payloadToken) {
-      const decoded = verifyToken(payloadToken)
-      if (decoded && decoded.id) {
-        verifiedDoc = await User.findById(decoded.id).populate('profilePic')
-        role = verifiedDoc?.role || 'staff'
-      }
-    }
-
-    if (!verifiedDoc) {
+    const session = await getLearningSession()
+    if (!session) {
       return NextResponse.json(
         { success: false, authenticated: false, error: 'Not authenticated.' },
         { status: 401, headers: NO_STORE }
       )
     }
 
+    const { role, account } = session
+    const verifiedDoc = await account.populate('profilePic')
     let studentId: string | undefined
     if (role === 'student') {
       try {
@@ -54,7 +29,7 @@ export async function GET() {
         studentId = await ensureStudentId(verifiedDoc)
       } catch (idErr) {
         console.error('ensureStudentId on /api/auth/me failed:', idErr)
-        studentId = verifiedDoc.studentId || undefined
+        studentId = 'studentId' in verifiedDoc ? verifiedDoc.studentId : undefined
       }
     }
 
@@ -62,7 +37,7 @@ export async function GET() {
     let profilePicUrl = null
     if (verifiedDoc.profilePic) {
       if (typeof verifiedDoc.profilePic === 'object') {
-        profilePicUrl = verifiedDoc.profilePic.url || null
+        profilePicUrl = 'url' in verifiedDoc.profilePic ? verifiedDoc.profilePic.url || null : null
       }
     }
 
@@ -74,7 +49,7 @@ export async function GET() {
       studentId,
       profilePic: profilePicUrl,
       role: role,
-      permissions: verifiedDoc.permissions || [],
+      permissions: 'permissions' in verifiedDoc ? verifiedDoc.permissions || [] : [],
     }
 
     return NextResponse.json(

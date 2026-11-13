@@ -8,30 +8,14 @@ import {
   getValidatedCompletedLessons,
   isLessonInCourse,
 } from '@/lib/progress/getCourseProgress'
-import { verifyToken } from '@/lib/auth/auth'
-import { cookies } from 'next/headers'
+import { getLearningSession } from '@/lib/auth/learningSession'
 
-async function getUserId(): Promise<string | null> {
-  const cookieStore = await cookies()
-  const studentToken = cookieStore.get('student-token')?.value
-  const payloadToken = cookieStore.get('payload-token')?.value
-
-  if (studentToken) {
-    const decoded = verifyToken(studentToken)
-    if (decoded?.id) return decoded.id
-  }
-  if (payloadToken) {
-    const decoded = verifyToken(payloadToken)
-    if (decoded?.id) return decoded.id
-  }
-  return null
-}
 
 // GET: Fetch student submissions
 export async function GET(request: Request) {
   try {
     await connectToDatabase()
-    const userId = await getUserId()
+    const userId = (await getLearningSession())?.account.id
     if (!userId) {
       return NextResponse.json({ success: false, error: 'Unauthorized.' }, { status: 401 })
     }
@@ -60,7 +44,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     await connectToDatabase()
-    const userId = await getUserId()
+    const userId = (await getLearningSession())?.account.id
     if (!userId) {
       return NextResponse.json({ success: false, error: 'Unauthorized.' }, { status: 401 })
     }

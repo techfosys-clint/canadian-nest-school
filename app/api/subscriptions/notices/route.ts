@@ -1,7 +1,6 @@
-import { verifyToken } from '@/lib/auth/auth'
+import { getLearningSession } from '@/lib/auth/learningSession'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { getStudentSubscriptionNotices } from '@/lib/subscriptions/access'
-import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
@@ -10,20 +9,7 @@ export async function GET() {
   try {
     await connectToDatabase()
 
-    const cookieStore = await cookies()
-    const studentToken = cookieStore.get('student-token')?.value
-    const payloadToken = cookieStore.get('payload-token')?.value
-
-    let userId: string | null = null
-    if (studentToken) {
-      const decoded = verifyToken(studentToken)
-      if (decoded?.id) userId = decoded.id
-    }
-    if (!userId && payloadToken) {
-      const decoded = verifyToken(payloadToken)
-      if (decoded?.id) userId = decoded.id
-    }
-
+    const userId = (await getLearningSession())?.account.id
     if (!userId) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized.' },

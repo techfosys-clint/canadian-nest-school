@@ -4,8 +4,7 @@ import { Enrollment } from '@/lib/db/models/Enrollment'
 import { Submission } from '@/lib/db/models/Submission'
 import { CertificateRequest } from '@/lib/db/models/CertificateRequest'
 import { getValidatedCompletedLessons } from '@/lib/progress/getCourseProgress'
-import { verifyToken } from '@/lib/auth/auth'
-import { cookies } from 'next/headers'
+import { getLearningSession } from '@/lib/auth/learningSession'
 
 // Standard API Response Format:
 // {
@@ -16,21 +15,6 @@ import { cookies } from 'next/headers'
 //   message?: string
 // }
 
-async function getUserId(): Promise<string | null> {
-  const cookieStore = await cookies()
-  const studentToken = cookieStore.get('student-token')?.value
-  const payloadToken = cookieStore.get('payload-token')?.value
-
-  if (studentToken) {
-    const decoded = verifyToken(studentToken)
-    if (decoded?.id) return decoded.id
-  }
-  if (payloadToken) {
-    const decoded = verifyToken(payloadToken)
-    if (decoded?.id) return decoded.id
-  }
-  return null
-}
 
 /**
  * GET /api/course-data?courseId=...
@@ -46,7 +30,7 @@ export async function GET(request: Request) {
   try {
     await connectToDatabase()
 
-    const userId = await getUserId()
+    const userId = (await getLearningSession())?.account.id
     if (!userId) {
       return NextResponse.json(
         {

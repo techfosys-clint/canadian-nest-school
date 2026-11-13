@@ -7,34 +7,18 @@ import {
   isLessonInCourse,
 } from '@/lib/progress/getCourseProgress'
 import { syncEnrollmentProgressSideEffects } from '@/lib/progress/syncEnrollmentProgress'
-import { verifyToken } from '@/lib/auth/auth'
-import { cookies } from 'next/headers'
+import { getLearningSession } from '@/lib/auth/learningSession'
 import { bdTodayYmd } from '@/lib/bdTime'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-async function getUserId(): Promise<string | null> {
-  const cookieStore = await cookies()
-  const studentToken = cookieStore.get('student-token')?.value
-  const payloadToken = cookieStore.get('payload-token')?.value
-
-  if (studentToken) {
-    const decoded = verifyToken(studentToken)
-    if (decoded?.id) return decoded.id
-  }
-  if (payloadToken) {
-    const decoded = verifyToken(payloadToken)
-    if (decoded?.id) return decoded.id
-  }
-  return null
-}
 
 // ─── GET: Fetch all progress for the current student ──────────────────────────
 // Returns: { completedLessons: { [courseId]: string[] }, loginDates: string[] }
 export async function GET() {
   try {
     await connectToDatabase()
-    const userId = await getUserId()
+    const userId = (await getLearningSession())?.account.id
     if (!userId) {
       return NextResponse.json({ success: false, error: 'Unauthorized.' }, { status: 401 })
     }
@@ -91,7 +75,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     await connectToDatabase()
-    const userId = await getUserId()
+    const userId = (await getLearningSession())?.account.id
     if (!userId) {
       return NextResponse.json({ success: false, error: 'Unauthorized.' }, { status: 401 })
     }

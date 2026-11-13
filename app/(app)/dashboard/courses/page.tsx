@@ -89,7 +89,7 @@ export default function MyCoursesPage() {
         setUser(sessionData.user);
 
         // Fetch student's enrollments
-        const enrollmentsRes = await fetch('/api/enrollments?depth=2', {
+        const enrollmentsRes = await fetch('/api/enrollments?depth=2&scope=mine', {
           cache: 'no-store',
         });
         let fetchedEnrollments: EnrollmentItem[] = [];
@@ -155,9 +155,12 @@ export default function MyCoursesPage() {
     checkSessionAndFetchData();
   }, [router]);
 
-  const handleResumeLearning = (_courseId: string, slug: string) => {
-    if (!slug) return;
-    router.push(`/courses/${slug}/watch`);
+  const handleResumeLearning = (slug: string) => {
+    if (!slug) {
+      router.replace('/dashboard/courses?courseAccess=unavailable');
+      return;
+    }
+    router.push(`/courses/${encodeURIComponent(slug)}/watch?from=courses`);
   };
 
   const handlePayNow = async (notice: FeeNotice) => {
@@ -332,7 +335,7 @@ export default function MyCoursesPage() {
                     <div className='p-6 space-y-3.5'>
                       <h3
                         onClick={() =>
-                          handleResumeLearning(course.id, course.slug)
+                          handleResumeLearning(course.slug)
                         }
                         className='text-lg font-bold text-zinc-800 line-clamp-2 leading-snug hover:text-[#E61C24] transition-colors cursor-pointer'
                       >
@@ -427,7 +430,7 @@ export default function MyCoursesPage() {
                               <button
                                 type='button'
                                 onClick={() =>
-                                  handleResumeLearning(course.id, course.slug)
+                                  handleResumeLearning(course.slug)
                                 }
                                 disabled={!!feeNotice?.isBlocked}
                                 className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all duration-200 cursor-pointer border-none active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed'

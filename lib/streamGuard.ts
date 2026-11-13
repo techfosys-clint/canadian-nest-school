@@ -1,9 +1,9 @@
-import { cookies } from 'next/headers'
+import { getLearningSession } from '@/lib/auth/learningSession'
+import { getEnrollmentPreview } from '@/lib/auth/enrollmentPreview'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Lesson } from '@/lib/db/models/Lesson'
-import { Enrollment } from '@/lib/db/models/Enrollment'
 import { WatchSession } from '@/lib/db/models/WatchSession'
-import { verifyToken } from '@/lib/auth/auth'
+import { assertCourseContentAccess } from '@/lib/subscriptions/access'
 import { isExternalEmbed, isAllowedOrigin, isStreamConfigured } from '@/lib/stream'
 
 const MAX_DEVICES = Number(process.env.STREAM_MAX_DEVICES || 2)
@@ -38,19 +38,13 @@ export async function guardStream(
   await connectToDatabase()
 
   // 2. Authentication
-  const cookieStore = await cookies()
-  const studentToken = cookieStore.get('student-token')?.value
-  const payloadToken = cookieStore.get('payload-token')?.value
-
-  let userId: string | null = null
-  if (studentToken) {
-    const decoded = verifyToken(studentToken)
-    if (decoded?.id) userId = decoded.id
+  const url = new URL(request.url)
+  const previewId = url.searchParams.get('preview')
+  const preview = previewId ? await getEnrollmentPreview(previewId) : null
+  if (previewId && !preview) {
+    return { ok: false, status: 403, error: 'Admin preview is unavailable.' }
   }
-  if (!userId && payloadToken) {
-    const decoded = verifyToken(payloadToken)
-    if (decoded?.id) userId = decoded.id
-  }
+  const userId = preview ? preview.admin.id : (await getLearningSession())?.account.id
   if (!userId) {
     return { ok: false, status: 401, error: 'Authentication required.' }
   }
@@ -67,22 +61,34 @@ export async function guardStream(
     return { ok: false, status: 400, error: 'This lesson uses an external player.' }
   }
 
-  // 4. Enrollment (free preview lessons are exempt)
-  if (!lesson.isPreviewable) {
-    const enrollment = await Enrollment.findOne({
-      student: userId,
-      course: lesson.course,
-      paymentStatus: 'completed',
-    }).lean()
-    if (!enrollment) {
-      return { ok: false, status: 403, error: 'You are not enrolled in this course.' }
+  if (preview) {
+    const { enrollment } = preview
+    if (
+      String(enrollment.course) !== String(lesson.course) ||
+      (lesson.batch && String(enrollment.batch) !== String(lesson.batch))
+    ) {
+      return { ok: false, status: 403, error: 'This lesson is outside the preview enrollment.' }
+    }
+    return { ok: true, objectKey: lesson.videoUrl, userId }
+  }
+
+  // Shared free previews can be played without an enrollment.
+  if (!lesson.isPreviewable || lesson.batch) {
+    const access = await assertCourseContentAccess(userId, String(lesson.course))
+    if (!access.allowed) {
+      const error = access.reason === 'SUBSCRIPTION_BLOCKED'
+        ? 'Renew your subscription to continue watching.'
+        : 'A completed enrollment is required to watch this lesson.'
+      return { ok: false, status: 403, error }
+    }
+    if (lesson.batch && String(access.enrollment?.batch) !== String(lesson.batch)) {
+      return { ok: false, status: 403, error: 'This lesson is unavailable for your batch.' }
     }
   }
 
   // 5. Concurrent-device limit (only when explicitly registering a session,
   //    so frequent Range requests on the proxy don't hammer the DB)
   if (opts.registerSession) {
-    const url = new URL(request.url)
     const deviceId = (url.searchParams.get('d') || request.headers.get('x-device-id') || '').trim()
     if (deviceId) {
       const cutoff = new Date(Date.now() - ACTIVE_WINDOW_MS)

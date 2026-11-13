@@ -3,16 +3,15 @@ import { notFound, redirect } from 'next/navigation'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Course } from '@/lib/db/models/Course'
 import { Lesson } from '@/lib/db/models/Lesson'
-import { Enrollment } from '@/lib/db/models/Enrollment'
-import '@/lib/db/models/Student'
-import '@/lib/db/models/User'
+import { getEnrollmentPreview } from '@/lib/auth/enrollmentPreview'
+import { getLearningSession } from '@/lib/auth/learningSession'
+import { assertCourseContentAccess } from '@/lib/subscriptions/access'
 import '@/lib/db/models/Category'
-import { cookies } from 'next/headers'
-import { verifyToken } from '@/lib/auth/auth'
 import CoursePlayerClient from '@/components/CoursePlayerClient'
 
 type Props = {
   params: Promise<{ slug: string }>
+  searchParams: Promise<{ preview?: string | string[]; from?: string | string[] }>
 }
 
 export async function generateMetadata({ params }: Props) {
@@ -28,84 +27,59 @@ export async function generateMetadata({ params }: Props) {
 
 export const dynamic = 'force-dynamic'
 
-export default async function CourseWatchPage({ params }: Props) {
+export default async function CourseWatchPage({ params, searchParams }: Props) {
   const { slug } = await params
   await connectToDatabase()
 
-  // Fetch course
+  const { preview, from } = await searchParams
+  if (preview !== undefined && (typeof preview !== 'string' || !preview)) notFound()
+  const dashboardPath = from === 'courses' ? '/dashboard/courses' : '/dashboard'
+  const fromDashboard = from === 'courses' || from === 'dashboard'
+  const previewSession = preview ? await getEnrollmentPreview(preview) : null
+  if (preview && !previewSession) notFound()
+
+  const session = previewSession ? null : await getLearningSession()
+  const account = previewSession?.admin ?? session?.account
+  if (!account) {
+    const returnTo = `/courses/${encodeURIComponent(slug)}/watch${fromDashboard ? `?from=${from}` : ''}`
+    redirect(`/login?redirectTo=${encodeURIComponent(returnTo)}`)
+  }
+
   const course = await Course.findOne({ slug, status: 'published' })
     .populate('category')
     .populate('instructor')
     .lean() as any
-
-  if (!course) notFound()
-
-  // ─── Session and Enrollment Check ───
-  const cookieStore = await cookies()
-  const studentToken = cookieStore.get('student-token')?.value
-  const payloadToken = cookieStore.get('payload-token')?.value
-
-  let userId: string | null = null
-  if (studentToken) {
-    const decoded = verifyToken(studentToken)
-    if (decoded && decoded.id) userId = decoded.id
-  }
-  if (!userId && payloadToken) {
-    const decoded = verifyToken(payloadToken)
-    if (decoded && decoded.id) userId = decoded.id
+  if (!course) {
+    if (fromDashboard) redirect(`${dashboardPath}?courseAccess=unavailable`)
+    notFound()
   }
 
-  // If not logged in, redirect to login page
-  if (!userId) {
-    redirect(`/login?redirectTo=/courses/${slug}/watch`)
+  let enrollment = previewSession?.enrollment
+  if (previewSession) {
+    if (String(enrollment?.course) !== String(course._id)) notFound()
+  } else {
+    const access = await assertCourseContentAccess(account.id, String(course._id))
+    if (!access.allowed) {
+      if (access.reason === 'SUBSCRIPTION_BLOCKED') {
+        redirect(`${dashboardPath}?courseAccess=blocked`)
+      }
+      if (fromDashboard) {
+        const reason = access.reason === 'NOT_ENROLLED' ? 'enrollment' : 'unavailable'
+        redirect(`${dashboardPath}?courseAccess=${reason}`)
+      }
+      redirect(`/courses/${encodeURIComponent(slug)}`)
+    }
+    enrollment = access.enrollment
   }
-
-  // Check enrollment + monthly subscription access
-  const { assertCourseContentAccess } = await import(
-    '@/lib/subscriptions/access'
-  )
-  const access = await assertCourseContentAccess(userId, course._id.toString())
-
-  // If not enrolled, redirect back to landing page
-  if (!access.allowed && access.reason === 'NOT_ENROLLED') {
-    redirect(`/courses/${slug}`)
-  }
-
-  // Monthly fee overdue / blocked — send to dashboard red banner + pay CTA
-  if (!access.allowed && access.reason === 'SUBSCRIPTION_BLOCKED') {
-    redirect('/dashboard?subscription=blocked')
-  }
-
-  // Resolve student's batch for this course (batch-scoped recordings)
-  const enrollment = await Enrollment.findOne({
-    student: userId,
-    course: course._id,
-    paymentStatus: 'completed',
-  })
-    .select('batch')
-    .lean()
-  const studentBatchId = (enrollment as any)?.batch?.toString?.() || null
+  const studentBatchId = enrollment?.batch?.toString()
 
   // Shared lessons (no batch) + lessons for this student's batch only
   const lessonsDocs = await Lesson.find({
     course: course._id,
-    $or: studentBatchId
-      ? [{ batch: null }, { batch: { $exists: false } }, { batch: studentBatchId }]
-      : [{ batch: null }, { batch: { $exists: false } }],
+    $or: [{ batch: null }, ...(studentBatchId ? [{ batch: studentBatchId }] : [])],
   })
     .sort({ order: 1 })
     .lean()
-
-  // Load student details for DRM watermark overlays
-  let studentDoc: any = null
-  if (userId) {
-    const { Student } = await import('@/lib/db/models/Student')
-    studentDoc = await Student.findById(userId).lean()
-    if (!studentDoc) {
-      const { User } = await import('@/lib/db/models/User')
-      studentDoc = await User.findById(userId).lean()
-    }
-  }
 
   // Watermark data — mask sensitive info for privacy
   const maskEmail = (email: string) => {
@@ -113,10 +87,10 @@ export default async function CourseWatchPage({ params }: Props) {
     return `${local.charAt(0)}***@${domain}`
   }
 
-  const serializedStudent = studentDoc ? {
-    name: studentDoc.name || 'Student',
-    email: maskEmail(studentDoc.email || 'student@example.com'),
-  } : undefined
+  const serializedStudent = {
+    name: account.name || 'Student',
+    email: maskEmail(account.email || 'student@example.com'),
+  }
 
   // Serialize models into safe plain structures for the client component
   const serializedCourse = {
@@ -152,9 +126,14 @@ export default async function CourseWatchPage({ params }: Props) {
 
   return (
     <CoursePlayerClient 
+      key={preview ?? String(course._id)}
       course={serializedCourse} 
       lessons={serializedLessons} 
       student={serializedStudent}
+      previewEnrollmentId={preview}
+      initialCompletedLessonIds={previewSession ? previewSession.enrollment.completedLessons?.filter(
+        (id: string) => serializedLessons.some((lesson) => lesson.id === id),
+      ) : undefined}
     />
   )
 }

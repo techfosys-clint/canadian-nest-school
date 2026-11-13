@@ -98,6 +98,7 @@ export async function GET(request: Request) {
       studentName: e.student && typeof e.student === 'object' ? e.student.name : 'Unknown Student',
       studentEmail: e.student && typeof e.student === 'object' ? e.student.email : '',
       courseTitle: e.course && typeof e.course === 'object' ? e.course.title : 'Unknown Course',
+      previewSlug: e.course?.status === 'published' ? e.course.slug : null,
       pricePaid: e.pricePaid || 0,
       paymentStatus: e.paymentStatus,
       createdAt: e.createdAt,

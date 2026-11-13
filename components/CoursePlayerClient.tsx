@@ -85,6 +85,8 @@ interface CourseItem {
 interface CoursePlayerClientProps {
   course: CourseItem;
   lessons: LessonItem[];
+  previewEnrollmentId?: string;
+  initialCompletedLessonIds?: string[];
   student?: {
     name: string;
     email: string;
@@ -117,15 +119,22 @@ export default function CoursePlayerClient({
   course,
   lessons,
   student,
+  previewEnrollmentId,
+  initialCompletedLessonIds = [],
 }: CoursePlayerClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const lessonHref = (lessonId: string) => {
+    const query = new URLSearchParams(searchParams.toString());
+    query.set('lesson', lessonId);
+    return `/courses/${course.slug}/watch?${query}`;
+  };
 
   // State for active lesson
   const [activeLesson, setActiveLesson] = useState<LessonItem | null>(null);
 
   // State for completed lessons (IDs list)
-  const [completedLessonIds, setCompletedLessonIds] = useState<string[]>([]);
+  const [completedLessonIds, setCompletedLessonIds] = useState<string[]>(initialCompletedLessonIds);
 
   // State for Screen modes (Theater, Fullscreen)
   const [isTheaterMode, setIsTheaterMode] = useState(false);
@@ -165,6 +174,7 @@ export default function CoursePlayerClient({
   // Combined fetch for course data (progress, submissions, certificates)
   // Eliminates 3 separate API calls and consolidates into 1
   const loadCourseData = useCallback(async () => {
+    if (previewEnrollmentId) return;
     try {
       const res = await fetch(`/api/course-data?courseId=${course.id}`);
       if (res.ok) {
@@ -183,7 +193,7 @@ export default function CoursePlayerClient({
     } catch (err) {
       console.error('Failed to load course data from combined API', err);
     }
-  }, [course.id]);
+  }, [course.id, previewEnrollmentId]);
 
   // Load all course data on component mount
   useEffect(() => {
@@ -474,7 +484,7 @@ export default function CoursePlayerClient({
     if (nextIdx > 0 && nextIdx < sortedLessons.length) {
       const nextL = sortedLessons[nextIdx];
       setActiveLesson(nextL);
-      router.replace(`/courses/${course.slug}/watch?lesson=${nextL.id}`);
+      router.replace(lessonHref(nextL.id));
     }
   };
 
@@ -483,6 +493,7 @@ export default function CoursePlayerClient({
     lessonId: string,
     advance: boolean = false,
   ) => {
+    if (previewEnrollmentId) return;
     const willBeCompleted = !completedLessonIds.includes(lessonId);
     const updatedCompleted = willBeCompleted
       ? [...completedLessonIds, lessonId]
@@ -568,6 +579,7 @@ export default function CoursePlayerClient({
       : 0;
 
   useEffect(() => {
+    if (previewEnrollmentId) return;
     let cancelled = false;
     (async () => {
       try {
@@ -587,7 +599,7 @@ export default function CoursePlayerClient({
     return () => {
       cancelled = true;
     };
-  }, [course.id]);
+  }, [course.id, previewEnrollmentId]);
 
   if (sortedLessons.length === 0) {
     return (
@@ -711,6 +723,16 @@ export default function CoursePlayerClient({
   // box) with a light theme that reads well on mobile.
   const renderQuiz = () => {
     const questions = currentLesson.quizQuestions || [];
+    if (previewEnrollmentId) {
+      return (
+        <div className='bg-white border border-slate-200 rounded-lg p-6 space-y-4'>
+          <h2 className='text-xl font-bold'>Quiz preview</h2>
+          <ol className='list-decimal pl-6 space-y-2 text-base'>
+            {questions.map((question, index) => <li key={index}>{question.questionText}</li>)}
+          </ol>
+        </div>
+      );
+    }
     const submission = submissionsMap[currentLesson.id];
     const showPreSubmitted = submission && !retakeQuiz && !quizCompleted;
 
@@ -850,7 +872,7 @@ export default function CoursePlayerClient({
           if (nextIdx < sortedLessons.length) {
             const nextL = sortedLessons[nextIdx];
             setActiveLesson(nextL);
-            router.replace(`/courses/${course.slug}/watch?lesson=${nextL.id}`);
+            router.replace(lessonHref(nextL.id));
           }
         }}
         className='w-full sm:w-auto px-6 py-2.5 bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base rounded-lg cursor-pointer transition-all shadow-md shadow-[#E61C24]/15 border-none'
@@ -1158,6 +1180,7 @@ export default function CoursePlayerClient({
         // Private R2-hosted video → secure signed-URL streaming player
         !isExternalEmbed(currentLesson.videoUrl) ? (
           <SecureVideoPlayer
+            previewEnrollmentId={previewEnrollmentId}
             lessonId={currentLesson.id}
             title={currentLesson.title}
           />
@@ -1229,6 +1252,8 @@ export default function CoursePlayerClient({
           {/* Bottom dynamic RSVP/Join button */}
           {renderLiveJoinButton(false)}
         </div>
+      ) : currentLesson.lessonType === 'assignment' && previewEnrollmentId ? (
+        <p className='p-6 text-base text-white'>Assignment preview</p>
       ) : currentLesson.lessonType === 'assignment' ? (
         // Render Assignment submission portal
         (() => {
@@ -1487,8 +1512,7 @@ export default function CoursePlayerClient({
           </div>
         </div>
 
-        {/* Complete lesson button */}
-        <button
+        {!previewEnrollmentId && <button
           type='button'
           onClick={() => handleToggleComplete(currentLesson.id, true)}
           className={`inline-flex items-center gap-2 px-4.5 py-2 rounded-lg border font-bold text-base whitespace-nowrap transition-all cursor-pointer shadow-sm hover:scale-[1.01] ${
@@ -1503,7 +1527,7 @@ export default function CoursePlayerClient({
               ? 'Completed (Click to undo)'
               : 'Mark as Completed'}
           </span>
-        </button>
+        </button>}
       </div>
 
       {/* Lesson Overview Description */}
@@ -1559,7 +1583,7 @@ export default function CoursePlayerClient({
       </div>
 
       {/* Reviews anytime + certificate unlock at 100% */}
-      {(() => {
+      {!previewEnrollmentId && (() => {
         const completeHref = `/dashboard/courses/${course.id}/complete`;
         const mode = getCertCtaMode(reviewGate);
         const reviewsDone =
@@ -1797,7 +1821,7 @@ export default function CoursePlayerClient({
                         onClick={() => {
                           setActiveLesson(lesson);
                           router.replace(
-                            `/courses/${course.slug}/watch?lesson=${lesson.id}`,
+                            lessonHref(lesson.id),
                           );
                         }}
                         className={`w-full flex items-start gap-3 p-3 text-left transition-all duration-150 cursor-pointer ${
@@ -1878,15 +1902,22 @@ export default function CoursePlayerClient({
 
   return (
     <div className='min-h-screen bg-slate-50 font-sans text-zinc-800 pb-16 relative'>
+      {previewEnrollmentId && (
+        <div className='bg-amber-50 border-b border-amber-200 text-amber-900'>
+          <p className='container mx-auto px-6 py-3 text-base font-semibold'>
+            Admin preview · Student progress is read-only.
+          </p>
+        </div>
+      )}
       {/* ─── Top Course Navigation Bar (Premium Glassmorphism) ─── */}
       <div className='sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200'>
         <div className='container mx-auto px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 select-none'>
           {/* Back button and title */}
           <div className='flex items-center gap-4 min-w-0'>
             <Link
-              href={`/courses/${course.slug}`}
+              href={previewEnrollmentId ? '/admin/enrollments' : searchParams.get('from') === 'courses' ? '/dashboard/courses' : searchParams.get('from') === 'dashboard' ? '/dashboard' : `/courses/${course.slug}`}
               className='h-10 w-10 border border-slate-200 hover:border-slate-300 rounded-lg flex items-center justify-center text-zinc-650 hover:text-zinc-800 bg-white hover:bg-slate-50 transition-colors shrink-0 shadow-sm'
-              title='Back to Landing Page'
+              title='Back'
             >
               <FiArrowLeft className='h-5 w-5' />
             </Link>

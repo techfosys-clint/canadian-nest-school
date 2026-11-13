@@ -1,4 +1,4 @@
-import { verifyToken } from '@/lib/auth/auth'
+import { getLearningSession } from '@/lib/auth/learningSession'
 import { isCouponExpired } from '@/lib/coupons'
 import { Coupon } from '@/lib/db/models/Coupon'
 import { Course } from '@/lib/db/models/Course'
@@ -12,25 +12,9 @@ import {
   isRecurringCourse,
   nextPaidUntil,
 } from '@/lib/subscriptions/billing'
-import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
-
-async function resolveUserId(): Promise<string | null> {
-  const cookieStore = await cookies()
-  const studentToken = cookieStore.get('student-token')?.value
-  const payloadToken = cookieStore.get('payload-token')?.value
-  if (studentToken) {
-    const decoded = verifyToken(studentToken)
-    if (decoded?.id) return decoded.id
-  }
-  if (payloadToken) {
-    const decoded = verifyToken(payloadToken)
-    if (decoded?.id) return decoded.id
-  }
-  return null
-}
 
 /**
  * POST /api/subscriptions/renew
@@ -40,7 +24,7 @@ async function resolveUserId(): Promise<string | null> {
 export async function POST(request: Request) {
   try {
     await connectToDatabase()
-    const userId = await resolveUserId()
+    const userId = (await getLearningSession())?.account.id
     if (!userId) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized.' },

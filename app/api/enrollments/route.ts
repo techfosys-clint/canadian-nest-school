@@ -1,3 +1,4 @@
+import { getLearningSession } from '@/lib/auth/learningSession'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Enrollment } from '@/lib/db/models/Enrollment'
@@ -16,39 +17,18 @@ export async function GET(request: Request) {
   try {
     await connectToDatabase()
 
-    const cookieStore = await cookies()
-    const studentToken = cookieStore.get('student-token')?.value
-    const payloadToken = cookieStore.get('payload-token')?.value
-
-    let userId: string | null = null
-    let isAdminOrStaff = false
-
-    // 1. Authenticate student token
-    if (studentToken) {
-      const decoded = verifyToken(studentToken)
-      if (decoded && decoded.id) {
-        userId = decoded.id
-      }
-    }
-
-    // 2. Authenticate admin/staff token
-    if (!userId && payloadToken) {
-      const decoded = verifyToken(payloadToken)
-      if (decoded && decoded.id) {
-        userId = decoded.id
-        const user = await User.findById(decoded.id).lean()
-        if (user && ['admin', 'staff', 'instructor'].includes(user.role)) {
-          isAdminOrStaff = true
-        }
-      }
-    }
-
-    if (!userId) {
+    const session = await getLearningSession()
+    if (!session) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized.' },
         { status: 401 }
       )
     }
+
+    const userId = session.account.id
+    const isAdminOrStaff = ['admin', 'staff', 'instructor'].includes(session.role)
+    const { searchParams } = new URL(request.url)
+    const ownEnrollments = searchParams.get('scope') === 'mine'
 
     // If this student has stuck pending/failed EPS enrollments, re-check EPS
     // before listing courses — recovers payments that succeeded but never
@@ -64,12 +44,11 @@ export async function GET(request: Request) {
       }
     }
 
-    const { searchParams } = new URL(request.url)
     const studentQueryParam = searchParams.get('student')
 
     // Determine query target student ID/filter criteria
     let query: any = { student: userId, paymentStatus: 'completed' }
-    if (isAdminOrStaff) {
+    if (isAdminOrStaff && !ownEnrollments) {
       if (studentQueryParam) {
         query = { student: studentQueryParam, paymentStatus: 'completed' }
       } else {

@@ -180,7 +180,7 @@ export default function CourseCompleteReviewPage() {
         }
 
         const [enrollRes, completionRes] = await Promise.all([
-          fetch('/api/enrollments?depth=2&limit=100', { cache: 'no-store' }),
+          fetch('/api/enrollments?depth=2&scope=mine&limit=100', { cache: 'no-store' }),
           fetch(`/api/completion-reviews?courseId=${encodeURIComponent(courseId)}`, {
             cache: 'no-store',
           }),

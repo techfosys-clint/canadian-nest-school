@@ -1,10 +1,11 @@
 'use client';
 
 import RequiredStudentPhotoModal from '@/components/RequiredStudentPhotoModal';
+import CourseAccessNotice from '@/components/CourseAccessNotice';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import {
   FiAward,
   FiBell,
@@ -434,7 +435,10 @@ export default function DashboardLayout({
         </header>
 
         {/* Main Nested Dashboard Views */}
-        <div className='flex-1 overflow-y-auto'>{children}</div>
+        <div className='flex-1 overflow-y-auto'>
+          <Suspense fallback={null}><CourseAccessNotice /></Suspense>
+          {children}
+        </div>
       </div>
     </div>
   );

@@ -127,7 +127,7 @@ export default function StudentDashboard() {
         setUser(sessionData.user);
 
         // Fetch student's enrollments with depth=2 to populate course and media details
-        const enrollmentsRes = await fetch('/api/enrollments?depth=2', {
+        const enrollmentsRes = await fetch('/api/enrollments?depth=2&scope=mine', {
           cache: 'no-store',
         });
         let fetchedEnrollments: EnrollmentItem[] = [];
@@ -230,7 +230,7 @@ export default function StudentDashboard() {
 
             // Immediate re-check (GET /api/enrollments already heals open EPS payments)
             try {
-              const immediateRes = await fetch('/api/enrollments?depth=2', {
+              const immediateRes = await fetch('/api/enrollments?depth=2&scope=mine', {
                 cache: 'no-store',
               });
               if (immediateRes.ok) {
@@ -252,7 +252,7 @@ export default function StudentDashboard() {
             ) {
               await new Promise((r) => setTimeout(r, delayMs));
               try {
-                const pollRes = await fetch('/api/enrollments?depth=2', {
+                const pollRes = await fetch('/api/enrollments?depth=2&scope=mine', {
                   cache: 'no-store',
                 });
                 if (!pollRes.ok) continue;
@@ -457,7 +457,7 @@ export default function StudentDashboard() {
     checkSessionAndFetchData();
   }, [router]);
 
-  const handleResumeLearning = (_courseId: string, slug: string) => {
+  const handleResumeLearning = (slug: string) => {
     if (!slug) {
       Swal.fire({
         icon: 'error',
@@ -467,7 +467,7 @@ export default function StudentDashboard() {
       });
       return;
     }
-    router.push(`/courses/${slug}/watch`);
+    router.push(`/courses/${encodeURIComponent(slug)}/watch?from=dashboard`);
   };
 
   const handlePayNow = async (notice: FeeNotice) => {
@@ -858,7 +858,7 @@ export default function StudentDashboard() {
                       <div className='p-6 space-y-3.5'>
                         <h3
                           onClick={() =>
-                            handleResumeLearning(course.id, course.slug)
+                            handleResumeLearning(course.slug)
                           }
                           className='text-lg font-bold text-zinc-800 line-clamp-2 leading-snug hover:text-[#E61C24] transition-colors cursor-pointer'
                         >
@@ -958,7 +958,7 @@ export default function StudentDashboard() {
                           <button
                             type='button'
                             onClick={() =>
-                              handleResumeLearning(course.id, course.slug)
+                              handleResumeLearning(course.slug)
                             }
                             disabled={!!feeNotice?.isBlocked}
                             className='w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#E61C24] hover:bg-[#CC181F] text-white font-bold text-base transition-all duration-200 cursor-pointer border-none active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed'

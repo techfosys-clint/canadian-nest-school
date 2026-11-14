@@ -1,3 +1,5 @@
+import { materialsForBatch } from '@/lib/studyMaterials'
+import { getSubscriptionAccessSnapshot } from '@/lib/subscriptions/billing'
 import { firstBatchPaymentDue, selectPaymentPlan } from '@/lib/subscriptions/plans'
 import { isRecurringBillingType } from '@/lib/subscriptions/billing'
 import { isLessonAvailable } from '@/lib/lessons/delivery'
@@ -122,6 +124,11 @@ export async function GET(request: Request) {
           id: courseId,
           ...doc.course,
           totalLessons,
+          studyMaterials: isAdminOrStaff && !ownEnrollments
+            ? doc.course.studyMaterials
+            : getSubscriptionAccessSnapshot(doc, doc.course).isBlocked
+              ? []
+              : materialsForBatch(doc.course.studyMaterials, doc.batch),
           category: doc.course.category ? {
             id: doc.course.category._id.toString(),
             ...doc.course.category

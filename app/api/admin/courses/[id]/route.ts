@@ -1,3 +1,4 @@
+import { validateStudyMaterialBatches } from '@/lib/db/validateStudyMaterialBatches'
 import { parsePaymentPlans } from '@/lib/subscriptions/plans'
 import { isRecurringBillingType } from '@/lib/subscriptions/billing'
 import { NextResponse } from 'next/server'
@@ -465,7 +466,10 @@ export async function PUT(
     course.requirements = requirements || []
     course.requirementsBn = requirementsBn || []
     course.seo = seo || {}
-    course.studyMaterials = studyMaterials || []
+    if (!await validateStudyMaterialBatches(studyMaterials, String(course._id))) {
+      return NextResponse.json({ success: false, error: 'Study materials must be assigned to a batch belonging to this course.' }, { status: 400 })
+    }
+    if (studyMaterials !== undefined) course.studyMaterials = studyMaterials
     course.modules = modules || []
     if (faqSource !== undefined) {
       course.faqSource = faqSource === 'course' ? 'course' : 'global'

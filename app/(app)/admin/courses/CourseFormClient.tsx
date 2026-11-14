@@ -91,7 +91,7 @@ export default function CourseFormClient({
         ? JSON.stringify(initialData.descriptionBn)
         : '',
   );
-  const [price, setPrice] = useState<number | ''>(initialData?.price ?? '');
+  const [price] = useState<number | ''>(initialData?.price ?? '');
   const [billingType] = useState<
     'one_time' | 'monthly' | 'two_month' | 'quarterly'
   >(initialData?.billingType ?? 'one_time');
@@ -311,6 +311,7 @@ export default function CourseFormClient({
       url: string;
       materialType: 'pdf' | 'epub' | 'link' | 'other';
       coverImage?: string;
+      batch?: string;
     }>
   >(initialData?.studyMaterials || []);
   const [uploadingStates, setUploadingStates] = useState<
@@ -823,11 +824,11 @@ export default function CourseFormClient({
 
   const handleStudyMaterialChange = (
     index: number,
-    field: 'title' | 'url' | 'materialType',
+    field: 'title' | 'url' | 'materialType' | 'batch',
     val: string,
   ) => {
     const updated = [...studyMaterials];
-    updated[index] = { ...updated[index], [field]: val };
+    updated[index] = { ...updated[index], [field]: field === 'batch' && !val ? undefined : val };
     setStudyMaterials(updated);
   };
 
@@ -1827,6 +1828,22 @@ export default function CourseFormClient({
                         </select>
                       </div>
                     </div>
+
+                    <label className='grid gap-2 text-base font-bold text-slate-600'>
+                      Visible to
+                      <select
+                        value={item.batch ?? ''}
+                        onChange={(event) => handleStudyMaterialChange(idx, 'batch', event.target.value)}
+                        className='rounded-lg border border-slate-200 bg-white p-3 text-base text-slate-800'
+                      >
+                        <option value=''>All batches</option>
+                        {item.batch && !batches.some(batch => batch._id === item.batch) && (
+                          <option value={item.batch}>Assigned batch</option>
+                        )}
+                        {batches.map(batch => <option key={batch._id} value={batch._id}>{batch.name}</option>)}
+                      </select>
+                    </label>
+                    {!savedCourseId && <p className='text-base text-slate-600'>Save the course and create a batch to assign materials to it.</p>}
 
                     {/* Cover Image Upload */}
                     <div className='flex flex-col gap-2'>

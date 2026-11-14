@@ -1,3 +1,4 @@
+import { materialsForBatch, matchesStudyMaterialFile } from '@/lib/studyMaterials'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Enrollment } from '@/lib/db/models/Enrollment'
@@ -65,9 +66,8 @@ export async function GET(request: Request) {
       for (const e of enrollments as any[]) {
         const course = e.course
         if (!course || !course.studyMaterials) continue
-        const matches = course.studyMaterials.some((material: any) => {
-          return material.url && material.url.includes(filename)
-        })
+        const matches = materialsForBatch<{ batch?: unknown; url: string }>(course.studyMaterials, e.batch)
+          .some(material => matchesStudyMaterialFile(material.url, filename))
         if (!matches) continue
 
         if (e.billingType === 'monthly' || e.billingType === 'two_month' || e.billingType === 'quarterly') {
@@ -119,7 +119,7 @@ export async function GET(request: Request) {
       headers: {
         'Content-Type': contentType,
         'Content-Disposition': `${disposition}; filename="${encodeURIComponent(filename)}"`,
-        'Cache-Control': 'private, max-age=3600',
+        'Cache-Control': 'private, no-store',
       },
     })
 

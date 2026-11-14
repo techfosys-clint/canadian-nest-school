@@ -36,6 +36,7 @@ export interface ICourse extends Document {
     title: string
     url: string
     materialType: 'pdf' | 'epub' | 'link' | 'other'
+    batch?: mongoose.Types.ObjectId | string
     coverImage?: string
   }>
   modules?: string[]
@@ -123,6 +124,7 @@ const CourseSchema = new Schema<ICourse>(
         title: { type: String, required: true },
         url: { type: String, required: true },
         materialType: { type: String, enum: ['pdf', 'epub', 'link', 'other'], default: 'pdf', required: true },
+        batch: { type: Schema.Types.ObjectId, ref: 'Batch' },
         coverImage: { type: String, default: '' },
       },
     ],
@@ -179,7 +181,7 @@ if (
   (!mongoose.models.Course.schema.paths.paymentPlans ||
     !mongoose.models.Course.schema.paths.modules ||
     !mongoose.models.Course.schema.paths.category ||
-    !mongoose.models.Course.schema.paths['studyMaterials.coverImage'] ||
+    !mongoose.models.Course.schema.paths.studyMaterials?.schema?.path('batch') ||
     !mongoose.models.Course.schema.paths.billingType ||
     !mongoose.models.Course.schema.paths.trailerVideoUrl ||
     !mongoose.models.Course.schema.paths.faqSource ||

@@ -93,7 +93,9 @@ try {
       await page.getByRole('button', { name: 'Enroll In Course' }).click()
       const dialog = page.getByRole('dialog', { name: 'Choose your batch' })
       await dialog.getByText('Monday at 7 PM').waitFor()
-      await dialog.getByText(/Orientation/).waitFor()
+      for (const label of ['Batch starts', 'Batch ends', 'Orientation', 'Enrollment closes']) {
+        await dialog.getByText(label, { exact: true }).waitFor()
+      }
       await dialog.getByRole('button', { name: /Evening batch/ }).click()
       await page.getByText('Payment options', { exact: true }).waitFor()
       assert.equal(await page.getByRole('radio', { name: /Every two months/ }).count(), 0)

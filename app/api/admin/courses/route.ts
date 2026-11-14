@@ -1,3 +1,4 @@
+import { validateStudyMaterialBatches } from '@/lib/db/validateStudyMaterialBatches'
 import { parsePaymentPlans } from '@/lib/subscriptions/plans'
 import { isRecurringBillingType } from '@/lib/subscriptions/billing'
 import { NextResponse } from 'next/server'
@@ -319,6 +320,9 @@ export async function POST(request: Request) {
       modules: modules || [],
     })
 
+    if (!await validateStudyMaterialBatches(newCourse.studyMaterials, String(newCourse._id))) {
+      return NextResponse.json({ success: false, error: 'Study materials must be assigned to a batch belonging to this course.' }, { status: 400 })
+    }
     await newCourse.save()
 
     // Revalidate paths for the public frontend to ensure changes are immediately visible

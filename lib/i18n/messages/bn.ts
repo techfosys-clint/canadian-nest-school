@@ -93,6 +93,7 @@ const bn: Messages = {
     enroll: 'এনরোল করুন',
     free: 'ফ্রি',
     perMonth: '/মাস',
+    perTwoMonths: ' / ৬০ দিন',
     students: 'শিক্ষার্থী',
     lessons: 'লেসন',
     duration: 'সময়কাল',

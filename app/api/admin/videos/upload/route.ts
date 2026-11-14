@@ -120,9 +120,9 @@ export async function POST(request: Request) {
     // uploadToStorage returns R2 object key (not full URL) when folder is 'study-materials'
     const objectKey = await uploadToStorage(buffer, filename, 'study-materials', file.type)
 
-    // Extract just the key (e.g., "study-materials/video-123.mp4" → "videos/video-123.mp4")
+    // The stream proxy needs the key used by the storage upload.
     const videoKey = objectKey.includes('/api/study-materials/download?file=')
-      ? `videos/${filename}`
+      ? `study-materials/${filename}`
       : objectKey
 
     return NextResponse.json(

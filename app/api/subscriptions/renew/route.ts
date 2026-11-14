@@ -10,6 +10,7 @@ import { connectToDatabase } from '@/lib/db/mongodb'
 import {
   computeRenewalAmount,
   isRecurringCourse,
+  isRecurringBillingType,
   nextPaidUntil,
 } from '@/lib/subscriptions/billing'
 import { NextResponse } from 'next/server'
@@ -63,15 +64,12 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          error: 'This course is not a monthly/quarterly subscription.',
+          error: 'This course is not a recurring subscription.',
         },
         { status: 400 },
       )
     }
-    if (
-      enrollment.billingType !== 'monthly' &&
-      enrollment.billingType !== 'quarterly'
-    ) {
+    if (!isRecurringBillingType(enrollment.billingType)) {
       return NextResponse.json(
         { success: false, error: 'This enrollment is not a subscription.' },
         { status: 400 },
@@ -140,7 +138,7 @@ export async function POST(request: Request) {
       enrollment.paidUntil = nextPaidUntil(
         previousEnd,
         extensionDays,
-        enrollment.billingType === 'quarterly' ? 'quarterly' : 'monthly',
+        enrollment.billingType,
       )
       enrollment.accessStatus = 'active'
       await enrollment.save()

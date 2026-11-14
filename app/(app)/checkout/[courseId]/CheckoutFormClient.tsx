@@ -23,7 +23,7 @@ interface CourseData {
   title: string;
   summary: string;
   price: number;
-  billingType?: 'one_time' | 'monthly' | 'quarterly';
+  billingType?: 'one_time' | 'monthly' | 'two_month' | 'quarterly';
   requiresBatch?: boolean;
   imageUrl: string;
   instructorName: string;
@@ -263,7 +263,9 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
   const periodSuffix =
     course.billingType === 'monthly'
       ? '/mo'
-      : course.billingType === 'quarterly'
+      : course.billingType === 'two_month'
+        ? ' / 60 days'
+        : course.billingType === 'quarterly'
         ? '/qtr'
         : '';
 
@@ -571,7 +573,9 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                           ? 'Start monthly subscription ('
                           : course.billingType === 'quarterly'
                             ? 'Start quarterly subscription ('
-                            : 'Complete Course Purchase ('}
+                            : course.billingType === 'two_month'
+                              ? 'Start two-month subscription ('
+                              : 'Complete Course Purchase ('}
                         {!finalPrice || finalPrice === 0
                           ? 'Free'
                           : `৳${finalPrice.toLocaleString('en-BD')}`}
@@ -636,7 +640,9 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                       ? 'First month fee'
                       : course.billingType === 'quarterly'
                         ? 'First quarter fee'
-                        : 'Base Course Price'}
+                        : course.billingType === 'two_month'
+                          ? 'First two-month fee'
+                          : 'Base Course Price'}
                   </span>
                   <span className='font-bold text-zinc-800'>
                     {!basePrice || basePrice === 0

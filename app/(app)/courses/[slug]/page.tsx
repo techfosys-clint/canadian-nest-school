@@ -1,3 +1,4 @@
+import { courseFee } from '@/lib/subscriptions/billing';
 import CourseCertificateSample from '@/components/CourseCertificateSample';
 import CourseTrailerPlayer from '@/components/CourseTrailerPlayer';
 import EnrollButton from '@/components/EnrollButton';
@@ -44,14 +45,16 @@ type Props = {
 
 function formatPrice(
   price?: number | null,
-  billingType?: 'one_time' | 'monthly' | 'quarterly',
+  billingType?: 'one_time' | 'monthly' | 'two_month' | 'quarterly',
   freeLabel = 'Free',
   perMonth = '/mo',
+  perTwoMonths = ' / 60 days',
   perQuarter = '/qtr',
 ) {
   if (!price || price === 0) return freeLabel;
   const base = `৳${price.toLocaleString('en-BD')}`;
   if (billingType === 'monthly') return `${base}${perMonth}`;
+  if (billingType === 'two_month') return `${base}${perTwoMonths}`;
   if (billingType === 'quarterly') return `${base}${perQuarter}`;
   return base;
 }
@@ -135,18 +138,8 @@ export default async function CourseDetailPage({ params }: Props) {
   const whatYouWillLearn = localized.whatYouWillLearn;
   const requirements = localized.requirements;
 
-  const isMonthly = course.billingType === 'monthly';
-  const isQuarterly = course.billingType === 'quarterly';
-  const displayPrice = isMonthly
-    ? Number(course.monthlyFee || 0)
-    : isQuarterly
-      ? Number(course.quarterlyFee || 0)
-      : Number(course.price || 0);
-  const displayBillingType = isMonthly
-    ? ('monthly' as const)
-    : isQuarterly
-      ? ('quarterly' as const)
-      : ('one_time' as const);
+  const displayPrice = courseFee(course);
+  const displayBillingType = course.billingType ?? 'one_time';
   const levelLabel =
     t.levels[(course.level as keyof typeof t.levels) || 'all'] || t.levels.all;
 
@@ -731,6 +724,7 @@ export default async function CourseDetailPage({ params }: Props) {
                       displayBillingType,
                       t.free,
                       t.perMonth,
+                      t.perTwoMonths,
                     )}
                   </span>
                 </div>

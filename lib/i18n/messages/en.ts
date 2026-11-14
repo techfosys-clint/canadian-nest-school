@@ -93,6 +93,7 @@ const en: Messages = {
     enroll: 'Enroll Now',
     free: 'Free',
     perMonth: '/mo',
+    perTwoMonths: ' / 60 days',
     students: 'students',
     lessons: 'Lessons',
     duration: 'Duration',

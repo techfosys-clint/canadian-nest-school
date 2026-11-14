@@ -1,3 +1,4 @@
+import { courseFee } from '@/lib/subscriptions/billing';
 import type { BlogDoc } from '@/components/BlogSection';
 import BlogSection from '@/components/BlogSection';
 import CTASection from '@/components/CTASection';
@@ -90,18 +91,8 @@ export default async function Home() {
       title: localized.title,
       slug: doc.slug,
       summary: localized.summary,
-      price:
-        doc.billingType === 'monthly'
-          ? Number(doc.monthlyFee || 0)
-          : doc.billingType === 'quarterly'
-            ? Number(doc.quarterlyFee || 0)
-            : Number(doc.price || 0),
-      billingType:
-        doc.billingType === 'monthly'
-          ? ('monthly' as const)
-          : doc.billingType === 'quarterly'
-            ? ('quarterly' as const)
-            : ('one_time' as const),
+      price: courseFee(doc),
+      billingType: doc.billingType ?? 'one_time',
       thumbnail: doc.thumbnail
         ? {
             id: doc.thumbnail._id.toString(),

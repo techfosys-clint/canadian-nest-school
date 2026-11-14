@@ -4,7 +4,7 @@ import { BD_TIME_ZONE } from '@/lib/bdTime'
 
 export const BILLING_PERIOD_DAYS = 30
 
-export type RecurringBillingType = 'monthly' | 'quarterly'
+export type RecurringBillingType = 'monthly' | 'two_month' | 'quarterly'
 
 export function addDays(date: Date, days: number): Date {
   const d = new Date(date.getTime())
@@ -40,7 +40,7 @@ export function isQuarterlyCourse(
 export function isRecurringCourse(
   course: Pick<ICourse, 'billingType'> | null | undefined,
 ): boolean {
-  return course?.billingType === 'monthly' || course?.billingType === 'quarterly'
+  return isRecurringBillingType(course?.billingType)
 }
 
 export function isMonthlyEnrollment(
@@ -52,16 +52,18 @@ export function isMonthlyEnrollment(
 export function isRecurringEnrollment(
   enrollment: Pick<IEnrollment, 'billingType'> | null | undefined,
 ): boolean {
-  return (
-    enrollment?.billingType === 'monthly' ||
-    enrollment?.billingType === 'quarterly'
-  )
+  return isRecurringBillingType(enrollment?.billingType)
+}
+
+export function isRecurringBillingType(value: unknown): value is RecurringBillingType {
+  return value === 'monthly' || value === 'two_month' || value === 'quarterly'
 }
 
 export function courseFee(
-  course: Pick<ICourse, 'billingType' | 'price' | 'monthlyFee' | 'quarterlyFee'>,
+  course: Pick<ICourse, 'billingType' | 'price' | 'monthlyFee' | 'twoMonthFee' | 'quarterlyFee'>,
 ): number {
   if (course.billingType === 'monthly') return Number(course.monthlyFee || 0)
+  if (course.billingType === 'two_month') return Number(course.twoMonthFee || 0)
   if (course.billingType === 'quarterly') return Number(course.quarterlyFee || 0)
   return Number(course.price || 0)
 }
@@ -108,13 +110,13 @@ export function nextPaidUntil(
   const base =
     billingType === 'quarterly'
       ? nextCalendarQuarterEnd(previousPaidUntil)
-      : addDays(previousPaidUntil, BILLING_PERIOD_DAYS)
+      : addDays(previousPaidUntil, billingType === 'two_month' ? 60 : BILLING_PERIOD_DAYS)
   return addDays(base, Math.max(0, extensionDays))
 }
 
 /** First monthly paidUntil: now + 30 days. */
-export function initialPaidUntil(from: Date = new Date()): Date {
-  return addDays(from, BILLING_PERIOD_DAYS)
+export function initialPaidUntil(from: Date = new Date(), billingType: 'monthly' | 'two_month' = 'monthly'): Date {
+  return addDays(from, billingType === 'two_month' ? 60 : BILLING_PERIOD_DAYS)
 }
 
 /**
@@ -129,7 +131,7 @@ export type SubscriptionAccessSnapshot = {
   isMonthly: boolean
   /** True for monthly or quarterly subscription enrollments. */
   isRecurring: boolean
-  billingType: 'one_time' | 'monthly' | 'quarterly' | null
+  billingType: 'one_time' | 'monthly' | 'two_month' | 'quarterly' | null
   paidUntil: Date | null
   accessStatus: 'active' | 'blocked'
   /** True when live join / recordings must be denied. */
@@ -157,16 +159,10 @@ export function getSubscriptionAccessSnapshot(
   >,
   now: Date = new Date(),
 ): SubscriptionAccessSnapshot {
-  const recurringType: RecurringBillingType | null =
-    enrollment.paymentStatus === 'completed'
-      ? enrollment.billingType === 'quarterly' ||
-        course.billingType === 'quarterly'
-        ? 'quarterly'
-        : enrollment.billingType === 'monthly' ||
-            course.billingType === 'monthly'
-          ? 'monthly'
-          : null
-      : null
+  const recurringType = enrollment.paymentStatus === 'completed'
+    ? [enrollment.billingType, course.billingType].find((type) => type === 'quarterly') ??
+      [enrollment.billingType, course.billingType].find(isRecurringBillingType) ?? null
+    : null
 
   const isRecurring = !!recurringType
 
@@ -203,7 +199,9 @@ export function getSubscriptionAccessSnapshot(
     enrollment.accessStatus === 'blocked' || now.getTime() >= blockAt.getTime()
 
   const showOverdueNotice =
-    !isBlocked && now.getTime() >= noticeStartAt.getTime()
+    !isBlocked &&
+    now.getTime() >= noticeStartAt.getTime() &&
+    now.getTime() < noticeEndAt.getTime()
 
   return {
     isMonthly: recurringType === 'monthly',
@@ -226,6 +224,7 @@ export function computeRenewalAmount(
     ICourse,
     | 'billingType'
     | 'monthlyFee'
+    | 'twoMonthFee'
     | 'quarterlyFee'
     | 'lateFeeEnabled'
     | 'lateFeeAmount'
@@ -237,10 +236,7 @@ export function computeRenewalAmount(
   },
 ): { baseFee: number; lateFee: number; total: number } {
   const now = options?.now ?? new Date()
-  const defaultFee =
-    course.billingType === 'quarterly'
-      ? Number(course.quarterlyFee || 0)
-      : Number(course.monthlyFee || 0)
+  const defaultFee = courseFee(course)
 
   const baseFee =
     typeof options?.overrideFee === 'number' && options.overrideFee >= 0

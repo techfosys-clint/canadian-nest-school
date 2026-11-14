@@ -72,8 +72,8 @@ export async function completePaidEnrollment(
     const now = new Date()
 
     let paidUntil: Date | undefined
-    if (billingType === 'monthly') {
-      paidUntil = initialPaidUntil(now)
+    if (billingType === 'monthly' || billingType === 'two_month') {
+      paidUntil = initialPaidUntil(now, billingType)
     } else if (billingType === 'quarterly') {
       let batchEnd = now
       if (enrollment.batch) {
@@ -115,7 +115,7 @@ export async function completePaidEnrollment(
     enrollment.paymentStatus = 'completed'
     enrollment.paymentReference = claimed.paymentReference
     if (isRecurring) {
-      enrollment.billingType = billingType as 'monthly' | 'quarterly'
+      enrollment.billingType = billingType as 'monthly' | 'two_month' | 'quarterly'
       enrollment.paidUntil = paidUntil
       enrollment.billingCycleAnchor = now
       enrollment.initialPaymentAmount = claimed.initialPaymentAmount

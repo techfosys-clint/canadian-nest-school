@@ -77,14 +77,20 @@ export async function getSignedVideoUrl(
  */
 export async function getVideoObject(objectKey: string, range?: string) {
   if (!isStreamConfigured || !streamClient) return null
-  const response = await streamClient.send(
-    new GetObjectCommand({
-      Bucket: process.env.S3_BUCKET!,
-      Key: toObjectKey(objectKey),
-      Range: range,
-    })
-  )
-  return response
+  const key = toObjectKey(objectKey)
+  const input = { Bucket: process.env.S3_BUCKET!, Key: key, Range: range }
+  try {
+    return await streamClient.send(new GetObjectCommand(input))
+  } catch (error) {
+    // Older uploads saved a videos/ key while writing to study-materials/.
+    if (!(error instanceof Error) || error.name !== 'NoSuchKey' || !key.startsWith('videos/')) {
+      throw error
+    }
+    return streamClient.send(new GetObjectCommand({
+      ...input,
+      Key: `study-materials/${key.slice('videos/'.length)}`,
+    }))
+  }
 }
 
 /**

@@ -16,6 +16,16 @@ import {
 } from '@/lib/subscriptions/billing'
 
 describe('billing type helpers', () => {
+  it('uses the two-month fee and extends the paid period by 60 days', () => {
+    const start = new Date('2026-11-14T08:00:00Z')
+    const firstEnd = initialPaidUntil(start, 'two_month')
+    expect(firstEnd.toISOString()).toBe('2027-01-13T08:00:00.000Z')
+    expect(nextPaidUntil(firstEnd, 0, 'two_month').toISOString()).toBe('2027-03-14T08:00:00.000Z')
+    expect(isRecurringCourse({ billingType: 'two_month' })).toBe(true)
+    expect(isRecurringEnrollment({ billingType: 'two_month' })).toBe(true)
+    expect(computeRenewalAmount({ billingType: 'two_month', twoMonthFee: 2400 }, {}).total).toBe(2400)
+  })
+
   it('detects monthly / quarterly / recurring courses', () => {
     expect(isMonthlyCourse({ billingType: 'monthly' })).toBe(true)
     expect(isQuarterlyCourse({ billingType: 'quarterly' })).toBe(true)
@@ -199,6 +209,20 @@ describe('getSubscriptionAccessSnapshot', () => {
     expect(snap.showOverdueNotice).toBe(true)
     expect(snap.isBlocked).toBe(false)
     expect(snap.billingType).toBe('quarterly')
+  })
+
+  it('hides the renewal reminder at its cutoff while access remains active', () => {
+    const enrollment = {
+      billingType: 'monthly' as const,
+      paymentStatus: 'completed' as const,
+      paidUntil: new Date('2026-11-20T12:00:00+06:00'),
+    }
+    const settings = { ...course, noticeEndOffsetDays: 2, blockOffsetDays: 5 }
+    const cutoff = new Date('2026-11-22T12:00:00+06:00')
+    expect(getSubscriptionAccessSnapshot(enrollment, settings, new Date(cutoff.getTime() - 1)).showOverdueNotice).toBe(true)
+    const snapshot = getSubscriptionAccessSnapshot(enrollment, settings, cutoff)
+    expect(snapshot.showOverdueNotice).toBe(false)
+    expect(snapshot.isBlocked).toBe(false)
   })
 
   it('blocks after paidUntil + blockOffsetDays', () => {

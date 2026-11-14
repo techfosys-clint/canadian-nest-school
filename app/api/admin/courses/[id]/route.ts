@@ -1,3 +1,4 @@
+import { isRecurringBillingType } from '@/lib/subscriptions/billing'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Course } from '@/lib/db/models/Course'
@@ -308,6 +309,7 @@ export async function PUT(
       price,
       billingType,
       monthlyFee,
+      twoMonthFee,
       quarterlyFee,
       lateFeeEnabled,
       lateFeeAmount,
@@ -397,14 +399,8 @@ export async function PUT(
     const oldSlug = course.slug
 
     // 4. Perform Mongoose Update
-    const resolvedBillingType =
-      billingType === 'monthly'
-        ? 'monthly'
-        : billingType === 'quarterly'
-          ? 'quarterly'
-          : 'one_time'
-    const isRecurring =
-      resolvedBillingType === 'monthly' || resolvedBillingType === 'quarterly'
+    const resolvedBillingType = isRecurringBillingType(billingType) ? billingType : 'one_time'
+    const isRecurring = resolvedBillingType !== 'one_time'
 
     course.title = resolvedTitle
     course.titleBn = resolvedTitleBn
@@ -417,6 +413,7 @@ export async function PUT(
     course.billingType = resolvedBillingType
     course.monthlyFee =
       resolvedBillingType === 'monthly' ? Number(monthlyFee) || 0 : undefined
+    course.twoMonthFee = resolvedBillingType === 'two_month' ? Number(twoMonthFee) || 0 : undefined
     course.quarterlyFee =
       resolvedBillingType === 'quarterly' ? Number(quarterlyFee) || 0 : undefined
     course.lateFeeEnabled = isRecurring ? !!lateFeeEnabled : false

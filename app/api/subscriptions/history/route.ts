@@ -51,7 +51,7 @@ export async function GET() {
       Enrollment.find({
         student: userId,
         paymentStatus: 'completed',
-        billingType: { $in: ['monthly', 'quarterly'] },
+        billingType: { $in: ['monthly', 'two_month', 'quarterly'] },
       })
         .populate({ path: 'course', select: 'title' })
         .sort({ createdAt: -1 })
@@ -94,8 +94,8 @@ export async function GET() {
           : null
       const periodEnd = e.initialPaymentPeriodEnd
         ? new Date(e.initialPaymentPeriodEnd)
-        : e.billingType === 'monthly' && originalStart
-          ? initialPaidUntil(originalStart)
+        : (e.billingType === 'monthly' || e.billingType === 'two_month') && originalStart
+          ? initialPaidUntil(originalStart, e.billingType)
           : null
       rows.push({
         id: `enroll-${e._id.toString()}`,
@@ -119,10 +119,7 @@ export async function GET() {
 
     for (const p of renewals as any[]) {
       const course = p.course
-      const billingType =
-        enrollmentById.get(String(p.enrollment))?.billingType === 'quarterly'
-          ? 'quarterly'
-          : 'monthly'
+      const billingType = enrollmentById.get(String(p.enrollment))?.billingType ?? 'monthly'
       // Older quarterly checkout records used the monthly period formula.
       const periodEnd = billingType === 'quarterly' && p.periodStart
         ? nextPaidUntil(new Date(p.periodStart), p.extensionDays || 0, billingType)

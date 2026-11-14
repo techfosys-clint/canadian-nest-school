@@ -41,6 +41,7 @@ export type Messages = {
     enroll: string
     free: string
     perMonth: string
+    perTwoMonths: string
     students: string
     lessons: string
     duration: string

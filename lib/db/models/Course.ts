@@ -38,8 +38,9 @@ export interface ICourse extends Document {
   }>
   modules?: string[]
   /** one_time = lifetime; monthly = 30-day; quarterly = calendar quarters */
-  billingType?: 'one_time' | 'monthly' | 'quarterly'
+  billingType?: 'one_time' | 'monthly' | 'two_month' | 'quarterly'
   monthlyFee?: number
+  twoMonthFee?: number
   quarterlyFee?: number
   lateFeeEnabled?: boolean
   lateFeeAmount?: number
@@ -125,10 +126,11 @@ const CourseSchema = new Schema<ICourse>(
     modules: { type: [String], default: [] },
     billingType: {
       type: String,
-      enum: ['one_time', 'monthly', 'quarterly'],
+      enum: ['one_time', 'monthly', 'two_month', 'quarterly'],
       default: 'one_time',
     },
     monthlyFee: { type: Number, min: 0 },
+    twoMonthFee: { type: Number, min: 0 },
     quarterlyFee: { type: Number, min: 0 },
     lateFeeEnabled: { type: Boolean, default: false },
     lateFeeAmount: { type: Number, min: 0, default: 0 },
@@ -165,7 +167,7 @@ if (
     !mongoose.models.Course.schema.paths.billingType ||
     !mongoose.models.Course.schema.paths.trailerVideoUrl ||
     !mongoose.models.Course.schema.paths.faqSource ||
-    !mongoose.models.Course.schema.paths.quarterlyFee ||
+    !mongoose.models.Course.schema.paths.twoMonthFee ||
     !mongoose.models.Course.schema.paths.titleBn ||
     !mongoose.models.Course.schema.paths.smsReminderEnabled)
 ) {

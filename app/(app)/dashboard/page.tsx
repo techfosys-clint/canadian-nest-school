@@ -1,5 +1,7 @@
 'use client';
 
+import { useFeaturedLiveClass } from '@/lib/lessons/useFeaturedLiveClass';
+
 import { generateEventId, pushToDataLayer } from '@/lib/gtm';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -304,7 +306,7 @@ export default function StudentDashboard() {
           Swal.fire({
             icon: 'success',
             title: 'Subscription renewed!',
-            text: 'Your monthly access has been extended. Thank you.',
+            text: 'Your course access has been extended. Thank you.',
             confirmButtonColor: '#E61C24',
             timer: 4000,
           });
@@ -530,27 +532,7 @@ export default function StudentDashboard() {
     });
   };
 
-  /** Today's class if any; otherwise the next upcoming live session. */
-  const featuredLiveClass = (() => {
-    const now = Date.now();
-    const withDate = webinars
-      .filter((w) => w.liveDate)
-      .map((w) => ({ ...w, ts: new Date(w.liveDate!).getTime() }))
-      .sort((a, b) => a.ts - b.ts);
-
-    const bdToday = new Date().toLocaleDateString('en-CA', {
-      timeZone: 'Asia/Dhaka',
-    });
-    const todayClass = withDate.find((w) => {
-      const ymd = new Date(w.ts).toLocaleDateString('en-CA', {
-        timeZone: 'Asia/Dhaka',
-      });
-      return ymd === bdToday;
-    });
-    if (todayClass) return todayClass;
-
-    return withDate.find((w) => w.ts >= now - 60 * 60 * 1000) || null;
-  })();
+  const { featuredLiveClass, now } = useFeaturedLiveClass(webinars);
 
   // Calculate dynamic stats based on actual course progress from DB
   const totalCompletedLessons = enrollments.reduce((sum, e) => {
@@ -660,7 +642,7 @@ export default function StudentDashboard() {
                 All live classes
               </Link>
               {featuredLiveClass.liveUrl &&
-              new Date(featuredLiveClass.liveDate!).getTime() <= Date.now() ? (
+              new Date(featuredLiveClass.liveDate!).getTime() <= now ? (
                 <a
                   href={featuredLiveClass.liveUrl}
                   target='_blank'
@@ -1047,8 +1029,7 @@ export default function StudentDashboard() {
                   </p>
                 </div>
                 {featuredLiveClass.liveUrl &&
-                new Date(featuredLiveClass.liveDate!).getTime() <=
-                  Date.now() ? (
+                new Date(featuredLiveClass.liveDate!).getTime() <= now ? (
                   <a
                     href={featuredLiveClass.liveUrl}
                     target='_blank'

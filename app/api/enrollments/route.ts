@@ -1,3 +1,4 @@
+import { isRecurringBillingType } from '@/lib/subscriptions/billing'
 import { isLessonAvailable } from '@/lib/lessons/delivery'
 import { getLearningSession } from '@/lib/auth/learningSession'
 import { NextResponse } from 'next/server'
@@ -238,12 +239,9 @@ export async function POST(request: Request) {
     const { assignStudentToBatch } = await import('@/lib/batches/assignStudent')
 
     const isRecurring = isRecurringCourse(course as any)
-    const resolvedBillingType =
-      (course as any).billingType === 'quarterly'
-        ? 'quarterly'
-        : (course as any).billingType === 'monthly'
-          ? 'monthly'
-          : 'one_time'
+    const resolvedBillingType = isRecurringBillingType(course.billingType)
+      ? course.billingType
+      : 'one_time'
 
     // Monthly/quarterly: several batches may be open at once. The student
     // picks one. A single open batch is accepted even if the client omits it.
@@ -417,8 +415,8 @@ export async function POST(request: Request) {
       const now = new Date()
       try {
         const paidUntil =
-          resolvedBillingType === 'monthly'
-            ? initialPaidUntil(now)
+          resolvedBillingType === 'monthly' || resolvedBillingType === 'two_month'
+            ? initialPaidUntil(now, resolvedBillingType)
             : resolvedBillingType === 'quarterly'
               ? initialQuarterlyPaidUntil(
                   selectedBatch ? new Date(selectedBatch.endDate) : now,

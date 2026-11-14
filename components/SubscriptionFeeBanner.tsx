@@ -46,7 +46,7 @@ export default function SubscriptionFeeBanner() {
       title: `Renew — ${notice.courseTitle}`,
       html: `
         <p class="text-base text-slate-600 mb-3">
-          Monthly fee: <strong>BDT ${notice.monthlyFee}</strong>
+          Subscription fee: <strong>BDT ${notice.monthlyFee}</strong>
           ${notice.paidUntil ? ` · Due ${formatBdDate(notice.paidUntil)}` : ''}
         </p>
         <input id="sub-coupon" class="swal2-input" placeholder="Extension coupon (optional)" />
@@ -117,7 +117,7 @@ export default function SubscriptionFeeBanner() {
               <div className='min-w-0'>
                 <p className='text-base font-bold text-rose-900'>
                   {n.isBlocked
-                    ? 'Course access paused — monthly fee unpaid'
+                    ? 'Course access paused — subscription fee unpaid'
                     : 'Monthly fee reminder'}
                 </p>
                 <p className='text-base text-rose-800/90 mt-1'>

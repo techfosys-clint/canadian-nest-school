@@ -877,7 +877,6 @@ export default function LessonFormClient({
                           </label>
                           <input
                             type='text'
-                            required
                             value={q.questionText}
                             onChange={(e) => {
                               const newQuestions = [...quizQuestions];
@@ -1038,7 +1037,6 @@ export default function LessonFormClient({
                                 </div>
                                 <input
                                   type='text'
-                                  required
                                   value={opt}
                                   onChange={(e) => {
                                     const newQuestions = [...quizQuestions];

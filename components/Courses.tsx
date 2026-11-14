@@ -52,7 +52,7 @@ export interface CourseDoc {
   slug: string;
   summary: string;
   price: number;
-  billingType?: 'one_time' | 'monthly' | 'quarterly';
+  billingType?: 'one_time' | 'monthly' | 'two_month' | 'quarterly';
   thumbnail: ThumbnailDoc | string | null;
   category: CategoryDoc | string | null;
   instructor?: { id: string; name: string } | null;
@@ -80,14 +80,16 @@ function getImageUrl(thumbnail: CourseDoc['thumbnail']): string {
 
 function formatPrice(
   price?: number | null,
-  billingType?: 'one_time' | 'monthly' | 'quarterly',
+  billingType?: 'one_time' | 'monthly' | 'two_month' | 'quarterly',
   freeLabel = 'Free',
   perMonth = '/mo',
+  perTwoMonths = ' / 60 days',
   perQuarter = '/qtr',
 ): string {
   if (!price || price === 0) return freeLabel;
   const base = `৳${price.toLocaleString('en-BD')}`;
   if (billingType === 'monthly') return `${base}${perMonth}`;
+  if (billingType === 'two_month') return `${base}${perTwoMonths}`;
   if (billingType === 'quarterly') return `${base}${perQuarter}`;
   return base;
 }
@@ -410,6 +412,7 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                             featuredCourse.billingType,
                             t.free,
                             t.perMonth,
+                            t.perTwoMonths,
                           )}
                         </span>
                         <Link
@@ -549,6 +552,7 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                                     course.billingType,
                                     t.free,
                                     t.perMonth,
+                                    t.perTwoMonths,
                                   )}
                                 </span>
                               </div>

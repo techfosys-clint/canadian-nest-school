@@ -1,3 +1,4 @@
+import { isRecurringBillingType } from '@/lib/subscriptions/billing'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Course } from '@/lib/db/models/Course'
@@ -146,6 +147,7 @@ export async function POST(request: Request) {
       price,
       billingType,
       monthlyFee,
+      twoMonthFee,
       quarterlyFee,
       lateFeeEnabled,
       lateFeeAmount,
@@ -235,14 +237,8 @@ export async function POST(request: Request) {
 
     // 3. Create course document
     const finalCategories = categories || []
-    const resolvedBillingType =
-      billingType === 'monthly'
-        ? 'monthly'
-        : billingType === 'quarterly'
-          ? 'quarterly'
-          : 'one_time'
-    const isRecurring =
-      resolvedBillingType === 'monthly' || resolvedBillingType === 'quarterly'
+    const resolvedBillingType = isRecurringBillingType(billingType) ? billingType : 'one_time'
+    const isRecurring = resolvedBillingType !== 'one_time'
 
     const newCourse = new Course({
       title: resolvedTitle,
@@ -258,6 +254,7 @@ export async function POST(request: Request) {
         resolvedBillingType === 'monthly'
           ? Number(monthlyFee) || 0
           : undefined,
+      twoMonthFee: resolvedBillingType === 'two_month' ? Number(twoMonthFee) || 0 : undefined,
       quarterlyFee:
         resolvedBillingType === 'quarterly'
           ? Number(quarterlyFee) || 0

@@ -1,3 +1,4 @@
+import { courseFee } from '@/lib/subscriptions/billing';
 import { formatBdDate } from '@/lib/bdTime';
 import { Course } from '@/lib/db/models/Course';
 import { Enrollment } from '@/lib/db/models/Enrollment';
@@ -45,7 +46,7 @@ async function run(request: Request) {
   // ── Auto-block ──────────────────────────────────────────────
   const recurringEnrollments = await Enrollment.find({
     paymentStatus: 'completed',
-    billingType: { $in: ['monthly', 'quarterly'] },
+    billingType: { $in: ['monthly', 'two_month', 'quarterly'] },
     paidUntil: { $exists: true },
     accessStatus: { $ne: 'blocked' },
   })
@@ -61,7 +62,7 @@ async function run(request: Request) {
     if (!course) {
       course = await Course.findById(courseId)
         .select(
-          'billingType noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays title monthlyFee quarterlyFee',
+          'billingType noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays title monthlyFee twoMonthFee quarterlyFee',
         )
         .lean();
       if (course) courseCache.set(courseId, course);
@@ -91,14 +92,14 @@ async function run(request: Request) {
   {
     const candidates = await Enrollment.find({
       paymentStatus: 'completed',
-      billingType: { $in: ['monthly', 'quarterly'] },
+      billingType: { $in: ['monthly', 'two_month', 'quarterly'] },
       paidUntil: { $exists: true },
       accessStatus: { $ne: 'blocked' },
     })
       .populate({
         path: 'course',
         select:
-          'title monthlyFee quarterlyFee billingType smsReminderEnabled smsOffsetDaysBeforeEnd smsMaxMessagesPerPeriod',
+          'title monthlyFee twoMonthFee quarterlyFee billingType smsReminderEnabled smsOffsetDaysBeforeEnd smsMaxMessagesPerPeriod',
       })
       .lean();
 
@@ -169,9 +170,7 @@ async function run(request: Request) {
       }
 
       const amount =
-        course.billingType === 'quarterly'
-          ? Number(course.quarterlyFee || 0)
-          : Number(course.monthlyFee || 0);
+        courseFee(course);
 
       const message = buildFeeReminderSms({
         studentName: student?.name || 'Student',
@@ -179,7 +178,7 @@ async function run(request: Request) {
         paidUntilLabel: formatBdDate(paidUntil),
         amount,
         periodLabel:
-          course.billingType === 'quarterly' ? 'quarterly fee' : 'monthly fee',
+          course.billingType === 'quarterly' ? 'quarterly fee' : course.billingType === 'two_month' ? 'two-month fee' : 'monthly fee',
       });
 
       const ok = await sendSms(phone, message);

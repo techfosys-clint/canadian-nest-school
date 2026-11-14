@@ -26,12 +26,7 @@ export default async function CheckoutPage({ params }: Props) {
 
   if (!course) notFound()
 
-  const billingType =
-    course.billingType === 'monthly'
-      ? ('monthly' as const)
-      : course.billingType === 'quarterly'
-        ? ('quarterly' as const)
-        : ('one_time' as const)
+  const billingType = course.billingType ?? 'one_time'
 
   const serializedCourse = {
     id: course._id.toString(),

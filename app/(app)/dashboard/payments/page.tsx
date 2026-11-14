@@ -90,7 +90,7 @@ export default function PaymentHistoryPage() {
             Fee Payment History
           </h1>
           <p className='text-zinc-400 text-base font-semibold leading-relaxed'>
-            Your monthly and quarterly course fee payments, including first
+            Your subscription course fee payments, including first
             enrollment and renewals.
           </p>
         </div>
@@ -112,7 +112,7 @@ export default function PaymentHistoryPage() {
             No fee payments yet
           </h2>
           <p className='text-base font-semibold text-zinc-500 max-w-md mx-auto'>
-            When you enroll in or renew a monthly or quarterly course, those
+            When you enroll in or renew a subscription course, those
             payments will appear here.
           </p>
         </div>

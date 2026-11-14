@@ -36,7 +36,7 @@ export async function assertCourseContentAccess(
 
   const course = await Course.findById(courseId)
     .select(
-      'billingType noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays title monthlyFee quarterlyFee',
+      'billingType noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays title monthlyFee twoMonthFee quarterlyFee',
     )
     .lean()
 
@@ -67,12 +67,12 @@ export async function getStudentSubscriptionNotices(studentId: string) {
   const enrollments = await Enrollment.find({
     student: studentId,
     paymentStatus: 'completed',
-    billingType: { $in: ['monthly', 'quarterly'] },
+    billingType: { $in: ['monthly', 'two_month', 'quarterly'] },
   })
     .populate({
       path: 'course',
       select:
-        'title slug billingType monthlyFee quarterlyFee noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays lateFeeEnabled lateFeeAmount',
+        'title slug billingType monthlyFee twoMonthFee quarterlyFee noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays lateFeeEnabled lateFeeAmount',
     })
     .lean()
 
@@ -88,7 +88,7 @@ export async function getStudentSubscriptionNotices(studentId: string) {
     daysUntilDue: number
     monthlyFee: number
     fee: number
-    billingType: 'monthly' | 'quarterly'
+    billingType: 'monthly' | 'two_month' | 'quarterly'
   }> = []
 
   for (const e of enrollments as any[]) {
@@ -99,7 +99,7 @@ export async function getStudentSubscriptionNotices(studentId: string) {
 
     const fee = courseFee(course)
     const billingType =
-      e.billingType === 'quarterly' ? 'quarterly' : 'monthly'
+      e.billingType === 'quarterly' || e.billingType === 'two_month' ? e.billingType : 'monthly'
 
     notices.push({
       enrollmentId: e._id.toString(),

@@ -13,7 +13,7 @@ export interface IEnrollment extends Document {
   couponCode?: string
   completedLessons: string[] // Array of lesson IDs completed by the student
   /** Present for subscription enrollments (monthly / quarterly). */
-  billingType?: 'one_time' | 'monthly' | 'quarterly'
+  billingType?: 'one_time' | 'monthly' | 'two_month' | 'quarterly'
   /** End of the current paid period (recurring only). */
   paidUntil?: Date
   /** Join date used as billing cycle anchor (recurring only). */
@@ -43,7 +43,7 @@ const EnrollmentSchema = new Schema<IEnrollment>(
     completedLessons: { type: [String], default: [] },
     billingType: {
       type: String,
-      enum: ['one_time', 'monthly', 'quarterly'],
+      enum: ['one_time', 'monthly', 'two_month', 'quarterly'],
       default: 'one_time',
     },
     paidUntil: { type: Date },
@@ -64,7 +64,8 @@ if (
   mongoose.models.Enrollment &&
   (!mongoose.models.Enrollment.schema.paths.billingType ||
     !mongoose.models.Enrollment.schema.paths.batch ||
-    !mongoose.models.Enrollment.schema.paths.initialPaymentPeriodEnd)
+    !mongoose.models.Enrollment.schema.paths.initialPaymentPeriodEnd ||
+    !mongoose.models.Enrollment.schema.path('billingType').enumValues.includes('two_month'))
 ) {
   delete mongoose.models.Enrollment
 }

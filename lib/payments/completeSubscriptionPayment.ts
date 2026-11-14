@@ -9,6 +9,7 @@ import { epsAmountsMatch } from '@/lib/payments/epsAmount'
 import { normalizeEpsStatus } from '@/lib/payments/epsStatus'
 import {
   nextPaidUntil,
+  isRecurringBillingType,
   type RecurringBillingType,
 } from '@/lib/subscriptions/billing'
 
@@ -83,7 +84,7 @@ export async function completeSubscriptionPayment(
           : new Date(claimed.periodStart)
 
       const recurringType: RecurringBillingType =
-        enrollment.billingType === 'quarterly' ? 'quarterly' : 'monthly'
+        isRecurringBillingType(enrollment.billingType) ? enrollment.billingType : 'monthly'
 
       const paidUntil = nextPaidUntil(
         previousEnd,

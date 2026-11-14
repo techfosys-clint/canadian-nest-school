@@ -9,6 +9,7 @@ import {
   parseBdDate,
   parseBdDateEndOfDay,
 } from '@/lib/bdTime';
+import { addDays, getSubscriptionAccessSnapshot } from '@/lib/subscriptions/billing';
 import { parseJsonResponse } from '@/lib/safeJson';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -90,22 +91,19 @@ export default function CourseFormClient({
   );
   const [price, setPrice] = useState<number | ''>(initialData?.price ?? '');
   const [billingType, setBillingType] = useState<
-    'one_time' | 'monthly' | 'quarterly'
+    'one_time' | 'monthly' | 'two_month' | 'quarterly'
   >(
-    initialData?.billingType === 'monthly'
-      ? 'monthly'
-      : initialData?.billingType === 'quarterly'
-        ? 'quarterly'
-        : 'one_time',
+    initialData?.billingType ?? 'one_time',
   );
   const [monthlyFee, setMonthlyFee] = useState<number | ''>(
     initialData?.monthlyFee ?? '',
   );
+  const [twoMonthFee, setTwoMonthFee] = useState<number | ''>(initialData?.twoMonthFee ?? '');
   const [quarterlyFee, setQuarterlyFee] = useState<number | ''>(
     initialData?.quarterlyFee ?? '',
   );
   const isRecurringBilling =
-    billingType === 'monthly' || billingType === 'quarterly';
+    billingType !== 'one_time';
   const [lateFeeEnabled, setLateFeeEnabled] = useState(
     !!initialData?.lateFeeEnabled,
   );
@@ -118,7 +116,7 @@ export default function CourseFormClient({
   const [smsReminderEnabled, setSmsReminderEnabled] = useState(
     initialData?.smsReminderEnabled !== false,
   );
-  const [smsOffsetsText, setSmsOffsetsText] = useState(
+  const [smsOffsetsText, setSmsOffsetsText] = useState<string>(
     Array.isArray(initialData?.smsOffsetDaysBeforeEnd)
       ? initialData.smsOffsetDaysBeforeEnd.join(', ')
       : '5, 3, 1',
@@ -983,6 +981,25 @@ export default function CourseFormClient({
   }
 
   // Builds the API payload from current form state
+  const smsOffsets = smsOffsetsText
+    .split(/[,\s]+/)
+    .filter(Boolean)
+    .map(Number)
+    .filter((days) => Number.isInteger(days) && days >= 0);
+  const exampleDue = new Date('2026-11-20T12:00:00+06:00');
+  const { noticeStartAt, noticeEndAt, blockAt } = getSubscriptionAccessSnapshot(
+    { billingType, paymentStatus: 'completed', paidUntil: exampleDue },
+    { billingType, noticeStartOffsetDays, noticeEndOffsetDays, blockOffsetDays },
+    exampleDue,
+  );
+  const reminderEnd = noticeEndAt && blockAt
+    ? new Date(Math.min(noticeEndAt.getTime(), blockAt.getTime()))
+    : null;
+  const smsDates = [...new Set(smsOffsets)]
+    .sort((a, b) => b - a)
+    .slice(0, Math.max(0, smsMaxMessages))
+    .map((days) => formatBdDate(addDays(exampleDue, -days)));
+
   const buildPayload = () => ({
     // Bangla is primary; keep `title` populated for DB/legacy readers.
     title: title.trim() || titleBn.trim(),
@@ -995,6 +1012,7 @@ export default function CourseFormClient({
     price: Number(price) || 0,
     billingType,
     monthlyFee: billingType === 'monthly' ? Number(monthlyFee) || 0 : undefined,
+    twoMonthFee: billingType === 'two_month' ? Number(twoMonthFee) || 0 : undefined,
     quarterlyFee:
       billingType === 'quarterly' ? Number(quarterlyFee) || 0 : undefined,
     lateFeeEnabled: isRecurringBilling ? lateFeeEnabled : false,
@@ -1008,14 +1026,7 @@ export default function CourseFormClient({
       : 2,
     blockOffsetDays: isRecurringBilling ? Number(blockOffsetDays) || 0 : 2,
     smsReminderEnabled: isRecurringBilling ? smsReminderEnabled : false,
-    smsOffsetDaysBeforeEnd: isRecurringBilling
-      ? smsOffsetsText
-          .split(/[,\s]+/)
-          .map((s: string) => s.trim())
-          .filter(Boolean)
-          .map((s: string) => Number(s))
-          .filter((n: number) => Number.isFinite(n) && n >= 0)
-      : [],
+    smsOffsetDaysBeforeEnd: isRecurringBilling ? smsOffsets : [],
     smsMaxMessagesPerPeriod: isRecurringBilling
       ? Number(smsMaxMessages) || 0
       : 0,
@@ -2157,7 +2168,7 @@ export default function CourseFormClient({
                   Batches
                 </h2>
                 <p className='text-sm font-semibold text-slate-400 mt-1'>
-                  For monthly/quarterly courses, open a batch with a join window
+                  For subscription courses, open a batch with a join window
                   so students can enroll before class starts.
                 </p>
               </div>
@@ -2174,7 +2185,7 @@ export default function CourseFormClient({
 
             {!isRecurringBilling ? (
               <p className='text-base font-semibold text-slate-400 py-2'>
-                Batches are only used for monthly and quarterly courses. Switch
+                Batches are used for subscription courses. Switch
                 billing type above to enable batch enrollment.
               </p>
             ) : !savedCourseId ? (
@@ -2852,20 +2863,12 @@ export default function CourseFormClient({
               </label>
               <select
                 value={billingType}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setBillingType(
-                    v === 'monthly'
-                      ? 'monthly'
-                      : v === 'quarterly'
-                        ? 'quarterly'
-                        : 'one_time',
-                  );
-                }}
+                onChange={(e) => setBillingType(e.target.value as typeof billingType)}
                 className='bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer'
               >
                 <option value='one_time'>One-time purchase (lifetime)</option>
                 <option value='monthly'>Monthly subscription (30 days)</option>
+                <option value='two_month'>Two months (60 days)</option>
                 <option value='quarterly'>
                   Quarterly subscription (calendar quarters)
                 </option>
@@ -2913,14 +2916,14 @@ export default function CourseFormClient({
                 ) : (
                   <div className='flex flex-col gap-2'>
                     <label className='text-base font-bold text-slate-600'>
-                      Quarterly fee (BDT)
+                      {billingType === 'two_month' ? 'Two-month fee (BDT)' : 'Quarterly fee (BDT)'}
                     </label>
                     <input
                       type='number'
                       min={0}
-                      value={quarterlyFee}
+                      value={billingType === 'two_month' ? twoMonthFee : quarterlyFee}
                       onChange={(e) =>
-                        setQuarterlyFee(
+                        (billingType === 'two_month' ? setTwoMonthFee : setQuarterlyFee)(
                           e.target.value === '' ? '' : Number(e.target.value),
                         )
                       }
@@ -2966,101 +2969,127 @@ export default function CourseFormClient({
                     />
                   </div>
                 )}
-                <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
-                  <div className='flex flex-col gap-2'>
-                    <label className='text-base font-bold text-slate-600'>
-                      Notice starts (days before due)
-                    </label>
-                    <input
-                      type='number'
-                      min={0}
-                      value={noticeStartOffsetDays}
-                      onChange={(e) =>
-                        setNoticeStartOffsetDays(Number(e.target.value) || 0)
-                      }
-                      className='bg-slate-100 border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none'
-                    />
-                  </div>
-                  <div className='flex flex-col gap-2'>
-                    <label className='text-base font-bold text-slate-600'>
-                      Notice ends (days after due)
-                    </label>
-                    <input
-                      type='number'
-                      min={0}
-                      value={noticeEndOffsetDays}
-                      onChange={(e) =>
-                        setNoticeEndOffsetDays(Number(e.target.value) || 0)
-                      }
-                      className='bg-slate-100 border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none'
-                    />
-                  </div>
-                  <div className='flex flex-col gap-2'>
-                    <label className='text-base font-bold text-slate-600'>
-                      Block access (days after due)
-                    </label>
-                    <input
-                      type='number'
-                      min={0}
-                      value={blockOffsetDays}
-                      onChange={(e) =>
-                        setBlockOffsetDays(Number(e.target.value) || 0)
-                      }
-                      className='bg-slate-100 border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none'
-                    />
-                  </div>
-                </div>
-
-                <div className='rounded-lg border border-slate-200 bg-slate-50 p-4 space-y-4'>
-                  <div className='flex items-start gap-3'>
-                    <input
-                      id='smsReminderEnabled'
-                      type='checkbox'
-                      checked={smsReminderEnabled}
-                      onChange={(e) => setSmsReminderEnabled(e.target.checked)}
-                      className='mt-1 h-5 w-5 rounded border-slate-300 text-[#E61C24] focus:ring-[#E61C24]'
-                    />
-                    <label htmlFor='smsReminderEnabled' className='cursor-pointer'>
-                      <span className='block text-base font-bold text-slate-800'>
-                        Fee SMS reminders for this course
-                      </span>
-                      <span className='block text-base font-semibold text-slate-500 mt-1'>
-                        Sends SMS before each period ends (paidUntil). Offsets
-                        are days before due, e.g. 5, 3, 1.
-                      </span>
-                    </label>
-                  </div>
-                  {smsReminderEnabled && (
-                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+                <details className='rounded-lg border border-slate-200 bg-slate-50 p-4'>
+                  <summary className='cursor-pointer text-base font-bold text-slate-800'>Renewal reminders and access</summary>
+                  <div className='mt-4 space-y-4'>
+                    <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
                       <div className='flex flex-col gap-2'>
-                        <label className='text-base font-bold text-slate-600'>
-                          Offset days (comma-separated)
+                        <label htmlFor='noticeStartOffsetDays' className='text-base font-bold text-slate-600'>
+                          Show reminder (days before due)
                         </label>
                         <input
-                          type='text'
-                          value={smsOffsetsText}
-                          onChange={(e) => setSmsOffsetsText(e.target.value)}
-                          placeholder='5, 3, 1'
-                          className='bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none'
+                          id='noticeStartOffsetDays'
+                          type='number'
+                          min={0}
+                          value={noticeStartOffsetDays}
+                          onChange={(e) =>
+                            setNoticeStartOffsetDays(Number(e.target.value) || 0)
+                          }
+                          className='bg-slate-100 border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none'
                         />
                       </div>
                       <div className='flex flex-col gap-2'>
-                        <label className='text-base font-bold text-slate-600'>
-                          Max SMS per billing period
+                        <label htmlFor='noticeEndOffsetDays' className='text-base font-bold text-slate-600'>
+                          Hide reminder (days after due)
                         </label>
                         <input
+                          id='noticeEndOffsetDays'
                           type='number'
                           min={0}
-                          value={smsMaxMessages}
+                          value={noticeEndOffsetDays}
                           onChange={(e) =>
-                            setSmsMaxMessages(Number(e.target.value) || 0)
+                            setNoticeEndOffsetDays(Number(e.target.value) || 0)
                           }
-                          className='bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none'
+                          className='bg-slate-100 border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none'
+                        />
+                      </div>
+                      <div className='flex flex-col gap-2'>
+                        <label htmlFor='blockOffsetDays' className='text-base font-bold text-slate-600'>
+                          Pause access (days after due)
+                        </label>
+                        <input
+                          id='blockOffsetDays'
+                          type='number'
+                          min={0}
+                          value={blockOffsetDays}
+                          onChange={(e) =>
+                            setBlockOffsetDays(Number(e.target.value) || 0)
+                          }
+                          className='bg-slate-100 border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none'
                         />
                       </div>
                     </div>
-                  )}
-                </div>
+
+                    <div className='rounded-lg border border-slate-200 bg-slate-50 p-4 space-y-4'>
+                      <div className='flex items-start gap-3'>
+                        <input
+                          id='smsReminderEnabled'
+                          type='checkbox'
+                          checked={smsReminderEnabled}
+                          onChange={(e) => setSmsReminderEnabled(e.target.checked)}
+                          className='mt-1 h-5 w-5 rounded border-slate-300 text-[#E61C24] focus:ring-[#E61C24]'
+                        />
+                        <label htmlFor='smsReminderEnabled' className='cursor-pointer'>
+                          <span className='block text-base font-bold text-slate-800'>
+                            Send fee reminders by SMS
+                          </span>
+                          <span className='block text-base font-semibold text-slate-500 mt-1'>
+                            Uses the student’s payment due date each billing period.
+                          </span>
+                        </label>
+                      </div>
+                      {smsReminderEnabled && (
+                        <div className='space-y-3'>
+                          <div className='flex flex-col gap-2'>
+                            <label htmlFor='smsOffsetsText' className='text-base font-bold text-slate-600'>
+                              Days before payment is due (comma-separated)
+                            </label>
+                            <input
+                              id='smsOffsetsText'
+                              type='text'
+                              value={smsOffsetsText}
+                              onChange={(e) => setSmsOffsetsText(e.target.value)}
+                              placeholder='5, 3, 1'
+                              className='bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none'
+                            />
+                          </div>
+                          <details className='space-y-3'>
+                            <summary className='cursor-pointer text-base font-semibold text-slate-700'>Advanced SMS settings</summary>
+                              <div className='flex flex-col gap-2'>
+                              <label htmlFor='smsMaxMessages' className='text-base font-bold text-slate-600'>
+                                Max SMS per billing period
+                              </label>
+                              <input
+                                id='smsMaxMessages'
+                                type='number'
+                                min={0}
+                                value={smsMaxMessages}
+                                onChange={(e) =>
+                                  setSmsMaxMessages(Number(e.target.value) || 0)
+                                }
+                                className='bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none'
+                              />
+                            </div>
+                          </details>
+                        </div>
+                      )}
+                    </div>
+                    <div className='rounded-lg border border-slate-200 bg-white p-4 text-base text-slate-700 space-y-2'>
+                      <p className='font-bold'>Example timeline · Payment due {formatBdDate(exampleDue)}</p>
+                      {noticeStartAt && reminderEnd && noticeStartAt < reminderEnd && (
+                        <p>The dashboard reminder appears on {formatBdDate(noticeStartAt)} and ends on {formatBdDate(reminderEnd)}.</p>
+                      )}
+                      <p>Course access pauses on {blockAt && formatBdDate(blockAt)} if payment is still due.</p>
+                      {smsReminderEnabled && (
+                        <p>{smsMaxMessages <= 0
+                          ? 'No SMS reminders are scheduled with a limit of zero.'
+                          : smsDates.length
+                            ? `SMS reminders are scheduled for ${smsDates.join(', ')}.`
+                            : 'With no days entered, SMS reminders use the school schedule or the default of 5, 3, and 1 days before payment is due.'}</p>
+                      )}
+                    </div>
+                  </div>
+                </details>
               </div>
             )}
 

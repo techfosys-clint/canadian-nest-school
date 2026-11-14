@@ -1,6 +1,8 @@
  
 'use client';
 
+import { useFeaturedLiveClass } from '@/lib/lessons/useFeaturedLiveClass';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -75,24 +77,7 @@ export default function StudyHubPage() {
     checkSessionAndFetchData();
   }, [router]);
 
-  const featuredLiveClass = (() => {
-    const now = Date.now();
-    const withDate = webinars
-      .filter((w) => w.liveDate)
-      .map((w) => ({ ...w, ts: new Date(w.liveDate).getTime() }))
-      .sort((a, b) => a.ts - b.ts);
-    const bdToday = new Date().toLocaleDateString('en-CA', {
-      timeZone: 'Asia/Dhaka',
-    });
-    const todayClass = withDate.find((w) => {
-      const ymd = new Date(w.ts).toLocaleDateString('en-CA', {
-        timeZone: 'Asia/Dhaka',
-      });
-      return ymd === bdToday;
-    });
-    if (todayClass) return todayClass;
-    return withDate.find((w) => w.ts >= now - 60 * 60 * 1000) || null;
-  })();
+  const { featuredLiveClass, now } = useFeaturedLiveClass(webinars);
 
   if (loading) {
     return (
@@ -193,7 +178,7 @@ export default function StudyHubPage() {
                   </p>
                 </div>
                 {featuredLiveClass.liveUrl &&
-                new Date(featuredLiveClass.liveDate).getTime() <= Date.now() ? (
+                new Date(featuredLiveClass.liveDate).getTime() <= now ? (
                   <a
                     href={featuredLiveClass.liveUrl}
                     target='_blank'

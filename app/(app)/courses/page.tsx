@@ -1,3 +1,4 @@
+import { courseFee } from '@/lib/subscriptions/billing';
 import React from 'react'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Course } from '@/lib/db/models/Course'
@@ -69,18 +70,8 @@ export default async function CoursesPage({ searchParams }: Props) {
       title: localized.title,
       slug: doc.slug,
       summary: localized.summary,
-      price:
-        doc.billingType === 'monthly'
-          ? Number(doc.monthlyFee || 0)
-          : doc.billingType === 'quarterly'
-            ? Number(doc.quarterlyFee || 0)
-            : Number(doc.price || 0),
-      billingType:
-        doc.billingType === 'monthly'
-          ? ('monthly' as const)
-          : doc.billingType === 'quarterly'
-            ? ('quarterly' as const)
-            : ('one_time' as const),
+      price: courseFee(doc),
+      billingType: doc.billingType ?? 'one_time',
       thumbnail: doc.thumbnail ? {
         id: doc.thumbnail._id.toString(),
         url: doc.thumbnail.url || null,

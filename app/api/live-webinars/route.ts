@@ -66,7 +66,7 @@ export async function GET() {
       const batchByCourse = new Map<string, string | null>()
       for (const e of enrollments as any[]) {
         const courseId = e.course?.toString?.() || String(e.course)
-        if (e.billingType === 'monthly' || e.billingType === 'quarterly') {
+        if (e.billingType === 'monthly' || e.billingType === 'two_month' || e.billingType === 'quarterly') {
           const course = await Course.findById(courseId)
             .select(
               'billingType noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays',

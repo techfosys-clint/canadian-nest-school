@@ -1,3 +1,4 @@
+import { listLiveDeliveries, liveLessonQuery, resolveLessonDelivery } from '@/lib/lessons/delivery'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Lesson } from '@/lib/db/models/Lesson'
@@ -41,7 +42,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized: Session missing.' }, { status: 401 })
     }
 
-    const lessonsQuery: any = { lessonType: 'live' }
+    const lessonsQuery: any = { ...liveLessonQuery }
 
     const blockedCourseIds = new Set<string>()
 
@@ -102,16 +103,15 @@ export async function GET() {
         .lean()
 
       const serializedLessons = (liveLessons as any[])
-        .filter((l: any) => {
-          const cid = l.course?._id?.toString?.() || l.course?.toString?.()
-          if (!cid || blockedCourseIds.has(cid)) return false
-          const lessonBatch = l.batch?.toString?.() || null
-          if (!lessonBatch) return true
-          const studentBatch = batchByCourse.get(cid) || null
-          return !!studentBatch && studentBatch === lessonBatch
+        .flatMap((lesson) => {
+          const courseId = String(lesson.course?._id ?? lesson.course)
+          if (!batchByCourse.has(courseId) || blockedCourseIds.has(courseId)) return []
+          const delivery = resolveLessonDelivery(lesson, batchByCourse.get(courseId))
+          return delivery?.lessonType === 'live' ? [delivery] : []
         })
+        .sort((a, b) => Number(a.liveDate) - Number(b.liveDate))
         .map((l: any) => ({
-          id: l._id.toString(),
+          id: l.deliveryBatchId ? `${l._id}-${l.deliveryBatchId}` : l._id.toString(),
           title: l.title,
           slug: l.slug,
           courseTitle: l.course?.title || 'Unknown Course',
@@ -131,12 +131,10 @@ export async function GET() {
       .lean()
 
     const serializedLessons = (liveLessons as any[])
-      .filter((l: any) => {
-        const cid = l.course?._id?.toString?.() || l.course?.toString?.()
-        return !cid || !blockedCourseIds.has(cid)
-      })
+      .flatMap(listLiveDeliveries)
+      .sort((a, b) => Number(a.liveDate) - Number(b.liveDate))
       .map((l: any) => ({
-        id: l._id.toString(),
+        id: l.deliveryBatchId ? `${l._id}-${l.deliveryBatchId}` : l._id.toString(),
         title: l.title,
         slug: l.slug,
         courseTitle: l.course?.title || 'Unknown Course',

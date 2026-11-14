@@ -4,11 +4,7 @@ import { Enrollment } from '@/lib/db/models/Enrollment'
 import { Course } from '@/lib/db/models/Course'
 import { CertificateRequest } from '@/lib/db/models/CertificateRequest'
 import {
-  calculateCourseProgressPercent,
   getCourseProgressPercent,
-  getLessonCountsByCourse,
-  getLessonIdsByCourse,
-  sanitizeCompletedLessons,
 } from '@/lib/progress/getCourseProgress'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
@@ -58,34 +54,24 @@ export async function GET() {
           .filter((id): id is string => Boolean(id)),
       ),
     ]
-    const lessonCounts = await getLessonCountsByCourse(courseIds)
-    const lessonIdsByCourse = await getLessonIdsByCourse(courseIds)
 
     const enrollments = await Enrollment.find({
       student: userId,
       paymentStatus: 'completed',
       course: { $in: courseIds },
     })
-      .select('course completedLessons')
+      .select('course batch completedLessons')
       .lean()
 
-    const enrollmentProgress = new Map<string, string[]>()
-    for (const enrollment of enrollments) {
-      const courseId = enrollment.course?.toString()
-      if (!courseId) continue
-      enrollmentProgress.set(courseId, enrollment.completedLessons || [])
-    }
+    const enrollmentByCourse = new Map(enrollments.map((enrollment) => [String(enrollment.course), enrollment]))
 
     // Reconcile each cert with review gate (holds legacy approved downloads)
     const reviewGates = await Promise.all(
       courseIds.map(async (courseId) => {
-        const completedLessons = enrollmentProgress.get(courseId) || []
-        const totalLessons = lessonCounts.get(courseId) || 0
-        const validLessonIds = lessonIdsByCourse.get(courseId) || new Set<string>()
-        const progress = calculateCourseProgressPercent(
-          sanitizeCompletedLessons(completedLessons, validLessonIds),
-          totalLessons,
-        )
+        const enrollment = enrollmentByCourse.get(courseId)
+        const progress = enrollment ? await getCourseProgressPercent(
+          courseId, enrollment.completedLessons, enrollment.batch?.toString() ?? null,
+        ) : 0
 
         const reconciled = await reconcileCertificateWithReviewGate(
           userId,
@@ -114,17 +100,7 @@ export async function GET() {
     const formatted = refreshed.map((r) => {
       const courseId = r.course?._id?.toString()
       const reviewGate = courseId ? reviewGateMap.get(courseId) : undefined
-      const progress =
-        reviewGate?.progress ??
-        calculateCourseProgressPercent(
-          sanitizeCompletedLessons(
-            courseId ? enrollmentProgress.get(courseId) || [] : [],
-            courseId
-              ? lessonIdsByCourse.get(courseId) || new Set<string>()
-              : new Set<string>(),
-          ),
-          courseId ? lessonCounts.get(courseId) || 0 : 0,
-        )
+      const progress = reviewGate?.progress ?? 0
 
       const courseReviewStatus = reviewGate?.courseReviewStatus || 'idle'
       const teacherReviewStatus = reviewGate?.teacherReviewStatus || 'idle'
@@ -216,6 +192,7 @@ export async function POST(request: Request) {
     const progress = await getCourseProgressPercent(
       courseId,
       enrollment.completedLessons,
+      enrollment.batch?.toString() ?? null,
     )
 
     // Create certificate request

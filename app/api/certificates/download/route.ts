@@ -74,6 +74,7 @@ export async function GET(request: NextRequest) {
     const progress = await getCourseProgressPercent(
       courseId,
       enrollment.completedLessons,
+      enrollment.batch?.toString() ?? null,
     )
 
     if (progress < 100) {

@@ -339,6 +339,7 @@ export default function CourseFormClient({
     lessonType: 'recorded' | 'live' | 'quiz' | 'assignment';
     duration: number;
     batchId: string | null;
+    batchSettings: { batch: string; order: number; duration: number; lessonType: LessonSummary['lessonType'] }[];
   }
   const [lessons, setLessons] = useState<LessonSummary[]>([]);
   const [lessonsLoading, setLessonsLoading] = useState(false);
@@ -358,6 +359,7 @@ export default function CourseFormClient({
                 order: l.order,
                 lessonType: l.lessonType,
                 duration: l.duration,
+                batchSettings: l.batchSettings ?? [],
                 batchId: l.batch ? l.batch.toString?.() || String(l.batch) : null,
               }))
               .sort((a: LessonSummary, b: LessonSummary) => a.order - b.order),
@@ -664,27 +666,6 @@ export default function CourseFormClient({
 
   const selectedBatch = batches.find((b) => b._id === selectedBatchId) || null;
 
-  const moveLessonToBatch = async (lessonId: string, nextBatchId: string) => {
-    setBatchActionMsg('');
-    try {
-      const res = await fetch(`/api/admin/lessons/${lessonId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ batch: nextBatchId }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || data.message || 'Failed to move lesson');
-      }
-      setLessons((prev) =>
-        prev.map((lesson) =>
-          lesson.id === lessonId ? { ...lesson, batchId: nextBatchId } : lesson,
-        ),
-      );
-    } catch (err: any) {
-      setBatchActionMsg(err.message || 'Failed to move lesson.');
-    }
-  };
   const availableStudentsForSelectedBatch = courseStudents.filter(
     (s) =>
       (s.name.toLowerCase().includes(studentSearchQuery.toLowerCase()) ||
@@ -2491,9 +2472,11 @@ export default function CourseFormClient({
                                   only visible to students in {batch.name}.
                                 </p>
                                 {(() => {
-                                  const batchLessons = lessons.filter(
-                                    (lesson) => lesson.batchId === batch._id,
-                                  );
+                                  const batchLessons = lessons.flatMap((lesson) => {
+                                    const settings = lesson.batchSettings.find((item) => item.batch === batch._id);
+                                    if (settings) return [{ ...lesson, ...settings }];
+                                    return lesson.batchId === batch._id ? [lesson] : [];
+                                  }).sort((a, b) => a.order - b.order);
                                   if (lessonsLoading) {
                                     return (
                                       <p className='text-base font-semibold text-slate-400 text-center py-6'>
@@ -2537,7 +2520,7 @@ export default function CourseFormClient({
                                               : lesson.lessonType}
                                           </span>
                                           <Link
-                                            href={`/admin/lessons/${lesson.id}/edit`}
+                                            href={`/admin/lessons/${lesson.id}/edit?batchId=${batch._id}`}
                                             className='p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors'
                                             title='Edit lesson'
                                           >
@@ -2548,13 +2531,13 @@ export default function CourseFormClient({
                                     </div>
                                   );
                                 })()}
-                                {lessons.some((lesson) => !lesson.batchId) && (
+                                {lessons.some((lesson) => lesson.batchId !== batch._id && !lesson.batchSettings.some((item) => item.batch === batch._id)) && (
                                   <div className='space-y-2 pt-2'>
                                     <p className='text-base font-bold text-slate-700'>
-                                      Not on a batch yet
+                                      Available course lessons
                                     </p>
                                     {lessons
-                                      .filter((lesson) => !lesson.batchId)
+                                      .filter((lesson) => lesson.batchId !== batch._id && !lesson.batchSettings.some((item) => item.batch === batch._id))
                                       .map((lesson) => (
                                         <div
                                           key={lesson.id}
@@ -2563,18 +2546,12 @@ export default function CourseFormClient({
                                           <p className='text-base font-bold text-slate-800 truncate'>
                                             {lesson.title}
                                           </p>
-                                          <button
-                                            type='button'
-                                            onClick={() =>
-                                              void moveLessonToBatch(
-                                                lesson.id,
-                                                batch._id,
-                                              )
-                                            }
+                                          <Link
+                                            href={`/admin/lessons/${lesson.id}/edit?batchId=${batch._id}`}
                                             className='shrink-0 px-3 py-2 rounded-lg border border-slate-200 text-base font-bold text-slate-700 hover:border-[#E61C24]/40 hover:text-[#E61C24]'
                                           >
-                                            Add to this batch
-                                          </button>
+                                            Configure for batch
+                                          </Link>
                                         </div>
                                       ))}
                                   </div>

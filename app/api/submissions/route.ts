@@ -1,12 +1,12 @@
+import { assertCourseContentAccess } from '@/lib/subscriptions/access'
+import { resolveLessonDelivery } from '@/lib/lessons/delivery'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Submission } from '@/lib/db/models/Submission'
 import { Lesson } from '@/lib/db/models/Lesson'
-import { Enrollment } from '@/lib/db/models/Enrollment'
 import { syncEnrollmentProgressSideEffects } from '@/lib/progress/syncEnrollmentProgress'
 import {
   getValidatedCompletedLessons,
-  isLessonInCourse,
 } from '@/lib/progress/getCourseProgress'
 import { getLearningSession } from '@/lib/auth/learningSession'
 
@@ -61,12 +61,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Lesson not found.' }, { status: 404 })
     }
 
-    const lessonBelongsToCourse = await isLessonInCourse(courseId, lessonId)
-    if (!lessonBelongsToCourse) {
-      return NextResponse.json(
-        { success: false, error: 'Lesson does not belong to this course.' },
-        { status: 400 },
-      )
+    if (String(lesson.course) !== courseId) {
+      return NextResponse.json({ success: false, error: 'Lesson does not belong to this course.' }, { status: 400 })
+    }
+    const access = await assertCourseContentAccess(userId, courseId)
+    const enrollment = access.enrollment
+    const delivery = access.allowed && resolveLessonDelivery(lesson, enrollment?.batch?.toString())
+    if (!delivery || delivery.lessonType !== type || !['quiz', 'assignment'].includes(type)) {
+      return NextResponse.json({ success: false, error: 'This activity is unavailable for your enrollment.' }, { status: 403 })
     }
 
     const totalMarks = lesson.totalMarks || 100
@@ -109,12 +111,6 @@ export async function POST(request: Request) {
     )
 
     // Automatically mark the lesson as completed in Enrollment progress
-    const enrollment = await Enrollment.findOne({
-      student: userId,
-      course: courseId,
-      paymentStatus: 'completed',
-    })
-
     if (enrollment) {
       if (!Array.isArray(enrollment.completedLessons)) {
         enrollment.completedLessons = []
@@ -131,6 +127,7 @@ export async function POST(request: Request) {
           userId,
           courseId,
           sanitizedCompletedLessons,
+          enrollment.batch?.toString() ?? null,
         )
       }
     }

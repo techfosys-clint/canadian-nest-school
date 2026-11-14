@@ -1,3 +1,4 @@
+import { isLessonAvailable } from '@/lib/lessons/delivery'
 import { getLearningSession } from '@/lib/auth/learningSession'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
@@ -87,25 +88,18 @@ export async function GET(request: Request) {
         .lean()
     }
 
-    // ═══════════════════════════════════════════════════════
-    // Pre-fetch ALL lesson counts in ONE aggregation query
-    // (instead of N separate queries — N+1 problem fixed)
-    // ═══════════════════════════════════════════════════════
-    const lessonCounts = await Lesson.aggregate([
-      {
-        $group: {
-          _id: '$course',
-          count: { $sum: 1 }
-        }
-      }
-    ])
+    const courseIds = [...new Set(docs.flatMap((doc) => doc.course?._id ? [String(doc.course._id)] : []))]
+    const lessons = await Lesson.find({ course: { $in: courseIds } })
+      .select('course batch hasDefaultDelivery batchSettings.batch')
+      .lean()
+    const lessonsByCourse = new Map<string, typeof lessons>()
+    for (const lesson of lessons) {
+      const courseId = String(lesson.course)
+      const courseLessons = lessonsByCourse.get(courseId) ?? []
+      courseLessons.push(lesson)
+      lessonsByCourse.set(courseId, courseLessons)
+    }
 
-    const countMap: Record<string, number> = {}
-    lessonCounts.forEach((item: any) => {
-      countMap[item._id.toString()] = item.count
-    })
-
-    // Now map enrollments with pre-fetched counts (no N+1 queries)
     const formattedDocs = docs.map((doc: any) => {
       if (!doc.course) {
         return {
@@ -116,7 +110,8 @@ export async function GET(request: Request) {
       }
 
       const courseId = doc.course._id.toString()
-      const totalLessons = countMap[courseId] || 0
+      const totalLessons = (lessonsByCourse.get(courseId) ?? [])
+        .filter((lesson) => isLessonAvailable(lesson, doc.batch?.toString())).length
 
       return {
         id: doc._id.toString(),

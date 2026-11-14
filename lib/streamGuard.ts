@@ -1,3 +1,4 @@
+import { resolveLessonDelivery } from '@/lib/lessons/delivery'
 import { getLearningSession } from '@/lib/auth/learningSession'
 import { getEnrollmentPreview } from '@/lib/auth/enrollmentPreview'
 import { connectToDatabase } from '@/lib/db/mongodb'
@@ -54,41 +55,38 @@ export async function guardStream(
   if (!lesson) {
     return { ok: false, status: 404, error: 'Lesson not found.' }
   }
-  if (lesson.lessonType !== 'recorded' || !lesson.videoUrl) {
-    return { ok: false, status: 400, error: 'This lesson has no streamable video.' }
-  }
-  if (isExternalEmbed(lesson.videoUrl)) {
-    return { ok: false, status: 400, error: 'This lesson uses an external player.' }
-  }
-
+  let batchId: string | undefined
   if (preview) {
-    const { enrollment } = preview
-    if (
-      String(enrollment.course) !== String(lesson.course) ||
-      (lesson.batch && String(enrollment.batch) !== String(lesson.batch))
-    ) {
+    if (String(preview.enrollment.course) !== String(lesson.course)) {
       return { ok: false, status: 403, error: 'This lesson is outside the preview enrollment.' }
     }
-    return { ok: true, objectKey: lesson.videoUrl, userId }
-  }
-
-  // Shared free previews can be played without an enrollment.
-  if (!lesson.isPreviewable || lesson.batch) {
+    batchId = preview.enrollment.batch?.toString()
+  } else if (!lesson.isPreviewable || lesson.batch || lesson.hasDefaultDelivery === false || lesson.batchSettings?.length) {
     const access = await assertCourseContentAccess(userId, String(lesson.course))
-    if (!access.allowed) {
+    if (access.allowed) {
+      batchId = access.enrollment?.batch?.toString()
+    } else if (!lesson.isPreviewable || !resolveLessonDelivery(lesson)) {
       const error = access.reason === 'SUBSCRIPTION_BLOCKED'
         ? 'Renew your subscription to continue watching.'
         : 'A completed enrollment is required to watch this lesson.'
       return { ok: false, status: 403, error }
     }
-    if (lesson.batch && String(access.enrollment?.batch) !== String(lesson.batch)) {
-      return { ok: false, status: 403, error: 'This lesson is unavailable for your batch.' }
-    }
+  }
+
+  const delivery = resolveLessonDelivery(lesson, batchId)
+  if (!delivery) {
+    return { ok: false, status: 403, error: 'This lesson is unavailable for your batch.' }
+  }
+  if (delivery.lessonType !== 'recorded' || !delivery.videoUrl) {
+    return { ok: false, status: 400, error: 'This lesson has no streamable video.' }
+  }
+  if (isExternalEmbed(delivery.videoUrl)) {
+    return { ok: false, status: 400, error: 'This lesson uses an external player.' }
   }
 
   // 5. Concurrent-device limit (only when explicitly registering a session,
   //    so frequent Range requests on the proxy don't hammer the DB)
-  if (opts.registerSession) {
+  if (opts.registerSession && !preview) {
     const deviceId = (url.searchParams.get('d') || request.headers.get('x-device-id') || '').trim()
     if (deviceId) {
       const cutoff = new Date(Date.now() - ACTIVE_WINDOW_MS)
@@ -115,5 +113,5 @@ export async function guardStream(
     }
   }
 
-  return { ok: true, objectKey: lesson.videoUrl, userId }
+  return { ok: true, objectKey: delivery.videoUrl, userId }
 }

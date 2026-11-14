@@ -1,3 +1,4 @@
+import { listLiveDeliveries, liveLessonQuery } from '@/lib/lessons/delivery'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { User } from '@/lib/db/models/User'
@@ -191,7 +192,7 @@ export async function GET() {
             course: { $in: courseIds },
             paymentStatus: 'completed',
           }),
-          Lesson.find({ course: { $in: courseIds }, lessonType: 'live' })
+          Lesson.find({ course: { $in: courseIds }, ...liveLessonQuery })
             .populate('course')
             .sort({ liveDate: 1 })
             .lean(),
@@ -248,8 +249,8 @@ export async function GET() {
         }
       })
 
-      const serializedLiveLessons = (rawLiveLessons as any[]).map((l: any) => ({
-        id: l._id.toString(),
+      const serializedLiveLessons = (rawLiveLessons as any[]).flatMap(listLiveDeliveries).sort((a, b) => Number(a.liveDate) - Number(b.liveDate)).map((l: any) => ({
+        id: l.deliveryBatchId ? `${l._id}-${l.deliveryBatchId}` : l._id.toString(),
         title: l.title,
         slug: l.slug,
         courseTitle: l.course?.title || 'Unknown Course',

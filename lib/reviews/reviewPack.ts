@@ -184,6 +184,7 @@ export async function assertStudentCanReviewCourse(studentId: string, courseId: 
   const progress = await getCourseProgressPercent(
     courseId,
     enrollment.completedLessons || [],
+    enrollment.batch?.toString() ?? null,
   )
 
   return { enrollment, progress }
@@ -199,11 +200,11 @@ async function syncCertificateForReviewPack(
     course: courseId,
     paymentStatus: 'completed',
   })
-    .select('completedLessons')
+    .select('batch completedLessons')
     .lean()
 
   const progress = enrollment
-    ? await getCourseProgressPercent(courseId, enrollment.completedLessons || [])
+    ? await getCourseProgressPercent(courseId, enrollment.completedLessons || [], enrollment.batch?.toString() ?? null)
     : 0
 
   if (status === 'approved') {
@@ -319,11 +320,11 @@ export async function reconcileCertificateWithReviewGate(
     course: courseId,
     paymentStatus: 'completed',
   })
-    .select('completedLessons')
+    .select('batch completedLessons')
     .lean()
 
   const progress = enrollment
-    ? await getCourseProgressPercent(courseId, enrollment.completedLessons || [])
+    ? await getCourseProgressPercent(courseId, enrollment.completedLessons || [], enrollment.batch?.toString() ?? null)
     : 0
 
   existing.progress = progress
@@ -397,11 +398,11 @@ export async function syncCertificateRequestWithReviewGate(
     course: courseId,
     paymentStatus: 'completed',
   })
-    .select('completedLessons')
+    .select('batch completedLessons')
     .lean()
 
   const progress = enrollment
-    ? await getCourseProgressPercent(courseId, enrollment.completedLessons || [])
+    ? await getCourseProgressPercent(courseId, enrollment.completedLessons || [], enrollment.batch?.toString() ?? null)
     : 0
 
   const existing = await CertificateRequest.findOne({

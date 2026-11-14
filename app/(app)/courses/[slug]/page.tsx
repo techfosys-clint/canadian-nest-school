@@ -243,12 +243,13 @@ export default async function CourseDetailPage({ params }: Props) {
     moduleOrder: l.moduleOrder || undefined,
     moduleName: l.moduleName || 'General Module',
     lessonType: l.lessonType || 'recorded',
-    duration: l.duration || 10,
-    isPreviewable: l.isPreviewable || false,
+    duration: l.batch || l.hasDefaultDelivery === false || l.batchSettings?.length ? 0 : l.duration || 0,
+    variesByBatch: Boolean(l.batch || l.hasDefaultDelivery === false || l.batchSettings?.length),
+    isPreviewable: Boolean(l.isPreviewable && !l.batch && l.hasDefaultDelivery !== false),
     livePlatform: l.livePlatform || '',
-    liveDate: l.liveDate ? l.liveDate.toISOString() : undefined,
-    videoUrl: l.videoUrl || '',
-    liveUrl: l.liveUrl || '',
+    liveDate: !l.batch && l.hasDefaultDelivery !== false && l.isPreviewable && l.liveDate ? l.liveDate.toISOString() : undefined,
+    videoUrl: !l.batch && l.hasDefaultDelivery !== false && l.isPreviewable ? l.videoUrl || '' : '',
+    liveUrl: !l.batch && l.hasDefaultDelivery !== false && l.isPreviewable ? l.liveUrl || '' : '',
   }));
 
   const initials = instructorName

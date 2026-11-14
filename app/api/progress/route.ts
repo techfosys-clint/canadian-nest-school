@@ -1,10 +1,12 @@
+import { assertCourseContentAccess } from '@/lib/subscriptions/access'
+import { Lesson } from '@/lib/db/models/Lesson'
+import { resolveLessonDelivery } from '@/lib/lessons/delivery'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Enrollment } from '@/lib/db/models/Enrollment'
 import { StudentProgress } from '@/lib/db/models/StudentProgress'
 import {
   getValidatedCompletedLessons,
-  isLessonInCourse,
 } from '@/lib/progress/getCourseProgress'
 import { syncEnrollmentProgressSideEffects } from '@/lib/progress/syncEnrollmentProgress'
 import { getLearningSession } from '@/lib/auth/learningSession'
@@ -25,7 +27,7 @@ export async function GET() {
 
     // Fetch all enrollments for the student and extract completedLessons
     const enrollments = await Enrollment.find({ student: userId, paymentStatus: 'completed' })
-      .select('course completedLessons')
+      .select('course batch completedLessons')
       .lean()
 
     const completedLessons: Record<string, string[]> = {}
@@ -36,16 +38,9 @@ export async function GET() {
       const sanitized = await getValidatedCompletedLessons(
         courseId,
         enr.completedLessons,
+        enr.batch?.toString() ?? null,
       )
       completedLessons[courseId] = sanitized
-
-      const raw = enr.completedLessons || []
-      if (raw.length !== sanitized.length) {
-        await Enrollment.updateOne(
-          { _id: enr._id },
-          { $set: { completedLessons: sanitized } },
-        )
-      }
     }
 
     // Fetch login streak dates
@@ -90,27 +85,22 @@ export async function POST(request: Request) {
       )
     }
 
-    // Find the enrollment
-    const enrollment = await Enrollment.findOne({
-      student: userId,
-      course: courseId,
-      paymentStatus: 'completed',
-    })
-
-    if (!enrollment) {
+    const access = await assertCourseContentAccess(userId, courseId)
+    if (!access.allowed) {
       return NextResponse.json(
-        { success: false, error: 'No active enrollment found for this course.' },
-        { status: 404 }
+        { success: false, error: 'Your enrollment does not currently grant access to this course.' },
+        { status: 403 },
       )
     }
+    const enrollment = access.enrollment
 
     if (!Array.isArray(enrollment.completedLessons)) {
       enrollment.completedLessons = []
     }
 
     if (completed) {
-      const lessonBelongsToCourse = await isLessonInCourse(courseId, lessonId)
-      if (!lessonBelongsToCourse) {
+      const lesson = await Lesson.findOne({ _id: lessonId, course: courseId }).lean()
+      if (!lesson || !resolveLessonDelivery(lesson, enrollment.batch?.toString())) {
         return NextResponse.json(
           { success: false, error: 'Lesson does not belong to this course.' },
           { status: 400 },
@@ -138,6 +128,7 @@ export async function POST(request: Request) {
       userId,
       courseId,
       sanitizedCompletedLessons,
+      enrollment.batch?.toString() ?? null,
     )
 
     return NextResponse.json({

@@ -1,3 +1,4 @@
+import { isLessonAvailable } from '@/lib/lessons/delivery'
 import { Lesson } from '@/lib/db/models/Lesson'
 
 export function calculateCourseProgressPercent(
@@ -29,9 +30,12 @@ export function sanitizeCompletedLessons(
 
 export async function getValidLessonIdSet(
   courseId: string,
+  batchId?: string | null,
 ): Promise<Set<string>> {
-  const lessons = await Lesson.find({ course: courseId }).select('_id').lean()
-  return new Set(lessons.map((lesson) => lesson._id.toString()))
+  const lessons = await Lesson.find({ course: courseId }).select('batch hasDefaultDelivery batchSettings.batch').lean()
+  return new Set(lessons
+    .filter((lesson) => batchId === undefined || isLessonAvailable(lesson, batchId))
+    .map((lesson) => String(lesson._id)))
 }
 
 export async function getLessonIdsByCourse(
@@ -61,8 +65,9 @@ export async function getLessonIdsByCourse(
 export async function getValidatedCompletedLessons(
   courseId: string,
   completedLessons: string[] | null | undefined,
+  batchId?: string | null,
 ): Promise<string[]> {
-  const validLessonIds = await getValidLessonIdSet(courseId)
+  const validLessonIds = await getValidLessonIdSet(courseId, batchId)
   return sanitizeCompletedLessons(completedLessons, validLessonIds)
 }
 
@@ -85,8 +90,9 @@ export async function getTotalLessonsForCourse(
 export async function getCourseProgressPercent(
   courseId: string,
   completedLessons: string[] | null | undefined,
+  batchId?: string | null,
 ): Promise<number> {
-  const validLessonIds = await getValidLessonIdSet(courseId)
+  const validLessonIds = await getValidLessonIdSet(courseId, batchId)
   const sanitized = sanitizeCompletedLessons(completedLessons, validLessonIds)
   return calculateCourseProgressPercent(sanitized, validLessonIds.size)
 }

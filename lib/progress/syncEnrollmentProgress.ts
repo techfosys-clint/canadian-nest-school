@@ -5,8 +5,9 @@ export async function syncEnrollmentProgressSideEffects(
   userId: string,
   courseId: string,
   completedLessons: string[],
+  batchId?: string | null,
 ): Promise<number> {
-  const progress = await getCourseProgressPercent(courseId, completedLessons)
+  const progress = await getCourseProgressPercent(courseId, completedLessons, batchId)
 
   // Single source of truth for cert row status vs reviews + syllabus %.
   await syncCertificateRequestWithReviewGate(userId, courseId)

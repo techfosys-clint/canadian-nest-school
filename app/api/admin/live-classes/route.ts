@@ -1,3 +1,4 @@
+import { listLiveDeliveries, liveLessonQuery } from '@/lib/lessons/delivery'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Lesson } from '@/lib/db/models/Lesson'
@@ -13,7 +14,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
     }
 
-    const lessonsQuery: any = { lessonType: 'live' }
+    const lessonsQuery: any = { ...liveLessonQuery }
 
     if (user.role === 'instructor') {
       // Instructors only see live classes in their assigned courses (regardless of who created the lesson)
@@ -27,8 +28,8 @@ export async function GET() {
       .sort({ liveDate: 1 })
       .lean()
 
-    const serializedLessons = (liveLessons as any[]).map((l: any) => ({
-      id: l._id.toString(),
+    const serializedLessons = (liveLessons as any[]).flatMap(listLiveDeliveries).sort((a, b) => Number(a.liveDate) - Number(b.liveDate)).map((l: any) => ({
+      id: l.deliveryBatchId ? `${l._id}-${l.deliveryBatchId}` : l._id.toString(),
       title: l.title,
       slug: l.slug,
       courseTitle: l.course?.title || 'Unknown Course',

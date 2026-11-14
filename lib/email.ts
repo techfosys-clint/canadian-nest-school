@@ -393,6 +393,7 @@ export async function checkAndSendLiveClassReminders() {
     const { connectToDatabase } = await import('@/lib/db/mongodb');
     await connectToDatabase();
 
+    const { listLiveDeliveries, liveLessonQuery } = await import('@/lib/lessons/delivery');
     const { Lesson } = await import('@/lib/db/models/Lesson');
     const { Course } = await import('@/lib/db/models/Course');
 
@@ -401,12 +402,19 @@ export async function checkAndSendLiveClassReminders() {
     const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
     const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
 
-    const upcomingLessons = await Lesson.find({
-      lessonType: 'live',
-      liveDate: { $gte: fifteenMinutesAgo, $lte: twoHoursLater },
-      liveUrl: { $exists: true, $ne: '' },
-      $or: [{ reminderSent: { $exists: false } }, { reminderSent: false }],
-    }).populate('course');
+    const candidates = await Lesson.find({
+      ...liveLessonQuery,
+      $and: [{
+        $or: [
+          { liveDate: { $gte: fifteenMinutesAgo, $lte: twoHoursLater } },
+          { 'batchSettings.liveDate': { $gte: fifteenMinutesAgo, $lte: twoHoursLater } },
+        ],
+      }],
+    }).lean();
+    const upcomingLessons = candidates.flatMap(listLiveDeliveries).filter((lesson) =>
+      lesson.liveDate && lesson.liveDate >= fifteenMinutesAgo && lesson.liveDate <= twoHoursLater &&
+      lesson.liveUrl && !lesson.reminderSent,
+    );
 
     if (upcomingLessons.length === 0) return;
 
@@ -415,7 +423,7 @@ export async function checkAndSendLiveClassReminders() {
       if (!course) continue;
 
       // Fetch course details to get the instructor
-      const courseDoc = await Course.findById(course._id || course).populate(
+      const courseDoc = await Course.findById(course).populate(
         'instructor',
       );
       if (!courseDoc || !courseDoc.instructor) continue;
@@ -434,8 +442,19 @@ export async function checkAndSendLiveClassReminders() {
       );
 
       if (success) {
-        lesson.reminderSent = true;
-        await lesson.save();
+        if (lesson.deliveryBatchId && !lesson.batch) {
+          await Lesson.updateOne(
+            { _id: lesson._id, batchSettings: { $elemMatch: {
+              batch: lesson.deliveryBatchId, liveDate: lesson.liveDate, liveUrl: lesson.liveUrl,
+            } } },
+            { $set: { 'batchSettings.$.reminderSent': true } },
+          );
+        } else {
+          await Lesson.updateOne(
+            { _id: lesson._id, liveDate: lesson.liveDate, liveUrl: lesson.liveUrl },
+            { $set: { reminderSent: true } },
+          );
+        }
       }
     }
   } catch (error) {

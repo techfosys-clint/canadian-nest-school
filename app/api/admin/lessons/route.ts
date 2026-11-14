@@ -3,10 +3,9 @@ import { connectToDatabase } from '@/lib/db/mongodb'
 import { Lesson } from '@/lib/db/models/Lesson'
 import { Course } from '@/lib/db/models/Course'
 import { User } from '@/lib/db/models/User'
-import { verifyToken } from '@/lib/auth/auth'
+import { getAuthorizedUser, verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
-import { createZoomMeeting } from '@/lib/zoom'
-import { parseBdDate } from '@/lib/bdTime'
+import { allocateLessonOrder, LessonDeliveryError, saveDeliveryFields } from '@/lib/lessons/saveDelivery'
 import { revalidatePath } from 'next/cache'
 
 /**
@@ -20,8 +19,14 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const courseId = searchParams.get('courseId')
 
-    const query: any = courseId ? { course: courseId } : {}
+    const user = await getAuthorizedUser(['admin', 'instructor'])
+    if (!user) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
+    const ownedCourses = user.role === 'instructor'
+      ? await Course.find({ instructor: user._id, ...(courseId ? { _id: courseId } : {}) }).distinct('_id')
+      : null
+    const query = ownedCourses ? { course: { $in: ownedCourses } } : courseId ? { course: courseId } : {}
     const lessons = await Lesson.find(query)
+      .select('-batchSettings.videoUrl -batchSettings.liveUrl')
       .populate({ path: 'course', select: 'title slug status instructor' })
       .sort({ course: 1, order: 1 })
       .lean()
@@ -94,7 +99,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { title, slug, course: courseId, batch, moduleOrder, moduleName, lessonType, videoUrl, livePlatform, liveUrl, liveDate, content, duration, isPreviewable, autoGenerateZoom, quizQuestions } = body
+    const { title, slug, course: courseId, batch, moduleOrder, moduleName, content, duration, isPreviewable, quizQuestions, totalMarks } = body
 
     if (!title || !slug || !courseId || !duration) {
       return NextResponse.json(
@@ -121,7 +126,7 @@ export async function POST(request: Request) {
         { status: 404 }
       )
     }
-    if (user.role === 'instructor' && (course as any).instructor.toString() !== user._id.toString()) {
+    if (user.role === 'instructor' && (course as any).instructor?.toString() !== user._id.toString()) {
       return NextResponse.json(
         {
           success: false,
@@ -147,44 +152,8 @@ export async function POST(request: Request) {
       )
     }
 
-    let actualLiveUrl = liveUrl
-    const finalAutoGenerate = !!(lessonType === 'live' && livePlatform === 'zoom' && autoGenerateZoom)
-
-    if (finalAutoGenerate) {
-      if (!liveDate) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: 'Missing required field',
-            code: 'VALIDATION_ERROR',
-            message: 'Scheduled Time & Date is required to auto-generate a Zoom meeting.',
-          },
-          { status: 400 }
-        )
-      }
-
-      const zoomDetails = await createZoomMeeting(title, parseBdDate(liveDate).toISOString(), Number(duration) || 60)
-      if (!zoomDetails) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: 'Failed to auto-generate Zoom meeting',
-            code: 'EXTERNAL_SERVICE_ERROR',
-            message: 'Failed to auto-generate Zoom meeting link. Please verify your Zoom credentials.',
-          },
-          { status: 500 }
-        )
-      }
-      actualLiveUrl = zoomDetails.joinUrl
-    }
-
-    // Course-wide serial (Lecture Order) is always assigned by the server —
-    // it tracks what number lesson this is across the entire course and is
-    // never taken from the client.
-    const lastCourseLesson = await Lesson.findOne({ course: courseId })
-      .sort({ order: -1 })
-      .lean()
-    const finalOrder = lastCourseLesson && lastCourseLesson.order ? lastCourseLesson.order + 1 : 1
+    const delivery = await saveDeliveryFields(courseId, batch || null, title, body)
+    const finalOrder = batch ? await allocateLessonOrder(courseId) : delivery.order
 
     // Module-level position: use the value from the form, else auto-append
     // to the end of the module.
@@ -197,14 +166,12 @@ export async function POST(request: Request) {
     }
 
     const newLesson = new Lesson({
-      title, slug, course: courseId, order: finalOrder, moduleOrder: finalModuleOrder, moduleName, lessonType: lessonType || 'recorded',
-      batch: batch || null,
-      videoUrl, livePlatform, liveUrl: actualLiveUrl,
-      liveDate: liveDate ? parseBdDate(liveDate) : undefined,
-      content, duration: Number(duration),
-      isPreviewable: isPreviewable || false,
-      autoGenerateZoom: finalAutoGenerate,
-      quizQuestions: lessonType === 'quiz' ? quizQuestions : undefined,
+      title, slug, course: courseId, moduleOrder: finalModuleOrder, moduleName,
+      ...(batch
+        ? { hasDefaultDelivery: false, batchSettings: [{ batch, ...delivery }], duration: delivery.duration }
+        : { ...delivery, hasDefaultDelivery: true }),
+      order: finalOrder,
+      content, isPreviewable, quizQuestions, totalMarks,
     })
     await newLesson.save()
 
@@ -229,6 +196,9 @@ export async function POST(request: Request) {
       { status: 201 }
     )
   } catch (error: any) {
+    if (error instanceof LessonDeliveryError) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
     console.error('POST /api/admin/lessons error:', error)
     return NextResponse.json(
       {

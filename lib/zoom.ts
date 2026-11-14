@@ -88,6 +88,10 @@ export async function createZoomMeeting(
     }
 
     const data = await res.json()
+    if (typeof data.join_url !== 'string' || !data.join_url.startsWith('https://') || !data.id) {
+      console.error('Zoom returned a meeting without a valid join URL or meeting ID.')
+      return null
+    }
     return {
       joinUrl: data.join_url,
       startUrl: data.start_url,

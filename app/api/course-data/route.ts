@@ -63,20 +63,15 @@ export async function GET(request: Request) {
       student: userId,
       course: courseId,
       paymentStatus: 'completed',
-    }).select('_id completedLessons')
+    }).select('_id batch completedLessons')
 
     let completedLessons: string[] = []
     if (enrollment) {
       completedLessons = await getValidatedCompletedLessons(
         courseId,
         enrollment.completedLessons,
+        enrollment.batch?.toString() ?? null,
       )
-
-      const raw = enrollment.completedLessons || []
-      if (raw.length !== completedLessons.length) {
-        enrollment.completedLessons = completedLessons
-        await enrollment.save()
-      }
     }
 
     // 2. Fetch submissions (quiz & assignment)

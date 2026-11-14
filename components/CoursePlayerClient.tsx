@@ -236,7 +236,7 @@ export default function CoursePlayerClient({
 
     return {
       moduleGroups: groups,
-      sortedLessons: groups.flatMap((mg) => mg.lessons),
+      sortedLessons: [...lessons].sort((a, b) => a.order - b.order || a.id.localeCompare(b.id)),
     };
   }, [lessons]);
 

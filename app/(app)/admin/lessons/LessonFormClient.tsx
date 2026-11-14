@@ -32,6 +32,17 @@ interface QuizQuestion {
   correctAnswerIndex: number;
 }
 
+type DeliverySettings = {
+  lessonType: 'recorded' | 'live' | 'quiz' | 'assignment';
+  videoUrl?: string;
+  livePlatform?: string;
+  liveUrl?: string;
+  liveDate?: string;
+  duration: number;
+  order: number;
+  autoGenerateZoom?: boolean;
+};
+
 interface LessonFormProps {
   courses: CourseOption[];
   initialData?: {
@@ -50,6 +61,10 @@ interface LessonFormProps {
     isPreviewable: boolean;
     courseId: string;
     batchId?: string;
+    legacyBatchId?: string;
+    requiresLegacyReview?: boolean;
+    hasDefaultDelivery?: boolean;
+    batchSettings?: (DeliverySettings & { batch: string })[];
     autoGenerateZoom?: boolean;
     quizQuestions?: QuizQuestion[];
     totalMarks?: number;
@@ -73,6 +88,11 @@ export default function LessonFormClient({
   const router = useRouter();
   const searchParams = useSearchParams();
   const isEditMode = !!initialData;
+  const initialDelivery = initialData?.batchSettings?.find(
+    (item) => item.batch === initialData.batchId,
+  ) ?? (initialData?.batchId
+    ? initialData.batchId === initialData.legacyBatchId ? initialData : undefined
+    : initialData?.hasDefaultDelivery ? initialData : undefined);
 
   // Determine active course
   const defaultCourseId =
@@ -86,7 +106,7 @@ export default function LessonFormClient({
     initialData?.moduleName || 'General Module',
   );
   // Course-wide serial — auto-tracked by the server, shown read-only
-  const [order, setOrder] = useState<number | ''>(initialData?.order || '');
+  const [order, setOrder] = useState<number | ''>(initialDelivery?.order || '');
   // Position within the module — auto-suggested, editable
   const [moduleOrder, setModuleOrder] = useState<number | ''>(
     initialData?.moduleOrder || '',
@@ -94,27 +114,27 @@ export default function LessonFormClient({
   const [content, setContent] = useState<string>(initialData?.content || '');
   const [lessonType, setLessonType] = useState<
     'recorded' | 'live' | 'quiz' | 'assignment'
-  >(initialData?.lessonType || 'recorded');
+  >(initialDelivery?.lessonType || 'recorded');
   const [totalMarks, setTotalMarks] = useState<number>(
     initialData?.totalMarks || 100,
   );
-  const [videoUrl, setVideoUrl] = useState(initialData?.videoUrl || '');
+  const [videoUrl, setVideoUrl] = useState(initialDelivery?.videoUrl || '');
   const [livePlatform, setLivePlatform] = useState(
-    initialData?.livePlatform || 'zoom',
+    initialDelivery?.livePlatform || 'zoom',
   );
-  const [liveUrl, setLiveUrl] = useState(initialData?.liveUrl || '');
+  const [liveUrl, setLiveUrl] = useState(initialDelivery?.liveUrl || '');
   const [liveDate, setLiveDate] = useState(
-    initialData?.liveDate ? toBdInputValue(initialData.liveDate) : '',
+    initialDelivery?.liveDate ? toBdInputValue(initialDelivery.liveDate) : '',
   );
-  const [duration, setDuration] = useState(initialData?.duration || 60);
+  const [duration, setDuration] = useState(initialDelivery?.duration || 60);
   const [isPreviewable, setIsPreviewable] = useState(
     initialData?.isPreviewable || false,
   );
   const [autoGenerateZoom, setAutoGenerateZoom] = useState(
-    initialData?.autoGenerateZoom || false,
+    initialDelivery?.autoGenerateZoom || false,
   );
   const [batchId, setBatchId] = useState(
-    initialData?.batchId || searchParams.get('batchId') || '',
+    initialData?.batchId ?? searchParams.get('batchId') ?? '',
   );
   const [batches, setBatches] = useState<{ id: string; name: string }[]>([]);
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(
@@ -135,21 +155,19 @@ export default function LessonFormClient({
       setBatches([]);
       return;
     }
+    let active = true;
     fetch(`/api/admin/batches?course=${courseId}`)
       .then((res) => res.json())
       .then((data) => {
+        if (!active) return;
         const list = (data.batches || []).map((b: any) => ({
           id: b._id?.toString?.() || b.id,
           name: b.name || b.title || 'Untitled batch',
         }));
         setBatches(list);
-        setBatchId((prev) =>
-          prev && list.length > 0 && !list.some((b: { id: string }) => b.id === prev)
-            ? ''
-            : prev,
-        );
       })
-      .catch(() => setBatches([]));
+      .catch(() => { if (active) setBatches([]); });
+    return () => { active = false; };
   }, [courseId]);
 
   // Fetch unique module names of the selected course
@@ -182,21 +200,15 @@ export default function LessonFormClient({
       .catch((err) => console.error('Failed to load course modules:', err));
   }, [courseId, initialData]);
 
-  // Auto-calculate both order numbers for NEW lessons when course or module changes:
-  // - order (Lecture Order): next serial across the whole course — read-only
-  // - moduleOrder (Display Order): next number inside the chosen module — editable
   React.useEffect(() => {
     if (isEditMode || !courseId) return;
+    let active = true;
     setAutoOrderLoading(true);
     fetch(`/api/admin/lessons?courseId=${courseId}`)
       .then((r) => r.json())
       .then((data) => {
+        if (!active) return;
         const lessons: any[] = data.data?.lessons || [];
-        const maxCourseOrder = lessons.reduce(
-          (max: number, l: any) => Math.max(max, l.order || 0),
-          0,
-        );
-        setOrder(maxCourseOrder + 1);
         const inModule = lessons.filter(
           (l) =>
             (l.moduleName || 'General Module') ===
@@ -211,8 +223,25 @@ export default function LessonFormClient({
         );
       })
       .catch(() => {})
-      .finally(() => setAutoOrderLoading(false));
+      .finally(() => { if (active) setAutoOrderLoading(false); });
+    return () => { active = false; };
   }, [courseId, moduleName, isEditMode]);
+
+  const selectBatch = (nextBatch: string) => {
+    const config = initialData?.batchSettings?.find((item) => item.batch === nextBatch) ??
+      (initialData && (
+        nextBatch === initialData.legacyBatchId || (!nextBatch && initialData.hasDefaultDelivery)
+      ) ? initialData : undefined);
+    setBatchId(nextBatch);
+    setLessonType(config?.lessonType ?? 'recorded');
+    setVideoUrl(config?.videoUrl ?? '');
+    setLivePlatform(config?.livePlatform ?? 'zoom');
+    setLiveUrl(config?.liveUrl ?? '');
+    setLiveDate(config?.liveDate ? toBdInputValue(config.liveDate) : '');
+    setDuration(config?.duration ?? 60);
+    setAutoGenerateZoom(config?.autoGenerateZoom ?? false);
+    setOrder(config?.order ?? '');
+  };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -248,8 +277,9 @@ export default function LessonFormClient({
       return;
     }
 
-    if (lessonType === 'quiz') {
-      const invalid = quizQuestions.some(
+    const questions = quizQuestions.filter((q) => q.questionText.trim() || q.options.some((o) => o.trim()));
+    if (questions.length || lessonType === 'quiz') {
+      const invalid = !questions.length || questions.some(
         (q) => !q.questionText.trim() || q.options.some((o) => !o.trim()),
       );
       if (invalid) {
@@ -277,19 +307,16 @@ export default function LessonFormClient({
         videoUrl: lessonType === 'recorded' ? videoUrl : undefined,
         livePlatform: lessonType === 'live' ? livePlatform : undefined,
         liveUrl: lessonType === 'live' ? liveUrl : undefined,
-        liveDate: lessonType === 'live' && liveDate ? liveDate : undefined,
+        liveDate: lessonType === 'live' ? liveDate : undefined,
         duration,
         isPreviewable,
         autoGenerateZoom:
           lessonType === 'live' && livePlatform === 'zoom'
             ? autoGenerateZoom
             : false,
-        quizQuestions: lessonType === 'quiz' ? quizQuestions : undefined,
-        totalMarks:
-          lessonType === 'quiz' || lessonType === 'assignment'
-            ? totalMarks
-            : undefined,
-        content: content || undefined,
+        quizQuestions: questions,
+        totalMarks,
+        content,
       };
 
       const url = isEditMode
@@ -317,8 +344,12 @@ export default function LessonFormClient({
         color: '#1a1a1a',
       });
 
-      router.push(`/admin/courses/${courseId}/edit`);
-      router.refresh();
+      const lessonId = initialData?.id ?? data.data?.lesson?._id;
+      if (lessonId) {
+        window.location.assign(`/admin/lessons/${lessonId}/edit?batchId=${encodeURIComponent(batchId)}`);
+      } else {
+        router.push(`/admin/courses/${courseId}/edit`);
+      }
     } catch (err: any) {
       Swal.fire({
         icon: 'error',
@@ -366,9 +397,14 @@ export default function LessonFormClient({
           <div className='lg:col-span-8 space-y-6'>
             <div className='bg-white border border-slate-200 rounded-lg p-6 space-y-5'>
               <h2 className='text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-3'>
-                Lesson Parameters
+                Course Details
               </h2>
 
+              {initialData?.requiresLegacyReview && (
+                <p role='status' className='rounded-lg border border-amber-200 bg-amber-50 p-3 text-base text-amber-900'>
+                  Another lesson in this course has the same title and module. Review both records before combining their batch settings.
+                </p>
+              )}
               {/* Course Dropdown */}
               <div className='flex flex-col gap-2'>
                 <label className='text-base font-bold text-slate-600'>
@@ -376,10 +412,11 @@ export default function LessonFormClient({
                 </label>
                 <select
                   required
+                  disabled={isEditMode}
                   value={courseId}
                   onChange={(e) => {
                     setCourseId(e.target.value);
-                    setBatchId('');
+                    selectBatch('');
                   }}
                   className='bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer'
                 >
@@ -390,31 +427,6 @@ export default function LessonFormClient({
                     </option>
                   ))}
                 </select>
-              </div>
-
-              {/* Batch scope — optional; empty = visible to all batches */}
-              <div className='flex flex-col gap-2'>
-                <label className='text-base font-bold text-slate-600'>
-                  Batch (recording visibility)
-                </label>
-                <select
-                  value={batchId}
-                  onChange={(e) => setBatchId(e.target.value)}
-                  disabled={!courseId}
-                  className='bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer disabled:opacity-60'
-                >
-                  <option value=''>All batches (shared)</option>
-                  {batches.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.name}
-                    </option>
-                  ))}
-                </select>
-                <p className='text-base font-medium text-slate-400 leading-relaxed'>
-                  Leave as &quot;All batches&quot; for shared lessons. Pick a
-                  batch so only students in that batch see this recording or
-                  live class.
-                </p>
               </div>
 
               {/* Title */}
@@ -479,7 +491,7 @@ export default function LessonFormClient({
                       Display Order (within module) *
                     </label>
                     {!isEditMode && (
-                      <span className='text-xs font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-500 select-none'>
+                      <span className='text-base font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-500 select-none'>
                         {autoOrderLoading
                           ? 'Calculating...'
                           : 'Auto-set · editable'}
@@ -499,6 +511,30 @@ export default function LessonFormClient({
                     a module = 1). Auto-counted; change if needed.
                   </p>
                 </div>
+              </div>
+
+              <h2 className='text-xl font-bold text-slate-800 border-t border-slate-200 pt-5'>Batch Settings</h2>
+              {/* Batch scope — optional; empty = visible to all batches */}
+              <div className='flex flex-col gap-2'>
+                <label className='text-base font-bold text-slate-600'>
+                  Batch
+                </label>
+                <select
+                  value={batchId}
+                  onChange={(e) => selectBatch(e.target.value)}
+                  disabled={!courseId || saving}
+                  className='bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer disabled:opacity-60'
+                >
+                  <option value=''>Default for all batches</option>
+                  {batches.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.name}
+                    </option>
+                  ))}
+                </select>
+                <p className='text-base font-medium text-slate-400 leading-relaxed'>
+                  Select a batch to configure its lesson. Batches without their own settings use the default when one is configured.
+                </p>
               </div>
 
               {/* Lesson Format / Type Selector */}
@@ -691,37 +727,69 @@ export default function LessonFormClient({
                     />
                   </div>
                 </div>
-              ) : lessonType === 'assignment' ? (
-                <div className='space-y-4 border border-[#E61C24]/25 rounded-lg p-6 bg-linear-to-b from-slate-50 to-white shadow-2xl shadow-[#E61C24]/5 animate-fadeIn'>
-                  <h3 className='text-xl font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3'>
-                    <FiFileText className='text-[#E61C24] h-6 w-6' /> Assignment
-                    Configuration
-                  </h3>
+              ) : null}
 
-                  <div className='flex flex-col gap-2'>
-                    <label className='text-base font-bold text-slate-600'>
-                      Assignment Evaluation Marks *
-                    </label>
-                    <input
-                      type='number'
-                      min={1}
-                      value={totalMarks}
-                      onChange={(e) => setTotalMarks(Number(e.target.value))}
-                      className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors animate-fadeIn'
-                    />
-                  </div>
-                  <p className='text-base font-semibold text-slate-500'>
-                    Students will see this assignment and submit a secure Google
-                    Drive link containing their work for grading.
-                  </p>
+              {/* Duration */}
+              <div className='flex flex-col gap-2'>
+                <label className='text-base font-bold text-slate-600'>
+                  Lecture Duration (Minutes) *
+                </label>
+                <input
+                  type='number'
+                  min={1}
+                  required
+                  value={duration}
+                  onChange={(e) => setDuration(Number(e.target.value))}
+                  className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
+                />
+              </div>
+
+              {/* Course-wide serial — auto-tracked, locked */}
+              <div className='flex flex-col gap-2'>
+                <div className='flex items-center justify-between'>
+                  <label className='text-base font-bold text-slate-600'>
+                    Lecture Order in Batch
+                  </label>
+                  <span className='text-base font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-500 select-none'>
+                    Auto-assigned
+                  </span>
                 </div>
-              ) : (
+                <input
+                  type='number'
+                  value={order}
+                  placeholder="Assigned on save"
+                  readOnly
+                  className='bg-slate-200/60 border border-slate-200 text-slate-500 rounded-lg p-3 text-base font-semibold outline-none w-full cursor-not-allowed'
+                />
+                <p className='text-base text-slate-500 font-semibold mt-1'>
+                  Assigned automatically when you save these settings.
+                </p>
+              </div>
+
+              <h2 className='text-xl font-bold text-slate-800 border-t border-slate-200 pt-5'>Shared Lesson Content</h2>
+              {/* Content / Description */}
+              <div className='flex flex-col gap-2 pt-4 border-t border-slate-100 mt-4'>
+                <label className='text-base font-bold text-slate-600'>
+                  Lesson Notes / Description
+                </label>
+                <p className='text-sm font-medium text-slate-500 mb-2'>
+                  Optional content shown beneath the lesson video or assignment.
+                </p>
+                <RichTextEditor
+                  value={content}
+                  onChange={setContent}
+                  placeholder='Write lesson notes, attach links, or provide further instructions...'
+                />
+              </div>
+              <details open={lessonType === 'quiz'} className='rounded-lg border border-slate-200 p-4'>
+                <summary className='cursor-pointer text-base font-bold text-slate-800'>Quiz questions and evaluation marks</summary>
+
                 <div className='space-y-6 border border-[#E61C24]/25 rounded-lg p-6 bg-linear-to-b from-slate-50 to-white shadow-2xl shadow-[#E61C24]/5 animate-fadeIn'>
                   <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200/60 pb-4'>
                     <div>
                       <h3 className='text-xl font-bold text-slate-800 flex items-center gap-2'>
-                        <FiHelpCircle className='text-[#E61C24] h-6 w-6' /> Quiz
-                        Questions Builder
+                        <FiHelpCircle className='text-[#E61C24] h-6 w-6' /> Shared Quiz
+                        Questions
                       </h3>
                       <p className='text-base font-medium text-slate-500 mt-1'>
                         Configure dynamic evaluation queries with dynamic option
@@ -729,10 +797,10 @@ export default function LessonFormClient({
                       </p>
                     </div>
                     <div className='flex flex-col sm:flex-row sm:items-center gap-3'>
-                      {/* Quiz Total Marks */}
+                      {/* Evaluation Marks */}
                       <div className='flex items-center gap-2 bg-slate-100 border border-slate-200 px-3.5 py-2.5 rounded-lg'>
                         <span className='text-base font-bold text-slate-500'>
-                          Quiz Marks:
+                          Evaluation Marks
                         </span>
                         <input
                           type='number'
@@ -993,62 +1061,7 @@ export default function LessonFormClient({
                     ))}
                   </div>
                 </div>
-              )}
-
-              {/* Duration */}
-              <div className='flex flex-col gap-2'>
-                <label className='text-base font-bold text-slate-600'>
-                  Lecture Duration (Minutes) *
-                </label>
-                <input
-                  type='number'
-                  min={1}
-                  required
-                  value={duration}
-                  onChange={(e) => setDuration(Number(e.target.value))}
-                  className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
-                />
-              </div>
-
-              {/* Course-wide serial — auto-tracked, locked */}
-              <div className='flex flex-col gap-2'>
-                <div className='flex items-center justify-between'>
-                  <label className='text-base font-bold text-slate-600'>
-                    Lecture Order (course serial)
-                  </label>
-                  <span className='text-xs font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-500 select-none'>
-                    {autoOrderLoading
-                      ? 'Calculating...'
-                      : 'Auto-tracked · locked'}
-                  </span>
-                </div>
-                <input
-                  type='number'
-                  value={order}
-                  readOnly
-                  disabled
-                  className='bg-slate-200/60 border border-slate-200 text-slate-500 rounded-lg p-3 text-base font-semibold outline-none w-full cursor-not-allowed'
-                />
-                <p className='text-xs text-slate-500 font-semibold mt-1'>
-                  This lesson&apos;s serial number across the whole course.
-                  Assigned automatically — cannot be changed.
-                </p>
-              </div>
-
-              {/* Content / Description */}
-              <div className='flex flex-col gap-2 pt-4 border-t border-slate-100 mt-4'>
-                <label className='text-base font-bold text-slate-600'>
-                  Lesson Notes / Description
-                </label>
-                <p className='text-sm font-medium text-slate-500 mb-2'>
-                  Optional content shown beneath the lesson video or assignment.
-                </p>
-                <RichTextEditor
-                  value={content}
-                  onChange={setContent}
-                  placeholder='Write lesson notes, attach links, or provide further instructions...'
-                />
-              </div>
+              </details>
             </div>
           </div>
 

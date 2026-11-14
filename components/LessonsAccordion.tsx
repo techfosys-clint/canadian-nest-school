@@ -14,6 +14,7 @@ interface LessonItem {
   moduleName?: string
   lessonType: 'recorded' | 'live' | 'quiz' | 'assignment'
   duration: number
+  variesByBatch?: boolean
   isPreviewable: boolean
   livePlatform?: string
   liveDate?: string
@@ -171,7 +172,7 @@ export default function LessonsAccordion({
                   <p className="text-base font-semibold text-zinc-550">
                     {lectureCount === 0
                       ? 'Coming soon — no lectures added yet'
-                      : `${lectureCount} ${lectureCount === 1 ? 'lecture' : 'lectures'} • ${totalMin} mins total duration`}
+                      : `${lectureCount} ${lectureCount === 1 ? 'lecture' : 'lectures'}${totalMin && !group.lessons.some((lesson) => lesson.variesByBatch) ? ` • ${totalMin} mins total duration` : ''}`}
                   </p>
                 </div>
 
@@ -250,21 +251,21 @@ export default function LessonsAccordion({
                                   {lesson.moduleOrder ?? lesson.order}. {lesson.title}
                                 </p>
                                 <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-zinc-455 mt-1 uppercase tracking-wide">
-                                  <span>{lesson.duration} mins duration</span>
-                                  {lesson.lessonType === 'live' && (
+                                  {lesson.variesByBatch ? <span>Delivery varies by batch</span> : lesson.duration > 0 && <span>{lesson.duration} mins duration</span>}
+                                  {!lesson.variesByBatch && lesson.lessonType === 'live' && (
                                     <>
                                       <span>•</span>
                                       <span className="text-rose-500 font-bold">Live • {lesson.livePlatform || 'Zoom'}</span>
                                       {formattedDate && <span>(Starts: {formattedDate})</span>}
                                     </>
                                   )}
-                                  {lesson.lessonType === 'quiz' && (
+                                  {!lesson.variesByBatch && lesson.lessonType === 'quiz' && (
                                     <>
                                       <span>•</span>
                                       <span className="text-amber-500 font-bold">Interactive Quiz</span>
                                     </>
                                   )}
-                                  {lesson.lessonType === 'assignment' && (
+                                  {!lesson.variesByBatch && lesson.lessonType === 'assignment' && (
                                     <>
                                       <span>•</span>
                                        <span className="text-[#E61C24] font-bold">Assignment</span>

@@ -40,7 +40,14 @@ describe('course player access', () => {
     session.mockResolvedValue({ account: { id: 'student' }, role: 'student' })
     lessons.mockReturnValue({
       sort: () => ({
-        lean: async () => [{ _id: 'visible-lesson' }],
+        lean: async () => [{
+          _id: 'visible-lesson',
+          lessonType: 'recorded',
+          batchSettings: [
+            { batch: 'batch', lessonType: 'recorded', videoUrl: 'videos/a.mp4', duration: 45, order: 2 },
+            { batch: 'student-batch', lessonType: 'live', liveUrl: 'https://example.com/class', duration: 60, order: 4 },
+          ],
+        }],
       }),
     })
   })
@@ -49,9 +56,9 @@ describe('course player access', () => {
     access.mockResolvedValue({ allowed: true, enrollment: { batch: 'batch' } })
     const player = await open({ from })
     expect(access).toHaveBeenCalledWith('student', 'course')
-    expect(lessons).toHaveBeenCalledWith(expect.objectContaining({
-      $or: expect.arrayContaining([{ batch: 'batch' }]),
-    }))
+    expect(player.props.lessons).toMatchObject([
+      { id: 'visible-lesson', lessonType: 'recorded', videoUrl: 'videos/a.mp4', duration: 45, order: 2 },
+    ])
     expect(player.props.previewEnrollmentId).toBeUndefined()
   })
 
@@ -62,6 +69,14 @@ describe('course player access', () => {
     access.mockResolvedValue({ allowed: false, reason })
     await expect(open({ from })).rejects.toThrow(url)
     expect(lessons).not.toHaveBeenCalled()
+  })
+
+  it('opens the same lesson ID with a different delivery for another enrolled batch', async () => {
+    access.mockResolvedValue({ allowed: true, enrollment: { batch: 'student-batch' } })
+    const player = await open({ from: 'dashboard' })
+    expect(player.props.lessons).toMatchObject([
+      { id: 'visible-lesson', lessonType: 'live', videoUrl: '', duration: 60, order: 4 },
+    ])
   })
 
   it('previews the selected enrollment with its visible progress', async () => {
@@ -77,9 +92,10 @@ describe('course player access', () => {
     expect(player.props.previewEnrollmentId).toBe('enrollment')
     expect(player.props.initialCompletedLessonIds).toEqual(['visible-lesson'])
     expect(access).not.toHaveBeenCalled()
-    expect(lessons).toHaveBeenCalledWith(expect.objectContaining({
-      $or: expect.arrayContaining([{ batch: 'student-batch' }]),
-    }))
+    expect(player.props.lessons).toMatchObject([
+      { id: 'visible-lesson', lessonType: 'live', liveUrl: 'https://example.com/class', duration: 60, order: 4 },
+    ])
+    expect(player.props.lessons[0].videoUrl).toBe('')
   })
 
   it('rejects unauthorized previews', async () => {

@@ -17,6 +17,8 @@ export interface ILesson extends Document {
    * see the lesson/recording. Leave empty for all batches.
    */
   batch?: mongoose.Types.ObjectId | string
+  batchSettings?: ILessonBatchSettings[]
+  hasDefaultDelivery?: boolean
   order: number
   moduleOrder?: number
   moduleName?: string
@@ -40,6 +42,32 @@ export interface ILesson extends Document {
   }
 }
 
+export interface ILessonBatchSettings {
+  batch: mongoose.Types.ObjectId | string
+  lessonType: ILesson['lessonType']
+  videoUrl?: string
+  livePlatform?: ILesson['livePlatform']
+  liveUrl?: string
+  liveDate?: Date
+  autoGenerateZoom?: boolean
+  reminderSent?: boolean
+  duration: number
+  order: number
+}
+
+const BatchSettingsSchema = new Schema<ILessonBatchSettings>({
+  batch: { type: Schema.Types.ObjectId, ref: 'Batch', required: true },
+  lessonType: { type: String, enum: ['recorded', 'live', 'quiz', 'assignment'], required: true },
+  videoUrl: String,
+  livePlatform: { type: String, enum: ['zoom', 'meet', 'teams', 'other'] },
+  liveUrl: String,
+  liveDate: Date,
+  autoGenerateZoom: Boolean,
+  reminderSent: Boolean,
+  duration: { type: Number, required: true, min: 1 },
+  order: { type: Number, required: true, min: 1 },
+}, { _id: false })
+
 const QuizQuestionSchema = new Schema<IQuizQuestion>({
   questionText: { type: String, required: true },
   options: [{ type: String, required: true }],
@@ -54,6 +82,8 @@ const LessonSchema = new Schema<ILesson>(
     slug: { type: String, required: true, unique: true },
     course: { type: Schema.Types.ObjectId, ref: 'Course', required: true },
     batch: { type: Schema.Types.ObjectId, ref: 'Batch', default: null },
+    batchSettings: { type: [BatchSettingsSchema], default: undefined },
+    hasDefaultDelivery: Boolean,
     // Course-wide serial number — assigned automatically on the server,
     // never editable from the admin form.
     order: { type: Number, required: true, min: 1 },
@@ -87,7 +117,7 @@ if (
   mongoose.models.Lesson &&
   (!mongoose.models.Lesson.schema.paths.moduleName ||
     !mongoose.models.Lesson.schema.paths.moduleOrder ||
-    !mongoose.models.Lesson.schema.paths.batch)
+    !mongoose.models.Lesson.schema.paths.batchSettings)
 ) {
   delete mongoose.models.Lesson
 }

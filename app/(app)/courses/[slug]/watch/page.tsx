@@ -1,3 +1,4 @@
+import { resolveLessonDelivery } from '@/lib/lessons/delivery'
 import React from 'react'
 import { notFound, redirect } from 'next/navigation'
 import { connectToDatabase } from '@/lib/db/mongodb'
@@ -76,7 +77,6 @@ export default async function CourseWatchPage({ params, searchParams }: Props) {
   // Shared lessons (no batch) + lessons for this student's batch only
   const lessonsDocs = await Lesson.find({
     course: course._id,
-    $or: [{ batch: null }, ...(studentBatchId ? [{ batch: studentBatchId }] : [])],
   })
     .sort({ order: 1 })
     .lean()
@@ -106,7 +106,13 @@ export default async function CourseWatchPage({ params, searchParams }: Props) {
     } : undefined,
   }
 
-  const serializedLessons = (lessonsDocs as any[]).map((l: any) => ({
+  const serializedLessons = lessonsDocs
+    .flatMap((lesson) => {
+      const delivery = resolveLessonDelivery(lesson, studentBatchId)
+      return delivery ? [delivery] : []
+    })
+    .sort((a, b) => a.order - b.order)
+    .map((l) => ({
     id: l._id.toString(),
     title: l.title,
     slug: l.slug,

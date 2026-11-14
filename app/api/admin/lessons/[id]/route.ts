@@ -5,8 +5,8 @@ import { Course } from '@/lib/db/models/Course'
 import { User } from '@/lib/db/models/User'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
-import { createZoomMeeting } from '@/lib/zoom'
-import { parseBdDate } from '@/lib/bdTime'
+import { LessonDeliveryError, saveDeliveryFields } from '@/lib/lessons/saveDelivery'
+import type { ILessonBatchSettings } from '@/lib/db/models/Lesson'
 import { revalidatePath } from 'next/cache'
 
 async function authCheck() {
@@ -34,68 +34,65 @@ export async function PUT(
 
     // Ownership check
     const course = await Course.findById(lesson.course).lean()
-    if (user.role === 'instructor' && (course as any)?.instructor.toString() !== user._id.toString()) {
+    if (user.role === 'instructor' && (course as any)?.instructor?.toString() !== user._id.toString()) {
       return NextResponse.json({ error: 'Forbidden: Not your course.' }, { status: 403 })
     }
 
     const body = await request.json()
-
-    const finalLessonType = body.lessonType ?? lesson.lessonType
-    const finalLivePlatform = body.livePlatform ?? lesson.livePlatform
-    const finalAutoGenerateZoom = body.autoGenerateZoom ?? lesson.autoGenerateZoom
-    const finalLiveDate = body.liveDate ? parseBdDate(body.liveDate) : lesson.liveDate
-    const finalTitle = body.title ?? lesson.title
-    const finalDuration = body.duration ? Number(body.duration) : lesson.duration
-
-    let finalLiveUrl = body.liveUrl ?? lesson.liveUrl
-
-    const shouldGenerateZoom = 
-      finalLessonType === 'live' &&
-      finalLivePlatform === 'zoom' &&
-      finalAutoGenerateZoom &&
-      (
-        !lesson.liveUrl || 
-        !lesson.autoGenerateZoom ||
-        (body.liveDate && parseBdDate(body.liveDate).getTime() !== new Date(lesson.liveDate).getTime()) ||
-        (body.title && body.title !== lesson.title)
-      )
-
-    if (shouldGenerateZoom) {
-      if (!finalLiveDate) {
-        return NextResponse.json({ error: 'Scheduled Time & Date is required to auto-generate a Zoom meeting.' }, { status: 400 })
-      }
-
-      const zoomDetails = await createZoomMeeting(finalTitle, finalLiveDate.toISOString(), finalDuration || 60)
-      if (!zoomDetails) {
-        return NextResponse.json({ error: 'Failed to auto-generate Zoom meeting link. Please verify your Zoom credentials.' }, { status: 500 })
-      }
-      finalLiveUrl = zoomDetails.joinUrl
+    if (body.course && String(body.course) !== String(lesson.course)) {
+      return NextResponse.json({ error: 'A saved lesson belongs to its original course.' }, { status: 400 })
     }
 
-    Object.assign(lesson, {
-      title: finalTitle,
+    const title = body.title ?? lesson.title
+    const batch = body.batch === undefined ? lesson.batch?.toString() || null : body.batch || null
+    const existing = lesson.batchSettings?.find((item: ILessonBatchSettings) => String(item.batch) === batch)
+    const legacyBatch = lesson.batch?.toString()
+    const previous = existing ?? (
+      (batch && batch === legacyBatch) ||
+      (!batch && !legacyBatch && lesson.hasDefaultDelivery !== false)
+        ? lesson
+        : undefined
+    )
+    if (!batch && legacyBatch) {
+      return NextResponse.json({ error: 'Save the original batch settings before adding a default.' }, { status: 409 })
+    }
+    const delivery = await saveDeliveryFields(String(lesson.course), batch, title, body, previous)
+    const shared = {
+      title,
       slug: body.slug ?? lesson.slug,
-      // order (course-wide serial) is server-managed and never editable
       moduleOrder: body.moduleOrder ? Number(body.moduleOrder) : lesson.moduleOrder,
       moduleName: body.moduleName ?? lesson.moduleName,
-      lessonType: finalLessonType,
-      batch:
-        body.batch === undefined
-          ? lesson.batch
-          : body.batch
-            ? body.batch
-            : null,
-      videoUrl: body.videoUrl ?? lesson.videoUrl,
-      livePlatform: finalLivePlatform,
-      liveUrl: finalLiveUrl,
-      liveDate: finalLiveDate,
       content: body.content ?? lesson.content,
-      duration: finalDuration,
       isPreviewable: body.isPreviewable ?? lesson.isPreviewable,
-      autoGenerateZoom: finalAutoGenerateZoom,
-      quizQuestions: finalLessonType === 'quiz' ? (body.quizQuestions ?? lesson.quizQuestions) : undefined,
-    })
-    await lesson.save()
+      quizQuestions: body.quizQuestions ?? lesson.quizQuestions,
+      totalMarks: body.totalMarks ?? lesson.totalMarks,
+    }
+
+    // Replace only the selected configuration and keep other batch saves intact.
+    if (batch) {
+      const settings = { batch, ...delivery }
+      const legacyScope = legacyBatch === batch
+        ? { batch: null, hasDefaultDelivery: false }
+        : {}
+      const updated = await Lesson.updateOne(
+        { _id: id, 'batchSettings.batch': batch },
+        { $set: { ...shared, ...legacyScope, 'batchSettings.$': settings } },
+        { runValidators: true },
+      )
+      if (!updated.matchedCount) {
+        const inserted = await Lesson.updateOne(
+          { _id: id, 'batchSettings.batch': { $ne: batch } },
+          { $set: { ...shared, ...legacyScope }, $push: { batchSettings: settings } },
+          { runValidators: true },
+        )
+        if (!inserted.matchedCount) {
+          return NextResponse.json({ error: 'This batch configuration changed. Reload and try again.' }, { status: 409 })
+        }
+      }
+    } else {
+      Object.assign(lesson, shared, delivery, { hasDefaultDelivery: true })
+      await lesson.save()
+    }
 
     // Revalidate paths for the public frontend to ensure changes are immediately visible
     if (course && (course as any).slug) {
@@ -109,8 +106,11 @@ export async function PUT(
       }
     }
 
-    return NextResponse.json({ success: true, lesson })
+    return NextResponse.json({ success: true })
   } catch (error: any) {
+    if (error instanceof LessonDeliveryError) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
     return NextResponse.json({ error: error.message || 'Failed to update lesson.' }, { status: 500 })
   }
 }
@@ -135,7 +135,7 @@ export async function DELETE(
 
     // Ownership check
     if (user.role === 'instructor') {
-      if ((course as any)?.instructor.toString() !== user._id.toString()) {
+      if ((course as any)?.instructor?.toString() !== user._id.toString()) {
         return NextResponse.json({ error: 'Forbidden: Not your course.' }, { status: 403 })
       }
     }

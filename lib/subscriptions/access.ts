@@ -1,7 +1,7 @@
 import { Course } from '@/lib/db/models/Course'
 import { Enrollment } from '@/lib/db/models/Enrollment'
 import {
-  courseFee,
+  enrollmentPlanFee,
   getSubscriptionAccessSnapshot,
   isRecurringEnrollment,
   type SubscriptionAccessSnapshot,
@@ -36,7 +36,7 @@ export async function assertCourseContentAccess(
 
   const course = await Course.findById(courseId)
     .select(
-      'billingType noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays title monthlyFee twoMonthFee quarterlyFee',
+      'billingType paymentPlans noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays title monthlyFee twoMonthFee quarterlyFee',
     )
     .lean()
 
@@ -72,7 +72,7 @@ export async function getStudentSubscriptionNotices(studentId: string) {
     .populate({
       path: 'course',
       select:
-        'title slug billingType monthlyFee twoMonthFee quarterlyFee noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays lateFeeEnabled lateFeeAmount',
+        'title slug billingType monthlyFee twoMonthFee quarterlyFee paymentPlans noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays lateFeeEnabled lateFeeAmount',
     })
     .lean()
 
@@ -97,7 +97,7 @@ export async function getStudentSubscriptionNotices(studentId: string) {
     const snapshot = getSubscriptionAccessSnapshot(e, course)
     if (!snapshot.showOverdueNotice && !snapshot.isBlocked) continue
 
-    const fee = courseFee(course)
+    const fee = enrollmentPlanFee(course, e)
     const billingType =
       e.billingType === 'quarterly' || e.billingType === 'two_month' ? e.billingType : 'monthly'
 

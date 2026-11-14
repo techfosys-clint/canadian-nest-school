@@ -78,21 +78,6 @@ function getImageUrl(thumbnail: CourseDoc['thumbnail']): string {
   return thumbnail.sizes?.card?.url ?? thumbnail.url ?? '';
 }
 
-function formatPrice(
-  price?: number | null,
-  billingType?: 'one_time' | 'monthly' | 'two_month' | 'quarterly',
-  freeLabel = 'Free',
-  perMonth = '/mo',
-  perTwoMonths = ' / 60 days',
-  perQuarter = '/qtr',
-): string {
-  if (!price || price === 0) return freeLabel;
-  const base = `৳${price.toLocaleString('en-BD')}`;
-  if (billingType === 'monthly') return `${base}${perMonth}`;
-  if (billingType === 'two_month') return `${base}${perTwoMonths}`;
-  if (billingType === 'quarterly') return `${base}${perQuarter}`;
-  return base;
-}
 
 function getCategoryName(category: CourseDoc['category']): string {
   if (!category || typeof category === 'string') return '';
@@ -407,13 +392,7 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                       {/* Price & CTA */}
                       <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2'>
                         <span className='text-3xl font-bold text-[#E61C24]'>
-                          {formatPrice(
-                            featuredCourse.price,
-                            featuredCourse.billingType,
-                            t.free,
-                            t.perMonth,
-                            t.perTwoMonths,
-                          )}
+                          {featuredCourse.price === 0 ? t.free : null}
                         </span>
                         <Link
                           href={href(`/courses/${featuredCourse.slug}`)}
@@ -547,13 +526,7 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                                 <span
                                   className={`text-xl font-bold ${course.price === 0 ? 'text-emerald-600' : 'text-zinc-900'} truncate`}
                                 >
-                                  {formatPrice(
-                                    course.price,
-                                    course.billingType,
-                                    t.free,
-                                    t.perMonth,
-                                    t.perTwoMonths,
-                                  )}
+                                  {course.price === 0 ? t.free : null}
                                 </span>
                               </div>
 

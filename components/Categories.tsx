@@ -115,7 +115,7 @@ export default function Categories() {
   }));
 
   return (
-    <section className='py-20 md:py-28 px-6 bg-[#f9fafb] border-t border-zinc-100 relative overflow-hidden'>
+    <section className='py-20 md:py-28 lg:pb-44 px-6 bg-[#f9fafb] border-t border-zinc-100 relative overflow-hidden'>
       <style jsx>{`
         @keyframes floatY {
           0%,
@@ -172,16 +172,14 @@ export default function Categories() {
           alt=''
           width={112}
           height={112}
-          className='float-c absolute w-20 h-20 md:w-28 md:h-28 object-contain hidden lg:block'
-          style={{ bottom: '8%', left: '4%' }}
+          className='float-c absolute bottom-5 left-[4%] w-28 h-28 object-contain hidden lg:block'
         />
         <Image
           src='/icon_image/man.png'
           alt=''
           width={128}
           height={128}
-          className='float-d absolute w-24 h-24 md:w-32 md:h-32 object-contain hidden lg:block'
-          style={{ bottom: '6%', right: '3%' }}
+          className='float-d absolute bottom-5 right-[3%] w-32 h-32 object-contain hidden lg:block'
         />
       </div>
 

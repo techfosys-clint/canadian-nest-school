@@ -1,3 +1,5 @@
+import { parseBdDate } from '@/lib/bdTime'
+import { addCalendarMonths } from '@/lib/subscriptions/plans'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Batch } from '@/lib/db/models/Batch'
@@ -91,6 +93,9 @@ export async function POST(request: Request) {
       name,
       course,
       instructor,
+      classSchedule,
+      orientationDate,
+      durationMonths,
       startDate,
       endDate,
       joinOpensAt,
@@ -98,8 +103,14 @@ export async function POST(request: Request) {
       status,
       maxStudents,
     } = body
+    if (durationMonths !== undefined && (!Number.isSafeInteger(durationMonths) || durationMonths < 1 || durationMonths > 120)) {
+      return NextResponse.json({ error: 'Duration must be 1 to 120 calendar months.' }, { status: 400 })
+    }
+    if (orientationDate && !Number.isFinite(parseBdDate(orientationDate).getTime())) {
+      return NextResponse.json({ error: 'Enter a valid orientation date.' }, { status: 400 })
+    }
 
-    if (!name || !course || !startDate || !endDate) {
+    if (!name || !course || !startDate || (!endDate && !durationMonths)) {
       return NextResponse.json({ error: 'Missing required batch parameters.' }, { status: 400 })
     }
 
@@ -126,8 +137,10 @@ export async function POST(request: Request) {
       name,
       course,
       instructor: finalInstructor,
-      startDate: new Date(startDate),
-      endDate: new Date(endDate),
+      startDate: parseBdDate(startDate),
+      endDate: durationMonths ? addCalendarMonths(parseBdDate(startDate), durationMonths) : parseBdDate(endDate),
+      classSchedule: typeof classSchedule === 'string' ? classSchedule.trim() : undefined,
+      orientationDate: orientationDate ? parseBdDate(orientationDate) : undefined,
       joinOpensAt: opens,
       joinClosesAt: closes,
       status: status || 'upcoming',

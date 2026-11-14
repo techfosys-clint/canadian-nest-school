@@ -1,3 +1,5 @@
+import { parseBdDate } from '@/lib/bdTime'
+import { addCalendarMonths } from '@/lib/subscriptions/plans'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Batch } from '@/lib/db/models/Batch'
@@ -88,6 +90,9 @@ export async function PUT(request: Request, { params }: Props) {
     const {
       name,
       instructor,
+      classSchedule,
+      orientationDate,
+      durationMonths,
       startDate,
       endDate,
       joinOpensAt,
@@ -96,6 +101,12 @@ export async function PUT(request: Request, { params }: Props) {
       students,
       maxStudents,
     } = body
+    if (durationMonths !== undefined && (!Number.isSafeInteger(durationMonths) || durationMonths < 1 || durationMonths > 120)) {
+      return NextResponse.json({ error: 'Duration must be 1 to 120 calendar months.' }, { status: 400 })
+    }
+    if (orientationDate && !Number.isFinite(parseBdDate(orientationDate).getTime())) {
+      return NextResponse.json({ error: 'Enter a valid orientation date.' }, { status: 400 })
+    }
 
     const batch = await Batch.findById(id)
     if (!batch) {
@@ -109,8 +120,11 @@ export async function PUT(request: Request, { params }: Props) {
 
     if (name) batch.name = name
     if (instructor && user.role === 'admin') batch.instructor = instructor
-    if (startDate) batch.startDate = new Date(startDate)
-    if (endDate) batch.endDate = new Date(endDate)
+    if (startDate) batch.startDate = parseBdDate(startDate)
+    if (durationMonths) batch.endDate = addCalendarMonths(batch.startDate, durationMonths)
+    else if (endDate) batch.endDate = parseBdDate(endDate)
+    if (classSchedule !== undefined) batch.classSchedule = String(classSchedule).trim()
+    if (orientationDate !== undefined) batch.orientationDate = orientationDate ? parseBdDate(orientationDate) : undefined
     if (joinOpensAt !== undefined) {
       batch.joinOpensAt = joinOpensAt ? new Date(joinOpensAt) : null
     }

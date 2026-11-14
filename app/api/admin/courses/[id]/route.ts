@@ -1,3 +1,4 @@
+import { parsePaymentPlans } from '@/lib/subscriptions/plans'
 import { isRecurringBillingType } from '@/lib/subscriptions/billing'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
@@ -399,8 +400,10 @@ export async function PUT(
     const oldSlug = course.slug
 
     // 4. Perform Mongoose Update
+    const paymentPlans = body.paymentPlans === undefined ? undefined : parsePaymentPlans(body.paymentPlans)
+    if (paymentPlans === null) return NextResponse.json({ success: false, error: 'Invalid payment options.' }, { status: 400 })
     const resolvedBillingType = isRecurringBillingType(billingType) ? billingType : 'one_time'
-    const isRecurring = resolvedBillingType !== 'one_time'
+    const isRecurring = resolvedBillingType !== 'one_time' || !!paymentPlans?.some(plan => plan.type !== 'one_time')
 
     course.title = resolvedTitle
     course.titleBn = resolvedTitleBn
@@ -410,6 +413,7 @@ export async function PUT(
     course.description = description
     course.descriptionBn = descriptionBn ?? ''
     course.price = price ? Number(price) : undefined
+    if (paymentPlans) course.paymentPlans = paymentPlans
     course.billingType = resolvedBillingType
     course.monthlyFee =
       resolvedBillingType === 'monthly' ? Number(monthlyFee) || 0 : undefined

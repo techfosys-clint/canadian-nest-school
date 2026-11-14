@@ -9,7 +9,6 @@ import { User } from '@/lib/db/models/User'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import {
   computeRenewalAmount,
-  isRecurringCourse,
   isRecurringBillingType,
   nextPaidUntil,
 } from '@/lib/subscriptions/billing'
@@ -60,7 +59,7 @@ export async function POST(request: Request) {
     }
 
     const course = await Course.findById(enrollment.course)
-    if (!course || !isRecurringCourse(course)) {
+    if (!course) {
       return NextResponse.json(
         {
           success: false,
@@ -139,6 +138,7 @@ export async function POST(request: Request) {
         previousEnd,
         extensionDays,
         enrollment.billingType,
+        enrollment.calendarBillingAnchor,
       )
       enrollment.accessStatus = 'active'
       await enrollment.save()
@@ -169,7 +169,7 @@ export async function POST(request: Request) {
       enrollment.paidUntil && new Date(enrollment.paidUntil).getTime() > 0
         ? new Date(enrollment.paidUntil)
         : new Date()
-    const periodEnd = nextPaidUntil(periodStart, extensionDays, enrollment.billingType)
+    const periodEnd = nextPaidUntil(periodStart, extensionDays, enrollment.billingType, enrollment.calendarBillingAnchor)
 
     const merchantTransactionId = `SUB${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 6).toUpperCase()}`
 

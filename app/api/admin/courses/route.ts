@@ -1,3 +1,4 @@
+import { parsePaymentPlans } from '@/lib/subscriptions/plans'
 import { isRecurringBillingType } from '@/lib/subscriptions/billing'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
@@ -237,8 +238,10 @@ export async function POST(request: Request) {
 
     // 3. Create course document
     const finalCategories = categories || []
+    const paymentPlans = body.paymentPlans === undefined ? undefined : parsePaymentPlans(body.paymentPlans)
+    if (paymentPlans === null) return NextResponse.json({ success: false, error: 'Invalid payment options.' }, { status: 400 })
     const resolvedBillingType = isRecurringBillingType(billingType) ? billingType : 'one_time'
-    const isRecurring = resolvedBillingType !== 'one_time'
+    const isRecurring = resolvedBillingType !== 'one_time' || !!paymentPlans?.some(plan => plan.type !== 'one_time')
 
     const newCourse = new Course({
       title: resolvedTitle,
@@ -250,6 +253,7 @@ export async function POST(request: Request) {
       descriptionBn: descriptionBn ?? '',
       price: price ? Number(price) : undefined,
       billingType: resolvedBillingType,
+      paymentPlans,
       monthlyFee:
         resolvedBillingType === 'monthly'
           ? Number(monthlyFee) || 0

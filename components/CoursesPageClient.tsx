@@ -26,21 +26,6 @@ function getImageUrl(thumbnail: CourseDoc['thumbnail']): string {
   if (!thumbnail || typeof thumbnail === 'string') return '';
   return (thumbnail as any).url ?? (thumbnail as any).sizes?.card?.url ?? '';
 }
-function formatPrice(
-  price?: number | null,
-  billingType?: 'one_time' | 'monthly' | 'two_month' | 'quarterly',
-  freeLabel = 'Free',
-  perMonth = '/mo',
-  perTwoMonths = ' / 60 days',
-  perQuarter = '/qtr',
-): string {
-  if (!price || price === 0) return freeLabel;
-  const base = `৳${price.toLocaleString('en-BD')}`;
-  if (billingType === 'monthly') return `${base}${perMonth}`;
-  if (billingType === 'two_month') return `${base}${perTwoMonths}`;
-  if (billingType === 'quarterly') return `${base}${perQuarter}`;
-  return base;
-}
 
 function getLevelLabel(level: string): string {
   const map: Record<string, string> = {
@@ -174,13 +159,7 @@ function CourseCard({
               <span
                 className={`text-lg sm:text-xl font-bold ${course.price === 0 ? 'text-emerald-600' : 'text-zinc-900'} truncate`}
               >
-                {formatPrice(
-                  course.price,
-                  course.billingType,
-                  t.free,
-                  t.perMonth,
-                  t.perTwoMonths,
-                )}
+                {course.price === 0 ? t.free : null}
               </span>
             </div>
 
@@ -283,13 +262,7 @@ function CourseCard({
                 <span
                   className={`text-xl font-bold ${course.price === 0 ? 'text-emerald-600' : 'text-zinc-900'} truncate`}
                 >
-                  {formatPrice(
-                    course.price,
-                    course.billingType,
-                    t.free,
-                    t.perMonth,
-                    t.perTwoMonths,
-                  )}
+                  {course.price === 0 ? t.free : null}
                 </span>
               </div>
 

@@ -1,11 +1,16 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { FiZap, FiCheck } from 'react-icons/fi'
 import { pushToDataLayer, generateEventId } from '@/lib/gtm'
 
+import { formatBdDate } from '@/lib/bdTime'
+
+type BatchOption = { id: string; name: string; startDate: string; endDate: string; classSchedule?: string; orientationDate?: string }
+
 interface EnrollButtonProps {
+  requiresBatch?: boolean
   courseId: string
   courseTitle: string
   courseSlug?: string
@@ -16,6 +21,7 @@ interface EnrollButtonProps {
 }
 
 export default function EnrollButton({
+  requiresBatch,
   courseId,
   courseTitle,
   courseSlug,
@@ -24,7 +30,27 @@ export default function EnrollButton({
   isAlreadyEnrolled,
 }: EnrollButtonProps) {
   const router = useRouter()
-  const [loading] = useState(false)
+  const dialog = useRef<HTMLDialogElement>(null)
+  const [loading, setLoading] = useState(false)
+  const [batchError, setBatchError] = useState('')
+  const [batches, setBatches] = useState<BatchOption[]>([])
+
+  async function chooseBatch() {
+    dialog.current?.showModal()
+    setLoading(true)
+    setBatchError('')
+    try {
+      const response = await fetch(`/api/courses/${courseId}/open-batches`)
+      if (!response.ok) throw new Error('Could not load batches. Please try again.')
+      const data = await response.json()
+      setBatches(data.batches)
+      if (!data.batches.length) setBatchError('No batches are open for enrollment right now.')
+    } catch {
+      setBatchError('Could not load batches. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleEnrollClick = async () => {
     if (isAlreadyEnrolled) {
@@ -49,7 +75,8 @@ export default function EnrollButton({
           }]
         }
       })
-      router.push(`/checkout/${courseId}`)
+      if (requiresBatch) await chooseBatch()
+      else router.push(`/checkout/${courseId}`)
     }
   }
 
@@ -66,8 +93,8 @@ export default function EnrollButton({
     )
   }
 
-  // Render State 2: Enrolling / Enrollable
   return (
+    <>
     <button
       onClick={handleEnrollClick}
       disabled={loading}
@@ -82,5 +109,30 @@ export default function EnrollButton({
       )}
       <span>{loading ? 'Processing Enrollment...' : 'Enroll In Course'}</span>
     </button>
+    <dialog ref={dialog} aria-label='Choose your batch'
+      className='fixed inset-0 m-auto w-[min(92vw,36rem)] max-h-[85dvh] overflow-auto rounded-lg border border-zinc-200 bg-white p-6 backdrop:bg-slate-950/50'>
+      <div className='flex items-center justify-between gap-4'>
+        <h2 className='text-xl font-bold'>Choose your batch</h2>
+        <button type='button' onClick={() => dialog.current?.close()} className='rounded-lg border border-zinc-200 px-3 py-2'>Close</button>
+      </div>
+      <div className='mt-4 space-y-3'>
+        {loading && <p role='status'>Loading batches…</p>}
+        {batchError && <p role='status'>{batchError}</p>}
+        {!loading && !batchError && batches.map(batch => (
+          <button key={batch.id} type='button'
+            className='block w-full rounded-lg border border-zinc-200 p-4 text-left hover:border-red-300'
+            onClick={() => {
+              dialog.current?.close()
+              router.push(`/checkout/${courseId}?batch=${encodeURIComponent(batch.id)}`)
+            }}>
+            <strong className='block'>{batch.name}</strong>
+            <span className='block'>{formatBdDate(batch.startDate)} – {formatBdDate(batch.endDate)}</span>
+            {batch.classSchedule && <span className='block'>{batch.classSchedule}</span>}
+            {batch.orientationDate && <span className='block'>Orientation {formatBdDate(batch.orientationDate)}</span>}
+          </button>
+        ))}
+      </div>
+    </dialog>
+    </>
   )
 }

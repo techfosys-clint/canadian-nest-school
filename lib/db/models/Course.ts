@@ -1,5 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose'
 
+import type { PaymentPlan } from '@/lib/subscriptions/plans'
+
 export interface ICourse extends Document {
   title: string
   /** Bangla title — primary content. English `title` is optional and falls back to this. */
@@ -45,6 +47,7 @@ export interface ICourse extends Document {
   lateFeeEnabled?: boolean
   lateFeeAmount?: number
   /** Days before paidUntil when red dashboard notice starts. */
+  paymentPlans?: PaymentPlan[]
   noticeStartOffsetDays?: number
   /** Days after paidUntil when red notice ends (usually <= blockOffsetDays). */
   noticeEndOffsetDays?: number
@@ -129,6 +132,18 @@ const CourseSchema = new Schema<ICourse>(
       enum: ['one_time', 'monthly', 'two_month', 'quarterly'],
       default: 'one_time',
     },
+    paymentPlans: {
+      type: [{
+        _id: false,
+        type: { type: String, enum: ['one_time', 'monthly', 'two_month', 'quarterly'], required: true },
+        price: { type: Number, min: 0, required: true },
+        regularPrice: Number,
+        noticeStartOffsetDays: Number,
+        noticeEndOffsetDays: Number,
+        blockOffsetDays: Number,
+      }],
+      default: undefined,
+    },
     monthlyFee: { type: Number, min: 0 },
     twoMonthFee: { type: Number, min: 0 },
     quarterlyFee: { type: Number, min: 0 },
@@ -161,7 +176,8 @@ const CourseSchema = new Schema<ICourse>(
 // Clear old model cache in development if newer fields are not registered in the compiled schema paths
 if (
   mongoose.models.Course &&
-  (!mongoose.models.Course.schema.paths.modules ||
+  (!mongoose.models.Course.schema.paths.paymentPlans ||
+    !mongoose.models.Course.schema.paths.modules ||
     !mongoose.models.Course.schema.paths.category ||
     !mongoose.models.Course.schema.paths['studyMaterials.coverImage'] ||
     !mongoose.models.Course.schema.paths.billingType ||

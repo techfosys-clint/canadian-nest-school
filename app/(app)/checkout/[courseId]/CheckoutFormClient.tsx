@@ -16,14 +16,15 @@ import {
   FiTag,
   FiZap,
 } from 'react-icons/fi';
+import { firstBatchPaymentDue, paymentPlanLabels, type PaymentPlan } from '@/lib/subscriptions/plans';
+import { formatBdDate } from '@/lib/bdTime';
 import Swal from 'sweetalert2';
 
 interface CourseData {
   id: string;
   title: string;
   summary: string;
-  price: number;
-  billingType?: 'one_time' | 'monthly' | 'two_month' | 'quarterly';
+  plans: PaymentPlan[];
   requiresBatch?: boolean;
   imageUrl: string;
   instructorName: string;
@@ -35,6 +36,8 @@ interface OpenBatchInfo {
   id: string;
   name: string;
   startDate: string;
+  classSchedule?: string;
+  orientationDate?: string;
   endDate: string;
   joinClosesAt: string;
   seatsLeft: number | null;
@@ -48,8 +51,14 @@ interface UserSession {
   role: string;
 }
 
-export default function CheckoutFormClient({ course }: { course: CourseData }) {
+export default function CheckoutFormClient({ course, initialSelection }: { course: CourseData; initialSelection: { plan?: string; batch?: string } }) {
   const router = useRouter();
+  const [selection, setSelection] = useState(initialSelection);
+  const plan = course.plans.find(option => option.type === selection.plan) ??
+    (course.plans.length === 1 ? course.plans[0] : undefined);
+  const price = plan?.price ?? 0;
+  const billingType = plan?.type;
+  const isFree = course.plans.length === 1 && course.plans[0].price === 0;
 
   // Auth states
   const [user, setUser] = useState<UserSession | null>(null);
@@ -96,7 +105,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
 
   /** Every batch whose join window is currently open. */
   const [openBatches, setOpenBatches] = useState<OpenBatchInfo[]>([]);
-  const [selectedBatchId, setSelectedBatchId] = useState('');
+  const [selectedBatchId, setSelectedBatchId] = useState(selection.batch ?? '');
   const [batchesLoading, setBatchesLoading] = useState(!!course.requiresBatch);
 
   const selectedBatch =
@@ -116,7 +125,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
         const list: OpenBatchInfo[] = data.batches || [];
         setOpenBatches(list);
         setSelectedBatchId((current) =>
-          list.some((b) => b.id === current) ? current : list[0]?.id || '',
+          list.some((b) => b.id === current) ? current : list.length === 1 ? list[0].id : '',
         );
       })
       .catch(() => {
@@ -141,14 +150,14 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
       event_id: generateEventId(),
       ecommerce: {
         currency: 'BDT',
-        value: course.price,
+        value: price,
         coupon: '',
         items: [
           {
             item_id: course.id,
             item_name: course.title,
             item_category: course.categoryName,
-            price: course.price,
+            price: price,
             quantity: 1,
           },
         ],
@@ -200,7 +209,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
       }
     }
     getSession();
-  }, [course.categoryName, course.id, course.price, course.title, user]);
+  }, [course.categoryName, course.id, price, course.title, user]);
 
   const handleAuthSuccess = (authUser: MobileAuthUser) => {
     setUser(authUser);
@@ -247,7 +256,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
   };
 
   // Recalculate prices
-  const basePrice = course.price;
+  const basePrice = price;
   let discountAmount = 0;
   if (appliedCoupon) {
     if (appliedCoupon.discountType === 'percentage') {
@@ -261,12 +270,12 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
   const finalPrice = Math.max(0, basePrice - discountAmount);
 
   const periodSuffix =
-    course.billingType === 'monthly'
+    billingType === 'monthly'
       ? '/mo'
-      : course.billingType === 'two_month'
-        ? ' / 60 days'
-        : course.billingType === 'quarterly'
-        ? '/qtr'
+      : billingType === 'two_month'
+        ? ' / 2 months'
+        : billingType === 'quarterly'
+        ? ' / 3 months'
         : '';
 
   // Complete course purchase / checkout
@@ -284,6 +293,10 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
       return;
     }
 
+    if (!plan) {
+      setCheckoutError('Choose a payment option.');
+      return;
+    }
     setPurchaseLoading(true);
     try {
       const response = await fetch('/api/enrollments', {
@@ -292,6 +305,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
         body: JSON.stringify({
           courseId: course.id,
           batchId: selectedBatch?.id,
+          paymentPlan: plan.type,
           couponCode: appliedCoupon ? appliedCoupon.code : undefined,
         }),
       });
@@ -318,7 +332,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                 item_id: course.id,
                 item_name: course.title,
                 item_category: course.categoryName,
-                price: course.price,
+                price: price,
                 quantity: 1,
               },
             ],
@@ -416,8 +430,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                   </div>
                 )}
 
-                {/* Promo Code */}
-                <div className='bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-4'>
+                {!isFree && plan && <div className='bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-4'>
                   <label className='text-base font-bold text-zinc-800 flex items-center gap-2'>
                     <FiTag className='text-[#E61C24]' />
                     Apply Coupon / Promo Code
@@ -485,7 +498,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                       <span>{couponSuccess}</span>
                     </div>
                   )}
-                </div>
+                </div>}
 
                 {course.requiresBatch && (
                   <div className='space-y-3 border border-zinc-200/80 rounded-lg p-4 bg-zinc-50'>
@@ -530,13 +543,11 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                                     {batch.name}
                                   </span>
                                   <span className='block text-base font-semibold text-zinc-500'>
-                                    {new Date(
-                                      batch.startDate,
-                                    ).toLocaleDateString()}{' '}
+                                    {formatBdDate(batch.startDate)}{' '}
                                     –{' '}
-                                    {new Date(
-                                      batch.endDate,
-                                    ).toLocaleDateString()}
+                                    {formatBdDate(batch.endDate)}
+                                    {batch.classSchedule && ` · ${batch.classSchedule}`}
+                                    {batch.orientationDate && ` · Orientation ${formatBdDate(batch.orientationDate)}`}
                                     {batch.joinClosesAt
                                       ? ` · Join closes ${new Date(batch.joinClosesAt).toLocaleString()}`
                                       : ''}
@@ -554,10 +565,34 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                   </div>
                 )}
 
+                {!isFree && (!course.requiresBatch || selectedBatch) && (
+                  <fieldset className='space-y-3'>
+                    <legend className='font-bold'>Payment options</legend>
+                    {course.plans.map(option => (
+                      <label key={option.type} className='flex gap-3 rounded-lg border border-zinc-200 bg-white p-4'>
+                        <input type='radio' name='payment-plan' checked={plan?.type === option.type}
+                          onChange={() => setSelection(current => ({ ...current, plan: option.type }))} />
+                        <span>
+                          <strong className='block'>{paymentPlanLabels[option.type]}</strong>
+                          {option.regularPrice && <del className='mr-2'>৳{option.regularPrice.toLocaleString('en-BD')}</del>}
+                          ৳{option.price.toLocaleString('en-BD')}
+                          {option.regularPrice && <span className='block text-emerald-700'>Save ৳{(option.regularPrice - option.price).toLocaleString('en-BD')}</span>}
+                        </span>
+                      </label>
+                    ))}
+                  </fieldset>
+                )}
+                {isFree && <p className='font-bold text-emerald-700'>Free</p>}
+                {selectedBatch && billingType && billingType !== 'one_time' && (
+                  <p className='rounded-lg border border-zinc-200 p-4'>
+                    Next payment due {formatBdDate(firstBatchPaymentDue(new Date(selectedBatch.startDate), billingType, new Date()))}
+                  </p>
+                )}
+
                 <button
                   type='submit'
                   disabled={
-                    purchaseLoading ||
+                    purchaseLoading || !plan ||
                     (course.requiresBatch &&
                       (batchesLoading || !selectedBatch))
                   }
@@ -569,11 +604,11 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                     <>
                       <FiZap className='h-5 w-5 fill-white' />
                       <span>
-                        {course.billingType === 'monthly'
+                        {isFree ? 'Next Step' : <>{billingType === 'monthly'
                           ? 'Start monthly subscription ('
-                          : course.billingType === 'quarterly'
+                          : billingType === 'quarterly'
                             ? 'Start quarterly subscription ('
-                            : course.billingType === 'two_month'
+                            : billingType === 'two_month'
                               ? 'Start two-month subscription ('
                               : 'Complete Course Purchase ('}
                         {!finalPrice || finalPrice === 0
@@ -582,7 +617,7 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                         {periodSuffix && finalPrice && finalPrice > 0
                           ? periodSuffix
                           : ''}
-                        )
+                        )</>}
                       </span>
                     </>
                   )}
@@ -634,13 +669,14 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                   Order Investment Summary
                 </p>
 
-                <div className='flex justify-between items-center text-base font-semibold text-zinc-600'>
+                {!plan && <p className='text-base text-zinc-600'>Choose an available payment option to see the amount due.</p>}
+                {plan && <div className='flex justify-between items-center text-base font-semibold text-zinc-600'>
                   <span>
-                    {course.billingType === 'monthly'
+                    {billingType === 'monthly'
                       ? 'First month fee'
-                      : course.billingType === 'quarterly'
+                      : billingType === 'quarterly'
                         ? 'First quarter fee'
-                        : course.billingType === 'two_month'
+                        : billingType === 'two_month'
                           ? 'First two-month fee'
                           : 'Base Course Price'}
                   </span>
@@ -649,9 +685,9 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                       ? 'Free'
                       : `৳${basePrice.toLocaleString('en-BD')}${periodSuffix}`}
                   </span>
-                </div>
+                </div>}
 
-                {appliedCoupon && (
+                {plan && appliedCoupon && (
                   <div className='flex justify-between items-center text-base font-semibold text-emerald-600'>
                     <span className='flex items-center gap-1.5'>
                       <FiTag className='h-4 w-4' />
@@ -663,16 +699,16 @@ export default function CheckoutFormClient({ course }: { course: CourseData }) {
                   </div>
                 )}
 
-                <div className='border-t border-zinc-100 pt-3.5 flex justify-between items-center'>
+                {plan && <div className='border-t border-zinc-100 pt-3.5 flex justify-between items-center'>
                   <span className='text-base font-bold text-zinc-800'>
-                    Total Investment
+                    Due today
                   </span>
                   <span className='text-3xl font-bold text-[#E61C24]'>
                     {!finalPrice || finalPrice === 0
                       ? 'Free'
                       : `৳${finalPrice.toLocaleString('en-BD')}`}
                   </span>
-                </div>
+                </div>}
               </div>
             </div>
           </div>

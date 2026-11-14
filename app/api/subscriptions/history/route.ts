@@ -119,9 +119,10 @@ export async function GET() {
 
     for (const p of renewals as any[]) {
       const course = p.course
-      const billingType = enrollmentById.get(String(p.enrollment))?.billingType ?? 'monthly'
+      const enrollment = enrollmentById.get(String(p.enrollment))
+      const billingType = enrollment?.billingType ?? 'monthly'
       // Older quarterly checkout records used the monthly period formula.
-      const periodEnd = billingType === 'quarterly' && p.periodStart
+      const periodEnd = billingType === 'quarterly' && !enrollment?.calendarBillingAnchor && p.periodStart
         ? nextPaidUntil(new Date(p.periodStart), p.extensionDays || 0, billingType)
         : p.periodEnd ? new Date(p.periodEnd) : null
       rows.push({

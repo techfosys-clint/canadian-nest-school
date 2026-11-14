@@ -1,4 +1,5 @@
-import { courseFee } from '@/lib/subscriptions/billing';
+import { Batch } from '@/lib/db/models/Batch';
+import { courseFee, isRecurringCourse } from '@/lib/subscriptions/billing';
 import CourseCertificateSample from '@/components/CourseCertificateSample';
 import CourseTrailerPlayer from '@/components/CourseTrailerPlayer';
 import EnrollButton from '@/components/EnrollButton';
@@ -43,21 +44,6 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-function formatPrice(
-  price?: number | null,
-  billingType?: 'one_time' | 'monthly' | 'two_month' | 'quarterly',
-  freeLabel = 'Free',
-  perMonth = '/mo',
-  perTwoMonths = ' / 60 days',
-  perQuarter = '/qtr',
-) {
-  if (!price || price === 0) return freeLabel;
-  const base = `৳${price.toLocaleString('en-BD')}`;
-  if (billingType === 'monthly') return `${base}${perMonth}`;
-  if (billingType === 'two_month') return `${base}${perTwoMonths}`;
-  if (billingType === 'quarterly') return `${base}${perQuarter}`;
-  return base;
-}
 
 function getImageUrl(thumbnail: any): string {
   if (!thumbnail || typeof thumbnail === 'string') return '';
@@ -139,7 +125,7 @@ export default async function CourseDetailPage({ params }: Props) {
   const requirements = localized.requirements;
 
   const displayPrice = courseFee(course);
-  const displayBillingType = course.billingType ?? 'one_time';
+  const requiresBatch = isRecurringCourse(course) || !!await Batch.exists({ course: course._id });
   const levelLabel =
     t.levels[(course.level as keyof typeof t.levels) || 'all'] || t.levels.all;
 
@@ -713,19 +699,13 @@ export default async function CourseDetailPage({ params }: Props) {
               {/* Dynamic Price Area */}
               <div className='space-y-1'>
                 <p className='text-base font-bold text-zinc-400 uppercase tracking-wide'>
-                  Investment
+
                 </p>
                 <div className='flex items-baseline gap-2'>
                   <span
                     className={`text-4xl font-bold ${displayPrice === 0 ? 'text-emerald-600' : 'text-[#E61C24]'}`}
                   >
-                    {formatPrice(
-                      displayPrice,
-                      displayBillingType,
-                      t.free,
-                      t.perMonth,
-                      t.perTwoMonths,
-                    )}
+                    {displayPrice === 0 ? t.free : null}
                   </span>
                 </div>
               </div>
@@ -736,6 +716,7 @@ export default async function CourseDetailPage({ params }: Props) {
                 courseTitle={course.title}
                 courseSlug={course.slug}
                 coursePrice={displayPrice}
+                requiresBatch={requiresBatch}
                 courseCategory={categoryName}
                 isLoggedIn={!!userId}
                 isAlreadyEnrolled={isAlreadyEnrolled}

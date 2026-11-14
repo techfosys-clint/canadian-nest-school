@@ -90,6 +90,7 @@ export async function completeSubscriptionPayment(
         previousEnd,
         claimed.extensionDays || 0,
         recurringType,
+        enrollment.calendarBillingAnchor,
       )
 
       enrollment.paidUntil = paidUntil

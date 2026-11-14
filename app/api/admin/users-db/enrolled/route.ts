@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
 
     const course = await Course.findById(courseId)
       .select(
-        'title billingType noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays',
+        'title billingType paymentPlans noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays',
       )
       .lean()
     if (!course) {
@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
 
     const enrollments = await Enrollment.find(filter)
       .select(
-        'student billingType paymentStatus paidUntil accessStatus batch createdAt',
+        'student billingType paymentStatus paidUntil accessStatus paymentPlanSnapshot batch createdAt',
       )
       .lean()
 

@@ -1,3 +1,4 @@
+import type { PaymentPlan } from '@/lib/subscriptions/plans'
 import mongoose, { Schema, Document } from 'mongoose'
 
 export interface IEnrollment extends Document {
@@ -17,6 +18,8 @@ export interface IEnrollment extends Document {
   /** End of the current paid period (recurring only). */
   paidUntil?: Date
   /** Join date used as billing cycle anchor (recurring only). */
+  paymentPlanSnapshot?: PaymentPlan
+  calendarBillingAnchor?: Date
   billingCycleAnchor?: Date
   /** Original charge and coverage, captured at recurring enrollment. */
   initialPaymentAmount?: number
@@ -47,6 +50,8 @@ const EnrollmentSchema = new Schema<IEnrollment>(
       default: 'one_time',
     },
     paidUntil: { type: Date },
+    paymentPlanSnapshot: { type: Schema.Types.Mixed },
+    calendarBillingAnchor: { type: Date },
     billingCycleAnchor: { type: Date },
     initialPaymentAmount: { type: Number, min: 0 },
     initialPaymentPeriodEnd: { type: Date },
@@ -63,6 +68,7 @@ const EnrollmentSchema = new Schema<IEnrollment>(
 if (
   mongoose.models.Enrollment &&
   (!mongoose.models.Enrollment.schema.paths.billingType ||
+    !mongoose.models.Enrollment.schema.paths.calendarBillingAnchor ||
     !mongoose.models.Enrollment.schema.paths.batch ||
     !mongoose.models.Enrollment.schema.paths.initialPaymentPeriodEnd ||
     !mongoose.models.Enrollment.schema.path('billingType').enumValues.includes('two_month'))

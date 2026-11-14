@@ -53,7 +53,7 @@ export async function GET() {
         paymentStatus: 'completed',
       })
         .select(
-          'course batch billingType paidUntil accessStatus paymentStatus',
+          'course batch billingType paidUntil accessStatus paymentStatus paymentPlanSnapshot',
         )
         .lean()
 
@@ -69,7 +69,7 @@ export async function GET() {
         if (e.billingType === 'monthly' || e.billingType === 'two_month' || e.billingType === 'quarterly') {
           const course = await Course.findById(courseId)
             .select(
-              'billingType noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays',
+              'billingType paymentPlans noticeStartOffsetDays noticeEndOffsetDays blockOffsetDays',
             )
             .lean()
           if (course) {

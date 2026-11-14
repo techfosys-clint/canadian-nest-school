@@ -1,3 +1,4 @@
+import { firstBatchPaymentDue } from '@/lib/subscriptions/plans'
 import { assignStudentToBatch } from '@/lib/batches/assignStudent'
 import { Coupon } from '@/lib/db/models/Coupon'
 import { Course } from '@/lib/db/models/Course'
@@ -11,7 +12,7 @@ import { normalizeEpsStatus } from '@/lib/payments/epsStatus'
 import {
   initialPaidUntil,
   initialQuarterlyPaidUntil,
-  isRecurringCourse,
+  isRecurringBillingType,
 } from '@/lib/subscriptions/billing'
 
 export type CompletePaidEnrollmentResult =
@@ -67,12 +68,14 @@ export async function completePaidEnrollment(
       .select('billingType title')
       .lean()
 
-    const billingType = courseForBilling?.billingType || 'one_time'
-    const isRecurring = isRecurringCourse(courseForBilling)
+    const billingType = enrollment.billingType ?? courseForBilling?.billingType ?? 'one_time'
+    const isRecurring = isRecurringBillingType(billingType)
     const now = new Date()
 
     let paidUntil: Date | undefined
-    if (billingType === 'monthly' || billingType === 'two_month') {
+    if (isRecurring && enrollment.calendarBillingAnchor) {
+      paidUntil = firstBatchPaymentDue(new Date(enrollment.calendarBillingAnchor), billingType, enrollment.createdAt ?? now)
+    } else if (billingType === 'monthly' || billingType === 'two_month') {
       paidUntil = initialPaidUntil(now, billingType)
     } else if (billingType === 'quarterly') {
       let batchEnd = now
@@ -123,7 +126,7 @@ export async function completePaidEnrollment(
       enrollment.accessStatus = 'active'
     }
 
-    if (isRecurring && claimed.batch) {
+    if (claimed.batch) {
       await assignStudentToBatch({
         batchId: claimed.batch.toString(),
         studentId: claimed.student.toString(),

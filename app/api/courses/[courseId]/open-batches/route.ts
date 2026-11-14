@@ -21,7 +21,7 @@ export async function GET(_request: Request, { params }: Props) {
     const { courseId } = await params
 
     const course = await Course.findById(courseId)
-      .select('billingType status title')
+      .select('billingType paymentPlans status title')
       .lean()
 
     if (!course || course.status !== 'published') {
@@ -31,7 +31,7 @@ export async function GET(_request: Request, { params }: Props) {
       )
     }
 
-    if (!isRecurringCourse(course)) {
+    if (!isRecurringCourse(course) && !await Batch.exists({ course: courseId })) {
       return NextResponse.json({
         success: true,
         requiresBatch: false,
@@ -44,7 +44,7 @@ export async function GET(_request: Request, { params }: Props) {
       status: { $ne: 'completed' },
     })
       .select(
-        'name startDate endDate joinOpensAt joinClosesAt maxStudents students status',
+        'name startDate endDate classSchedule orientationDate joinOpensAt joinClosesAt maxStudents students status',
       )
       .sort({ joinOpensAt: 1, startDate: 1 })
       .lean()
@@ -56,6 +56,8 @@ export async function GET(_request: Request, { params }: Props) {
         name: b.name,
         startDate: b.startDate,
         endDate: b.endDate,
+        classSchedule: b.classSchedule,
+        orientationDate: b.orientationDate,
         joinOpensAt: b.joinOpensAt,
         joinClosesAt: b.joinClosesAt,
         seatsLeft:

@@ -1,5 +1,6 @@
 import type { ICourse } from '@/lib/db/models/Course'
 import type { IEnrollment } from '@/lib/db/models/Enrollment'
+import { nextBatchPaymentDue, type PaymentPlan } from './plans'
 import { BD_TIME_ZONE } from '@/lib/bdTime'
 
 export const BILLING_PERIOD_DAYS = 30
@@ -38,9 +39,9 @@ export function isQuarterlyCourse(
 
 /** Monthly or quarterly courses use subscription access + batches. */
 export function isRecurringCourse(
-  course: Pick<ICourse, 'billingType'> | null | undefined,
+  course: Pick<ICourse, 'billingType' | 'paymentPlans'> | null | undefined,
 ): boolean {
-  return isRecurringBillingType(course?.billingType)
+  return course?.paymentPlans?.length ? course.paymentPlans.some(plan => isRecurringBillingType(plan.type)) : isRecurringBillingType(course?.billingType)
 }
 
 export function isMonthlyEnrollment(
@@ -60,12 +61,30 @@ export function isRecurringBillingType(value: unknown): value is RecurringBillin
 }
 
 export function courseFee(
-  course: Pick<ICourse, 'billingType' | 'price' | 'monthlyFee' | 'twoMonthFee' | 'quarterlyFee'>,
+  course: Pick<ICourse, 'billingType' | 'price' | 'monthlyFee' | 'twoMonthFee' | 'quarterlyFee' | 'paymentPlans'>,
+  type?: ICourse['billingType'],
 ): number {
-  if (course.billingType === 'monthly') return Number(course.monthlyFee || 0)
-  if (course.billingType === 'two_month') return Number(course.twoMonthFee || 0)
-  if (course.billingType === 'quarterly') return Number(course.quarterlyFee || 0)
+  const plan = course.paymentPlans?.find(option => option.type === type)
+  if (plan) return plan.price
+  if (!type && course.paymentPlans?.length) return Math.min(...course.paymentPlans.map(option => option.price))
+  const billingType = type ?? course.billingType
+  if (billingType === 'monthly') return Number(course.monthlyFee || 0)
+  if (billingType === 'two_month') return Number(course.twoMonthFee || 0)
+  if (billingType === 'quarterly') return Number(course.quarterlyFee || 0)
   return Number(course.price || 0)
+}
+
+export function availablePaymentPlans(course: Parameters<typeof courseFee>[0]): PaymentPlan[] {
+  return course.paymentPlans?.length ? course.paymentPlans : [{ type: course.billingType ?? 'one_time', price: courseFee(course) }]
+}
+
+export function enrollmentPlanFee(
+  course: Parameters<typeof courseFee>[0],
+  enrollment: Pick<IEnrollment, 'billingType' | 'paymentPlanSnapshot'>,
+): number {
+  return course.paymentPlans?.find(plan => plan.type === enrollment.billingType)?.price ??
+    enrollment.paymentPlanSnapshot?.price ??
+    courseFee(course, enrollment.billingType)
 }
 
 /** YYYY-MM-DD parts in Asia/Dhaka. */
@@ -106,9 +125,11 @@ export function nextPaidUntil(
   previousPaidUntil: Date,
   extensionDays = 0,
   billingType: RecurringBillingType = 'monthly',
+  calendarBillingAnchor?: Date,
 ): Date {
-  const base =
-    billingType === 'quarterly'
+  const base = calendarBillingAnchor
+    ? nextBatchPaymentDue(previousPaidUntil, billingType, calendarBillingAnchor)
+    : billingType === 'quarterly'
       ? nextCalendarQuarterEnd(previousPaidUntil)
       : addDays(previousPaidUntil, billingType === 'two_month' ? 60 : BILLING_PERIOD_DAYS)
   return addDays(base, Math.max(0, extensionDays))
@@ -148,11 +169,12 @@ export type SubscriptionAccessSnapshot = {
 export function getSubscriptionAccessSnapshot(
   enrollment: Pick<
     IEnrollment,
-    'billingType' | 'paidUntil' | 'accessStatus' | 'paymentStatus'
+    'billingType' | 'paidUntil' | 'accessStatus' | 'paymentStatus' | 'paymentPlanSnapshot'
   >,
   course: Pick<
     ICourse,
     | 'billingType'
+    | 'paymentPlans'
     | 'noticeStartOffsetDays'
     | 'noticeEndOffsetDays'
     | 'blockOffsetDays'
@@ -160,11 +182,10 @@ export function getSubscriptionAccessSnapshot(
   now: Date = new Date(),
 ): SubscriptionAccessSnapshot {
   const recurringType = enrollment.paymentStatus === 'completed'
-    ? [enrollment.billingType, course.billingType].find((type) => type === 'quarterly') ??
-      [enrollment.billingType, course.billingType].find(isRecurringBillingType) ?? null
+    ? (enrollment.billingType === undefined ? course.billingType : enrollment.billingType) ?? null
     : null
 
-  const isRecurring = !!recurringType
+  const isRecurring = isRecurringBillingType(recurringType)
 
   if (!isRecurring || !enrollment.paidUntil) {
     return {
@@ -183,10 +204,11 @@ export function getSubscriptionAccessSnapshot(
     }
   }
 
+  const plan = course.paymentPlans?.find(option => option.type === recurringType) ?? enrollment.paymentPlanSnapshot
   const paidUntil = new Date(enrollment.paidUntil)
-  const noticeStart = Math.max(0, course.noticeStartOffsetDays ?? 5)
-  const noticeEnd = Math.max(0, course.noticeEndOffsetDays ?? 2)
-  const blockOffset = Math.max(0, course.blockOffsetDays ?? 2)
+  const noticeStart = Math.max(0, plan?.noticeStartOffsetDays ?? course.noticeStartOffsetDays ?? 5)
+  const noticeEnd = Math.max(0, plan?.noticeEndOffsetDays ?? course.noticeEndOffsetDays ?? 2)
+  const blockOffset = Math.max(0, plan?.blockOffsetDays ?? course.blockOffsetDays ?? 2)
 
   const noticeStartAt = addDays(paidUntil, -noticeStart)
   const noticeEndAt = addDays(paidUntil, noticeEnd)
@@ -226,17 +248,19 @@ export function computeRenewalAmount(
     | 'monthlyFee'
     | 'twoMonthFee'
     | 'quarterlyFee'
+    | 'price'
+    | 'paymentPlans'
     | 'lateFeeEnabled'
     | 'lateFeeAmount'
   >,
-  enrollment: Pick<IEnrollment, 'paidUntil'>,
+  enrollment: Pick<IEnrollment, 'paidUntil' | 'billingType' | 'paymentPlanSnapshot'>,
   options?: {
     overrideFee?: number | null
     now?: Date
   },
 ): { baseFee: number; lateFee: number; total: number } {
   const now = options?.now ?? new Date()
-  const defaultFee = courseFee(course)
+  const defaultFee = enrollmentPlanFee(course, enrollment)
 
   const baseFee =
     typeof options?.overrideFee === 'number' && options.overrideFee >= 0

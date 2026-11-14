@@ -1,3 +1,4 @@
+import { firstBatchPaymentDue, selectPaymentPlan } from '@/lib/subscriptions/plans'
 import { isRecurringBillingType } from '@/lib/subscriptions/billing'
 import { isLessonAvailable } from '@/lib/lessons/delivery'
 import { getLearningSession } from '@/lib/auth/learningSession'
@@ -221,7 +222,7 @@ export async function POST(request: Request) {
 
     // Check if course exists
     const course = await Course.findById(courseId).lean()
-    if (!course) {
+    if (!course || course.status !== 'published') {
       return NextResponse.json(
         { success: false, error: 'Course not found.' },
         { status: 404 }
@@ -229,24 +230,25 @@ export async function POST(request: Request) {
     }
 
     const {
-      courseFee,
-      initialPaidUntil,
-      initialQuarterlyPaidUntil,
+      availablePaymentPlans,
       isRecurringCourse,
     } = await import('@/lib/subscriptions/billing')
     const { canStudentJoinBatch } = await import('@/lib/batchCapacity')
     const { Batch } = await import('@/lib/db/models/Batch')
     const { assignStudentToBatch } = await import('@/lib/batches/assignStudent')
 
-    const isRecurring = isRecurringCourse(course as any)
-    const resolvedBillingType = isRecurringBillingType(course.billingType)
-      ? course.billingType
-      : 'one_time'
+    const plan = selectPaymentPlan(availablePaymentPlans(course), body.paymentPlan)
+    if (!plan) {
+      return NextResponse.json({ success: false, error: 'Choose an enabled payment option.' }, { status: 400 })
+    }
+    const resolvedBillingType = plan.type
+    const isRecurring = isRecurringBillingType(resolvedBillingType)
+    const requiresBatch = isRecurringCourse(course) || await Batch.exists({ course: courseId })
 
     // Monthly/quarterly: several batches may be open at once. The student
     // picks one. A single open batch is accepted even if the client omits it.
     let selectedBatch: any = null
-    if (isRecurring) {
+    if (requiresBatch) {
       const candidates = await Batch.find({
         course: courseId,
         status: { $ne: 'completed' },
@@ -329,7 +331,7 @@ export async function POST(request: Request) {
     }
 
     // Coupon logic
-    let pricePaid = courseFee(course as any)
+    let pricePaid = plan.price
     let appliedCoupon = null
 
     if (couponCode) {
@@ -414,14 +416,9 @@ export async function POST(request: Request) {
       let newEnrollment
       const now = new Date()
       try {
-        const paidUntil =
-          resolvedBillingType === 'monthly' || resolvedBillingType === 'two_month'
-            ? initialPaidUntil(now, resolvedBillingType)
-            : resolvedBillingType === 'quarterly'
-              ? initialQuarterlyPaidUntil(
-                  selectedBatch ? new Date(selectedBatch.endDate) : now,
-                )
-              : undefined
+        const paidUntil = isRecurring
+          ? firstBatchPaymentDue(new Date(selectedBatch.startDate), resolvedBillingType, now)
+          : undefined
 
         newEnrollment = await Enrollment.create({
           student: userId,
@@ -434,10 +431,12 @@ export async function POST(request: Request) {
           billingAddress: resolvedBillingAddress,
           couponCode: appliedCoupon ? appliedCoupon.code : undefined,
           billingType: resolvedBillingType,
+          paymentPlanSnapshot: plan,
           accessStatus: 'active',
+          ...(selectedBatch ? { batch: selectedBatch._id } : {}),
           ...(isRecurring
             ? {
-                batch: selectedBatch._id,
+                calendarBillingAnchor: new Date(selectedBatch.startDate),
                 paidUntil,
                 billingCycleAnchor: now,
                 initialPaymentAmount: pricePaid,
@@ -446,7 +445,7 @@ export async function POST(request: Request) {
             : {}),
         })
 
-        if (isRecurring && selectedBatch) {
+        if (selectedBatch) {
           const assigned = await assignStudentToBatch({
             batchId: selectedBatch._id.toString(),
             studentId: userId,
@@ -506,9 +505,10 @@ export async function POST(request: Request) {
         billingAddress: resolvedBillingAddress,
         couponCode: appliedCoupon ? appliedCoupon.code : undefined,
         billingType: resolvedBillingType,
+        paymentPlanSnapshot: plan,
         accessStatus: 'active',
-        ...(isRecurring && selectedBatch
-          ? { batch: selectedBatch._id }
+        ...(selectedBatch
+          ? { batch: selectedBatch._id, ...(isRecurring ? { calendarBillingAnchor: new Date(selectedBatch.startDate) } : {}) }
           : {}),
       })
     } catch (enrollError) {

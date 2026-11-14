@@ -6,16 +6,19 @@ import '@/lib/db/models/Category'
 import '@/lib/db/models/Media'
 import '@/lib/db/models/User'
 import CheckoutFormClient from './CheckoutFormClient'
-import { courseFee, isRecurringCourse } from '@/lib/subscriptions/billing'
+import { Batch } from '@/lib/db/models/Batch'
+import { availablePaymentPlans, isRecurringCourse } from '@/lib/subscriptions/billing'
 
 type Props = {
   params: Promise<{ courseId: string }>
+  searchParams: Promise<{ batch?: string; plan?: string }>
 }
 
 export const dynamic = 'force-dynamic'
 
-export default async function CheckoutPage({ params }: Props) {
+export default async function CheckoutPage({ params, searchParams }: Props) {
   const { courseId } = await params
+  const selection = await searchParams
   await connectToDatabase()
 
   const course = await Course.findById(courseId)
@@ -24,18 +27,15 @@ export default async function CheckoutPage({ params }: Props) {
     .populate('thumbnail')
     .lean() as any
 
-  if (!course) notFound()
-
-  const billingType = course.billingType ?? 'one_time'
+  if (!course || course.status !== 'published') notFound()
 
   const serializedCourse = {
     id: course._id.toString(),
     slug: course.slug || '',
     title: course.title || '',
     summary: course.summary || '',
-    price: courseFee(course),
-    billingType,
-    requiresBatch: isRecurringCourse(course),
+    plans: availablePaymentPlans(course),
+    requiresBatch: isRecurringCourse(course) || !!await Batch.exists({ course: courseId }),
     imageUrl:
       course.thumbnail?.sizes?.card?.url ??
       course.thumbnail?.sizes?.hero?.url ??
@@ -47,7 +47,7 @@ export default async function CheckoutPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-zinc-50/50">
-      <CheckoutFormClient course={serializedCourse} />
+      <CheckoutFormClient course={serializedCourse} initialSelection={selection} />
     </div>
   )
 }

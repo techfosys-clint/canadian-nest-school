@@ -1,16 +1,18 @@
 'use client';
 
+import { availablePaymentPlans } from '@/lib/subscriptions/billing';
+import { paymentPlanLabels, paymentPlanTypes, type PaymentPlan } from '@/lib/subscriptions/plans';
+
 import AdminDateField from '@/components/admin/AdminDateField';
 import type { MediaItem } from '@/components/MediaPickerModal';
 import MediaPickerModal from '@/components/MediaPickerModal';
 import RichTextEditor from '@/components/RichTextEditor';
-import {
-  formatBdDate,
-  parseBdDate,
-  parseBdDateEndOfDay,
-} from '@/lib/bdTime';
-import { addDays, getSubscriptionAccessSnapshot } from '@/lib/subscriptions/billing';
+import { formatBdDate, parseBdDate, parseBdDateEndOfDay, toBdDateYmd } from '@/lib/bdTime';
 import { parseJsonResponse } from '@/lib/safeJson';
+import {
+  addDays,
+  getSubscriptionAccessSnapshot,
+} from '@/lib/subscriptions/billing';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -90,20 +92,24 @@ export default function CourseFormClient({
         : '',
   );
   const [price, setPrice] = useState<number | ''>(initialData?.price ?? '');
-  const [billingType, setBillingType] = useState<
+  const [billingType] = useState<
     'one_time' | 'monthly' | 'two_month' | 'quarterly'
-  >(
-    initialData?.billingType ?? 'one_time',
-  );
-  const [monthlyFee, setMonthlyFee] = useState<number | ''>(
+  >(initialData?.billingType ?? 'one_time');
+  const [monthlyFee] = useState<number | ''>(
     initialData?.monthlyFee ?? '',
   );
-  const [twoMonthFee, setTwoMonthFee] = useState<number | ''>(initialData?.twoMonthFee ?? '');
-  const [quarterlyFee, setQuarterlyFee] = useState<number | ''>(
+  const [twoMonthFee] = useState<number | ''>(
+    initialData?.twoMonthFee ?? '',
+  );
+  const [quarterlyFee] = useState<number | ''>(
     initialData?.quarterlyFee ?? '',
   );
-  const isRecurringBilling =
-    billingType !== 'one_time';
+  const [paymentPlans, setPaymentPlans] = useState<PaymentPlan[]>(() =>
+    availablePaymentPlans(initialData ?? {}),
+  );
+  const isRecurringBilling = paymentPlans.some(plan => plan.type !== 'one_time');
+  const updatePlan = (type: PaymentPlan['type'], fields: Partial<PaymentPlan>) =>
+    setPaymentPlans(plans => plans.map(plan => plan.type === type ? { ...plan, ...fields } : plan));
   const [lateFeeEnabled, setLateFeeEnabled] = useState(
     !!initialData?.lateFeeEnabled,
   );
@@ -209,10 +215,10 @@ export default function CourseFormClient({
   );
   const [courseFaqs, setCourseFaqs] = useState<
     Array<{
-      question: string
-      answer: string
-      questionBn?: string
-      answerBn?: string
+      question: string;
+      answer: string;
+      questionBn?: string;
+      answerBn?: string;
     }>
   >(initialData?.courseFaqs || []);
   const [modules, setModules] = useState<string[]>(initialData?.modules || []);
@@ -337,7 +343,12 @@ export default function CourseFormClient({
     lessonType: 'recorded' | 'live' | 'quiz' | 'assignment';
     duration: number;
     batchId: string | null;
-    batchSettings: { batch: string; order: number; duration: number; lessonType: LessonSummary['lessonType'] }[];
+    batchSettings: {
+      batch: string;
+      order: number;
+      duration: number;
+      lessonType: LessonSummary['lessonType'];
+    }[];
   }
   const [lessons, setLessons] = useState<LessonSummary[]>([]);
   const [lessonsLoading, setLessonsLoading] = useState(false);
@@ -358,7 +369,9 @@ export default function CourseFormClient({
                 lessonType: l.lessonType,
                 duration: l.duration,
                 batchSettings: l.batchSettings ?? [],
-                batchId: l.batch ? l.batch.toString?.() || String(l.batch) : null,
+                batchId: l.batch
+                  ? l.batch.toString?.() || String(l.batch)
+                  : null,
               }))
               .sort((a: LessonSummary, b: LessonSummary) => a.order - b.order),
           );
@@ -380,6 +393,8 @@ export default function CourseFormClient({
     instructor: { _id: string; name: string } | null;
     startDate: string;
     endDate: string;
+    classSchedule?: string;
+    orientationDate?: string;
     joinOpensAt: string | null;
     joinClosesAt: string | null;
     status: 'upcoming' | 'active' | 'completed';
@@ -400,6 +415,9 @@ export default function CourseFormClient({
   const [newBatchInstructor, setNewBatchInstructor] = useState('');
   const [newBatchStart, setNewBatchStart] = useState('');
   const [newBatchEnd, setNewBatchEnd] = useState('');
+  const [newBatchDuration, setNewBatchDuration] = useState('');
+  const [newBatchSchedule, setNewBatchSchedule] = useState('');
+  const [newBatchOrientation, setNewBatchOrientation] = useState('');
   const [newBatchJoinOpens, setNewBatchJoinOpens] = useState('');
   const [newBatchJoinCloses, setNewBatchJoinCloses] = useState('');
   const [newBatchMax, setNewBatchMax] = useState<number | ''>(0);
@@ -423,6 +441,8 @@ export default function CourseFormClient({
               instructor: b.instructor,
               startDate: b.startDate,
               endDate: b.endDate,
+              classSchedule: b.classSchedule,
+              orientationDate: b.orientationDate,
               joinOpensAt: b.joinOpensAt || null,
               joinClosesAt: b.joinClosesAt || null,
               status: b.status,
@@ -475,7 +495,7 @@ export default function CourseFormClient({
       !newBatchName.trim() ||
       !newBatchInstructor ||
       !newBatchStart ||
-      !newBatchEnd ||
+      (!newBatchEnd && !newBatchDuration) ||
       !newBatchJoinOpens ||
       !newBatchJoinCloses
     ) {
@@ -515,7 +535,10 @@ export default function CourseFormClient({
           course: savedCourseId,
           instructor: newBatchInstructor,
           startDate: newBatchStart,
-          endDate: newBatchEnd,
+          endDate: newBatchEnd || undefined,
+          durationMonths: newBatchDuration ? Number(newBatchDuration) : undefined,
+          classSchedule: newBatchSchedule,
+          orientationDate: newBatchOrientation || undefined,
           joinOpensAt: joinOpens.toISOString(),
           joinClosesAt: joinCloses.toISOString(),
           maxStudents: newBatchMax === '' ? 0 : Number(newBatchMax),
@@ -528,6 +551,9 @@ export default function CourseFormClient({
       setNewBatchInstructor('');
       setNewBatchStart('');
       setNewBatchEnd('');
+      setNewBatchDuration('');
+      setNewBatchSchedule('');
+      setNewBatchOrientation('');
       setNewBatchJoinOpens('');
       setNewBatchJoinCloses('');
       setNewBatchMax(0);
@@ -581,7 +607,7 @@ export default function CourseFormClient({
 
   const handleUpdateBatchField = async (
     batchId: string,
-    field: 'maxStudents' | 'status',
+    field: 'maxStudents' | 'status' | 'classSchedule' | 'orientationDate',
     value: any,
   ) => {
     try {
@@ -987,14 +1013,22 @@ export default function CourseFormClient({
     .map(Number)
     .filter((days) => Number.isInteger(days) && days >= 0);
   const exampleDue = new Date('2026-11-20T12:00:00+06:00');
+  const exampleBillingType = paymentPlans.find(plan => plan.type !== 'one_time')?.type ?? billingType;
   const { noticeStartAt, noticeEndAt, blockAt } = getSubscriptionAccessSnapshot(
-    { billingType, paymentStatus: 'completed', paidUntil: exampleDue },
-    { billingType, noticeStartOffsetDays, noticeEndOffsetDays, blockOffsetDays },
+    { billingType: exampleBillingType, paymentStatus: 'completed', paidUntil: exampleDue },
+    {
+      billingType: exampleBillingType,
+      paymentPlans,
+      noticeStartOffsetDays,
+      noticeEndOffsetDays,
+      blockOffsetDays,
+    },
     exampleDue,
   );
-  const reminderEnd = noticeEndAt && blockAt
-    ? new Date(Math.min(noticeEndAt.getTime(), blockAt.getTime()))
-    : null;
+  const reminderEnd =
+    noticeEndAt && blockAt
+      ? new Date(Math.min(noticeEndAt.getTime(), blockAt.getTime()))
+      : null;
   const smsDates = [...new Set(smsOffsets)]
     .sort((a, b) => b - a)
     .slice(0, Math.max(0, smsMaxMessages))
@@ -1011,8 +1045,10 @@ export default function CourseFormClient({
     descriptionBn,
     price: Number(price) || 0,
     billingType,
+    paymentPlans,
     monthlyFee: billingType === 'monthly' ? Number(monthlyFee) || 0 : undefined,
-    twoMonthFee: billingType === 'two_month' ? Number(twoMonthFee) || 0 : undefined,
+    twoMonthFee:
+      billingType === 'two_month' ? Number(twoMonthFee) || 0 : undefined,
     quarterlyFee:
       billingType === 'quarterly' ? Number(quarterlyFee) || 0 : undefined,
     lateFeeEnabled: isRecurringBilling ? lateFeeEnabled : false,
@@ -1052,17 +1088,16 @@ export default function CourseFormClient({
       .filter((item) => {
         const hasBn =
           (item.questionBn || '').trim() !== '' &&
-          (item.answerBn || '').trim() !== ''
-        const hasEn =
-          item.question.trim() !== '' && item.answer.trim() !== ''
-        return hasBn || hasEn
+          (item.answerBn || '').trim() !== '';
+        const hasEn = item.question.trim() !== '' && item.answer.trim() !== '';
+        return hasBn || hasEn;
       })
       .map((item) => {
-        const questionBn = (item.questionBn || '').trim()
-        const answerBn = (item.answerBn || '').trim()
-        const question = item.question.trim() || questionBn
-        const answer = item.answer.trim() || answerBn
-        return { question, answer, questionBn, answerBn }
+        const questionBn = (item.questionBn || '').trim();
+        const answerBn = (item.answerBn || '').trim();
+        const question = item.question.trim() || questionBn;
+        const answer = item.answer.trim() || answerBn;
+        return { question, answer, questionBn, answerBn };
       }),
     studyMaterials: studyMaterials.filter(
       (item) => item.title.trim() !== '' && item.url.trim() !== '',
@@ -1414,9 +1449,9 @@ export default function CourseFormClient({
                     type='text'
                     value={item.outcome}
                     onChange={(e) => {
-                      const updated = [...whatYouWillLearnBn]
-                      updated[idx] = { outcome: e.target.value }
-                      setWhatYouWillLearnBn(updated)
+                      const updated = [...whatYouWillLearnBn];
+                      updated[idx] = { outcome: e.target.value };
+                      setWhatYouWillLearnBn(updated);
                     }}
                     placeholder='বাংলা আউটকাম…'
                     className='bg-slate-100 border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none flex-1'
@@ -1458,9 +1493,9 @@ export default function CourseFormClient({
                     type='text'
                     value={item.requirement}
                     onChange={(e) => {
-                      const updated = [...requirementsBn]
-                      updated[idx] = { requirement: e.target.value }
-                      setRequirementsBn(updated)
+                      const updated = [...requirementsBn];
+                      updated[idx] = { requirement: e.target.value };
+                      setRequirementsBn(updated);
                     }}
                     placeholder='বাংলা প্রয়োজনীয়তা…'
                     className='bg-slate-100 border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none flex-1'
@@ -2059,105 +2094,106 @@ export default function CourseFormClient({
 
           {/* ── Course Curriculum (one-time courses only) ────────────────────── */}
           {!isRecurringBilling && (
-          <div className='bg-white border border-slate-200 rounded-lg p-6 space-y-4'>
-            <div className='flex items-center justify-between border-b border-slate-100 pb-3'>
-              <h2 className='text-xl font-bold text-slate-800 tracking-tight'>
-                Course Curriculum
-              </h2>
-              <button
-                type='button'
-                onClick={() => void handleAddLessonClick()}
-                disabled={isSubmitting}
-                className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#E61C24]/15 hover:bg-[#E61C24]/25 text-[#E61C24] border border-[#E61C24]/20 rounded-lg text-base font-bold transition-colors cursor-pointer disabled:opacity-50'
-              >
-                <FiPlus className='h-4 w-4' /> Add Lesson
-              </button>
-            </div>
-
-            {!savedCourseId ? (
-              <div className='flex flex-col items-center justify-center py-10 gap-3 text-center'>
-                <FiVideo className='h-10 w-10 text-zinc-700' />
-                <p className='text-base font-semibold text-slate-400'>
-                  Add a title and modules above, then click &ldquo;Add
-                  Lesson&quot; — the course will be saved as a draft
-                  automatically.
-                </p>
-              </div>
-            ) : lessonsLoading ? (
-              <div className='flex items-center justify-center py-8'>
-                <div className='h-6 w-6 border-2 border-[#E61C24] border-t-transparent rounded-full animate-spin' />
-              </div>
-            ) : lessons.length === 0 ? (
-              <div className='flex flex-col items-center justify-center py-10 gap-3 text-center'>
-                <FiVideo className='h-10 w-10 text-zinc-700' />
-                <p className='text-base font-semibold text-slate-400'>
-                  No lessons yet. Add your first lesson to build the curriculum.
-                </p>
+            <div className='bg-white border border-slate-200 rounded-lg p-6 space-y-4'>
+              <div className='flex items-center justify-between border-b border-slate-100 pb-3'>
+                <h2 className='text-xl font-bold text-slate-800 tracking-tight'>
+                  Course Curriculum
+                </h2>
                 <button
                   type='button'
                   onClick={() => void handleAddLessonClick()}
                   disabled={isSubmitting}
-                  className='inline-flex items-center gap-2 px-4 py-2.5 bg-[#E61C24] hover:bg-[#CC181F] text-white rounded-lg font-bold text-base transition-all cursor-pointer disabled:opacity-50'
+                  className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#E61C24]/15 hover:bg-[#E61C24]/25 text-[#E61C24] border border-[#E61C24]/20 rounded-lg text-base font-bold transition-colors cursor-pointer disabled:opacity-50'
                 >
-                  <FiPlus className='h-4 w-4' /> Add First Lesson
+                  <FiPlus className='h-4 w-4' /> Add Lesson
                 </button>
               </div>
-            ) : (
-              <div className='space-y-2'>
-                {lessons.map((lesson) => (
-                  <div
-                    key={lesson.id}
-                    className='flex items-center gap-3 bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-slate-300 transition-colors'
+
+              {!savedCourseId ? (
+                <div className='flex flex-col items-center justify-center py-10 gap-3 text-center'>
+                  <FiVideo className='h-10 w-10 text-zinc-700' />
+                  <p className='text-base font-semibold text-slate-400'>
+                    Add a title and modules above, then click &ldquo;Add
+                    Lesson&quot; — the course will be saved as a draft
+                    automatically.
+                  </p>
+                </div>
+              ) : lessonsLoading ? (
+                <div className='flex items-center justify-center py-8'>
+                  <div className='h-6 w-6 border-2 border-[#E61C24] border-t-transparent rounded-full animate-spin' />
+                </div>
+              ) : lessons.length === 0 ? (
+                <div className='flex flex-col items-center justify-center py-10 gap-3 text-center'>
+                  <FiVideo className='h-10 w-10 text-zinc-700' />
+                  <p className='text-base font-semibold text-slate-400'>
+                    No lessons yet. Add your first lesson to build the
+                    curriculum.
+                  </p>
+                  <button
+                    type='button'
+                    onClick={() => void handleAddLessonClick()}
+                    disabled={isSubmitting}
+                    className='inline-flex items-center gap-2 px-4 py-2.5 bg-[#E61C24] hover:bg-[#CC181F] text-white rounded-lg font-bold text-base transition-all cursor-pointer disabled:opacity-50'
                   >
-                    <div className='flex h-7 w-7 shrink-0 items-center justify-center rounded bg-slate-100 text-slate-500 font-bold text-sm'>
-                      {lesson.order}
-                    </div>
-                    <div className='flex-1 min-w-0'>
-                      <p className='text-slate-800 font-bold text-base truncate'>
-                        {lesson.title}
-                      </p>
-                      <p className='text-slate-400 text-sm font-semibold'>
-                        {lesson.duration} min
-                      </p>
-                    </div>
-                    <span
-                      className={`inline-flex items-center gap-1 px-2 py-1 rounded text-sm font-bold ${
-                        lesson.lessonType === 'live'
-                          ? 'bg-rose-500/15 text-rose-400'
+                    <FiPlus className='h-4 w-4' /> Add First Lesson
+                  </button>
+                </div>
+              ) : (
+                <div className='space-y-2'>
+                  {lessons.map((lesson) => (
+                    <div
+                      key={lesson.id}
+                      className='flex items-center gap-3 bg-white border border-slate-200 rounded-lg px-4 py-3 hover:border-slate-300 transition-colors'
+                    >
+                      <div className='flex h-7 w-7 shrink-0 items-center justify-center rounded bg-slate-100 text-slate-500 font-bold text-sm'>
+                        {lesson.order}
+                      </div>
+                      <div className='flex-1 min-w-0'>
+                        <p className='text-slate-800 font-bold text-base truncate'>
+                          {lesson.title}
+                        </p>
+                        <p className='text-slate-400 text-sm font-semibold'>
+                          {lesson.duration} min
+                        </p>
+                      </div>
+                      <span
+                        className={`inline-flex items-center gap-1 px-2 py-1 rounded text-sm font-bold ${
+                          lesson.lessonType === 'live'
+                            ? 'bg-rose-500/15 text-rose-400'
+                            : lesson.lessonType === 'quiz'
+                              ? 'bg-amber-500/15 text-amber-400'
+                              : 'bg-slate-100 text-slate-500'
+                        }`}
+                      >
+                        {lesson.lessonType === 'live' ? (
+                          <FiRadio className='h-3 w-3' />
+                        ) : lesson.lessonType === 'quiz' ? (
+                          <FiHelpCircle className='h-3 w-3' />
+                        ) : (
+                          <FiVideo className='h-3 w-3' />
+                        )}
+                        {lesson.lessonType === 'live'
+                          ? 'Live'
                           : lesson.lessonType === 'quiz'
-                            ? 'bg-amber-500/15 text-amber-400'
-                            : 'bg-slate-100 text-slate-500'
-                      }`}
-                    >
-                      {lesson.lessonType === 'live' ? (
-                        <FiRadio className='h-3 w-3' />
-                      ) : lesson.lessonType === 'quiz' ? (
-                        <FiHelpCircle className='h-3 w-3' />
-                      ) : (
-                        <FiVideo className='h-3 w-3' />
-                      )}
-                      {lesson.lessonType === 'live'
-                        ? 'Live'
-                        : lesson.lessonType === 'quiz'
-                          ? 'Quiz'
-                          : 'Video'}
-                    </span>
-                    <Link
-                      href={`/admin/lessons/${lesson.id}/edit`}
-                      className='p-2 rounded-lg bg-slate-100 hover:bg-zinc-700 text-slate-500 hover:text-white transition-all'
-                      title='Edit lesson'
-                    >
-                      <FiEdit2 className='h-4 w-4' />
-                    </Link>
-                  </div>
-                ))}
-                <p className='text-sm font-semibold text-slate-400 text-right pt-1'>
-                  {lessons.length} lesson{lessons.length !== 1 ? 's' : ''} —{' '}
-                  {lessons.reduce((a, l) => a + l.duration, 0)} min total
-                </p>
-              </div>
-            )}
-          </div>
+                            ? 'Quiz'
+                            : 'Video'}
+                      </span>
+                      <Link
+                        href={`/admin/lessons/${lesson.id}/edit`}
+                        className='p-2 rounded-lg bg-slate-100 hover:bg-zinc-700 text-slate-500 hover:text-white transition-all'
+                        title='Edit lesson'
+                      >
+                        <FiEdit2 className='h-4 w-4' />
+                      </Link>
+                    </div>
+                  ))}
+                  <p className='text-sm font-semibold text-slate-400 text-right pt-1'>
+                    {lessons.length} lesson{lessons.length !== 1 ? 's' : ''} —{' '}
+                    {lessons.reduce((a, l) => a + l.duration, 0)} min total
+                  </p>
+                </div>
+              )}
+            </div>
           )}
 
           {/* ── Batches (Intake Groups) ────────────────────── */}
@@ -2168,11 +2204,10 @@ export default function CourseFormClient({
                   Batches
                 </h2>
                 <p className='text-sm font-semibold text-slate-400 mt-1'>
-                  For subscription courses, open a batch with a join window
-                  so students can enroll before class starts.
+                  Set a class schedule and open an enrollment window for each batch.
                 </p>
               </div>
-              {savedCourseId && isRecurringBilling && (
+              {savedCourseId && (
                 <button
                   type='button'
                   onClick={() => setShowAddBatchForm((v) => !v)}
@@ -2183,12 +2218,7 @@ export default function CourseFormClient({
               )}
             </div>
 
-            {!isRecurringBilling ? (
-              <p className='text-base font-semibold text-slate-400 py-2'>
-                Batches are used for subscription courses. Switch
-                billing type above to enable batch enrollment.
-              </p>
-            ) : !savedCourseId ? (
+            {!savedCourseId ? (
               <div className='flex flex-col items-center justify-center py-10 gap-3 text-center'>
                 <FiUsers className='h-10 w-10 text-zinc-700' />
                 <p className='text-base font-semibold text-slate-400'>
@@ -2234,6 +2264,21 @@ export default function CourseFormClient({
                           ))}
                         </select>
                       </div>
+                      <label className='grid gap-1 font-semibold'>
+                        Class days and time
+                        <input className='rounded-lg border border-slate-200 p-2' placeholder='Sat and Mon, 7:00 PM Dhaka time'
+                          value={newBatchSchedule} onChange={event => setNewBatchSchedule(event.target.value)} />
+                      </label>
+                      <label className='grid gap-1 font-semibold'>
+                        Orientation date
+                        <input type='date' className='rounded-lg border border-slate-200 p-2'
+                          value={newBatchOrientation} onChange={event => setNewBatchOrientation(event.target.value)} />
+                      </label>
+                      <label className='grid gap-1 font-semibold'>
+                        Duration in calendar months (optional)
+                        <input type='number' min={1} max={120} className='rounded-lg border border-slate-200 p-2'
+                          value={newBatchDuration} onChange={event => setNewBatchDuration(event.target.value)} />
+                      </label>
                       <div className='flex flex-col gap-1.5'>
                         <label className='text-base font-bold text-slate-600'>
                           Start Date *
@@ -2249,6 +2294,7 @@ export default function CourseFormClient({
                           End Date *
                         </label>
                         <AdminDateField
+                          disabled={!!newBatchDuration}
                           value={newBatchEnd}
                           onChange={setNewBatchEnd}
                           required
@@ -2274,8 +2320,8 @@ export default function CourseFormClient({
                           required
                         />
                         <p className='text-base font-medium text-slate-400'>
-                          Students can enroll from the open date through the
-                          end of the close date (Bangladesh time).
+                          Students can enroll from the open date through the end
+                          of the close date (Bangladesh time).
                         </p>
                       </div>
                       <div className='flex flex-col gap-1.5'>
@@ -2420,6 +2466,23 @@ export default function CourseFormClient({
                                 </div>
                               )}
 
+                              <div className='grid gap-4 sm:grid-cols-2'>
+                                <label className='grid gap-1 font-semibold'>
+                                  Class days and time
+                                  <input className='rounded-lg border border-slate-200 p-2' defaultValue={batch.classSchedule}
+                                    onBlur={event => {
+                                      if (event.target.value !== (batch.classSchedule ?? '')) {
+                                        handleUpdateBatchField(batch._id, 'classSchedule', event.target.value);
+                                      }
+                                    }} />
+                                </label>
+                                <label className='grid gap-1 font-semibold'>
+                                  Orientation date
+                                  <input type='date' className='rounded-lg border border-slate-200 p-2'
+                                    defaultValue={toBdDateYmd(batch.orientationDate)}
+                                    onChange={event => handleUpdateBatchField(batch._id, 'orientationDate', event.target.value)} />
+                                </label>
+                              </div>
                               {/* Capacity & status controls */}
                               <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
                                 <div className='flex flex-col gap-1.5'>
@@ -2483,11 +2546,19 @@ export default function CourseFormClient({
                                   only visible to students in {batch.name}.
                                 </p>
                                 {(() => {
-                                  const batchLessons = lessons.flatMap((lesson) => {
-                                    const settings = lesson.batchSettings.find((item) => item.batch === batch._id);
-                                    if (settings) return [{ ...lesson, ...settings }];
-                                    return lesson.batchId === batch._id ? [lesson] : [];
-                                  }).sort((a, b) => a.order - b.order);
+                                  const batchLessons = lessons
+                                    .flatMap((lesson) => {
+                                      const settings =
+                                        lesson.batchSettings.find(
+                                          (item) => item.batch === batch._id,
+                                        );
+                                      if (settings)
+                                        return [{ ...lesson, ...settings }];
+                                      return lesson.batchId === batch._id
+                                        ? [lesson]
+                                        : [];
+                                    })
+                                    .sort((a, b) => a.order - b.order);
                                   if (lessonsLoading) {
                                     return (
                                       <p className='text-base font-semibold text-slate-400 text-center py-6'>
@@ -2542,13 +2613,25 @@ export default function CourseFormClient({
                                     </div>
                                   );
                                 })()}
-                                {lessons.some((lesson) => lesson.batchId !== batch._id && !lesson.batchSettings.some((item) => item.batch === batch._id)) && (
+                                {lessons.some(
+                                  (lesson) =>
+                                    lesson.batchId !== batch._id &&
+                                    !lesson.batchSettings.some(
+                                      (item) => item.batch === batch._id,
+                                    ),
+                                ) && (
                                   <div className='space-y-2 pt-2'>
                                     <p className='text-base font-bold text-slate-700'>
                                       Available course lessons
                                     </p>
                                     {lessons
-                                      .filter((lesson) => lesson.batchId !== batch._id && !lesson.batchSettings.some((item) => item.batch === batch._id))
+                                      .filter(
+                                        (lesson) =>
+                                          lesson.batchId !== batch._id &&
+                                          !lesson.batchSettings.some(
+                                            (item) => item.batch === batch._id,
+                                          ),
+                                      )
                                       .map((lesson) => (
                                         <div
                                           key={lesson.id}
@@ -2857,124 +2940,80 @@ export default function CourseFormClient({
               Finance & Status
             </h3>
 
-            <div className='flex flex-col gap-2'>
-              <label className='text-base font-bold text-slate-600'>
-                Billing type
-              </label>
-              <select
-                value={billingType}
-                onChange={(e) => setBillingType(e.target.value as typeof billingType)}
-                className='bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer'
-              >
-                <option value='one_time'>One-time purchase (lifetime)</option>
-                <option value='monthly'>Monthly subscription (30 days)</option>
-                <option value='two_month'>Two months (60 days)</option>
-                <option value='quarterly'>
-                  Quarterly subscription (calendar quarters)
-                </option>
-              </select>
-            </div>
+            <fieldset className='space-y-3'>
+              <legend className='font-bold text-slate-700'>Payment options</legend>
+              {paymentPlanTypes.map(type => {
+                const plan = paymentPlans.find(option => option.type === type);
+                return (
+                  <div key={type} className='rounded-lg border border-slate-200 p-4 space-y-3'>
+                    <label className='flex items-center gap-2 font-semibold'>
+                      <input type='checkbox' checked={!!plan} onChange={event => {
+                        setPaymentPlans(plans => event.target.checked
+                          ? [...plans, { type, price: type === 'one_time' && plans.length === 0 ? 0 : 1 }]
+                          : plans.filter(option => option.type !== type));
+                      }} />
+                      {paymentPlanLabels[type]}
+                    </label>
+                    {plan && (
+                      <div className='grid gap-3 sm:grid-cols-2'>
+                        <label className='grid gap-1'>
+                          Amount charged (BDT)
+                          <input type='number' min={type === 'one_time' && paymentPlans.length === 1 ? 0 : 1} step='0.01' required
+                            value={plan.price}
+                            onChange={event => updatePlan(type, { price: Number(event.target.value) })}
+                            className='rounded-lg border border-slate-200 p-2' />
+                        </label>
+                        <label className='grid gap-1'>
+                          Regular price (optional)
+                          <input type='number' min={plan.price + 0.01} step='0.01' value={plan.regularPrice ?? ''}
+                            onChange={event => updatePlan(type, { regularPrice: event.target.value === '' ? undefined : Number(event.target.value) })}
+                            className='rounded-lg border border-slate-200 p-2' />
+                        </label>
+                        {type !== 'one_time' && ([
+                          ['noticeStartOffsetDays', 'Show notice days before due', noticeStartOffsetDays],
+                          ['noticeEndOffsetDays', 'Hide notice days after due', noticeEndOffsetDays],
+                          ['blockOffsetDays', 'Pause access days after due', blockOffsetDays],
+                        ] as const).map(([field, label, fallback]) => (
+                          <label key={field} className='grid gap-1'>
+                            {label}
+                            <input type='number' min={0} value={plan[field] ?? fallback}
+                              onChange={event => updatePlan(type, { [field]: Number(event.target.value) })}
+                              className='rounded-lg border border-slate-200 p-2' />
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+              <p className='text-base text-slate-600'>For a free course, enable only Full-course payment and set the price to zero.</p>
+            </fieldset>
 
-            {billingType === 'one_time' ? (
-              <div className='flex flex-col gap-2'>
-                <label className='text-base font-bold text-slate-600'>
-                  Price (BDT)
-                </label>
-                <input
-                  type='number'
-                  min={0}
-                  value={price}
-                  onChange={(e) =>
-                    setPrice(
-                      e.target.value === '' ? '' : Number(e.target.value),
-                    )
-                  }
-                  placeholder='4500'
-                  className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
-                />
-              </div>
-            ) : (
+            {isRecurringBilling && (
               <div className='space-y-4'>
-                {billingType === 'monthly' ? (
-                  <div className='flex flex-col gap-2'>
-                    <label className='text-base font-bold text-slate-600'>
-                      Monthly fee (BDT)
-                    </label>
-                    <input
-                      type='number'
-                      min={0}
-                      value={monthlyFee}
-                      onChange={(e) =>
-                        setMonthlyFee(
-                          e.target.value === '' ? '' : Number(e.target.value),
-                        )
-                      }
-                      placeholder='1500'
-                      className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
-                    />
-                  </div>
-                ) : (
-                  <div className='flex flex-col gap-2'>
-                    <label className='text-base font-bold text-slate-600'>
-                      {billingType === 'two_month' ? 'Two-month fee (BDT)' : 'Quarterly fee (BDT)'}
-                    </label>
-                    <input
-                      type='number'
-                      min={0}
-                      value={billingType === 'two_month' ? twoMonthFee : quarterlyFee}
-                      onChange={(e) =>
-                        (billingType === 'two_month' ? setTwoMonthFee : setQuarterlyFee)(
-                          e.target.value === '' ? '' : Number(e.target.value),
-                        )
-                      }
-                      placeholder='4000'
-                      className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
-                    />
-                  </div>
-                )}
-                <p className='text-base font-semibold text-slate-500'>
-                  Students can enroll only while a batch join window is open.
-                  They are auto-assigned to that batch (no picker).
-                </p>
-                <div className='flex items-center gap-3'>
-                  <input
-                    type='checkbox'
-                    id='lateFeeEnabled'
-                    checked={lateFeeEnabled}
-                    onChange={(e) => setLateFeeEnabled(e.target.checked)}
-                    className='h-5 w-5 accent-[#E61C24] rounded cursor-pointer'
-                  />
-                  <label
-                    htmlFor='lateFeeEnabled'
-                    className='text-base font-bold text-slate-600 cursor-pointer'
-                  >
-                    Add late fee when renewing after period end
-                  </label>
-                </div>
+                <label className='flex items-center gap-2 font-semibold'>
+                  <input type='checkbox' checked={lateFeeEnabled} onChange={event => setLateFeeEnabled(event.target.checked)} />
+                  Charge a late fee
+                </label>
                 {lateFeeEnabled && (
-                  <div className='flex flex-col gap-2'>
-                    <label className='text-base font-bold text-slate-600'>
-                      Late fee amount (BDT)
-                    </label>
-                    <input
-                      type='number'
-                      min={0}
-                      value={lateFeeAmount}
-                      onChange={(e) =>
-                        setLateFeeAmount(
-                          e.target.value === '' ? '' : Number(e.target.value),
-                        )
-                      }
-                      className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
-                    />
-                  </div>
+                  <label className='grid gap-1'>
+                    Late fee (BDT)
+                    <input type='number' min={0} value={lateFeeAmount}
+                      onChange={event => setLateFeeAmount(Number(event.target.value))}
+                      className='rounded-lg border border-slate-200 p-2' />
+                  </label>
                 )}
                 <details className='rounded-lg border border-slate-200 bg-slate-50 p-4'>
-                  <summary className='cursor-pointer text-base font-bold text-slate-800'>Renewal reminders and access</summary>
+                  <summary className='cursor-pointer text-base font-bold text-slate-800'>
+                    Renewal reminders and access
+                  </summary>
                   <div className='mt-4 space-y-4'>
                     <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
                       <div className='flex flex-col gap-2'>
-                        <label htmlFor='noticeStartOffsetDays' className='text-base font-bold text-slate-600'>
+                        <label
+                          htmlFor='noticeStartOffsetDays'
+                          className='text-sm font-bold text-slate-600'
+                        >
                           Show reminder (days before due)
                         </label>
                         <input
@@ -2983,13 +3022,18 @@ export default function CourseFormClient({
                           min={0}
                           value={noticeStartOffsetDays}
                           onChange={(e) =>
-                            setNoticeStartOffsetDays(Number(e.target.value) || 0)
+                            setNoticeStartOffsetDays(
+                              Number(e.target.value) || 0,
+                            )
                           }
                           className='bg-slate-100 border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none'
                         />
                       </div>
                       <div className='flex flex-col gap-2'>
-                        <label htmlFor='noticeEndOffsetDays' className='text-base font-bold text-slate-600'>
+                        <label
+                          htmlFor='noticeEndOffsetDays'
+                          className='text-sm font-bold text-slate-600'
+                        >
                           Hide reminder (days after due)
                         </label>
                         <input
@@ -3004,7 +3048,10 @@ export default function CourseFormClient({
                         />
                       </div>
                       <div className='flex flex-col gap-2'>
-                        <label htmlFor='blockOffsetDays' className='text-base font-bold text-slate-600'>
+                        <label
+                          htmlFor='blockOffsetDays'
+                          className='text-sm font-bold text-slate-600'
+                        >
                           Pause access (days after due)
                         </label>
                         <input
@@ -3026,37 +3073,53 @@ export default function CourseFormClient({
                           id='smsReminderEnabled'
                           type='checkbox'
                           checked={smsReminderEnabled}
-                          onChange={(e) => setSmsReminderEnabled(e.target.checked)}
+                          onChange={(e) =>
+                            setSmsReminderEnabled(e.target.checked)
+                          }
                           className='mt-1 h-5 w-5 rounded border-slate-300 text-[#E61C24] focus:ring-[#E61C24]'
                         />
-                        <label htmlFor='smsReminderEnabled' className='cursor-pointer'>
+                        <label
+                          htmlFor='smsReminderEnabled'
+                          className='cursor-pointer'
+                        >
                           <span className='block text-base font-bold text-slate-800'>
                             Send fee reminders by SMS
                           </span>
                           <span className='block text-base font-semibold text-slate-500 mt-1'>
-                            Uses the student’s payment due date each billing period.
+                            Uses the student’s payment due date each billing
+                            period.
                           </span>
                         </label>
                       </div>
                       {smsReminderEnabled && (
                         <div className='space-y-3'>
                           <div className='flex flex-col gap-2'>
-                            <label htmlFor='smsOffsetsText' className='text-base font-bold text-slate-600'>
+                            <label
+                              htmlFor='smsOffsetsText'
+                              className='text-base font-bold text-slate-600'
+                            >
                               Days before payment is due (comma-separated)
                             </label>
                             <input
                               id='smsOffsetsText'
                               type='text'
                               value={smsOffsetsText}
-                              onChange={(e) => setSmsOffsetsText(e.target.value)}
+                              onChange={(e) =>
+                                setSmsOffsetsText(e.target.value)
+                              }
                               placeholder='5, 3, 1'
                               className='bg-white border border-slate-200 rounded-lg p-3 text-base font-semibold outline-none'
                             />
                           </div>
                           <details className='space-y-3'>
-                            <summary className='cursor-pointer text-base font-semibold text-slate-700'>Advanced SMS settings</summary>
-                              <div className='flex flex-col gap-2'>
-                              <label htmlFor='smsMaxMessages' className='text-base font-bold text-slate-600'>
+                            <summary className='cursor-pointer text-base font-semibold text-slate-700'>
+                              Advanced SMS settings
+                            </summary>
+                            <div className='flex flex-col gap-2'>
+                              <label
+                                htmlFor='smsMaxMessages'
+                                className='text-base font-bold text-slate-600'
+                              >
                                 Max SMS per billing period
                               </label>
                               <input
@@ -3075,17 +3138,32 @@ export default function CourseFormClient({
                       )}
                     </div>
                     <div className='rounded-lg border border-slate-200 bg-white p-4 text-base text-slate-700 space-y-2'>
-                      <p className='font-bold'>Example timeline · Payment due {formatBdDate(exampleDue)}</p>
-                      {noticeStartAt && reminderEnd && noticeStartAt < reminderEnd && (
-                        <p>The dashboard reminder appears on {formatBdDate(noticeStartAt)} and ends on {formatBdDate(reminderEnd)}.</p>
-                      )}
-                      <p>Course access pauses on {blockAt && formatBdDate(blockAt)} if payment is still due.</p>
+                      <p className='font-bold'>
+                        Example timeline · Payment due{' '}
+                        {formatBdDate(exampleDue)}
+                      </p>
+                      {noticeStartAt &&
+                        reminderEnd &&
+                        noticeStartAt < reminderEnd && (
+                          <p>
+                            The dashboard reminder appears on{' '}
+                            {formatBdDate(noticeStartAt)} and ends on{' '}
+                            {formatBdDate(reminderEnd)}.
+                          </p>
+                        )}
+                      <p>
+                        Course access pauses on{' '}
+                        {blockAt && formatBdDate(blockAt)} if payment is still
+                        due.
+                      </p>
                       {smsReminderEnabled && (
-                        <p>{smsMaxMessages <= 0
-                          ? 'No SMS reminders are scheduled with a limit of zero.'
-                          : smsDates.length
-                            ? `SMS reminders are scheduled for ${smsDates.join(', ')}.`
-                            : 'With no days entered, SMS reminders use the school schedule or the default of 5, 3, and 1 days before payment is due.'}</p>
+                        <p>
+                          {smsMaxMessages <= 0
+                            ? 'No SMS reminders are scheduled with a limit of zero.'
+                            : smsDates.length
+                              ? `SMS reminders are scheduled for ${smsDates.join(', ')}.`
+                              : 'With no days entered, SMS reminders use the school schedule or the default of 5, 3, and 1 days before payment is due.'}
+                        </p>
                       )}
                     </div>
                   </div>

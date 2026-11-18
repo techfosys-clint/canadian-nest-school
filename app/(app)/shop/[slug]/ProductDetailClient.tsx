@@ -1,6 +1,7 @@
 'use client';
 
 import { useCart } from '@/context/CartContext';
+import CourseTrailerPlayer from '@/components/CourseTrailerPlayer';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -27,7 +28,8 @@ interface ProductData {
   comparePrice: number | null;
   thumbnail: string;
   images: string[];
-  productType: 'book' | 'merchandise' | 'other';
+  introVideo?: string;
+  productType: 'book' | 'ebook' | 'merchandise' | 'other';
   author: string;
   sku: string;
   category: string;
@@ -50,7 +52,7 @@ export default function ProductDetailClient({
   const [activeImage, setActiveImage] = useState(product.thumbnail);
   const [cartMessage, setCartMessage] = useState<string | null>(null);
 
-  const maxQty = product.stock === null ? 99 : Math.max(1, product.stock);
+  const maxQty = product.productType === 'ebook' ? 1 : product.stock === null ? 99 : Math.max(1, product.stock);
   const gallery = [product.thumbnail, ...product.images].filter(Boolean);
 
   const toCartLine = () => ({
@@ -61,6 +63,7 @@ export default function ProductDetailClient({
     thumbnail: product.thumbnail,
     maxQty,
     inStock: product.inStock,
+    digital: product.productType === 'ebook',
     quantity,
   });
 
@@ -95,6 +98,16 @@ export default function ProductDetailClient({
       <div className='grid grid-cols-1 lg:grid-cols-12 gap-10 items-start'>
         {/* Gallery */}
         <div className='lg:col-span-5 space-y-3'>
+          {product.introVideo ? (
+            <CourseTrailerPlayer
+              key={`${product.id}-${activeImage}`}
+              title={product.title}
+              trailerUrl={product.introVideo}
+              posterUrl={activeImage || product.thumbnail}
+              previewLabel='product preview'
+              className='rounded-lg border border-zinc-200/80'
+            />
+          ) : (
           <div className='aspect-3/4 bg-white border border-zinc-200/80 rounded-lg overflow-hidden flex items-center justify-center'>
             {activeImage ? (
               <Image
@@ -112,6 +125,7 @@ export default function ProductDetailClient({
               <FiBookOpen className='h-16 w-16 text-zinc-300' />
             )}
           </div>
+          )}
           {gallery.length > 1 && (
             <div className='grid grid-cols-4 gap-2'>
               {gallery.map((url, idx) => (

@@ -19,6 +19,7 @@ export interface IEnrollment extends Document {
   paidUntil?: Date
   /** Join date used as billing cycle anchor (recurring only). */
   paymentPlanSnapshot?: PaymentPlan
+  paymentTermsAcceptedAt?: Date
   calendarBillingAnchor?: Date
   billingCycleAnchor?: Date
   /** Original charge and coverage, captured at recurring enrollment. */
@@ -51,6 +52,7 @@ const EnrollmentSchema = new Schema<IEnrollment>(
     },
     paidUntil: { type: Date },
     paymentPlanSnapshot: { type: Schema.Types.Mixed },
+    paymentTermsAcceptedAt: Date,
     calendarBillingAnchor: { type: Date },
     billingCycleAnchor: { type: Date },
     initialPaymentAmount: { type: Number, min: 0 },
@@ -68,6 +70,7 @@ const EnrollmentSchema = new Schema<IEnrollment>(
 if (
   mongoose.models.Enrollment &&
   (!mongoose.models.Enrollment.schema.paths.billingType ||
+    !mongoose.models.Enrollment.schema.paths.paymentTermsAcceptedAt ||
     !mongoose.models.Enrollment.schema.paths.calendarBillingAnchor ||
     !mongoose.models.Enrollment.schema.paths.batch ||
     !mongoose.models.Enrollment.schema.paths.initialPaymentPeriodEnd ||

@@ -1,3 +1,4 @@
+import { getYoutubePreviewUrl } from '@/lib/videoEmbed'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Product } from '@/lib/db/models/Product'
@@ -33,13 +34,13 @@ export async function PUT(
     if (!user) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
 
     const { id } = await params
-    const product = await Product.findById(id)
+    const product = await Product.findById(id).select('+ebookPages')
     if (!product) return NextResponse.json({ error: 'Product not found.' }, { status: 404 })
 
     const body = await request.json()
     const {
       title, slug, shortDescription, description, price, comparePrice,
-      thumbnail, images, productType, author, sku, category, stock, status, seo,
+      thumbnail, images, productType, introVideo, ebookPages, author, sku, category, stock, status, seo,
     } = body
 
     if (slug && slug !== product.slug) {
@@ -57,6 +58,18 @@ export async function PUT(
     if (comparePrice !== undefined) product.comparePrice = comparePrice || undefined
     if (thumbnail !== undefined) product.thumbnail = thumbnail
     if (images !== undefined) product.images = images
+    if (introVideo && !getYoutubePreviewUrl(introVideo)) {
+      return NextResponse.json({ error: 'Enter a valid YouTube video link.' }, { status: 400 })
+    }
+    if (ebookPages !== undefined && (!Array.isArray(ebookPages) || ebookPages.length > 500 ||
+      ebookPages.some(key => typeof key !== 'string' || !/^[a-f0-9-]{36}\.webp$/.test(key)))) {
+      return NextResponse.json({ error: 'Invalid eBook page list.' }, { status: 400 })
+    }
+    if ((productType ?? product.productType) === 'ebook' && (status ?? product.status) === 'published' && !(ebookPages ?? product.ebookPages)?.length) {
+      return NextResponse.json({ error: 'Upload at least one eBook page before publishing.' }, { status: 400 })
+    }
+    if (introVideo !== undefined) product.introVideo = getYoutubePreviewUrl(introVideo) ?? ''
+    if (ebookPages !== undefined) product.ebookPages = ebookPages
     if (productType !== undefined) product.productType = productType
     if (author !== undefined) product.author = author
     if (sku !== undefined) product.sku = sku

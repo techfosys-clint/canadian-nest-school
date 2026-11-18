@@ -30,6 +30,7 @@ export default function ShopCheckoutFormClient() {
   const router = useRouter();
   const { items, authLoading, userId, refreshAuth, clearCart } = useCart();
 
+  const needsShipping = items.some(item => !item.digital);
   const [user, setUser] = useState<UserSession | null>(null);
   const [loadingSession, setLoadingSession] = useState(true);
   const [shippingName, setShippingName] = useState('');
@@ -89,7 +90,7 @@ export default function ShopCheckoutFormClient() {
     if (
       !shippingName.trim() ||
       !shippingPhone.trim() ||
-      !shippingAddress.trim()
+      (needsShipping && !shippingAddress.trim())
     ) {
       setOrderError(
         'Please fill in your name, phone number, and shipping address.',
@@ -251,7 +252,7 @@ export default function ShopCheckoutFormClient() {
               </div>
             </div>
 
-            <div className='space-y-1.5'>
+            {needsShipping && <div className='space-y-1.5'>
               <label className='text-base font-bold text-zinc-700'>
                 Full Delivery Address
               </label>
@@ -268,7 +269,7 @@ export default function ShopCheckoutFormClient() {
                   className='w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base font-semibold text-zinc-800 bg-white resize-none'
                 />
               </div>
-            </div>
+            </div>}
 
             <button
               type='submit'

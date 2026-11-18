@@ -37,7 +37,7 @@ export default async function EditProductPage({ params }: Props) {
   const sessionUser = await User.findById(decoded.id).lean()
   if (!sessionUser || !['admin', 'staff'].includes(sessionUser.role)) redirect('/login')
 
-  const productDoc = await Product.findById(id).lean() as any
+  const productDoc = await Product.findById(id).select('+ebookPages').lean() as any
   if (!productDoc) notFound()
 
   const serializedProduct = {
@@ -51,6 +51,8 @@ export default async function EditProductPage({ params }: Props) {
     thumbnail: productDoc.thumbnail || '',
     images: productDoc.images || [],
     productType: productDoc.productType,
+    introVideo: productDoc.introVideo,
+    ebookPages: productDoc.ebookPages,
     author: productDoc.author || '',
     sku: productDoc.sku || '',
     category: productDoc.category || '',

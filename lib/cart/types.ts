@@ -7,6 +7,7 @@ export interface CartItem {
   quantity: number;
   maxQty: number;
   inStock: boolean;
+  digital?: boolean;
 }
 
 export type CartItemInput = Omit<CartItem, 'quantity'> & { quantity?: number };

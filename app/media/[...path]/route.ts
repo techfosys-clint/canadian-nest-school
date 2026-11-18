@@ -22,6 +22,8 @@ export async function GET(
       else if (ext === '.png') contentType = 'image/png'
       else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg'
       else if (ext === '.svg') contentType = 'image/svg+xml'
+      else if (ext === '.mp4') contentType = 'video/mp4'
+      else if (ext === '.webm') contentType = 'video/webm'
       else if (ext === '.gif') contentType = 'image/gif'
     }
 

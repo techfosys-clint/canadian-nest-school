@@ -91,6 +91,7 @@ export async function PUT(request: Request, { params }: Props) {
       name,
       instructor,
       classSchedule,
+      firstClassAt,
       orientationDate,
       durationMonths,
       startDate,
@@ -103,6 +104,9 @@ export async function PUT(request: Request, { params }: Props) {
     } = body
     if (durationMonths !== undefined && (!Number.isSafeInteger(durationMonths) || durationMonths < 1 || durationMonths > 120)) {
       return NextResponse.json({ error: 'Duration must be 1 to 120 calendar months.' }, { status: 400 })
+    }
+    if (firstClassAt && (typeof firstClassAt !== 'string' || !Number.isFinite(parseBdDate(firstClassAt).getTime()))) {
+      return NextResponse.json({ error: 'Enter a valid first class date and time.' }, { status: 400 })
     }
     if (orientationDate && !Number.isFinite(parseBdDate(orientationDate).getTime())) {
       return NextResponse.json({ error: 'Enter a valid orientation date.' }, { status: 400 })
@@ -123,6 +127,7 @@ export async function PUT(request: Request, { params }: Props) {
     if (startDate) batch.startDate = parseBdDate(startDate)
     if (durationMonths) batch.endDate = addCalendarMonths(batch.startDate, durationMonths)
     else if (endDate) batch.endDate = parseBdDate(endDate)
+    if (firstClassAt !== undefined) batch.firstClassAt = firstClassAt ? parseBdDate(firstClassAt) : undefined
     if (classSchedule !== undefined) batch.classSchedule = String(classSchedule).trim()
     if (orientationDate !== undefined) batch.orientationDate = orientationDate ? parseBdDate(orientationDate) : undefined
     if (joinOpensAt !== undefined) {

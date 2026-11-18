@@ -1,5 +1,6 @@
 'use client';
 
+import AdminAssetInput from '@/components/AdminAssetInput';
 import { availablePaymentPlans } from '@/lib/subscriptions/billing';
 import { paymentPlanLabels, paymentPlanTypes, type PaymentPlan } from '@/lib/subscriptions/plans';
 
@@ -7,7 +8,7 @@ import AdminDateField from '@/components/admin/AdminDateField';
 import type { MediaItem } from '@/components/MediaPickerModal';
 import MediaPickerModal from '@/components/MediaPickerModal';
 import RichTextEditor from '@/components/RichTextEditor';
-import { formatBdDate, parseBdDate, parseBdDateEndOfDay, toBdDateYmd } from '@/lib/bdTime';
+import { formatBdDate, parseBdDate, parseBdDateEndOfDay, toBdInputValue } from '@/lib/bdTime';
 import { parseJsonResponse } from '@/lib/safeJson';
 import {
   addDays,
@@ -394,6 +395,7 @@ export default function CourseFormClient({
     instructor: { _id: string; name: string } | null;
     startDate: string;
     endDate: string;
+    firstClassAt?: string;
     classSchedule?: string;
     orientationDate?: string;
     joinOpensAt: string | null;
@@ -418,6 +420,7 @@ export default function CourseFormClient({
   const [newBatchEnd, setNewBatchEnd] = useState('');
   const [newBatchDuration, setNewBatchDuration] = useState('');
   const [newBatchSchedule, setNewBatchSchedule] = useState('');
+  const [newBatchFirstClass, setNewBatchFirstClass] = useState('');
   const [newBatchOrientation, setNewBatchOrientation] = useState('');
   const [newBatchJoinOpens, setNewBatchJoinOpens] = useState('');
   const [newBatchJoinCloses, setNewBatchJoinCloses] = useState('');
@@ -443,6 +446,7 @@ export default function CourseFormClient({
               startDate: b.startDate,
               endDate: b.endDate,
               classSchedule: b.classSchedule,
+              firstClassAt: b.firstClassAt,
               orientationDate: b.orientationDate,
               joinOpensAt: b.joinOpensAt || null,
               joinClosesAt: b.joinClosesAt || null,
@@ -539,6 +543,7 @@ export default function CourseFormClient({
           endDate: newBatchEnd || undefined,
           durationMonths: newBatchDuration ? Number(newBatchDuration) : undefined,
           classSchedule: newBatchSchedule,
+          firstClassAt: newBatchFirstClass || undefined,
           orientationDate: newBatchOrientation || undefined,
           joinOpensAt: joinOpens.toISOString(),
           joinClosesAt: joinCloses.toISOString(),
@@ -555,6 +560,7 @@ export default function CourseFormClient({
       setNewBatchDuration('');
       setNewBatchSchedule('');
       setNewBatchOrientation('');
+      setNewBatchFirstClass('');
       setNewBatchJoinOpens('');
       setNewBatchJoinCloses('');
       setNewBatchMax(0);
@@ -608,7 +614,7 @@ export default function CourseFormClient({
 
   const handleUpdateBatchField = async (
     batchId: string,
-    field: 'maxStudents' | 'status' | 'classSchedule' | 'orientationDate',
+    field: 'maxStudents' | 'status' | 'classSchedule' | 'orientationDate' | 'firstClassAt',
     value: any,
   ) => {
     try {
@@ -2287,8 +2293,13 @@ export default function CourseFormClient({
                           value={newBatchSchedule} onChange={event => setNewBatchSchedule(event.target.value)} />
                       </label>
                       <label className='grid gap-1 font-semibold'>
-                        Orientation date
-                        <input type='date' className='rounded-lg border border-slate-200 p-2'
+                        First class (Dhaka time)
+                        <input type='datetime-local' className='rounded-lg border border-slate-200 p-2'
+                          value={newBatchFirstClass} onChange={event => setNewBatchFirstClass(event.target.value)} />
+                      </label>
+                      <label className='grid gap-1 font-semibold'>
+                        Orientation (Dhaka time)
+                        <input type='datetime-local' className='rounded-lg border border-slate-200 p-2'
                           value={newBatchOrientation} onChange={event => setNewBatchOrientation(event.target.value)} />
                       </label>
                       <label className='grid gap-1 font-semibold'>
@@ -2494,9 +2505,15 @@ export default function CourseFormClient({
                                     }} />
                                 </label>
                                 <label className='grid gap-1 font-semibold'>
-                                  Orientation date
-                                  <input type='date' className='rounded-lg border border-slate-200 p-2'
-                                    defaultValue={toBdDateYmd(batch.orientationDate)}
+                                  First class (Dhaka time)
+                                  <input type='datetime-local' className='rounded-lg border border-slate-200 p-2'
+                                    defaultValue={batch.firstClassAt ? toBdInputValue(batch.firstClassAt) : ''}
+                                    onChange={event => handleUpdateBatchField(batch._id, 'firstClassAt', event.target.value)} />
+                                </label>
+                                <label className='grid gap-1 font-semibold'>
+                                  Orientation (Dhaka time)
+                                  <input type='datetime-local' className='rounded-lg border border-slate-200 p-2'
+                                    defaultValue={batch.orientationDate ? toBdInputValue(batch.orientationDate) : ''}
                                     onChange={event => handleUpdateBatchField(batch._id, 'orientationDate', event.target.value)} />
                                 </label>
                               </div>
@@ -2911,6 +2928,7 @@ export default function CourseFormClient({
               <label className='text-base font-bold text-slate-600'>
                 YouTube or Vimeo URL (optional)
               </label>
+              <AdminAssetInput kind='video' onUpload={([key]) => setTrailerVideoUrl(key)} />
               <input
                 type='url'
                 value={trailerVideoUrl}

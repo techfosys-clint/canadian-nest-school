@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { FiPackage, FiMapPin, FiCheckCircle } from 'react-icons/fi'
@@ -13,6 +14,7 @@ interface UserSession {
 }
 
 interface OrderItem {
+  product?: { _id: string; productType: string }
   title: string
   price: number
   quantity: number
@@ -113,7 +115,11 @@ export default function MyOrdersPage() {
               <div className="space-y-2 border-t border-zinc-100 pt-3">
                 {order.items.map((item, idx) => (
                   <div key={idx} className="flex items-center justify-between text-base font-semibold text-zinc-700">
-                    <span>{item.title} &times; {item.quantity}</span>
+                    <span>{item.title} &times; {item.quantity}
+                      {item.product?.productType === 'ebook' && order.orderStatus !== 'cancelled' && (
+                        <Link className='ml-3 underline' href={`/dashboard/ebooks/${item.product._id}`}>Read eBook</Link>
+                      )}
+                    </span>
                     <span>৳{(item.price * item.quantity).toLocaleString('en-BD')}</span>
                   </div>
                 ))}

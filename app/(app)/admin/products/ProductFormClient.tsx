@@ -6,6 +6,7 @@ import RichTextEditor from '@/components/RichTextEditor';
 import { parseJsonResponse } from '@/lib/safeJson';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import AdminAssetInput from '@/components/AdminAssetInput';
 import React, { useRef, useState } from 'react';
 import {
   FiArrowLeft,
@@ -24,11 +25,13 @@ interface ProductFormProps {
     slug: string;
     shortDescription?: string;
     description?: string;
+    introVideo?: string;
+    ebookPages?: string[];
     price: number;
     comparePrice?: number;
     thumbnail?: string;
     images?: string[];
-    productType: 'book' | 'merchandise' | 'other';
+    productType: 'book' | 'ebook' | 'merchandise' | 'other';
     author?: string;
     sku?: string;
     category?: string;
@@ -55,6 +58,8 @@ export default function ProductFormClient({ initialData }: ProductFormProps) {
   const [shortDescription, setShortDescription] = useState(
     initialData?.shortDescription || '',
   );
+  const [introVideo, setIntroVideo] = useState(initialData?.introVideo ?? '');
+  const [ebookPages, setEbookPages] = useState<string[]>(initialData?.ebookPages ?? []);
   const [description, setDescription] = useState(
     initialData?.description || '',
   );
@@ -63,7 +68,7 @@ export default function ProductFormClient({ initialData }: ProductFormProps) {
     initialData?.comparePrice ?? '',
   );
   const [productType, setProductType] = useState<
-    'book' | 'merchandise' | 'other'
+    'book' | 'ebook' | 'merchandise' | 'other'
   >(initialData?.productType || 'book');
   const [author, setAuthor] = useState(initialData?.author || '');
   const [sku, setSku] = useState(initialData?.sku || '');
@@ -181,6 +186,8 @@ export default function ProductFormClient({ initialData }: ProductFormProps) {
       thumbnail,
       images,
       productType,
+      introVideo,
+      ebookPages: productType === 'ebook' ? ebookPages : [],
       author: author || undefined,
       sku: sku || undefined,
       category: category || undefined,
@@ -303,6 +310,7 @@ export default function ProductFormClient({ initialData }: ProductFormProps) {
                   className='bg-slate-100 border border-slate-200 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors cursor-pointer'
                 >
                   <option value='book'>Book</option>
+                  <option value='ebook'>Digital eBook</option>
                   <option value='merchandise'>Merchandise</option>
                   <option value='other'>Other</option>
                 </select>
@@ -362,11 +370,49 @@ export default function ProductFormClient({ initialData }: ProductFormProps) {
             </div>
           </div>
 
-          {/* Description */}
+          {/* Preview and reading content */}
           <div className='bg-white border border-slate-200 rounded-lg p-6 space-y-4'>
             <h2 className='text-xl font-bold text-slate-800 tracking-tight border-b border-slate-100 pb-3'>
-              Full Description
+              Product Preview
             </h2>
+            <label className='grid gap-2 text-base font-semibold text-slate-700'>
+              YouTube preview URL
+              <input type='text' value={introVideo} onChange={event => setIntroVideo(event.target.value.trim())}
+                placeholder='https://www.youtube.com/watch?v=...'
+                className='w-full rounded-lg border border-slate-200 bg-slate-100 p-3 text-base outline-none focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80' />
+              <span className='font-normal text-slate-500'>Customers play this video from the product cover.</span>
+            </label>
+            {introVideo && (
+              <button type='button' onClick={() => setIntroVideo('')}
+                className='inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-base font-semibold text-red-700 transition-colors hover:bg-red-100'>
+                <FiTrash2 aria-hidden='true' /> Remove preview
+              </button>
+            )}
+          </div>
+
+          {productType === 'ebook' && (
+              <div className='space-y-4 rounded-lg border border-slate-200 bg-white p-6'>
+                <div className='flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3'>
+                  <h2 className='text-xl font-bold tracking-tight text-slate-800'>eBook Pages</h2>
+                  <span className='rounded-lg border border-slate-200 bg-slate-50 px-3 py-1 text-base font-semibold text-slate-600'>
+                    {ebookPages.length} {ebookPages.length === 1 ? 'page' : 'pages'} uploaded
+                  </span>
+                </div>
+                <AdminAssetInput kind='ebook' onUpload={keys => setEbookPages(current => [...current, ...keys])} />
+                <div className='flex flex-wrap items-center justify-between gap-3'>
+                  <p className='text-base text-slate-500'>New pages are added after the existing pages. Save the product to apply changes.</p>
+                  {!!ebookPages.length && (
+                    <button type='button' onClick={() => setEbookPages([])}
+                      className='inline-flex shrink-0 items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-base font-semibold text-red-700 transition-colors hover:bg-red-100'>
+                      <FiTrash2 aria-hidden='true' /> Clear all pages
+                    </button>
+                  )}
+                </div>
+              </div>
+          )}
+
+          <div className='space-y-4 rounded-lg border border-slate-200 bg-white p-6'>
+            <h2 className='border-b border-slate-100 pb-3 text-xl font-bold tracking-tight text-slate-800'>Full Description</h2>
             <RichTextEditor
               value={description}
               onChange={setDescription}

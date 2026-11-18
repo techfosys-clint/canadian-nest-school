@@ -39,10 +39,11 @@ export default async function ProductDetailPage({ params }: Props) {
     thumbnail: product.thumbnail || '',
     images: product.images || [],
     productType: product.productType,
+    introVideo: product.introVideo,
     author: product.author || '',
     sku: product.sku || '',
     category: product.category || '',
-    inStock: product.stock === null || product.stock === undefined || product.stock > 0,
+    inStock: product.productType === 'ebook' || product.stock === null || product.stock === undefined || product.stock > 0,
     stock: product.stock === undefined ? null : product.stock,
   }
 

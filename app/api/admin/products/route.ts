@@ -1,3 +1,4 @@
+import { getYoutubePreviewUrl } from '@/lib/videoEmbed'
  
 import { getAuthorizedUser } from '@/lib/auth/auth';
 import { Product } from '@/lib/db/models/Product';
@@ -37,6 +38,8 @@ export async function POST(request: Request) {
       thumbnail,
       images,
       productType,
+      introVideo,
+      ebookPages,
       author,
       sku,
       category,
@@ -60,6 +63,16 @@ export async function POST(request: Request) {
       );
     }
 
+    if (introVideo && !getYoutubePreviewUrl(introVideo)) {
+      return NextResponse.json({ error: 'Enter a valid YouTube video link.' }, { status: 400 })
+    }
+    if (ebookPages !== undefined && (!Array.isArray(ebookPages) || ebookPages.length > 500 ||
+      ebookPages.some(key => typeof key !== 'string' || !/^[a-f0-9-]{36}\.webp$/.test(key)))) {
+      return NextResponse.json({ error: 'Invalid eBook page list.' }, { status: 400 })
+    }
+    if (productType === 'ebook' && status === 'published' && !ebookPages?.length) {
+      return NextResponse.json({ error: 'Upload at least one eBook page before publishing.' }, { status: 400 })
+    }
     const product = new Product({
       title,
       slug,
@@ -70,6 +83,8 @@ export async function POST(request: Request) {
       thumbnail: thumbnail || '',
       images: images || [],
       productType: productType || 'book',
+      introVideo: getYoutubePreviewUrl(introVideo) ?? '',
+      ebookPages,
       author,
       sku,
       category,

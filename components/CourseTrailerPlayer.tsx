@@ -11,6 +11,7 @@ type Props = {
   posterUrl?: string | null
   /** Match existing sticky card: hide on small screens when image-only legacy. */
   className?: string
+  previewLabel?: string
 }
 
 /**
@@ -22,13 +23,15 @@ export default function CourseTrailerPlayer({
   trailerUrl,
   posterUrl,
   className = '',
+  previewLabel = 'course trailer',
 }: Props) {
   const [playing, setPlaying] = useState(false)
   const embedBase = getYoutubeOrVimeoEmbedUrl(trailerUrl)
+  const uploadedVideo = /^\/media\/intro-[a-f0-9-]{36}\.(mp4|webm)$/.test(trailerUrl)
 
-  if (!embedBase) return null
+  if (!embedBase && !uploadedVideo) return null
 
-  const embedSrc = embedBase.includes('?')
+  const embedSrc = embedBase?.includes('?')
     ? `${embedBase}&autoplay=1`
     : `${embedBase}?autoplay=1`
 
@@ -36,10 +39,19 @@ export default function CourseTrailerPlayer({
     <div
       className={`aspect-video overflow-hidden bg-zinc-900 border-b border-zinc-100 relative ${className}`}
     >
-      {playing ? (
+      {playing && uploadedVideo ? (
+        <video
+          src={trailerUrl}
+          aria-label={`${title} — ${previewLabel}`}
+          className='absolute inset-0 h-full w-full'
+          controls
+          autoPlay
+          playsInline
+        />
+      ) : playing ? (
         <iframe
           src={embedSrc}
-          title={`${title} — course trailer`}
+          title={`${title} — ${previewLabel}`}
           className='absolute inset-0 h-full w-full'
           allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
           allowFullScreen
@@ -50,7 +62,7 @@ export default function CourseTrailerPlayer({
           type='button'
           onClick={() => setPlaying(true)}
           className='absolute inset-0 w-full h-full group cursor-pointer text-left'
-          aria-label={`Play course trailer for ${title}`}
+          aria-label={`Play ${previewLabel} for ${title}`}
         >
           {posterUrl ? (
             <Image

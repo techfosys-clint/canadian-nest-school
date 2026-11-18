@@ -37,3 +37,22 @@ export function getYoutubeOrVimeoEmbedUrl(
 export function isYoutubeOrVimeoUrl(videoUrl: string | null | undefined): boolean {
   return !!getYoutubeOrVimeoEmbedUrl(videoUrl)
 }
+
+
+export function getYoutubePreviewUrl(value: unknown): string | null {
+  if (typeof value !== 'string') return null
+  try {
+    const url = new URL(value.trim())
+    if (!['https:', 'http:'].includes(url.protocol)) return null
+    const host = url.hostname.toLowerCase()
+    let id: string | null = null
+    if (host === 'youtu.be') id = url.pathname.slice(1)
+    if (['youtube.com', 'www.youtube.com', 'm.youtube.com', 'www.youtube-nocookie.com'].includes(host)) {
+      id = url.pathname === '/watch' ? url.searchParams.get('v') :
+        /^\/(embed|shorts|live)\/([^/]+)$/.exec(url.pathname)?.[2] ?? null
+    }
+    return id && /^[A-Za-z0-9_-]{11}$/.test(id) ? 'https://www.youtube.com/watch?v=' + id : null
+  } catch {
+    return null
+  }
+}

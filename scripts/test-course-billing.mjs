@@ -67,7 +67,7 @@ try {
       course: paid.courseId, name: 'Evening batch', startDate, durationMonths: 6,
       joinOpensAt: new Date(Date.now() - 86400000).toISOString(),
       joinClosesAt: new Date(Date.now() + 86400000).toISOString(),
-      classSchedule: 'Monday at 7 PM', orientationDate: startDate,
+      classSchedule: 'Monday at 7 PM', orientationDate: startDate + 'T17:00', firstClassAt: startDate + 'T19:00',
     },
   })
   const batch = batchResult.batch
@@ -80,6 +80,11 @@ try {
     body: { courseId: paid.courseId, batchId: batch._id, paymentPlan: 'two_month', price: 1 },
   })
   assert.equal(denied.success, false)
+  const unsigned = await request('/api/enrollments', {
+    session: studentSession, status: 400,
+    body: { courseId: paid.courseId, batchId: batch._id, paymentPlan: 'monthly' },
+  })
+  assert.match(unsigned.error, /Accept the payment schedule/)
 
   if (process.env.BILLING_TEST_PLAYWRIGHT) {
     const { chromium } = await import(process.env.BILLING_TEST_PLAYWRIGHT)
@@ -89,20 +94,36 @@ try {
       await page.context().addCookies([{
         name: 'student-token', value: studentSession.slice('student-token='.length), url: origin,
       }])
-      await page.goto(origin + '/courses/' + paid.slug)
+      await page.goto(origin + '/en/courses/' + paid.slug)
       await page.getByRole('button', { name: 'Enroll In Course' }).click()
       const dialog = page.getByRole('dialog', { name: 'Choose your batch' })
       await dialog.getByText('Monday at 7 PM').waitFor()
-      for (const label of ['Batch starts', 'Batch ends', 'Orientation', 'Enrollment closes']) {
+      for (const label of ['Batch starts', 'Batch ends', 'First class', 'Orientation', 'Enrollment closes']) {
         await dialog.getByText(label, { exact: true }).waitFor()
       }
-      await dialog.getByRole('button', { name: /Evening batch/ }).click()
+      await dialog.getByRole('radio', { name: /Evening batch/ }).check()
+      await dialog.getByRole('button', { name: 'Continue' }).click()
       await page.getByText('Payment options', { exact: true }).waitFor()
       assert.equal(await page.getByRole('radio', { name: /Every two months/ }).count(), 0)
       await page.getByRole('radio', { name: /Every three months/ }).check()
       await page.getByText(/Next payment due/).waitFor()
-      await page.getByText(/Save ৳/).first().waitFor()
-      await page.goto(origin + '/checkout/' + free.courseId)
+      await page.getByText(/Discount and savings/).first().waitFor()
+      await page.getByText(/Expected payments/).waitFor()
+      assert.equal(await page.getByRole('button', { name: /Confirm enrollment/ }).isDisabled(), true)
+      await page.getByRole('checkbox', { name: /I understand and agree/ }).check()
+      assert.equal(await page.getByRole('button', { name: /Confirm enrollment/ }).isEnabled(), true)
+      await page.context().clearCookies()
+      await page.goto(origin + '/courses/' + paid.slug)
+      await page.getByRole('button', { name: 'কোর্সে ভর্তি হন' }).click()
+      const bangla = page.getByRole('dialog', { name: 'ব্যাচ নির্বাচন করুন' })
+      await bangla.getByRole('radio', { name: /Evening batch/ }).check()
+      await bangla.getByRole('button', { name: 'এগিয়ে যান' }).click()
+      await page.getByRole('radio', { name: /প্রতি তিন মাসে/ }).check()
+      await page.getByText(/সম্ভাব্য পেমেন্ট সংখ্যা/).waitFor()
+      await page.getByRole('button', { name: 'সাইন ইন করে এগিয়ে যান' }).click()
+      await page.getByText('পরবর্তী ধাপে যেতে সাইন ইন করুন').waitFor()
+      await page.context().addCookies([{ name: 'student-token', value: studentSession.slice('student-token='.length), url: origin }])
+      await page.goto(origin + '/checkout/' + free.courseId + '?lang=en')
       const next = page.getByRole('button', { name: 'Next Step' })
       await next.waitFor()
       assert.equal(await page.getByText('Payment options', { exact: true }).count(), 0)
@@ -132,7 +153,7 @@ try {
     await students.updateOne({ _id: student._id }, { $set: { email: 'billing-smoke-' + id + '@example.com' } })
     const pending = await request('/api/enrollments', {
       session: studentSession,
-      body: { courseId: paid.courseId, batchId: batch._id, paymentPlan: 'quarterly', price: 1 },
+      body: { courseId: paid.courseId, batchId: batch._id, paymentPlan: 'quarterly', acceptPaymentTerms: true, price: 1 },
     })
     const paidEnrollment = await db.collection('enrollments').findOne({ student: student._id, course: new mongoose.Types.ObjectId(paid.courseId) })
     assert(paidEnrollment, 'Paid checkout did not create an enrollment')

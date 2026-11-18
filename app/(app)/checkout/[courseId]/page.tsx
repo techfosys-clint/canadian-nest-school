@@ -11,7 +11,7 @@ import { availablePaymentPlans, isRecurringCourse } from '@/lib/subscriptions/bi
 
 type Props = {
   params: Promise<{ courseId: string }>
-  searchParams: Promise<{ batch?: string; plan?: string }>
+  searchParams: Promise<{ batch?: string; plan?: string; lang?: string }>
 }
 
 export const dynamic = 'force-dynamic'

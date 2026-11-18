@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { getSubscriptionAccessSnapshot, nextPaidUntil, computeRenewalAmount } from './billing'
-import { addCalendarMonths, firstBatchPaymentDue, parsePaymentPlans, selectPaymentPlan } from './plans'
+import { expectedBatchPayments, addCalendarMonths, firstBatchPaymentDue, parsePaymentPlans, selectPaymentPlan } from './plans'
 
 const start = new Date('2026-11-15T00:00:00+06:00')
 const joined = new Date('2026-11-25T13:00:00+06:00')
@@ -63,4 +63,11 @@ describe('payment option configuration', () => {
     expect(getSubscriptionAccessSnapshot(enrollment, course, joined).noticeStartAt)
       .toEqual(new Date('2026-11-06T00:00:00+06:00'))
   })
+})
+
+it('counts the initial full payment and renewals before the batch ends', () => {
+  const end = addCalendarMonths(start, 6)
+  expect(expectedBatchPayments(start, end, 'monthly', joined)).toBe(6)
+  expect(expectedBatchPayments(start, end, 'quarterly', joined)).toBe(2)
+  expect(expectedBatchPayments(start, end, 'monthly', new Date('2027-04-25T00:00:00+06:00'))).toBe(1)
 })

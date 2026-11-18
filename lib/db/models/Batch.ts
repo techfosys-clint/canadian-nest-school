@@ -4,6 +4,7 @@ export interface IBatch extends Document {
   name: string
   course: mongoose.Types.ObjectId | string
   instructor: mongoose.Types.ObjectId | string
+  firstClassAt?: Date
   classSchedule?: string
   orientationDate?: Date
   startDate: Date
@@ -29,6 +30,7 @@ const BatchSchema = new Schema<IBatch>(
     name: { type: String, required: true },
     course: { type: Schema.Types.ObjectId, ref: 'Course', required: true },
     instructor: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    firstClassAt: Date,
     classSchedule: { type: String, trim: true },
     orientationDate: Date,
     startDate: { type: Date, required: true },
@@ -47,7 +49,7 @@ const BatchSchema = new Schema<IBatch>(
   { collection: 'batches', timestamps: true }
 )
 
-if (mongoose.models.Batch && !mongoose.models.Batch.schema.paths.classSchedule) {
+if (mongoose.models.Batch && !mongoose.models.Batch.schema.paths.firstClassAt) {
   delete mongoose.models.Batch
 }
 

@@ -7,7 +7,7 @@ import { parseJsonResponse } from '@/lib/safeJson';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   FiAlertCircle,
   FiCheck,
@@ -16,8 +16,7 @@ import {
   FiTag,
   FiZap,
 } from 'react-icons/fi';
-import { firstBatchPaymentDue, paymentPlanLabels, type PaymentPlan } from '@/lib/subscriptions/plans';
-import { formatBdDate } from '@/lib/bdTime';
+import { expectedBatchPayments, firstBatchPaymentDue, paymentPlanLabels, type PaymentPlan } from '@/lib/subscriptions/plans';
 import Swal from 'sweetalert2';
 
 interface CourseData {
@@ -36,6 +35,7 @@ interface OpenBatchInfo {
   id: string;
   name: string;
   startDate: string;
+  firstClassAt?: string;
   classSchedule?: string;
   orientationDate?: string;
   endDate: string;
@@ -51,8 +51,19 @@ interface UserSession {
   role: string;
 }
 
-export default function CheckoutFormClient({ course, initialSelection }: { course: CourseData; initialSelection: { plan?: string; batch?: string } }) {
+export default function CheckoutFormClient({ course, initialSelection }: { course: CourseData; initialSelection: { plan?: string; batch?: string; lang?: string } }) {
   const router = useRouter();
+  const bn = initialSelection.lang !== 'en';
+  const label = (en: string, bangla: string) => bn ? bangla : en;
+  const language = bn ? 'bn-BD' : 'en-BD';
+  const money = (amount: number) => '৳' + amount.toLocaleString(language);
+  const date = (value: string | Date, time = false) => new Intl.DateTimeFormat(language, {
+    timeZone: 'Asia/Dhaka', dateStyle: 'medium', ...(time ? { timeStyle: 'short' } : {}),
+  }).format(new Date(value));
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showSignIn, setShowSignIn] = useState(false);
+  const authPanel = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (showSignIn) authPanel.current?.scrollIntoView({ block: 'start' }); }, [showSignIn]);
   const [selection, setSelection] = useState(initialSelection);
   const plan = course.plans.find(option => option.type === selection.plan) ??
     (course.plans.length === 1 ? course.plans[0] : undefined);
@@ -297,6 +308,11 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
       setCheckoutError('Choose a payment option.');
       return;
     }
+    if (!user) {
+      setShowSignIn(true);
+      return;
+    }
+    if (billingType !== 'one_time' && !termsAccepted) return;
     setPurchaseLoading(true);
     try {
       const response = await fetch('/api/enrollments', {
@@ -306,6 +322,7 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
           courseId: course.id,
           batchId: selectedBatch?.id,
           paymentPlan: plan.type,
+          acceptPaymentTerms: termsAccepted,
           couponCode: appliedCoupon ? appliedCoupon.code : undefined,
         }),
       });
@@ -388,25 +405,25 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
     <div className='container mx-auto px-6 pt-28 pb-16'>
       {/* Back button */}
       <Link
-        href={`/courses/${course.slug}`}
+        href={`${bn ? '' : '/en'}/courses/${course.slug}`}
         className='inline-flex items-center gap-2 text-base font-bold text-zinc-500 hover:text-zinc-900 transition-colors mb-8 group'
       >
         <FiChevronLeft className='h-5 w-5 transition-transform group-hover:-translate-x-0.5' />
-        <span>Return to Course Page</span>
+        <span>{label('Return to Course Page', 'কোর্স পেজে ফিরে যান')}</span>
       </Link>
 
       <div className='grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start'>
         {/* LEFT COLUMN: AUTH WORKSPACE OR CHECKOUT BILLING */}
         <div className='lg:col-span-7 space-y-8 order-2 lg:order-1'>
-          {!user ? (
-            <MobileAuthFlow
+          {!user && showSignIn && (
+            <div ref={authPanel} className='scroll-mt-28'><MobileAuthFlow
               onSuccess={handleAuthSuccess}
-              heading='Sign in to complete purchase'
-              subheading='Enter your mobile number to continue checkout.'
+              heading={label('Sign in to continue', 'পরবর্তী ধাপে যেতে সাইন ইন করুন')}
+              subheading={label('Enter your mobile number.', 'আপনার মোবাইল নম্বর দিন।')}
+              locale={bn ? 'bn' : 'en'}
               signUpMethod='checkout_inline'
-            />
-          ) : (
-            /* USER IS AUTHENTICATED: COUPON + PURCHASE (no billing on course checkout) */
+            /></div>
+          )}
             <div className='space-y-6'>
               <form onSubmit={handleCompletePurchase} className='space-y-6'>
                 {checkoutError && (
@@ -433,7 +450,7 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
                 {!isFree && plan && <div className='bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-4'>
                   <label className='text-base font-bold text-zinc-800 flex items-center gap-2'>
                     <FiTag className='text-[#E61C24]' />
-                    Apply Coupon / Promo Code
+                    {label('Apply Coupon / Promo Code', 'কুপন বা প্রোমো কোড ব্যবহার করুন')}
                   </label>
 
                   <div className='flex gap-2'>
@@ -515,8 +532,8 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
                       <>
                         <p className='text-base font-bold text-zinc-800'>
                           {openBatches.length > 1
-                            ? 'Choose your batch'
-                            : 'Joining'}
+                            ? label('Choose your batch', 'ব্যাচ নির্বাচন করুন')
+                            : label('Joining', 'নির্বাচিত ব্যাচ')}
                         </p>
                         <div className='space-y-2'>
                           {openBatches.map((batch) => {
@@ -535,7 +552,7 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
                                   name='checkout-batch'
                                   value={batch.id}
                                   checked={selected}
-                                  onChange={() => setSelectedBatchId(batch.id)}
+                                  onChange={() => { setSelectedBatchId(batch.id); setTermsAccepted(false); }}
                                   className='mt-1 h-4 w-4 accent-[#E61C24]'
                                 />
                                 <span className='min-w-0'>
@@ -543,13 +560,14 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
                                     {batch.name}
                                   </span>
                                   <span className='block text-base font-semibold text-zinc-500'>
-                                    {formatBdDate(batch.startDate)}{' '}
+                                    {date(batch.startDate)}{' '}
                                     –{' '}
-                                    {formatBdDate(batch.endDate)}
+                                    {date(batch.endDate)}
+                                    {batch.firstClassAt && ` · ${label('First class', 'প্রথম ক্লাস')} ${date(batch.firstClassAt, true)}`}
                                     {batch.classSchedule && ` · ${batch.classSchedule}`}
-                                    {batch.orientationDate && ` · Orientation ${formatBdDate(batch.orientationDate)}`}
+                                    {batch.orientationDate && ` · ${label('Orientation', 'ওরিয়েন্টেশন')} ${date(batch.orientationDate, true)}`}
                                     {batch.joinClosesAt
-                                      ? ` · Join closes ${new Date(batch.joinClosesAt).toLocaleString()}`
+                                      ? ` · ${label('Enrollment closes', 'ভর্তির শেষ সময়')} ${date(batch.joinClosesAt, true)}`
                                       : ''}
                                     {batch.seatsLeft !== null
                                       ? ` · ${batch.seatsLeft} seat${batch.seatsLeft === 1 ? '' : 's'} left`
@@ -567,32 +585,41 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
 
                 {!isFree && (!course.requiresBatch || selectedBatch) && (
                   <fieldset className='space-y-3'>
-                    <legend className='font-bold'>Payment options</legend>
+                    <legend className='font-bold'>{label('Payment options', 'পেমেন্টের বিকল্প')}</legend>
                     {course.plans.map(option => (
                       <label key={option.type} className='flex gap-3 rounded-lg border border-zinc-200 bg-white p-4'>
                         <input type='radio' name='payment-plan' checked={plan?.type === option.type}
-                          onChange={() => setSelection(current => ({ ...current, plan: option.type }))} />
+                          onChange={() => { setSelection(current => ({ ...current, plan: option.type })); setTermsAccepted(false); }} />
                         <span>
-                          <strong className='block'>{paymentPlanLabels[option.type]}</strong>
-                          {option.regularPrice && <del className='mr-2'>৳{option.regularPrice.toLocaleString('en-BD')}</del>}
-                          ৳{option.price.toLocaleString('en-BD')}
-                          {option.regularPrice && <span className='block text-emerald-700'>Save ৳{(option.regularPrice - option.price).toLocaleString('en-BD')}</span>}
+                          <strong className='block'>{bn ? { one_time: 'এককালীন পেমেন্ট', monthly: 'প্রতি মাসে', two_month: 'প্রতি দুই মাসে', quarterly: 'প্রতি তিন মাসে' }[option.type] : paymentPlanLabels[option.type]}</strong>
+                          {option.regularPrice && (
+                            <span className='block'>{label('Regular price', 'নিয়মিত মূল্য')} <del>{money(option.regularPrice)}</del></span>
+                          )}
+                          <span className='block'>{label('Plan price', 'প্ল্যানের মূল্য')} {money(option.price)}</span>
+                          {option.regularPrice && <span className='block text-emerald-700'>{label('Discount and savings', 'ছাড় ও সাশ্রয়')} {money(option.regularPrice - option.price)}</span>}
                         </span>
                       </label>
                     ))}
                   </fieldset>
                 )}
-                {isFree && <p className='font-bold text-emerald-700'>Free</p>}
+                {isFree && <p className='font-bold text-emerald-700'>{label('Free', 'ফ্রি')}</p>}
                 {selectedBatch && billingType && billingType !== 'one_time' && (
-                  <p className='rounded-lg border border-zinc-200 p-4'>
-                    Next payment due {formatBdDate(firstBatchPaymentDue(new Date(selectedBatch.startDate), billingType, new Date()))}
-                  </p>
+                  <div className='space-y-3 rounded-lg border border-zinc-200 bg-white p-4'>
+                    <p>{label('Expected payments, including today', 'আজকের পেমেন্টসহ সম্ভাব্য পেমেন্ট সংখ্যা')} <strong>{expectedBatchPayments(new Date(selectedBatch.startDate), new Date(selectedBatch.endDate), billingType, new Date()).toLocaleString(language)}</strong></p>
+                    <p>{label('Next payment due', 'পরবর্তী পেমেন্টের তারিখ')} <strong>{date(firstBatchPaymentDue(new Date(selectedBatch.startDate), billingType, new Date()))}</strong></p>
+                    {user && (
+                      <label className='flex items-start gap-3'>
+                        <input type='checkbox' className='mt-1' checked={termsAccepted} onChange={event => setTermsAccepted(event.target.checked)} />
+                        {label('I understand and agree to the payment schedule. If a payment remains overdue, course access may be paused until I pay.', 'আমি পেমেন্টের সময়সূচি বুঝেছি এবং সম্মত আছি। পেমেন্ট বকেয়া থাকলে পরিশোধ না করা পর্যন্ত কোর্সে প্রবেশ সাময়িকভাবে বন্ধ হতে পারে।')}
+                      </label>
+                    )}
+                  </div>
                 )}
 
                 <button
                   type='submit'
                   disabled={
-                    purchaseLoading || !plan ||
+                    purchaseLoading || !plan || (!!user && billingType !== 'one_time' && !termsAccepted) ||
                     (course.requiresBatch &&
                       (batchesLoading || !selectedBatch))
                   }
@@ -604,27 +631,13 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
                     <>
                       <FiZap className='h-5 w-5 fill-white' />
                       <span>
-                        {isFree ? 'Next Step' : <>{billingType === 'monthly'
-                          ? 'Start monthly subscription ('
-                          : billingType === 'quarterly'
-                            ? 'Start quarterly subscription ('
-                            : billingType === 'two_month'
-                              ? 'Start two-month subscription ('
-                              : 'Complete Course Purchase ('}
-                        {!finalPrice || finalPrice === 0
-                          ? 'Free'
-                          : `৳${finalPrice.toLocaleString('en-BD')}`}
-                        {periodSuffix && finalPrice && finalPrice > 0
-                          ? periodSuffix
-                          : ''}
-                        )</>}
+                        {!user ? label('Sign in to continue', 'সাইন ইন করে এগিয়ে যান') : isFree ? label('Next Step', 'পরবর্তী ধাপ') : `${label('Confirm enrollment', 'ভর্তি নিশ্চিত করুন')} (${money(finalPrice)})`}
                       </span>
                     </>
                   )}
                 </button>
               </form>
             </div>
-          )}
         </div>
 
         {/* RIGHT COLUMN: STICKY COURSE SUMMARY CARD & COUPON APPLICATION */}
@@ -666,24 +679,24 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
               {/* Price list breakdown */}
               <div className='border-t border-zinc-100 pt-5 space-y-3.5'>
                 <p className='text-base font-bold text-zinc-800'>
-                  Order Investment Summary
+                  {label('Payment summary', 'পেমেন্টের সারাংশ')}
                 </p>
 
-                {!plan && <p className='text-base text-zinc-600'>Choose an available payment option to see the amount due.</p>}
+                {!plan && <p className='text-base text-zinc-600'>{label('Choose an available payment option to see the amount due.', 'পরিশোধযোগ্য পরিমাণ দেখতে একটি পেমেন্ট বিকল্প নির্বাচন করুন।')}</p>}
                 {plan && <div className='flex justify-between items-center text-base font-semibold text-zinc-600'>
                   <span>
                     {billingType === 'monthly'
-                      ? 'First month fee'
+                      ? label('First month fee', 'প্রথম মাসের ফি')
                       : billingType === 'quarterly'
-                        ? 'First quarter fee'
+                        ? label('First quarter fee', 'প্রথম তিন মাসের ফি')
                         : billingType === 'two_month'
-                          ? 'First two-month fee'
-                          : 'Base Course Price'}
+                          ? label('First two-month fee', 'প্রথম দুই মাসের ফি')
+                          : label('Base Course Price', 'কোর্সের মূল্য')}
                   </span>
                   <span className='font-bold text-zinc-800'>
                     {!basePrice || basePrice === 0
                       ? 'Free'
-                      : `৳${basePrice.toLocaleString('en-BD')}${periodSuffix}`}
+                      : `৳${basePrice.toLocaleString(language)}${periodSuffix}`}
                   </span>
                 </div>}
 
@@ -694,19 +707,19 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
                       Promo code ({appliedCoupon.code})
                     </span>
                     <span className='font-bold'>
-                      -৳{discountAmount.toLocaleString('en-BD')}
+                      -৳{discountAmount.toLocaleString(language)}
                     </span>
                   </div>
                 )}
 
                 {plan && <div className='border-t border-zinc-100 pt-3.5 flex justify-between items-center'>
                   <span className='text-base font-bold text-zinc-800'>
-                    Due today
+                    {label('Due today', 'আজ পরিশোধযোগ্য')}
                   </span>
                   <span className='text-3xl font-bold text-[#E61C24]'>
                     {!finalPrice || finalPrice === 0
                       ? 'Free'
-                      : `৳${finalPrice.toLocaleString('en-BD')}`}
+                      : `৳${finalPrice.toLocaleString(language)}`}
                   </span>
                 </div>}
               </div>

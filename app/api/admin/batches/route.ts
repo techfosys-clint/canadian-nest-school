@@ -94,6 +94,7 @@ export async function POST(request: Request) {
       course,
       instructor,
       classSchedule,
+      firstClassAt,
       orientationDate,
       durationMonths,
       startDate,
@@ -105,6 +106,9 @@ export async function POST(request: Request) {
     } = body
     if (durationMonths !== undefined && (!Number.isSafeInteger(durationMonths) || durationMonths < 1 || durationMonths > 120)) {
       return NextResponse.json({ error: 'Duration must be 1 to 120 calendar months.' }, { status: 400 })
+    }
+    if (firstClassAt && (typeof firstClassAt !== 'string' || !Number.isFinite(parseBdDate(firstClassAt).getTime()))) {
+      return NextResponse.json({ error: 'Enter a valid first class date and time.' }, { status: 400 })
     }
     if (orientationDate && !Number.isFinite(parseBdDate(orientationDate).getTime())) {
       return NextResponse.json({ error: 'Enter a valid orientation date.' }, { status: 400 })
@@ -139,6 +143,7 @@ export async function POST(request: Request) {
       instructor: finalInstructor,
       startDate: parseBdDate(startDate),
       endDate: durationMonths ? addCalendarMonths(parseBdDate(startDate), durationMonths) : parseBdDate(endDate),
+      firstClassAt: firstClassAt ? parseBdDate(firstClassAt) : undefined,
       classSchedule: typeof classSchedule === 'string' ? classSchedule.trim() : undefined,
       orientationDate: orientationDate ? parseBdDate(orientationDate) : undefined,
       joinOpensAt: opens,

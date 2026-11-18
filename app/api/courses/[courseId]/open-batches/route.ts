@@ -44,7 +44,7 @@ export async function GET(_request: Request, { params }: Props) {
       status: { $ne: 'completed' },
     })
       .select(
-        'name startDate endDate classSchedule orientationDate joinOpensAt joinClosesAt maxStudents students status',
+        'name startDate endDate classSchedule orientationDate firstClassAt joinOpensAt joinClosesAt maxStudents students status',
       )
       .sort({ joinOpensAt: 1, startDate: 1 })
       .lean()
@@ -56,6 +56,7 @@ export async function GET(_request: Request, { params }: Props) {
         name: b.name,
         startDate: b.startDate,
         endDate: b.endDate,
+        firstClassAt: b.firstClassAt,
         classSchedule: b.classSchedule,
         orientationDate: b.orientationDate,
         joinOpensAt: b.joinOpensAt,

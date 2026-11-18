@@ -15,7 +15,7 @@ interface ShopProduct {
   price: number;
   comparePrice: number | null;
   thumbnail: string;
-  productType: 'book' | 'merchandise' | 'other';
+  productType: 'book' | 'ebook' | 'merchandise' | 'other';
   author: string;
   category: string;
   inStock: boolean;

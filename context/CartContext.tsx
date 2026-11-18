@@ -42,6 +42,7 @@ function mergeItem(existing: CartItem[], incoming: CartItemInput): CartItem[] {
     thumbnail: incoming.thumbnail,
     maxQty: incoming.maxQty,
     inStock: incoming.inStock,
+    digital: incoming.digital,
     quantity: Math.min(quantity, incoming.maxQty),
   };
 

@@ -64,7 +64,7 @@ export async function GET() {
       student: userId,
       paymentStatus: 'completed',
     })
-      .populate('items.product', 'title thumbnail slug')
+      .populate('items.product', 'title thumbnail slug productType')
       .sort({ createdAt: -1 })
       .lean();
 
@@ -109,12 +109,12 @@ export async function POST(request: Request) {
     const { shippingName, shippingPhone, shippingAddress } = body;
     const lines = normalizeOrderLines(body);
 
-    if (!lines?.length || !shippingName || !shippingPhone || !shippingAddress) {
+    if (!lines?.length || !shippingName || !shippingPhone) {
       return NextResponse.json(
         {
           success: false,
           error:
-            'Cart items, name, phone, and shipping address are required.',
+            'Cart items, name, and phone are required.',
         },
         { status: 400 },
       );
@@ -127,6 +127,7 @@ export async function POST(request: Request) {
       quantity: number;
     }[] = [];
     let totalAmount = 0;
+    let needsShipping = false;
 
     for (const line of lines) {
       const product = await Product.findById(line.productId);
@@ -140,7 +141,14 @@ export async function POST(request: Request) {
         );
       }
 
+      if (product.productType === 'ebook') {
+        if (line.quantity !== 1) return NextResponse.json({ success: false, error: 'Choose one copy of each digital eBook.' }, { status: 400 });
+      } else {
+        needsShipping = true;
+      }
+
       if (
+        product.productType !== 'ebook' &&
         product.stock !== null &&
         product.stock !== undefined &&
         product.stock < line.quantity
@@ -161,6 +169,10 @@ export async function POST(request: Request) {
         quantity: line.quantity,
       });
       totalAmount += product.price * line.quantity;
+    }
+
+    if (needsShipping && (typeof shippingAddress !== 'string' || !shippingAddress.trim())) {
+      return NextResponse.json({ success: false, error: 'Enter a delivery address.' }, { status: 400 });
     }
 
     let student = await Student.findById(userId).lean();
@@ -184,7 +196,7 @@ export async function POST(request: Request) {
       merchantTransactionId,
       shippingName,
       shippingPhone,
-      shippingAddress,
+      shippingAddress: needsShipping ? shippingAddress : 'Digital delivery',
     });
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';

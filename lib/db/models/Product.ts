@@ -10,7 +10,9 @@ export interface IProduct extends Document {
   comparePrice?: number;
   thumbnail?: string;
   images?: string[];
-  productType: 'book' | 'merchandise' | 'other';
+  productType: 'book' | 'ebook' | 'merchandise' | 'other';
+  introVideo?: string;
+  ebookPages?: string[];
   author?: string;
   sku?: string;
   category?: string;
@@ -37,10 +39,12 @@ const ProductSchema = new Schema<IProduct>(
     images: { type: [String], default: [] },
     productType: {
       type: String,
-      enum: ['book', 'merchandise', 'other'],
+      enum: ['book', 'ebook', 'merchandise', 'other'],
       default: 'book',
       required: true,
     },
+    introVideo: String,
+    ebookPages: { type: [String], select: false },
     author: { type: String },
     sku: { type: String },
     category: { type: String },
@@ -57,7 +61,7 @@ const ProductSchema = new Schema<IProduct>(
 
 if (
   mongoose.models.Product &&
-  !mongoose.models.Product.schema.paths.productType
+  !mongoose.models.Product.schema.paths.ebookPages
 ) {
   delete mongoose.models.Product;
 }

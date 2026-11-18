@@ -70,3 +70,11 @@ export function nextBatchPaymentDue(previous: Date, type: Exclude<PaymentPlanTyp
   const extension = Math.max(0, previous.getTime() - previousBoundary.getTime())
   return new Date(boundary.getTime() + extension)
 }
+
+export function expectedBatchPayments(anchor: Date, end: Date, type: Exclude<PaymentPlanType, 'one_time'>, now: Date): number {
+  let count = 1
+  for (let due = firstBatchPaymentDue(anchor, type, now); due < end; due = nextBatchPaymentDue(due, type, anchor)) {
+    count++
+  }
+  return count
+}

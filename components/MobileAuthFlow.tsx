@@ -32,6 +32,7 @@ interface MobileAuthFlowProps {
   heading?: string;
   subheading?: string;
   /** GTM sign_up method label */
+  locale?: 'en' | 'bn';
   signUpMethod?: string;
 }
 
@@ -43,8 +44,10 @@ export default function MobileAuthFlow({
   variant = 'card',
   heading,
   subheading,
+  locale = 'en',
   signUpMethod = 'mobile_auth_flow',
 }: MobileAuthFlowProps) {
+  const t = (en: string, bn: string) => locale === 'bn' ? bn : en;
   const [step, setStep] = useState<AuthStep>('phone');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -298,17 +301,17 @@ export default function MobileAuthFlow({
         'Enter your mobile number to sign in or create a student account.',
     },
     password: {
-      title: 'Welcome back',
-      description: `Enter the password for ${phone.trim()}.`,
+      title: t('Welcome back', 'স্বাগতম'),
+      description: t(`Enter the password for ${phone.trim()}.`, `${phone.trim()} নম্বরের পাসওয়ার্ড দিন।`),
     },
     otp: {
-      title: 'Verify your number',
-      description: `We sent a code to ${phone.trim()}. Enter it below.`,
+      title: t('Verify your number', 'মোবাইল নম্বর যাচাই করুন'),
+      description: t(`We sent a code to ${phone.trim()}.`, `${phone.trim()} নম্বরে পাঠানো কোডটি লিখুন।`),
     },
     register: {
-      title: 'Complete student account',
+      title: t('Complete student account', 'শিক্ষার্থীর অ্যাকাউন্ট সম্পূর্ণ করুন'),
       description:
-        'Enter the student’s details below (not the parent’s) to finish creating the account.',
+        t('Enter the student’s details to finish creating the account.', 'অ্যাকাউন্ট তৈরি করতে শিক্ষার্থীর তথ্য দিন।'),
     },
   };
 
@@ -344,7 +347,7 @@ export default function MobileAuthFlow({
         <form onSubmit={handlePhoneSubmit} className='space-y-4'>
           <div className='space-y-1.5'>
             <label className='text-base font-bold text-zinc-700'>
-              Mobile Number
+              {t('Mobile Number', 'মোবাইল নম্বর')}
             </label>
             <div className='relative'>
               <div className='absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none'>
@@ -374,7 +377,7 @@ export default function MobileAuthFlow({
               <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
             ) : (
               <>
-                <span>Continue</span>
+                <span>{t('Continue', 'এগিয়ে যান')}</span>
                 <FiArrowRight className='h-5 w-5' />
               </>
             )}
@@ -385,7 +388,7 @@ export default function MobileAuthFlow({
       {step === 'password' && (
         <form onSubmit={handlePasswordSubmit} className='space-y-4'>
           <div className='space-y-1.5'>
-            <label className='text-base font-bold text-zinc-700'>Password</label>
+            <label className='text-base font-bold text-zinc-700'>{t('Password', 'পাসওয়ার্ড')}</label>
             <div className='relative'>
               <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
                 <FiLock className='h-5 w-5' />
@@ -419,13 +422,13 @@ export default function MobileAuthFlow({
               onClick={resetToPhone}
               className='text-zinc-500 hover:text-zinc-800 transition-colors cursor-pointer'
             >
-              Change number
+              {t('Change number', 'নম্বর পরিবর্তন করুন')}
             </button>
             <Link
               href='/forgot-password'
               className='text-[#E61C24] hover:text-[#CC181F] transition-colors font-bold'
             >
-              Forgot password?
+              {t('Forgot password?', 'পাসওয়ার্ড ভুলে গেছেন?')}
             </Link>
           </div>
 
@@ -438,7 +441,7 @@ export default function MobileAuthFlow({
               <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
             ) : (
               <>
-                <span>Sign In & Continue</span>
+                <span>{t('Sign In & Continue', 'সাইন ইন করে এগিয়ে যান')}</span>
                 <FiArrowRight className='h-5 w-5' />
               </>
             )}
@@ -450,7 +453,7 @@ export default function MobileAuthFlow({
         <form onSubmit={handleVerifyOtp} className='space-y-4'>
           <div className='space-y-1.5'>
             <label className='text-base font-bold text-zinc-700'>
-              Verification Code
+              {t('Verification Code', 'যাচাইকরণ কোড')}
             </label>
             <input
               type='text'
@@ -470,7 +473,7 @@ export default function MobileAuthFlow({
               onClick={resetToPhone}
               className='text-zinc-500 hover:text-zinc-800 transition-colors cursor-pointer'
             >
-              Change number
+              {t('Change number', 'নম্বর পরিবর্তন করুন')}
             </button>
             <button
               type='button'
@@ -479,10 +482,10 @@ export default function MobileAuthFlow({
               className='text-[#E61C24] hover:text-[#CC181F] transition-colors font-bold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
             >
               {sendingOtp
-                ? 'Sending…'
+                ? t('Sending…', 'পাঠানো হচ্ছে…')
                 : countdown > 0
                   ? `Resend in ${countdown}s`
-                  : 'Resend OTP'}
+                  : t('Resend OTP', 'ওটিপি আবার পাঠান')}
             </button>
           </div>
 
@@ -495,7 +498,7 @@ export default function MobileAuthFlow({
               <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
             ) : (
               <>
-                <span>Verify OTP</span>
+                <span>{t('Verify OTP', 'ওটিপি যাচাই করুন')}</span>
                 <FiCheck className='h-5 w-5' />
               </>
             )}
@@ -507,7 +510,7 @@ export default function MobileAuthFlow({
         <form onSubmit={handleRegisterSubmit} className='space-y-4'>
           <div className='space-y-1.5'>
             <label className='text-base font-bold text-zinc-700'>
-              Student Name
+              {t('Student Name', 'শিক্ষার্থীর নাম')}
             </label>
             <div className='relative'>
               <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
@@ -530,7 +533,7 @@ export default function MobileAuthFlow({
 
           <div className='space-y-1.5'>
             <label className='text-base font-bold text-zinc-700'>
-              Student Email
+              {t('Student Email', 'শিক্ষার্থীর ইমেইল')}
             </label>
             <div className='relative'>
               <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
@@ -550,7 +553,7 @@ export default function MobileAuthFlow({
 
           <div className='space-y-1.5'>
             <label className='text-base font-bold text-zinc-700'>
-              Student Password (Min 6 chars)
+              {t('Student Password (Min 6 chars)', 'শিক্ষার্থীর পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)')}
             </label>
             <div className='relative'>
               <span className='absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-400'>
@@ -584,7 +587,7 @@ export default function MobileAuthFlow({
             onClick={resetToPhone}
             className='text-base font-semibold text-zinc-500 hover:text-zinc-800 transition-colors cursor-pointer'
           >
-            Change number
+            {t('Change number', 'নম্বর পরিবর্তন করুন')}
           </button>
 
           <button
@@ -596,7 +599,7 @@ export default function MobileAuthFlow({
               <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
             ) : (
               <>
-                <span>Create Account & Continue</span>
+                <span>{t('Create Account & Continue', 'অ্যাকাউন্ট তৈরি করে এগিয়ে যান')}</span>
                 <FiArrowRight className='h-5 w-5' />
               </>
             )}

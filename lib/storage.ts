@@ -27,7 +27,7 @@ if (isS3Configured) {
 export async function uploadToStorage(
   buffer: Buffer,
   filename: string,
-  folder: 'media' | 'study-materials',
+  folder: 'media' | 'study-materials' | 'ebooks',
   mimeType?: string
 ): Promise<string> {
   if (isS3Configured && s3Client) {
@@ -40,6 +40,7 @@ export async function uploadToStorage(
         ContentType: mimeType || 'application/octet-stream',
       })
     )
+    if (folder === 'ebooks') return filename
     if (folder === 'study-materials') {
       return `/api/study-materials/download?file=${filename}`
     } else {
@@ -47,11 +48,12 @@ export async function uploadToStorage(
     }
   } else {
     // Local VPS filesystem storage
-    const targetFolder = folder === 'media' ? path.join(process.cwd(), 'public', 'media') : path.join(process.cwd(), 'storage', 'study-materials')
+    const targetFolder = folder === 'media' ? path.join(process.cwd(), 'public', 'media') : path.join(process.cwd(), 'storage', folder)
     await fs.mkdir(targetFolder, { recursive: true })
     const filePath = path.join(targetFolder, filename)
     await fs.writeFile(filePath, buffer)
     
+    if (folder === 'ebooks') return filename
     if (folder === 'study-materials') {
       return `/api/study-materials/download?file=${filename}`
     } else {
@@ -65,8 +67,9 @@ export async function uploadToStorage(
  */
 export async function getFromStorage(
   filename: string,
-  folder: 'media' | 'study-materials'
+  folder: 'media' | 'study-materials' | 'ebooks'
 ): Promise<{ buffer: Buffer; contentType?: string } | null> {
+  if (!filename || filename.includes('..') || filename.includes('/') || filename.includes('\\')) return null
   if (isS3Configured && s3Client) {
     const key = `${folder}/${filename}`
     try {
@@ -88,7 +91,7 @@ export async function getFromStorage(
     }
   } else {
     // Local filesystem read
-    const targetFolder = folder === 'media' ? path.join(process.cwd(), 'public', 'media') : path.join(process.cwd(), 'storage', 'study-materials')
+    const targetFolder = folder === 'media' ? path.join(process.cwd(), 'public', 'media') : path.join(process.cwd(), 'storage', folder)
     const filePath = path.join(targetFolder, filename)
     try {
       await fs.access(filePath)

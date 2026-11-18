@@ -28,11 +28,13 @@ export default async function LegacyShopCheckoutPage({
     slug: product.slug,
     price: product.price,
     thumbnail: product.thumbnail || '',
+    digital: product.productType === 'ebook',
     inStock:
+      product.productType === 'ebook' ||
       product.stock === null ||
       product.stock === undefined ||
       product.stock > 0,
-    maxQty:
+    maxQty: product.productType === 'ebook' ? 1 :
       product.stock === null || product.stock === undefined
         ? 99
         : Math.max(1, product.stock),

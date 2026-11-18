@@ -484,7 +484,11 @@ export default async function CourseDetailPage({ params }: Props) {
           )}
 
           {/* Section: Detailed Description */}
-          {course.description && (
+          {course.trailerVideoUrl?.startsWith('/media/intro-') && (
+            <video src={course.trailerVideoUrl} controls playsInline preload='metadata' className='mb-6 w-full rounded-lg' />
+          )}
+
+          {courseDescription && (
             <div className='space-y-6'>
               <h2 className='text-2xl font-bold text-[#0A163A] tracking-tight'>
                 Course Description
@@ -492,7 +496,7 @@ export default async function CourseDetailPage({ params }: Props) {
               <div className='bg-white border border-zinc-200/80 rounded-lg p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)]'>
                 <div
                   className='course-description-content font-sans select-text'
-                  dangerouslySetInnerHTML={{ __html: course.description }}
+                  dangerouslySetInnerHTML={{ __html: courseDescription }}
                 />
               </div>
               <style
@@ -713,7 +717,10 @@ export default async function CourseDetailPage({ params }: Props) {
               {/* Action Button: Register / Enroll */}
               <EnrollButton
                 courseId={course._id.toString()}
-                courseTitle={course.title}
+                courseTitle={courseTitle}
+                thumbnail={imageUrl}
+                level={course.level}
+                classCount={lessonCount}
                 courseSlug={course.slug}
                 coursePrice={displayPrice}
                 requiresBatch={requiresBatch}
@@ -764,7 +771,7 @@ export default async function CourseDetailPage({ params }: Props) {
               </div>
 
               <CourseCertificateSample
-                courseTitle={course.title}
+                courseTitle={courseTitle}
                 description={buildCertificateDescription(course.title)}
               />
 

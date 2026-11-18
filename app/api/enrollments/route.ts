@@ -250,6 +250,10 @@ export async function POST(request: Request) {
     }
     const resolvedBillingType = plan.type
     const isRecurring = isRecurringBillingType(resolvedBillingType)
+    if (isRecurring && body.acceptPaymentTerms !== true) {
+      return NextResponse.json({ success: false, error: 'Accept the payment schedule before enrolling.' }, { status: 400 })
+    }
+    const paymentTermsAcceptedAt = isRecurring ? new Date() : undefined
     const requiresBatch = isRecurringCourse(course) || await Batch.exists({ course: courseId })
 
     // Monthly/quarterly: several batches may be open at once. The student
@@ -439,6 +443,7 @@ export async function POST(request: Request) {
           couponCode: appliedCoupon ? appliedCoupon.code : undefined,
           billingType: resolvedBillingType,
           paymentPlanSnapshot: plan,
+          paymentTermsAcceptedAt,
           accessStatus: 'active',
           ...(selectedBatch ? { batch: selectedBatch._id } : {}),
           ...(isRecurring
@@ -513,6 +518,7 @@ export async function POST(request: Request) {
         couponCode: appliedCoupon ? appliedCoupon.code : undefined,
         billingType: resolvedBillingType,
         paymentPlanSnapshot: plan,
+        paymentTermsAcceptedAt,
         accessStatus: 'active',
         ...(selectedBatch
           ? { batch: selectedBatch._id, ...(isRecurring ? { calendarBillingAnchor: new Date(selectedBatch.startDate) } : {}) }

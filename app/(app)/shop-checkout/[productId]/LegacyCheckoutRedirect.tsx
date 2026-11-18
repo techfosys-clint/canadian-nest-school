@@ -16,6 +16,7 @@ export default function LegacyCheckoutRedirect({
     price: number;
     thumbnail: string;
     inStock: boolean;
+    digital?: boolean;
     maxQty: number;
   };
   initialQuantity: number;
@@ -37,6 +38,7 @@ export default function LegacyCheckoutRedirect({
       thumbnail: product.thumbnail,
       maxQty: product.maxQty,
       inStock: product.inStock,
+      digital: product.digital,
       quantity: Math.min(initialQuantity, product.maxQty),
     };
 

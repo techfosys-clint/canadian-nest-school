@@ -399,6 +399,27 @@ export default function ProductFormClient({ initialData }: ProductFormProps) {
                   </span>
                 </div>
                 <AdminAssetInput kind='ebook' onUpload={keys => setEbookPages(current => [...current, ...keys])} />
+                {!!ebookPages.length && (
+                  <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4'>
+                    {ebookPages.map((key, index) => (
+                      <div key={key + index} className='overflow-hidden rounded-lg border border-slate-200 bg-slate-50'>
+                        <a href={`/api/admin/ebook-page?key=${encodeURIComponent(key)}`} target='_blank' rel='noreferrer'
+                          aria-label={`Open page ${index + 1}`}>
+                          <img src={`/api/admin/ebook-page?key=${encodeURIComponent(key)}`} alt={`eBook page ${index + 1}`}
+                            loading='lazy' className='aspect-3/4 w-full bg-white object-contain' />
+                        </a>
+                        <div className='flex items-center justify-between gap-2 border-t border-slate-200 p-3'>
+                          <span className='text-base font-semibold text-slate-700'>Page {index + 1}</span>
+                          <button type='button' aria-label={`Remove page ${index + 1}`}
+                            onClick={() => setEbookPages(current => current.filter((_, position) => position !== index))}
+                            className='rounded-lg p-2 text-red-700 hover:bg-red-50'>
+                            <FiTrash2 aria-hidden='true' />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <div className='flex flex-wrap items-center justify-between gap-3'>
                   <p className='text-base text-slate-500'>New pages are added after the existing pages. Save the product to apply changes.</p>
                   {!!ebookPages.length && (

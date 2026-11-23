@@ -12,6 +12,7 @@ import {
   FiChevronLeft,
   FiMinus,
   FiPlus,
+  FiPlay,
   FiShield,
   FiShoppingBag,
   FiShoppingCart,
@@ -50,10 +51,11 @@ export default function ProductDetailClient({
   const { addItem, replaceCart, requireLogin } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(product.thumbnail);
+  const [showVideoPreview, setShowVideoPreview] = useState(!!product.introVideo);
   const [cartMessage, setCartMessage] = useState<string | null>(null);
 
   const maxQty = product.productType === 'ebook' ? 1 : product.stock === null ? 99 : Math.max(1, product.stock);
-  const gallery = [product.thumbnail, ...product.images].filter(Boolean);
+  const gallery = [...new Set([product.thumbnail, ...product.images].filter(Boolean))];
 
   const toCartLine = () => ({
     productId: product.id,
@@ -98,7 +100,7 @@ export default function ProductDetailClient({
       <div className='grid grid-cols-1 lg:grid-cols-12 gap-10 items-start'>
         {/* Gallery */}
         <div className='lg:col-span-5 space-y-3'>
-          {product.introVideo ? (
+          {product.introVideo && showVideoPreview ? (
             <CourseTrailerPlayer
               key={`${product.id}-${activeImage}`}
               title={product.title}
@@ -117,7 +119,7 @@ export default function ProductDetailClient({
                     : activeImage
                 }
                 alt={product.title}
-                className='w-full h-full object-cover'
+                className='w-full h-full object-contain'
                 width={700}
                 height={900}
               />
@@ -126,14 +128,25 @@ export default function ProductDetailClient({
             )}
           </div>
           )}
-          {gallery.length > 1 && (
+          {(gallery.length > 1 || product.introVideo) && (
             <div className='grid grid-cols-4 gap-2'>
+              {product.introVideo && (
+                <button type='button' aria-label='Show video preview' aria-pressed={showVideoPreview}
+                  onClick={() => setShowVideoPreview(true)}
+                  className={`flex aspect-square flex-col items-center justify-center gap-2 rounded-lg border-2 bg-slate-50 text-base font-semibold text-slate-700 ${showVideoPreview ? 'border-[#E61C24]' : 'border-slate-200'}`}>
+                  <FiPlay className='h-6 w-6 text-[#E61C24]' aria-hidden='true' />
+                  Video
+                </button>
+              )}
               {gallery.map((url, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setActiveImage(url)}
+                  type='button'
+                  aria-label={`Show product image ${idx + 1}`}
+                  aria-pressed={!showVideoPreview && activeImage === url}
+                  onClick={() => { setActiveImage(url); setShowVideoPreview(false); }}
                   className={`aspect-square rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
-                    activeImage === url
+                    !showVideoPreview && activeImage === url
                       ? 'border-[#E61C24]'
                       : 'border-transparent hover:border-zinc-200'
                   }`}

@@ -17,6 +17,8 @@ export interface IOrder extends Document {
   merchantTransactionId?: string
   shippingName: string
   shippingPhone: string
+  deliveryAddress?: import('@/lib/shippingAddress').DeliveryAddress
+  deliveryMessage?: string
   shippingAddress: string
   createdAt: Date
   updatedAt: Date
@@ -43,9 +45,16 @@ const OrderSchema = new Schema<IOrder>(
     merchantTransactionId: { type: String, unique: true, sparse: true },
     shippingName: { type: String, required: true },
     shippingPhone: { type: String, required: true },
+    deliveryAddress: {
+      street: String, area: String, city: String, district: String,
+      division: String, postalCode: String, landmark: String, country: String,
+    },
+    deliveryMessage: { type: String, trim: true, maxlength: 500 },
     shippingAddress: { type: String, required: true },
   },
   { collection: 'orders', timestamps: true }
 )
+
+if (mongoose.models.Order && !mongoose.models.Order.schema.path('deliveryMessage')) delete mongoose.models.Order
 
 export const Order = mongoose.models.Order || mongoose.model<IOrder>('Order', OrderSchema)

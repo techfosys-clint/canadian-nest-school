@@ -21,6 +21,7 @@ interface OrderRow {
   shippingName: string
   shippingPhone: string
   shippingAddress: string
+  deliveryMessage?: string
   merchantTransactionId?: string
   createdAt: string
 }
@@ -400,6 +401,12 @@ export default function OrdersPageClient({ initialOrders }: { initialOrders: Ord
                 <p className="text-base font-bold text-slate-800">{order.shippingName}</p>
                 <p className="text-base font-semibold text-slate-600">{order.shippingPhone}</p>
                 <p className="text-base font-semibold text-slate-600">{order.shippingAddress}</p>
+                {order.deliveryMessage && (
+                  <p className="mt-2 whitespace-pre-wrap break-words text-base text-slate-600">
+                    <span className="block font-semibold text-slate-800">Delivery message</span>
+                    {order.deliveryMessage}
+                  </p>
+                )}
               </div>
             </div>
 

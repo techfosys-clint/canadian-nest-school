@@ -1,3 +1,4 @@
+import { parseDeliveryAddress, formatDeliveryAddress } from '@/lib/shippingAddress';
  
 import { verifyToken } from '@/lib/auth/auth';
 import { Order } from '@/lib/db/models/Order';
@@ -171,7 +172,18 @@ export async function POST(request: Request) {
       totalAmount += product.price * line.quantity;
     }
 
-    if (needsShipping && (typeof shippingAddress !== 'string' || !shippingAddress.trim())) {
+    const deliveryAddress = body.deliveryAddress === undefined ? null : parseDeliveryAddress(body.deliveryAddress);
+    if (needsShipping && body.deliveryAddress !== undefined && !deliveryAddress) {
+      return NextResponse.json({ success: false, error: 'Enter a complete Bangladesh delivery address and a valid four-digit postal code if provided.' }, { status: 400 });
+    }
+    const message = body.deliveryMessage;
+    if (needsShipping && message !== undefined && (typeof message !== 'string' || message.trim().length > 500)) {
+      return NextResponse.json({ success: false, error: 'Enter a delivery message of up to 500 characters.' }, { status: 400 });
+    }
+
+    const resolvedAddress = deliveryAddress ? formatDeliveryAddress(deliveryAddress) : shippingAddress;
+
+    if (needsShipping && (typeof resolvedAddress !== 'string' || !resolvedAddress.trim())) {
       return NextResponse.json({ success: false, error: 'Enter a delivery address.' }, { status: 400 });
     }
 
@@ -196,7 +208,9 @@ export async function POST(request: Request) {
       merchantTransactionId,
       shippingName,
       shippingPhone,
-      shippingAddress: needsShipping ? shippingAddress : 'Digital delivery',
+      shippingAddress: needsShipping ? resolvedAddress : 'Digital delivery',
+      deliveryMessage: needsShipping && typeof message === 'string' ? message.trim() || undefined : undefined,
+      deliveryAddress: needsShipping ? deliveryAddress ?? undefined : undefined,
     });
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';

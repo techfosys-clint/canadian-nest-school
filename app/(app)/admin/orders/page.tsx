@@ -51,6 +51,7 @@ export default async function AdminOrdersPage() {
     shippingName: o.shippingName,
     shippingPhone: o.shippingPhone,
     shippingAddress: o.shippingAddress,
+    deliveryMessage: o.deliveryMessage,
     merchantTransactionId: o.merchantTransactionId || '',
     createdAt: o.createdAt ? o.createdAt.toISOString() : '',
   }))

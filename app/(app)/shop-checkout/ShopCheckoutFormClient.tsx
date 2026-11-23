@@ -4,6 +4,7 @@ import MobileAuthFlow, {
   type MobileAuthUser,
 } from '@/components/MobileAuthFlow';
 import { useCart } from '@/context/CartContext';
+import { bangladeshDivisions, parseDeliveryAddress, type DeliveryAddress } from '@/lib/shippingAddress';
 import { parseJsonResponse } from '@/lib/safeJson';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -13,7 +14,6 @@ import {
   FiBookOpen,
   FiCheckCircle,
   FiChevronLeft,
-  FiMapPin,
   FiPhone,
   FiShoppingBag,
   FiUser,
@@ -35,7 +35,10 @@ export default function ShopCheckoutFormClient() {
   const [loadingSession, setLoadingSession] = useState(true);
   const [shippingName, setShippingName] = useState('');
   const [shippingPhone, setShippingPhone] = useState('');
-  const [shippingAddress, setShippingAddress] = useState('');
+  const [deliveryAddress, setDeliveryAddress] = useState<DeliveryAddress>({
+    street: '', area: '', city: '', district: '', division: '', postalCode: '', landmark: '', country: 'Bangladesh',
+  });
+  const [deliveryMessage, setDeliveryMessage] = useState('');
   const [placingOrder, setPlacingOrder] = useState(false);
   const [orderError, setOrderError] = useState<string | null>(null);
 
@@ -90,10 +93,10 @@ export default function ShopCheckoutFormClient() {
     if (
       !shippingName.trim() ||
       !shippingPhone.trim() ||
-      (needsShipping && !shippingAddress.trim())
+      (needsShipping && !parseDeliveryAddress(deliveryAddress))
     ) {
       setOrderError(
-        'Please fill in your name, phone number, and shipping address.',
+        'Please enter your name, phone number and complete delivery address. Use a four-digit postal code if provided.',
       );
       return;
     }
@@ -115,7 +118,8 @@ export default function ShopCheckoutFormClient() {
           })),
           shippingName,
           shippingPhone,
-          shippingAddress,
+          deliveryMessage: needsShipping ? deliveryMessage.trim() : undefined,
+          deliveryAddress: needsShipping ? deliveryAddress : undefined,
         }),
       });
 
@@ -252,24 +256,56 @@ export default function ShopCheckoutFormClient() {
               </div>
             </div>
 
-            {needsShipping && <div className='space-y-1.5'>
-              <label className='text-base font-bold text-zinc-700'>
-                Full Delivery Address
-              </label>
-              <div className='relative'>
-                <span className='absolute top-3 left-0 pl-3.5 flex items-center text-zinc-400'>
-                  <FiMapPin className='h-5 w-5' />
-                </span>
-                <textarea
-                  required
-                  rows={3}
-                  value={shippingAddress}
-                  onChange={(e) => setShippingAddress(e.target.value)}
-                  placeholder='House, road, area, city, postal code'
-                  className='w-full pl-11 pr-4 py-3 rounded-lg border border-zinc-200 focus:border-[#E61C24] focus:ring-3 focus:ring-[#E61C24]/10 outline-none text-base font-semibold text-zinc-800 bg-white resize-none'
-                />
-              </div>
-            </div>}
+            {needsShipping && (
+              <fieldset className='space-y-5 border-t border-slate-100 pt-6'>
+                <legend className='flex items-center gap-2 pt-4 text-lg font-bold text-slate-800'>Delivery address</legend>
+                <p className='text-base text-slate-500'>Delivery within Bangladesh. Enter the address where you would like to receive your order.</p>
+                <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+                  {([
+                    ['street', 'House / flat and street', 'House 12, Flat 3B, Road 5', 'address-line1'],
+                    ['area', 'Area / neighbourhood', 'Dhanmondi', 'address-line2'],
+                    ['city', 'City / town / upazila', 'Dhaka', 'address-level3'],
+                    ['district', 'District', 'Dhaka', 'address-level2'],
+                  ] as const).map(([field, title, placeholder, autoComplete]) => (
+                    <label key={field} className={`grid gap-2 text-base font-semibold text-slate-700 ${field === 'street' ? 'sm:col-span-2' : ''}`}>
+                      {title} <span className='sr-only'>(required)</span>
+                      <input required maxLength={250} autoComplete={autoComplete} placeholder={placeholder}
+                        value={deliveryAddress[field]}
+                        onChange={event => setDeliveryAddress(current => ({ ...current, [field]: event.target.value }))}
+                        className='w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-800 outline-none transition-colors focus:border-[#E61C24]/70 focus:ring-2 focus:ring-[#E61C24]/10' />
+                    </label>
+                  ))}
+                  <label className='grid gap-2 text-base font-semibold text-slate-700'>
+                    Division
+                    <select required autoComplete='address-level1' value={deliveryAddress.division}
+                      onChange={event => setDeliveryAddress(current => ({ ...current, division: event.target.value }))}
+                      className='w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-800 outline-none focus:border-[#E61C24]/70 focus:ring-2 focus:ring-[#E61C24]/10'>
+                      <option value=''>Select division</option>
+                      {bangladeshDivisions.map(division => <option key={division}>{division}</option>)}
+                    </select>
+                  </label>
+                  <label className='grid gap-2 text-base font-semibold text-slate-700'>
+                    Postal code (optional)
+                    <input inputMode='numeric' autoComplete='postal-code' maxLength={4} pattern='[0-9০-৯]{4}' placeholder='1209'
+                      value={deliveryAddress.postalCode} onChange={event => setDeliveryAddress(current => ({ ...current, postalCode: event.target.value }))}
+                      className='w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-800 outline-none focus:border-[#E61C24]/70 focus:ring-2 focus:ring-[#E61C24]/10' />
+                  </label>
+                  <label className='grid gap-2 text-base font-semibold text-slate-700 sm:col-span-2'>
+                    Nearby landmark (optional)
+                    <input maxLength={250} placeholder='Near a school, mosque or familiar building'
+                      value={deliveryAddress.landmark} onChange={event => setDeliveryAddress(current => ({ ...current, landmark: event.target.value }))}
+                      className='w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-800 outline-none focus:border-[#E61C24]/70 focus:ring-2 focus:ring-[#E61C24]/10' />
+                  </label>
+                </div>
+                <label className='grid gap-2 text-base font-semibold text-slate-700'>
+                  Delivery message (optional)
+                  <textarea rows={3} maxLength={500} value={deliveryMessage}
+                    onChange={event => setDeliveryMessage(event.target.value)}
+                    placeholder='Add any instructions that would help with delivery'
+                    className='w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-800 outline-none focus:border-[#E61C24]/70 focus:ring-2 focus:ring-[#E61C24]/10' />
+                </label>
+              </fieldset>
+            )}
 
             <button
               type='submit'
@@ -284,7 +320,7 @@ export default function ShopCheckoutFormClient() {
               ) : (
                 <>
                   <FiShoppingBag className='h-5 w-5' />
-                  Pay ৳{totalPrice.toLocaleString('en-BD')} &amp; Place Order
+                  {`Pay ৳${totalPrice.toLocaleString('en-BD')} & Place Order`}
                 </>
               )}
             </button>
@@ -318,8 +354,7 @@ export default function ShopCheckoutFormClient() {
                       {item.title}
                     </p>
                     <p className='text-base font-semibold text-zinc-500'>
-                      Qty {item.quantity} · ৳
-                      {(item.price * item.quantity).toLocaleString('en-BD')}
+                      {`Qty ${item.quantity} · ৳${(item.price * item.quantity).toLocaleString('en-BD')}`}
                     </p>
                   </div>
                 </div>

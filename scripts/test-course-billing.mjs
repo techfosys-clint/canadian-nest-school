@@ -98,10 +98,10 @@ try {
       await page.getByRole('button', { name: 'Enroll In Course' }).click()
       const dialog = page.getByRole('dialog', { name: 'Choose your batch' })
       await dialog.getByText('Monday at 7 PM').waitFor()
-      for (const label of ['Batch starts', 'Batch ends', 'First class', 'Orientation', 'Enrollment closes']) {
-        await dialog.getByText(label, { exact: true }).waitFor()
+      for (const label of ['Batch dates', 'First class', 'Orientation', 'Enrollment closes']) {
+        await dialog.getByText(label).waitFor()
       }
-      await dialog.getByRole('radio', { name: /Evening batch/ }).check()
+      await dialog.getByText('Evening batch', { exact: true }).click()
       await dialog.getByRole('button', { name: 'Continue' }).click()
       await page.getByText('Payment options', { exact: true }).waitFor()
       assert.equal(await page.getByRole('radio', { name: /Every two months/ }).count(), 0)
@@ -116,7 +116,7 @@ try {
       await page.goto(origin + '/courses/' + paid.slug)
       await page.getByRole('button', { name: 'কোর্সে ভর্তি হন' }).click()
       const bangla = page.getByRole('dialog', { name: 'ব্যাচ নির্বাচন করুন' })
-      await bangla.getByRole('radio', { name: /Evening batch/ }).check()
+      await bangla.getByText('Evening batch', { exact: true }).click()
       await bangla.getByRole('button', { name: 'এগিয়ে যান' }).click()
       await page.getByRole('radio', { name: /প্রতি তিন মাসে/ }).check()
       await page.getByText(/সম্ভাব্য পেমেন্ট সংখ্যা/).waitFor()

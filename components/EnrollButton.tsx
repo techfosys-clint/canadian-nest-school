@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { FiZap, FiCheck } from 'react-icons/fi'
+import { FiCalendar, FiZap, FiCheck } from 'react-icons/fi'
 import { pushToDataLayer, generateEventId } from '@/lib/gtm'
 
 import { useLocale } from '@/context/LocaleContext'
@@ -157,43 +157,37 @@ export default function EnrollButton({
         {loading && <p role='status'>{t('Loading batches…', 'ব্যাচ লোড হচ্ছে…')}</p>}
         {batchError && <p role='status'>{batchError}</p>}
         {!loading && !batchError && batches.map(batch => (
-          <label key={batch.id} className={`block cursor-pointer rounded-lg border p-4 ${selectedBatch === batch.id ? 'border-red-600 bg-red-50' : 'border-slate-300 bg-slate-50'}`}>
-            <div className='flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1'>
-              <span className='flex items-center gap-3 font-bold text-[#0A163A]'><input type='radio' name='enrollment-batch' checked={selectedBatch === batch.id} onChange={() => setSelectedBatch(batch.id)} />{batch.name}</span>
+          <label key={batch.id} className={`block cursor-pointer overflow-hidden rounded-lg border bg-white transition-colors focus-within:ring-2 focus-within:ring-red-200 ${selectedBatch === batch.id ? 'border-[#E61C24] ring-1 ring-[#E61C24]' : 'border-slate-200 hover:border-red-300'}`}>
+            <div className='px-4 py-3'>
+              <div className='flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1'>
+              <span className='flex items-center gap-3 font-bold text-[#0A163A]'><input type='radio' className='sr-only' aria-label={batch.name} name='enrollment-batch' checked={selectedBatch === batch.id} onChange={() => setSelectedBatch(batch.id)} />{batch.name}</span>
               {batch.seatsLeft !== null && (
                 <span className='text-base font-semibold text-slate-700'>
                   {locale === 'bn' ? `${batch.seatsLeft.toLocaleString('bn-BD')}টি আসন বাকি` : `${batch.seatsLeft} ${batch.seatsLeft === 1 ? 'seat' : 'seats'} left`}
                 </span>
               )}
+              </div>
+              <p className='mt-1 flex items-start gap-2 text-base text-slate-600'>
+                <FiCalendar className='mt-1 shrink-0' aria-hidden='true' />
+                {batch.classSchedule || t('Schedule to be announced', 'সময়সূচি পরে জানানো হবে')}
+              </p>
             </div>
-            <dl className='my-3 grid grow grid-cols-2 gap-x-4 gap-y-2 text-base text-slate-700 md:grid-cols-4'>
-              <div>
-                <dt className='font-semibold'>{t('Batch starts', 'ব্যাচ শুরু')}</dt>
-                <dd>{date(batch.startDate)}</dd>
-              </div>
-              <div>
-                <dt className='font-semibold'>{t('Batch ends', 'ব্যাচ শেষ')}</dt>
-                <dd>{date(batch.endDate)}</dd>
-              </div>
-              {batch.firstClassAt && <div>
-                <dt className='font-semibold'>{t('First class', 'প্রথম ক্লাস')}</dt>
-                <dd>{date(batch.firstClassAt, true)}</dd>
-              </div>}
-              <div>
-                <dt className='font-semibold'>{t('Class days and times', 'ক্লাসের দিন ও সময়')}</dt>
-                <dd>{batch.classSchedule || t('To be announced', 'পরে জানানো হবে')}</dd>
-              </div>
+            <dl className='grid grid-cols-1 gap-y-3 border-t border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-700 sm:grid-cols-2 sm:divide-x sm:divide-slate-200'>
               <div>
                 <dt className='font-semibold'>{t('Orientation', 'ওরিয়েন্টেশন')}</dt>
                 <dd>{batch.orientationDate ? date(batch.orientationDate, !batch.orientationDate.includes('T00:00:00.000Z') && !batch.orientationDate.includes('T18:00:00.000Z')) : t('To be announced', 'পরে জানানো হবে')}</dd>
               </div>
-              {batch.joinClosesAt && (
-                <div className='col-span-2'>
-                  <dt className='font-semibold'>{t('Enrollment closes', 'ভর্তির শেষ সময়')}</dt>
-                  <dd>{date(batch.joinClosesAt, true)} (Dhaka time)</dd>
-                </div>
-              )}
+              <div className='sm:pl-4'>
+                <dt className='font-semibold'>{t('Batch dates', 'ব্যাচের সময়সীমা')}</dt>
+                <dd>{date(batch.startDate)} – {date(batch.endDate)}</dd>
+              </div>
             </dl>
+            {(batch.firstClassAt || batch.joinClosesAt) && (
+              <p className='flex flex-wrap gap-x-5 gap-y-1 border-t border-slate-200 px-4 py-2 text-base text-slate-600'>
+                {batch.firstClassAt && <span>{t('First class', 'প্রথম ক্লাস')} · {date(batch.firstClassAt, true)}</span>}
+                {batch.joinClosesAt && <span>{t('Enrollment closes', 'ভর্তির শেষ সময়')} · {date(batch.joinClosesAt, true)}</span>}
+              </p>
+            )}
           </label>
         ))}
       </div>

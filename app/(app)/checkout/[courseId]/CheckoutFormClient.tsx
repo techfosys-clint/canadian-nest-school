@@ -447,76 +447,6 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
                   </div>
                 )}
 
-                {!isFree && plan && <div className='bg-white border border-zinc-200 rounded-lg p-6 sm:p-8 space-y-4'>
-                  <label className='text-base font-bold text-zinc-800 flex items-center gap-2'>
-                    <FiTag className='text-[#E61C24]' />
-                    {label('Apply Coupon / Promo Code', 'কুপন বা প্রোমো কোড ব্যবহার করুন')}
-                  </label>
-
-                  <div className='flex gap-2'>
-                    <input
-                      type='text'
-                      placeholder='e.g. SAVE20'
-                      value={couponCode}
-                      onChange={(e) => {
-                        const next = e.target.value.toUpperCase();
-                        setCouponCode(next);
-                        if (
-                          appliedCoupon &&
-                          next.trim() !== appliedCoupon.code
-                        ) {
-                          setAppliedCoupon(null);
-                          setCouponSuccess('');
-                        }
-                        setCouponError('');
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleApplyCoupon();
-                        }
-                      }}
-                      className='flex-1 px-3.5 py-2.5 rounded-lg border border-zinc-200 focus:border-[#E61C24] outline-none text-base transition-all font-mono font-bold text-zinc-800'
-                    />
-                    {appliedCoupon ? (
-                      <button
-                        type='button'
-                        onClick={handleRemoveCoupon}
-                        className='px-5 rounded-lg border border-zinc-200 hover:border-rose-300 hover:bg-rose-50 text-rose-600 font-bold text-base transition-all cursor-pointer select-none'
-                      >
-                        Remove
-                      </button>
-                    ) : (
-                      <button
-                        type='button'
-                        onClick={handleApplyCoupon}
-                        disabled={couponLoading}
-                        className='px-5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base transition-all cursor-pointer flex items-center justify-center select-none'
-                      >
-                        {couponLoading ? (
-                          <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
-                        ) : (
-                          'Apply'
-                        )}
-                      </button>
-                    )}
-                  </div>
-
-                  {couponError && (
-                    <div className='flex items-center gap-1.5 text-rose-500 text-base font-semibold'>
-                      <FiAlertCircle className='h-4.5 w-4.5 shrink-0' />
-                      <span>{couponError}</span>
-                    </div>
-                  )}
-
-                  {couponSuccess && appliedCoupon && (
-                    <div className='flex items-center gap-1.5 text-emerald-600 text-base font-semibold'>
-                      <FiCheck className='h-4.5 w-4.5 shrink-0' />
-                      <span>{couponSuccess}</span>
-                    </div>
-                  )}
-                </div>}
-
                 {course.requiresBatch && (
                   <div className='space-y-3 border border-zinc-200/80 rounded-lg p-4 bg-zinc-50'>
                     {batchesLoading ? (
@@ -541,9 +471,9 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
                             return (
                               <label
                                 key={batch.id}
-                                className={`flex items-start gap-3 rounded-lg border p-3 cursor-pointer ${
+                                className={`flex items-start justify-between gap-3 rounded-lg border p-4 cursor-pointer focus-within:ring-2 focus-within:ring-red-200 ${
                                   selected
-                                    ? 'border-[#E61C24]/60 bg-white'
+                                    ? 'border-[#E61C24]/60 bg-red-50'
                                     : 'border-zinc-200/80 bg-white'
                                 }`}
                               >
@@ -553,7 +483,7 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
                                   value={batch.id}
                                   checked={selected}
                                   onChange={() => { setSelectedBatchId(batch.id); setTermsAccepted(false); }}
-                                  className='mt-1 h-4 w-4 accent-[#E61C24]'
+                                  className='sr-only'
                                 />
                                 <span className='min-w-0'>
                                   <span className='block text-base font-bold text-zinc-800'>
@@ -574,6 +504,7 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
                                       : ''}
                                   </span>
                                 </span>
+                                {selected && <FiCheck aria-hidden='true' className='mt-1 h-5 w-5 shrink-0 text-[#E61C24]' />}
                               </label>
                             );
                           })}
@@ -584,22 +515,25 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
                 )}
 
                 {!isFree && (!course.requiresBatch || selectedBatch) && (
-                  <fieldset className='space-y-3'>
-                    <legend className='font-bold'>{label('Payment options', 'পেমেন্টের বিকল্প')}</legend>
+                  <fieldset className='min-w-0'>
+                    <legend className='mb-3 font-bold'>{label('Payment options', 'পেমেন্টের বিকল্প')}</legend>
+                    <div className='grid gap-3 lg:grid-cols-3'>
                     {course.plans.map(option => (
-                      <label key={option.type} className='flex gap-3 rounded-lg border border-zinc-200 bg-white p-4'>
-                        <input type='radio' name='payment-plan' checked={plan?.type === option.type}
+                      <label key={option.type} className={`flex cursor-pointer relative flex-col items-start gap-2 rounded-lg border p-4 focus-within:ring-2 focus-within:ring-red-200 ${plan?.type === option.type ? 'border-[#E61C24]/60 bg-red-50' : 'border-zinc-200 bg-white hover:border-red-300'}`}>
+                        <input type='radio' name='payment-plan' className='sr-only' checked={plan?.type === option.type}
                           onChange={() => { setSelection(current => ({ ...current, plan: option.type })); setTermsAccepted(false); }} />
-                        <span>
+                        <span className='min-w-0 w-full pr-6'>
                           <strong className='block'>{bn ? { one_time: 'এককালীন পেমেন্ট', monthly: 'প্রতি মাসে', two_month: 'প্রতি দুই মাসে', quarterly: 'প্রতি তিন মাসে' }[option.type] : paymentPlanLabels[option.type]}</strong>
                           {option.regularPrice && (
                             <span className='block'>{label('Regular price', 'নিয়মিত মূল্য')} <del>{money(option.regularPrice)}</del></span>
                           )}
-                          <span className='block'>{label('Plan price', 'প্ল্যানের মূল্য')} {money(option.price)}</span>
-                          {option.regularPrice && <span className='block text-emerald-700'>{label('Discount and savings', 'ছাড় ও সাশ্রয়')} {money(option.regularPrice - option.price)}</span>}
+                          {option.regularPrice && <span className='block text-emerald-700'>{label('Save', 'সাশ্রয়')} {money(option.regularPrice - option.price)}</span>}
                         </span>
+                        <strong className='text-lg text-zinc-900'>{money(option.price)}</strong>
+                        {plan?.type === option.type && <FiCheck aria-hidden='true' className='absolute right-3 top-4 h-5 w-5 text-[#E61C24]' />}
                       </label>
                     ))}
+                    </div>
                   </fieldset>
                 )}
                 {isFree && <p className='font-bold text-emerald-700'>{label('Free', 'ফ্রি')}</p>}
@@ -631,7 +565,7 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
                     <>
                       <FiZap className='h-5 w-5 fill-white' />
                       <span>
-                        {!user ? label('Sign in to continue', 'সাইন ইন করে এগিয়ে যান') : isFree ? label('Next Step', 'পরবর্তী ধাপ') : `${label('Confirm enrollment', 'ভর্তি নিশ্চিত করুন')} (${money(finalPrice)})`}
+                        {!plan ? label('Select a payment option', 'একটি পেমেন্ট বিকল্প বেছে নিন') : !user ? label('Sign in to continue', 'সাইন ইন করে এগিয়ে যান') : isFree ? label('Next Step', 'পরবর্তী ধাপ') : `${label('Confirm enrollment', 'ভর্তি নিশ্চিত করুন')} (${money(finalPrice)})`}
                       </span>
                     </>
                   )}
@@ -645,17 +579,15 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
           {/* Sticky Course details widget */}
           <div className='bg-white border border-zinc-200 rounded-lg overflow-hidden'>
             {/* Banner image */}
-            {course.imageUrl && (
-              <div className='aspect-16/10 overflow-hidden bg-zinc-50 border-b border-zinc-100 relative'>
+              <div className='aspect-video overflow-hidden bg-slate-50 border-b border-zinc-100 relative'>
                 <Image
-                  src={course.imageUrl}
-                  alt={course.title}
-                  className='w-full h-full object-cover'
-                  width={610}
-                  height={380}
+                  src={course.imageUrl || '/logo.png'}
+                  alt={course.imageUrl ? course.title : 'Canadian Nest School'}
+                  className={course.imageUrl ? 'object-cover' : 'object-contain p-10'}
+                  fill
+                  sizes='(min-width: 1024px) 40vw, 100vw'
                 />
               </div>
-            )}
 
             <div className='p-6 space-y-6'>
               {/* Category, Title, Instructor */}
@@ -722,6 +654,75 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
                       : `৳${finalPrice.toLocaleString(language)}`}
                   </span>
                 </div>}
+                {!isFree && plan && <details className='border-t border-zinc-100 pt-3'>
+                  <summary className='cursor-pointer text-base font-semibold text-zinc-700'>
+                    {label('Apply Coupon / Promo Code', 'কুপন বা প্রোমো কোড ব্যবহার করুন')}
+                  </summary>
+
+                  <div className='mt-3 flex gap-2'>
+                    <input
+                      type='text'
+                      aria-label={label('Coupon code', 'কুপন কোড')}
+                      placeholder='e.g. SAVE20'
+                      value={couponCode}
+                      onChange={(e) => {
+                        const next = e.target.value.toUpperCase();
+                        setCouponCode(next);
+                        if (
+                          appliedCoupon &&
+                          next.trim() !== appliedCoupon.code
+                        ) {
+                          setAppliedCoupon(null);
+                          setCouponSuccess('');
+                        }
+                        setCouponError('');
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleApplyCoupon();
+                        }
+                      }}
+                      className='min-w-0 flex-1 px-3.5 py-2.5 rounded-lg border border-zinc-200 focus:border-[#E61C24] outline-none text-base transition-all font-mono font-bold text-zinc-800'
+                    />
+                    {appliedCoupon ? (
+                      <button
+                        type='button'
+                        onClick={handleRemoveCoupon}
+                        className='px-5 rounded-lg border border-zinc-200 hover:border-rose-300 hover:bg-rose-50 text-rose-600 font-bold text-base transition-all cursor-pointer select-none'
+                      >
+                        Remove
+                      </button>
+                    ) : (
+                      <button
+                        type='button'
+                        onClick={handleApplyCoupon}
+                        disabled={couponLoading}
+                        className='px-5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base transition-all cursor-pointer flex items-center justify-center select-none'
+                      >
+                        {couponLoading ? (
+                          <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
+                        ) : (
+                          'Apply'
+                        )}
+                      </button>
+                    )}
+                  </div>
+
+                  {couponError && (
+                    <div className='flex items-center gap-1.5 text-rose-500 text-base font-semibold'>
+                      <FiAlertCircle className='h-4.5 w-4.5 shrink-0' />
+                      <span>{couponError}</span>
+                    </div>
+                  )}
+
+                  {couponSuccess && appliedCoupon && (
+                    <div className='flex items-center gap-1.5 text-emerald-600 text-base font-semibold'>
+                      <FiCheck className='h-4.5 w-4.5 shrink-0' />
+                      <span>{couponSuccess}</span>
+                    </div>
+                  )}
+                </details>}
               </div>
             </div>
           </div>

@@ -654,15 +654,16 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
                       : `৳${finalPrice.toLocaleString(language)}`}
                   </span>
                 </div>}
-                {!isFree && plan && <details className='border-t border-zinc-100 pt-3'>
-                  <summary className='cursor-pointer text-base font-semibold text-zinc-700'>
+                {!isFree && plan && <div className='border-t border-zinc-100 pt-3'>
+                  <label htmlFor='checkout-coupon' className='flex items-center gap-2 text-base font-semibold text-zinc-700'>
+                    <FiTag className='text-[#E61C24]' aria-hidden='true' />
                     {label('Apply Coupon / Promo Code', 'কুপন বা প্রোমো কোড ব্যবহার করুন')}
-                  </summary>
+                  </label>
 
                   <div className='mt-3 flex gap-2'>
                     <input
                       type='text'
-                      aria-label={label('Coupon code', 'কুপন কোড')}
+                      id='checkout-coupon'
                       placeholder='e.g. SAVE20'
                       value={couponCode}
                       onChange={(e) => {
@@ -722,7 +723,7 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
                       <span>{couponSuccess}</span>
                     </div>
                   )}
-                </details>}
+                </div>}
               </div>
             </div>
           </div>

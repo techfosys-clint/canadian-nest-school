@@ -388,6 +388,79 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
     }
   };
 
+  const renderCoupon = (placement: 'mobile' | 'desktop') => !isFree && plan && (
+    <div className='border-t border-zinc-100 pt-3'>
+                  <label htmlFor={`checkout-coupon-${placement}`} className='flex items-center gap-2 text-base font-semibold text-zinc-700'>
+                    <FiTag className='text-[#E61C24]' aria-hidden='true' />
+                    {label('Apply Coupon / Promo Code', 'কুপন বা প্রোমো কোড ব্যবহার করুন')}
+                  </label>
+
+                  <div className='mt-3 flex gap-2'>
+                    <input
+                      type='text'
+                      id={`checkout-coupon-${placement}`}
+                      placeholder='e.g. SAVE20'
+                      value={couponCode}
+                      onChange={(e) => {
+                        const next = e.target.value.toUpperCase();
+                        setCouponCode(next);
+                        if (
+                          appliedCoupon &&
+                          next.trim() !== appliedCoupon.code
+                        ) {
+                          setAppliedCoupon(null);
+                          setCouponSuccess('');
+                        }
+                        setCouponError('');
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleApplyCoupon();
+                        }
+                      }}
+                      className='min-w-0 flex-1 px-3.5 py-2.5 rounded-lg border border-zinc-200 focus:border-[#E61C24] outline-none text-base transition-all font-mono font-bold text-zinc-800'
+                    />
+                    {appliedCoupon ? (
+                      <button
+                        type='button'
+                        onClick={handleRemoveCoupon}
+                        className='px-5 rounded-lg border border-zinc-200 hover:border-rose-300 hover:bg-rose-50 text-rose-600 font-bold text-base transition-all cursor-pointer select-none'
+                      >
+                        Remove
+                      </button>
+                    ) : (
+                      <button
+                        type='button'
+                        onClick={handleApplyCoupon}
+                        disabled={couponLoading}
+                        className='px-5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base transition-all cursor-pointer flex items-center justify-center select-none'
+                      >
+                        {couponLoading ? (
+                          <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
+                        ) : (
+                          'Apply'
+                        )}
+                      </button>
+                    )}
+                  </div>
+
+                  {couponError && (
+                    <div className='flex items-center gap-1.5 text-rose-500 text-base font-semibold'>
+                      <FiAlertCircle className='h-4.5 w-4.5 shrink-0' />
+                      <span>{couponError}</span>
+                    </div>
+                  )}
+
+                  {couponSuccess && appliedCoupon && (
+                    <div className='flex items-center gap-1.5 text-emerald-600 text-base font-semibold'>
+                      <FiCheck className='h-4.5 w-4.5 shrink-0' />
+                      <span>{couponSuccess}</span>
+                    </div>
+                  )}
+                </div>
+  );
+
   if (loadingSession) {
     return (
       <div className='min-h-screen flex items-center justify-center bg-zinc-50'>
@@ -414,7 +487,7 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
 
       <div className='grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start'>
         {/* LEFT COLUMN: AUTH WORKSPACE OR CHECKOUT BILLING */}
-        <div className='lg:col-span-7 space-y-8 order-2 lg:order-1'>
+        <div className='lg:col-span-7 space-y-8'>
           {!user && showSignIn && (
             <div ref={authPanel} className='scroll-mt-28'><MobileAuthFlow
               onSuccess={handleAuthSuccess}
@@ -550,6 +623,8 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
                   </div>
                 )}
 
+                <div className='lg:hidden'>{renderCoupon('mobile')}</div>
+
                 <button
                   type='submit'
                   disabled={
@@ -575,7 +650,7 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
         </div>
 
         {/* RIGHT COLUMN: STICKY COURSE SUMMARY CARD & COUPON APPLICATION */}
-        <div className='lg:col-span-5 relative z-10 w-full order-1 lg:order-2 space-y-6 lg:sticky lg:top-32'>
+        <div className='lg:col-span-5 relative z-10 w-full space-y-6 lg:sticky lg:top-32'>
           {/* Sticky Course details widget */}
           <div className='bg-white border border-zinc-200 rounded-lg overflow-hidden'>
             {/* Banner image */}
@@ -654,76 +729,7 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
                       : `৳${finalPrice.toLocaleString(language)}`}
                   </span>
                 </div>}
-                {!isFree && plan && <div className='border-t border-zinc-100 pt-3'>
-                  <label htmlFor='checkout-coupon' className='flex items-center gap-2 text-base font-semibold text-zinc-700'>
-                    <FiTag className='text-[#E61C24]' aria-hidden='true' />
-                    {label('Apply Coupon / Promo Code', 'কুপন বা প্রোমো কোড ব্যবহার করুন')}
-                  </label>
-
-                  <div className='mt-3 flex gap-2'>
-                    <input
-                      type='text'
-                      id='checkout-coupon'
-                      placeholder='e.g. SAVE20'
-                      value={couponCode}
-                      onChange={(e) => {
-                        const next = e.target.value.toUpperCase();
-                        setCouponCode(next);
-                        if (
-                          appliedCoupon &&
-                          next.trim() !== appliedCoupon.code
-                        ) {
-                          setAppliedCoupon(null);
-                          setCouponSuccess('');
-                        }
-                        setCouponError('');
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleApplyCoupon();
-                        }
-                      }}
-                      className='min-w-0 flex-1 px-3.5 py-2.5 rounded-lg border border-zinc-200 focus:border-[#E61C24] outline-none text-base transition-all font-mono font-bold text-zinc-800'
-                    />
-                    {appliedCoupon ? (
-                      <button
-                        type='button'
-                        onClick={handleRemoveCoupon}
-                        className='px-5 rounded-lg border border-zinc-200 hover:border-rose-300 hover:bg-rose-50 text-rose-600 font-bold text-base transition-all cursor-pointer select-none'
-                      >
-                        Remove
-                      </button>
-                    ) : (
-                      <button
-                        type='button'
-                        onClick={handleApplyCoupon}
-                        disabled={couponLoading}
-                        className='px-5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base transition-all cursor-pointer flex items-center justify-center select-none'
-                      >
-                        {couponLoading ? (
-                          <div className='h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin' />
-                        ) : (
-                          'Apply'
-                        )}
-                      </button>
-                    )}
-                  </div>
-
-                  {couponError && (
-                    <div className='flex items-center gap-1.5 text-rose-500 text-base font-semibold'>
-                      <FiAlertCircle className='h-4.5 w-4.5 shrink-0' />
-                      <span>{couponError}</span>
-                    </div>
-                  )}
-
-                  {couponSuccess && appliedCoupon && (
-                    <div className='flex items-center gap-1.5 text-emerald-600 text-base font-semibold'>
-                      <FiCheck className='h-4.5 w-4.5 shrink-0' />
-                      <span>{couponSuccess}</span>
-                    </div>
-                  )}
-                </div>}
+                <div className='hidden lg:block'>{renderCoupon('desktop')}</div>
               </div>
             </div>
           </div>

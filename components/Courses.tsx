@@ -262,10 +262,10 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                 <FiBookOpen className='h-7 w-7 text-[#E61C24]' />
               </div>
               <h3 className='text-xl font-bold text-zinc-800 mb-2'>
-                No courses yet
+                {t.emptyCategoryTitle}
               </h3>
               <p className='text-base font-semibold text-zinc-400 max-w-xs'>
-                Courses in this category will appear here once published.
+                {t.emptyCategoryText}
               </p>
             </motion.div>
           ) : (
@@ -342,7 +342,7 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                           </span>
                           <span className='px-3.5 py-1.5 bg-zinc-950 text-white rounded-lg font-bold text-base flex items-center gap-1.5 shadow-sm'>
                             <FiZap className='h-4 w-4 text-amber-400 fill-amber-400' />
-                            <span>Featured</span>
+                            <span>{t.featured}</span>
                           </span>
                         </div>
 

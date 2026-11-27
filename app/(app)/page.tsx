@@ -17,7 +17,7 @@ import { Enrollment } from '@/lib/db/models/Enrollment';
 import { Review } from '@/lib/db/models/Review';
 import { connectToDatabase } from '@/lib/db/mongodb';
 import { getLocale } from '@/lib/i18n/getLocale';
-import { localizeCourseDoc } from '@/lib/i18n/localizeCourse';
+import { localizeCategoryName, localizeCourseDoc } from '@/lib/i18n/localizeCourse';
 
 export const dynamic = 'force-dynamic';
 
@@ -104,7 +104,7 @@ export default async function Home() {
       category: doc.category
         ? {
             id: doc.category._id.toString(),
-            name: doc.category.name,
+            name: localizeCategoryName(doc.category, locale),
             slug: doc.category.slug,
           }
         : null,
@@ -127,7 +127,7 @@ export default async function Home() {
   // CategoryItem and CategoryDoc are the same shape (id, name, slug) - satisfies both components
   const categories = categoriesDocs.map((doc: any) => ({
     id: doc._id.toString(),
-    name: doc.name,
+    name: localizeCategoryName(doc, locale),
     slug: doc.slug,
   }));
 

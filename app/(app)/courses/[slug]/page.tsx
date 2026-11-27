@@ -18,7 +18,11 @@ import '@/lib/db/models/Student';
 import { connectToDatabase } from '@/lib/db/mongodb';
 import { getLocale } from '@/lib/i18n/getLocale';
 import { getMessages } from '@/lib/i18n/getMessages';
-import { localizeCourseDoc, localizeFaqDoc } from '@/lib/i18n/localizeCourse';
+import {
+  localizeCategoryName,
+  localizeCourseDoc,
+  localizeFaqDoc,
+} from '@/lib/i18n/localizeCourse';
 import { localizedPath } from '@/lib/i18n/path';
 import { isRichTextEmpty } from '@/lib/richText';
 import { getYoutubeOrVimeoEmbedUrl } from '@/lib/videoEmbed';
@@ -199,13 +203,16 @@ export default async function CourseDetailPage({ params }: Props) {
     (course.instructors?.[0] && typeof course.instructors[0] === 'object'
       ? course.instructors[0]
       : null);
-  const categoryName =
+  const primaryCategory =
     (course.category && typeof course.category === 'object'
-      ? course.category.name
+      ? course.category
       : null) ??
     (course.categories?.[0] && typeof course.categories[0] === 'object'
-      ? course.categories[0].name
-      : '');
+      ? course.categories[0]
+      : null);
+  // English name for analytics; localized name for display.
+  const categoryName: string = primaryCategory?.name ?? '';
+  const categoryLabel = localizeCategoryName(primaryCategory, locale);
   const instructorName = resolvedInstructor
     ? (resolvedInstructor.name ?? resolvedInstructor.email)
     : 'Expert Instructor';
@@ -319,9 +326,9 @@ export default async function CourseDetailPage({ params }: Props) {
 
             {/* Badges */}
             <div className='flex flex-wrap items-center gap-2.5'>
-              {categoryName && (
+              {categoryLabel && (
                 <span className='px-3.5 py-1.5 bg-[#E61C24]/15 border border-[#E61C24]/25 text-[#ff8e91] rounded-lg font-bold text-base uppercase tracking-wide'>
-                  {categoryName}
+                  {categoryLabel}
                 </span>
               )}
               <span className='px-3.5 py-1.5 bg-white/8 border border-white/12 text-zinc-300 rounded-lg font-bold text-base uppercase tracking-wide'>

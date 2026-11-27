@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  localizeCategoryName,
   localizeCourseDoc,
   localizeFaqDoc,
   localizeInstructorBio,
@@ -135,5 +136,30 @@ describe('localizeFaqDoc', () => {
         'en',
       ),
     ).toEqual({ question: 'প্রশ্ন?', answer: 'উত্তর' })
+  })
+})
+
+describe('localizeCategoryName', () => {
+  it('uses the Bangla name on the Bangla site', () => {
+    expect(
+      localizeCategoryName({ name: 'Kids English', nameBn: 'শিশুদের ইংরেজি' }, 'bn'),
+    ).toBe('শিশুদের ইংরেজি')
+  })
+
+  it('falls back to the English name when no Bangla name is set', () => {
+    expect(localizeCategoryName({ name: 'Kids English', nameBn: '' }, 'bn')).toBe(
+      'Kids English',
+    )
+    expect(localizeCategoryName({ name: 'Kids English' }, 'bn')).toBe('Kids English')
+  })
+
+  it('uses the English name on the English site', () => {
+    expect(
+      localizeCategoryName({ name: 'Kids English', nameBn: 'শিশুদের ইংরেজি' }, 'en'),
+    ).toBe('Kids English')
+  })
+
+  it('returns an empty string for a missing category', () => {
+    expect(localizeCategoryName(null, 'bn')).toBe('')
   })
 })

@@ -8,6 +8,7 @@ import { Review } from '@/lib/db/models/Review'
 import { User } from '@/lib/db/models/User'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { getLocale } from '@/lib/i18n/getLocale'
+import { localizeCategoryName } from '@/lib/i18n/localizeCourse'
 import { getMessages } from '@/lib/i18n/getMessages'
 import InstructorsPageClient from './InstructorsPageClient'
 
@@ -23,6 +24,7 @@ export async function generateMetadata() {
 }
 
 export default async function InstructorsPage() {
+  const locale = await getLocale()
   await connectToDatabase()
 
   // Fetch all registered instructors, published courses, categories, and approved reviews from database
@@ -99,7 +101,7 @@ export default async function InstructorsPage() {
       } : null,
       category: doc.category ? {
         id: doc.category._id.toString(),
-        name: doc.category.name,
+        name: localizeCategoryName(doc.category, locale),
         slug: doc.category.slug,
       } : null,
       instructor: doc.instructor && typeof doc.instructor === 'object' ? {
@@ -117,7 +119,7 @@ export default async function InstructorsPage() {
 
   const categories = categoriesDocs.map((doc: any) => ({
     id: doc._id.toString(),
-    name: doc.name,
+    name: localizeCategoryName(doc, locale),
     slug: doc.slug,
   }))
 

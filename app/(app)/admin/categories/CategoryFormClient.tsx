@@ -9,12 +9,14 @@ interface CategoryFormProps {
   initialData?: {
     id: string
     name: string
+    nameBn?: string
     slug: string
   }
 }
 
 interface CategoryRow {
   name: string
+  nameBn: string
   slug: string
 }
 
@@ -33,11 +35,12 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
 
   // Single category states for edit mode
   const [name, setName] = useState(initialData?.name || '')
+  const [nameBn, setNameBn] = useState(initialData?.nameBn || '')
   const [slug, setSlug] = useState(initialData?.slug || '')
 
   // Multiple category rows state for creation mode
   const [categoryRows, setCategoryRows] = useState<CategoryRow[]>([
-    { name: '', slug: '' }
+    { name: '', nameBn: '', slug: '' }
   ])
 
   const [saving, setSaving] = useState(false)
@@ -57,6 +60,12 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
     setCategoryRows(updated)
   }
 
+  const handleRowNameBnChange = (index: number, val: string) => {
+    const updated = [...categoryRows]
+    updated[index].nameBn = val
+    setCategoryRows(updated)
+  }
+
   const handleRowSlugChange = (index: number, val: string) => {
     const updated = [...categoryRows]
     updated[index].slug = slugify(val)
@@ -64,7 +73,7 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
   }
 
   const addCategoryRow = () => {
-    setCategoryRows([...categoryRows, { name: '', slug: '' }])
+    setCategoryRows([...categoryRows, { name: '', nameBn: '', slug: '' }])
   }
 
   const removeCategoryRow = (index: number) => {
@@ -110,12 +119,18 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
 
       if (isEditMode) {
         method = 'PUT'
-        body = { id: initialData?.id, name: name.trim(), slug: slug.trim() }
+        body = {
+          id: initialData?.id,
+          name: name.trim(),
+          nameBn: nameBn.trim(),
+          slug: slug.trim(),
+        }
       } else {
         // Bulk creation payload
         body = {
           categories: categoryRows.map(row => ({
             name: row.name.trim(),
+            nameBn: row.nameBn.trim(),
             slug: row.slug.trim()
           }))
         }
@@ -214,6 +229,21 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
                 </div>
 
                 <div className="flex flex-col gap-2">
+                  <label className="text-base font-bold text-slate-600">Category Name (Bangla)</label>
+                  <input
+                    type="text"
+                    lang="bn"
+                    value={nameBn}
+                    onChange={(e) => setNameBn(e.target.value)}
+                    placeholder="যেমন: শিশুদের ইংরেজি"
+                    className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
+                  />
+                  <p className="text-base font-medium text-slate-400">
+                    Shown on the Bangla site. Leave empty to show the English name.
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-2">
                   <label className="text-base font-bold text-slate-600">URL path suffix (Slug) *</label>
                   <input
                     type="text"
@@ -264,6 +294,17 @@ export default function CategoryFormClient({ initialData }: CategoryFormProps) {
                           onChange={(e) => handleRowSlugChange(idx, e.target.value)}
                           placeholder="graphic-design"
                           className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors font-mono"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1.5 sm:col-span-2">
+                        <label className="text-sm font-bold text-slate-500">Category Name (Bangla)</label>
+                        <input
+                          type="text"
+                          lang="bn"
+                          value={row.nameBn}
+                          onChange={(e) => handleRowNameBnChange(idx, e.target.value)}
+                          placeholder="যেমন: শিশুদের ইংরেজি"
+                          className="bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors"
                         />
                       </div>
                     </div>

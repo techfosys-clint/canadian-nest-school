@@ -127,6 +127,9 @@ const en: Messages = {
     pageSubtitle: 'Find the right program for your goals.',
     noCourses: 'No courses available right now.',
     filterAll: 'All',
+    featured: 'Featured',
+    emptyCategoryTitle: 'No courses yet',
+    emptyCategoryText: 'Courses in this category will appear here once published.',
   },
   cta: {
     title: 'Ready to Transform Your English Skills?',
@@ -148,6 +151,9 @@ const en: Messages = {
     privacy: 'Privacy Policy',
     refund: 'Refund Policy',
     rights: 'All rights reserved.',
+    phoneLabel: 'Phone',
+    emailLabel: 'Email',
+    followUs: 'Follow Us',
   },
   about: {
     title: 'About Us',

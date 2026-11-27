@@ -54,6 +54,7 @@ export async function POST(request: Request) {
       const inserted = await Category.insertMany(
         categories.map((c: any) => ({
           name: c.name.trim(),
+          nameBn: typeof c.nameBn === 'string' ? c.nameBn.trim() : '',
           slug: c.slug.trim()
         }))
       )
@@ -63,12 +64,13 @@ export async function POST(request: Request) {
 
     // Support single insertion
     const { name, slug } = body
+    const nameBn = typeof body.nameBn === 'string' ? body.nameBn.trim() : ''
     if (!name || !slug) return NextResponse.json({ error: 'Name and slug are required.' }, { status: 400 })
 
     const existing = await Category.findOne({ $or: [{ name }, { slug }] }).lean()
     if (existing) return NextResponse.json({ error: 'Category name or slug already exists.' }, { status: 400 })
 
-    const category = new Category({ name, slug })
+    const category = new Category({ name, nameBn, slug })
     await category.save()
     return NextResponse.json({ success: true, category }, { status: 201 })
   } catch (error: any) {
@@ -82,7 +84,7 @@ export async function PUT(request: Request) {
     const user = await getAuthorizedUser(['admin', 'staff'], 'categories')
     if (!user) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
 
-    const { id, name, slug } = await request.json()
+    const { id, name, slug, nameBn } = await request.json()
     if (!id || !name || !slug) return NextResponse.json({ error: 'id, name and slug required.' }, { status: 400 })
 
     const category = await Category.findById(id)
@@ -90,6 +92,7 @@ export async function PUT(request: Request) {
 
     category.name = name
     category.slug = slug
+    if (typeof nameBn === 'string') category.nameBn = nameBn.trim()
     await category.save()
     return NextResponse.json({ success: true, category })
   } catch (error: any) {

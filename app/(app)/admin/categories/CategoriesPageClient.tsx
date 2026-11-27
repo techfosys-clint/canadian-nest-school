@@ -8,6 +8,7 @@ import Swal from 'sweetalert2'
 interface CategoryItem {
   id: string
   name: string
+  nameBn?: string
   slug: string
 }
 
@@ -104,7 +105,14 @@ export default function CategoriesPageClient({
                         <div className="h-9 w-9 rounded-lg bg-[#E61C24]/10 border border-[#E61C24]/20 flex items-center justify-center shrink-0">
                           <FiBookmark className="h-4 w-4 text-[#E61C24]" />
                         </div>
-                        <span className="font-bold text-slate-800 text-base">{cat.name}</span>
+                        <div className="flex flex-col">
+                          <span className="font-bold text-slate-800 text-base">{cat.name}</span>
+                          {cat.nameBn && (
+                            <span lang="bn" className="font-medium text-slate-500 text-base">
+                              {cat.nameBn}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">

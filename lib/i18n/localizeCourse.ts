@@ -89,3 +89,15 @@ export function localizeFaqDoc(doc: Record<string, any>, locale: Locale) {
     answer: answerBn || answerEn,
   }
 }
+
+/**
+ * Display name for a category: `nameBn` on the Bangla site, falling back to
+ * the English `name`. Keep using `name` for analytics so reports don't split.
+ */
+export function localizeCategoryName(
+  category: Record<string, any> | null | undefined,
+  locale: Locale,
+): string {
+  if (!category || typeof category !== 'object') return ''
+  return pickLocalizedString(category, 'name', locale)
+}

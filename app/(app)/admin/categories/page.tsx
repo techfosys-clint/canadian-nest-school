@@ -27,7 +27,7 @@ export default async function CategoriesPage() {
   if (!sessionUser || !['admin', 'staff'].includes(sessionUser.role)) redirect('/login')
 
   const cats = await Category.find().sort({ name: 1 }).lean()
-  const categories = cats.map((c: any) => ({ id: c._id.toString(), name: c.name, slug: c.slug }))
+  const categories = cats.map((c: any) => ({ id: c._id.toString(), name: c.name, nameBn: c.nameBn || '', slug: c.slug }))
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-800">

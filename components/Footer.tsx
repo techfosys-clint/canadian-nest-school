@@ -97,7 +97,7 @@ export default function Footer() {
               </h3>
               <div className='space-y-2 text-base'>
                 <p>
-                  <span className='text-[#E61C24]'>Phone:</span>{' '}
+                  <span className='text-[#E61C24]'>{t.phoneLabel}:</span>{' '}
                   <a
                     href='tel:+8801739534707'
                     className='text-zinc-300 hover:text-[#E61C24] transition-colors'
@@ -106,7 +106,7 @@ export default function Footer() {
                   </a>
                 </p>
                 <p>
-                  <span className='text-[#E61C24]'>Email:</span>{' '}
+                  <span className='text-[#E61C24]'>{t.emailLabel}:</span>{' '}
                   <a
                     href='mailto:info.canadiannestschool@gmail.com'
                     className='text-zinc-300 hover:text-[#E61C24] transition-colors'
@@ -118,7 +118,7 @@ export default function Footer() {
             </div>
 
             <div className='space-y-3'>
-              <h3 className='text-base font-bold text-white'>Follow Us</h3>
+              <h3 className='text-base font-bold text-white'>{t.followUs}</h3>
               <div className='flex items-center gap-3'>
                 <a
                   href='https://www.facebook.com/CanadianNestSchoolofBangladesh'

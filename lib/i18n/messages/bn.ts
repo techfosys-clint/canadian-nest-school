@@ -131,6 +131,9 @@ const bn: Messages = {
     pageSubtitle: 'আপনার লক্ষ্য অনুযায়ী সঠিক প্রোগ্রাম খুঁজুন।',
     noCourses: 'এখন কোনো কোর্স নেই।',
     filterAll: 'সব',
+    featured: 'ফিচার্ড',
+    emptyCategoryTitle: 'এখনো কোনো কোর্স নেই',
+    emptyCategoryText: 'এই ক্যাটাগরির কোর্স প্রকাশিত হলে এখানে দেখা যাবে।',
   },
   cta: {
     title: 'ইংরেজিতে কথা বলার পালা এবার আপনার',
@@ -151,6 +154,9 @@ const bn: Messages = {
     privacy: 'প্রাইভেসি পলিসি',
     refund: 'রিফান্ড পলিসি',
     rights: 'সর্বস্বত্ব সংরক্ষিত।',
+    phoneLabel: 'ফোন',
+    emailLabel: 'ইমেইল',
+    followUs: 'আমাদের অনুসরণ করুন',
   },
   about: {
     title: 'আমাদের সম্পর্কে',

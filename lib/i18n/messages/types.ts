@@ -68,6 +68,9 @@ export type Messages = {
     pageSubtitle: string
     noCourses: string
     filterAll: string
+    featured: string
+    emptyCategoryTitle: string
+    emptyCategoryText: string
   }
   cta: {
     title: string
@@ -86,6 +89,9 @@ export type Messages = {
     privacy: string
     refund: string
     rights: string
+    phoneLabel: string
+    emailLabel: string
+    followUs: string
   }
   about: {
     title: string

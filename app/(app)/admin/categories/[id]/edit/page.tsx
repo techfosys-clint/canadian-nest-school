@@ -47,6 +47,7 @@ export default async function EditCategoryPage({ params }: Props) {
   const serializedCategory = {
     id: catDoc._id.toString(),
     name: catDoc.name,
+    nameBn: catDoc.nameBn || '',
     slug: catDoc.slug,
   }
 

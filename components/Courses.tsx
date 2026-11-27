@@ -204,6 +204,15 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
           >
             {t.sectionSubtitle}
           </motion.h2>
+          <motion.p
+            custom={0.18}
+            variants={sectionHeadVariants}
+            initial='hidden'
+            animate={headInView ? 'visible' : 'hidden'}
+            className='mt-4 text-base md:text-lg text-[#4F5B7C] font-semibold'
+          >
+            {t.sectionDescription}
+          </motion.p>
         </div>
 
         {/* Category Tabs */}

@@ -85,10 +85,19 @@ const en: Messages = {
         description: 'Browse all available learning programs and resources.',
       },
     ],
+    marquee: [
+      'English for Kids',
+      'English for Teens',
+      'English for Adults',
+      'IELTS Preparation',
+      'Teacher Training',
+      'Educational Shop',
+    ],
   },
   courses: {
     sectionTitle: 'Featured Courses',
     sectionSubtitle: 'Explore our most popular programs designed for real results.',
+    sectionDescription: 'Find the course you need and enroll today.',
     viewAll: 'View all courses',
     enroll: 'Enroll Now',
     free: 'Free',
@@ -124,6 +133,7 @@ const en: Messages = {
     subtitle:
       'Join our growing community of learners globally. Enroll in our upcoming batch today and step into a brighter, more confident future.',
     button: 'Browse Courses',
+    secondaryButton: 'Register',
   },
   footer: {
     blurb:
@@ -257,6 +267,25 @@ const en: Messages = {
     formTitle: 'Send Us a Message',
     formSubtitle:
       'Fill out the form below and we will get back to you within 24 hours.',
+    phoneLabel: 'Phone',
+    emailLabel: 'Email Address',
+    nameLabel: 'Full Name',
+    namePlaceholder: 'e.g. John Doe',
+    emailPlaceholder: 'e.g. user@example.com',
+    subjectLabel: 'Subject',
+    subjectPlaceholder: 'Please write the subject of your query here',
+    messageLabel: 'Your Message',
+    messagePlaceholder:
+      'Please write your questions or detailed message here so we can help you better...',
+    submit: 'Send Message',
+    submitting: 'Sending Message...',
+    requiredTitle: 'Fields Required',
+    requiredText: 'Please fill in all the required form fields.',
+    successTitle: 'Message Sent!',
+    successText:
+      'Thank you for reaching out. A support representative will get back to you shortly.',
+    errorTitle: 'Error Occurred',
+    errorText: 'Failed to send message. Please try again later.',
     faqEyebrow: 'Got Questions?',
     faqHeadingBefore: 'Frequently Asked',
     faqHeadingAccent: 'Questions',
@@ -271,10 +300,8 @@ const en: Messages = {
     title: 'Books & Learning Materials',
     descriptionBefore:
       'Physical books, guides, and other learning materials to support your ',
-    descriptionAccent1: 'study journey',
-    descriptionMiddle: ' — delivered right to your ',
-    descriptionAccent2: 'door',
-    descriptionAfter: '.',
+    descriptionAccent: 'study journey',
+    descriptionAfter: ' — delivered right to your door.',
   },
   instructors: {
     title: 'Our Team',

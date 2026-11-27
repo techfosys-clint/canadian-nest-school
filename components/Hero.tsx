@@ -10,6 +10,8 @@ const MotionImage = motion.create(Image);
 export default function Hero({ children }: { children?: React.ReactNode }) {
   const { messages, href } = useLocale();
   const t = messages.hero;
+  // Bengali line 1 ends in a comma right after the avatar, so skip the gap.
+  const englishIsPunctuation = /^[,.!?।]/.test(t.english);
 
   return (
     <section className='w-full min-h-[96vh] relative flex flex-col justify-between pt-36 md:pt-44 overflow-hidden'>
@@ -80,7 +82,11 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
               </motion.span>
             </span>
 
-            <span className='align-middle ml-1.5 md:ml-3'>{t.english}</span>
+            <span
+              className={`align-middle ${englishIsPunctuation ? 'ml-0.5' : 'ml-1.5 md:ml-3'}`}
+            >
+              {t.english}
+            </span>
 
             {/* Purple Lines Spark (heading-svg2.svg) - Animated Zoom */}
             <motion.span

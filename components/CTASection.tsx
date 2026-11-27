@@ -66,7 +66,7 @@ export default function CTASection() {
             href='/login'
             className='w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold text-base rounded-lg transition-all duration-300 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer border-none'
           >
-            {messages.nav.register}
+            {t.secondaryButton}
           </Link>
         </motion.div>
       </div>

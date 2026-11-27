@@ -33,10 +33,12 @@ export type Messages = {
     headingAccent: string
     subtitle: string
     items: Array<{ title: string; description: string }>
+    marquee: string[]
   }
   courses: {
     sectionTitle: string
     sectionSubtitle: string
+    sectionDescription: string
     viewAll: string
     enroll: string
     free: string
@@ -71,6 +73,7 @@ export type Messages = {
     title: string
     subtitle: string
     button: string
+    secondaryButton: string
   }
   footer: {
     blurb: string
@@ -123,6 +126,23 @@ export type Messages = {
     supportHours: string
     formTitle: string
     formSubtitle: string
+    phoneLabel: string
+    emailLabel: string
+    nameLabel: string
+    namePlaceholder: string
+    emailPlaceholder: string
+    subjectLabel: string
+    subjectPlaceholder: string
+    messageLabel: string
+    messagePlaceholder: string
+    submit: string
+    submitting: string
+    requiredTitle: string
+    requiredText: string
+    successTitle: string
+    successText: string
+    errorTitle: string
+    errorText: string
     faqEyebrow: string
     faqHeadingBefore: string
     faqHeadingAccent: string
@@ -134,9 +154,7 @@ export type Messages = {
     tag: string
     title: string
     descriptionBefore: string
-    descriptionAccent1: string
-    descriptionMiddle: string
-    descriptionAccent2: string
+    descriptionAccent: string
     descriptionAfter: string
   }
   instructors: {

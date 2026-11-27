@@ -58,11 +58,7 @@ export default function ShopPageClient({
           <>
             {t.descriptionBefore}
             <span className='text-[#E61C24] font-bold'>
-              {t.descriptionAccent1}
-            </span>
-            {t.descriptionMiddle}
-            <span className='text-[#E61C24] font-bold'>
-              {t.descriptionAccent2}
+              {t.descriptionAccent}
             </span>
             {t.descriptionAfter}
           </>

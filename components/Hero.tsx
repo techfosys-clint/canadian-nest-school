@@ -8,10 +8,10 @@ import Link from 'next/link';
 const MotionImage = motion.create(Image);
 
 export default function Hero({ children }: { children?: React.ReactNode }) {
-  const { messages, href } = useLocale();
+  const { messages, href, locale } = useLocale();
   const t = messages.hero;
-  // Bengali line 1 ends in a comma right after the avatar, so skip the gap.
-  const englishIsPunctuation = /^[,.!?।]/.test(t.english);
+  // Bangla line 1 is wider, so its decorations sit further out.
+  const isBn = locale === 'bn';
 
   return (
     <section className='w-full min-h-[96vh] relative flex flex-col justify-between pt-36 md:pt-44 overflow-hidden'>
@@ -31,7 +31,7 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
               initial={{ opacity: 0, scale: 0.8, rotate: -25 }}
               animate={{ opacity: 1, scale: 1, rotate: -12 }}
               transition={{ duration: 0.9, delay: 0.4, ease: 'easeOut' }}
-              className='absolute -left-24 -top-12 w-32 h-32 pointer-events-none hidden lg:block'
+              className={`absolute ${isBn ? '-left-36' : '-left-24'} -top-12 w-32 h-32 pointer-events-none hidden lg:block`}
             >
               <Image
                 src='/svg/heading-svg.svg'
@@ -82,18 +82,16 @@ export default function Hero({ children }: { children?: React.ReactNode }) {
               </motion.span>
             </span>
 
-            <span
-              className={`align-middle ${englishIsPunctuation ? 'ml-0.5' : 'ml-1.5 md:ml-3'}`}
-            >
-              {t.english}
-            </span>
+            {t.english && (
+              <span className='align-middle ml-1.5 md:ml-3'>{t.english}</span>
+            )}
 
             {/* Purple Lines Spark (heading-svg2.svg) - Animated Zoom */}
             <motion.span
               initial={{ opacity: 0, scale: 0.8, rotate: 15 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ duration: 0.9, delay: 0.5, ease: 'easeOut' }}
-              className='absolute right-2 -top-8 w-20 h-20 pointer-events-none hidden lg:block'
+              className={`absolute ${isBn ? '-right-16 -top-10' : 'right-2 -top-8'} w-20 h-20 pointer-events-none hidden lg:block`}
             >
               <Image
                 src='/svg/heading-svg2.svg'

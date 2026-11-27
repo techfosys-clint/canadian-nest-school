@@ -1,4 +1,4 @@
-import type { Messages } from './types'
+import type { Messages } from './types';
 
 const bn: Messages = {
   nav: {
@@ -17,7 +17,6 @@ const bn: Messages = {
   hero: {
     master: 'ইংরেজি জানা',
     authentic: 'এক কথা',
-    english: ',',
     fromAnywhere: 'বলতে পারা',
     inTheWorld: 'আরেক।',
     subtitle1:
@@ -44,8 +43,7 @@ const bn: Messages = {
       },
       {
         title: 'সবার জন্য আলাদা পথ',
-        description:
-          'শিশু, কিশোর, বড় কিংবা শিক্ষক—প্রত্যেকের জন্য সঠিক পথ।',
+        description: 'শিশু, কিশোর, বড় কিংবা শিক্ষক—প্রত্যেকের জন্য সঠিক পথ।',
       },
     ],
   },
@@ -62,13 +60,11 @@ const bn: Messages = {
       },
       {
         title: 'কিশোরদের ইংরেজি',
-        description:
-          'স্কুলের ইংরেজি আর মুখে বলার আত্মবিশ্বাস, দুটোই একসাথে।',
+        description: 'স্কুলের ইংরেজি আর মুখে বলার আত্মবিশ্বাস, দুটোই একসাথে।',
       },
       {
         title: 'বড়দের স্পোকেন ইংলিশ',
-        description:
-          'অফিস, ইন্টারভিউ বা রোজকার আলাপ—গুছিয়ে ইংরেজি বলুন।',
+        description: 'অফিস, ইন্টারভিউ বা রোজকার আলাপ—গুছিয়ে ইংরেজি বলুন।',
       },
       {
         title: 'IELTS প্রস্তুতি',
@@ -137,8 +133,7 @@ const bn: Messages = {
   },
   cta: {
     title: 'ইংরেজিতে কথা বলার পালা এবার আপনার',
-    subtitle:
-      'নতুন ব্যাচের ভর্তি চলছে। কোর্স দেখুন, আপনার ব্যাচটি বেছে নিন।',
+    subtitle: 'নতুন ব্যাচের ভর্তি চলছে। কোর্স দেখুন, আপনার ব্যাচটি বেছে নিন।',
     button: 'কোর্স দেখুন',
     secondaryButton: 'ভর্তি হন',
   },
@@ -150,6 +145,7 @@ const bn: Messages = {
     quickLinks: 'দ্রুত লিংক',
     blogs: 'ব্লগ',
     career: 'ক্যারিয়ার',
+    courses: 'কোর্সসমূহ',
     contact: 'যোগাযোগ',
     privacy: 'প্রাইভেসি পলিসি',
     refund: 'রিফান্ড পলিসি',
@@ -269,8 +265,8 @@ const bn: Messages = {
     subtitle:
       'কোর্স, ব্যাচ বা ভর্তি নিয়ে যেকোনো প্রশ্ন থাকলে লিখুন, আমরা সাহায্য করব।',
     infoTitle: 'যোগাযোগের তথ্য',
-    officeLabel: 'আমরা কোথায়',
-    officeValue: 'অনলাইনে, ঘরে বসেই আমাদের সাথে',
+    officeLabel: 'আমাদের অফিস',
+    officeValue: 'অনলাইন প্ল্যাটফর্ম',
     supportHoursLabel: 'সাপোর্টের সময়',
     supportHours: 'রবিবার থেকে বৃহস্পতিবার, সকাল ৯টা থেকে রাত ৮টা (GMT+6)',
     formTitle: 'আমাদের লিখুন',
@@ -301,8 +297,7 @@ const bn: Messages = {
   },
   shop: {
     metaTitle: 'শপ - Canadian Nest School',
-    metaDescription:
-      'Canadian Nest School-এর বই ও শিক্ষা উপকরণ ব্রাউজ করুন।',
+    metaDescription: 'Canadian Nest School-এর বই ও শিক্ষা উপকরণ ব্রাউজ করুন।',
     tag: 'Canadian Nest School Shop',
     title: 'বই ও শেখার উপকরণ',
     descriptionBefore: 'আপনার ',
@@ -312,8 +307,7 @@ const bn: Messages = {
   },
   instructors: {
     title: 'আমাদের টিম',
-    subtitle:
-      'যাঁরা পড়ান, পথ দেখান, আর পর্দার আড়ালে আপনার শেখাকে সহজ করেন।',
+    subtitle: 'যাঁরা পড়ান, পথ দেখান, আর পর্দার আড়ালে আপনার শেখাকে সহজ করেন।',
     metaTitle: 'আমাদের টিম - Canadian Nest School',
     metaDescription:
       'Canadian Nest School-এর ইনস্ট্রাক্টর ও টিম মেম্বারদের সাথে পরিচিত হোন।',
@@ -332,6 +326,6 @@ const bn: Messages = {
     en: 'EN',
     switchTo: 'ভাষা পরিবর্তন',
   },
-}
+};
 
-export default bn
+export default bn;

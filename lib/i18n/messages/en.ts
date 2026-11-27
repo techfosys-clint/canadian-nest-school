@@ -1,4 +1,4 @@
-import type { Messages } from './types'
+import type { Messages } from './types';
 
 const en: Messages = {
   nav: {
@@ -96,7 +96,8 @@ const en: Messages = {
   },
   courses: {
     sectionTitle: 'Featured Courses',
-    sectionSubtitle: 'Explore our most popular programs designed for real results.',
+    sectionSubtitle:
+      'Explore our most popular programs designed for real results.',
     sectionDescription: 'Find the course you need and enroll today.',
     viewAll: 'View all courses',
     enroll: 'Enroll Now',
@@ -129,7 +130,8 @@ const en: Messages = {
     filterAll: 'All',
     featured: 'Featured',
     emptyCategoryTitle: 'No courses yet',
-    emptyCategoryText: 'Courses in this category will appear here once published.',
+    emptyCategoryText:
+      'Courses in this category will appear here once published.',
   },
   cta: {
     title: 'Ready to Transform Your English Skills?',
@@ -146,6 +148,7 @@ const en: Messages = {
     mainPages: 'Main Pages',
     quickLinks: 'Quick Links',
     blogs: 'Blogs',
+    courses: 'Courses',
     career: 'Career',
     contact: 'Contact',
     privacy: 'Privacy Policy',
@@ -311,8 +314,7 @@ const en: Messages = {
   },
   instructors: {
     title: 'Our Team',
-    subtitle:
-      'Instructors, mentors, and the people who support your progress.',
+    subtitle: 'Instructors, mentors, and the people who support your progress.',
     metaTitle: 'Our Team - Canadian Nest School',
     metaDescription:
       'Meet the instructors and team members who teach and support students at Canadian Nest School.',
@@ -331,7 +333,7 @@ const en: Messages = {
     en: 'EN',
     switchTo: 'Switch language',
   },
-}
+};
 
-export default en
-export type { Messages } from './types'
+export default en;
+export type { Messages } from './types';

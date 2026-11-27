@@ -25,11 +25,13 @@ export default function Footer() {
       ? 'text-[#E61C24] font-bold transition-colors'
       : 'text-zinc-400 hover:text-[#E61C24] transition-colors';
 
-  const MAIN_PAGES = [{ label: messages.nav.home, href: '/', match: '/' }];
+  const MAIN_PAGES = [
+    { label: messages.nav.home, href: '/', match: '/' },
+    { label: t.courses, href: '/courses', match: '/courses' },
+  ];
 
   const QUICK_LINKS = [
     { label: t.blogs, href: '/blogs', match: '/blogs' },
-    { label: t.career, href: '/#career', match: '/career' },
     { label: t.contact, href: '/contact', match: '/contact' },
   ];
 
@@ -79,7 +81,11 @@ export default function Footer() {
                 {QUICK_LINKS.map(({ label, href: path, match }) => (
                   <li key={path}>
                     <Link
-                      href={path.startsWith('/#') ? href('/') + path.slice(1) : href(path)}
+                      href={
+                        path.startsWith('/#')
+                          ? href('/') + path.slice(1)
+                          : href(path)
+                      }
                       className={linkClass(match)}
                     >
                       {label}

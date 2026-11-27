@@ -17,6 +17,9 @@ function leafPaths(value: unknown, prefix = ''): string[] {
   return [prefix]
 }
 
+// Keys a locale may leave out because its layout has nothing to put there.
+const OPTIONAL_KEYS = new Set(['hero.english'])
+
 describe('getMessages', () => {
   it('returns Bangla and English catalogs', () => {
     expect(getMessages('bn')).toBe(bn)
@@ -24,8 +27,8 @@ describe('getMessages', () => {
   })
 
   it('keeps bn/en message key trees in sync', () => {
-    const bnPaths = leafPaths(bn).sort()
-    const enPaths = leafPaths(en).sort()
+    const bnPaths = leafPaths(bn).filter((p) => !OPTIONAL_KEYS.has(p)).sort()
+    const enPaths = leafPaths(en).filter((p) => !OPTIONAL_KEYS.has(p)).sort()
     expect(enPaths).toEqual(bnPaths)
   })
 

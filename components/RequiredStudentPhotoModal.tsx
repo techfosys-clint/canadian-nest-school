@@ -49,21 +49,21 @@ export default function RequiredStudentPhotoModal({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
       Swal.fire({
         icon: 'error',
         title: 'Invalid File',
-        text: 'Please upload a JPG or PNG image.',
+        text: 'Please upload a JPG, PNG or WebP image.',
         confirmButtonColor: '#E61C24',
       });
       return;
     }
 
-    if (file.size > 2 * 1024 * 1024) {
+    if (file.size > 5 * 1024 * 1024) {
       Swal.fire({
         icon: 'error',
         title: 'File Too Large',
-        text: 'Profile image size must be under 2MB.',
+        text: 'Profile photo must be 5 MB or smaller.',
         confirmButtonColor: '#E61C24',
       });
       return;
@@ -180,17 +180,17 @@ export default function RequiredStudentPhotoModal({
             )}
           </div>
           <span className='text-base font-bold text-zinc-700'>
-            {preview ? 'Change photo' : 'Choose JPG or PNG'}
+            {preview ? 'Change photo' : 'Choose JPG, PNG or WebP'}
           </span>
           <span className='text-base font-semibold text-zinc-400 text-center leading-snug'>
-            Max 2MB. Prefer a clear face-centered photo (about 10:9).
+            Max 5 MB. Prefer a clear face-centered photo (about 10:9).
           </span>
         </button>
 
         <input
           ref={fileInputRef}
           type='file'
-          accept='image/jpeg,image/png,image/jpg,image/webp'
+          accept='image/jpeg,image/png,image/webp'
           className='hidden'
           onChange={handleImageChange}
         />

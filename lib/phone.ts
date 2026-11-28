@@ -19,3 +19,8 @@ export function normalizePhone(phone: string): string {
 
   return digits
 }
+
+/** True for a normalized Bangladeshi mobile number (01XXXXXXXXX). */
+export function isValidBdPhone(phone: string): boolean {
+  return /^01\d{9}$/.test(phone)
+}

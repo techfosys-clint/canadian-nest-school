@@ -13,6 +13,10 @@ import {
   FiUser,
 } from 'react-icons/fi';
 import Swal from 'sweetalert2';
+import { isValidBdPhone, normalizePhone } from '@/lib/phone';
+
+const PHOTO_MAX_BYTES = 5 * 1024 * 1024;
+const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 interface UserProfile {
   id: string;
@@ -34,6 +38,10 @@ export default function StudentProfile() {
   // Form fields
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  // Phone change: the new number must be confirmed with an SMS code.
+  const [phoneOtp, setPhoneOtp] = useState('');
+  const [otpSentTo, setOtpSentTo] = useState<string | null>(null);
+  const [sendingOtp, setSendingOtp] = useState(false);
   const [imageFile, setImageFile] = useState<{
     base64: string;
     name: string;
@@ -79,11 +87,24 @@ export default function StudentProfile() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
+    // Reset so picking the same file again still triggers onChange.
+    e.target.value = '';
+
+    if (!PHOTO_TYPES.includes(file.type)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Unsupported File',
+        text: 'Please choose a JPG, PNG or WebP image.',
+        confirmButtonColor: '#E61C24',
+      });
+      return;
+    }
+
+    if (file.size > PHOTO_MAX_BYTES) {
       Swal.fire({
         icon: 'error',
         title: 'File Too Large',
-        text: 'Profile image size must be under 2MB.',
+        text: 'Profile photo must be 5 MB or smaller.',
         confirmButtonColor: '#E61C24',
       });
       return;
@@ -102,6 +123,53 @@ export default function StudentProfile() {
     reader.readAsDataURL(file);
   };
 
+  const originalPhone = user?.phone ? normalizePhone(user.phone) : '';
+  const enteredPhone = phone.trim() ? normalizePhone(phone) : '';
+  const phoneChanged = !!enteredPhone && enteredPhone !== originalPhone;
+  const codeSentForEntered = phoneChanged && otpSentTo === enteredPhone;
+
+  const handleSendPhoneOtp = async () => {
+    if (!isValidBdPhone(enteredPhone)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Number',
+        text: 'Enter a valid mobile number (01XXXXXXXXX).',
+        confirmButtonColor: '#E61C24',
+      });
+      return;
+    }
+
+    setSendingOtp(true);
+    try {
+      const res = await fetch('/api/auth/change-phone/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: enteredPhone }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Could not send the code.');
+      }
+      setOtpSentTo(enteredPhone);
+      setPhoneOtp('');
+      Swal.fire({
+        icon: 'success',
+        title: 'Code Sent',
+        text: `We sent a code to ${enteredPhone}. Enter it below, then save.`,
+        confirmButtonColor: '#E61C24',
+      });
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Could Not Send Code',
+        text: err.message || 'Please try again.',
+        confirmButtonColor: '#E61C24',
+      });
+    } finally {
+      setSendingOtp(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
@@ -109,6 +177,28 @@ export default function StudentProfile() {
         icon: 'error',
         title: 'Validation Error',
         text: 'Please enter your full name.',
+        confirmButtonColor: '#E61C24',
+      });
+      return;
+    }
+
+    if (!enteredPhone) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Please enter your mobile number.',
+        confirmButtonColor: '#E61C24',
+      });
+      return;
+    }
+
+    if (phoneChanged && (!codeSentForEntered || !phoneOtp.trim())) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Verify Your New Number',
+        text: codeSentForEntered
+          ? 'Enter the code sent to your new mobile number.'
+          : 'Tap "Send code" to verify your new mobile number before saving.',
         confirmButtonColor: '#E61C24',
       });
       return;
@@ -152,7 +242,8 @@ export default function StudentProfile() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name,
-          phone,
+          phone: enteredPhone,
+          phoneOtp: phoneChanged ? phoneOtp.trim() : undefined,
           profilePic: imageFile,
           currentPassword: currentPassword || undefined,
           newPassword: newPassword || undefined,
@@ -268,7 +359,7 @@ export default function StudentProfile() {
             type='file'
             ref={fileInputRef}
             onChange={handleImageChange}
-            accept='image/*'
+            accept='image/jpeg,image/png,image/webp'
             className='hidden'
           />
 
@@ -281,8 +372,9 @@ export default function StudentProfile() {
               : user.role}
           </p>
           <p className='text-base font-semibold text-zinc-400 mt-4 leading-relaxed max-w-xs'>
-            Upload the student’s photo (JPG or PNG, ideally 10:9 e.g. 800×720 px)
-            with their face centered. Other ratios are cropped automatically.
+            Upload the student’s photo (JPG, PNG or WebP, up to 5 MB, ideally
+            10:9 e.g. 800×720 px) with their face centered. Other ratios are
+            cropped automatically.
           </p>
 
           <button
@@ -365,12 +457,57 @@ export default function StudentProfile() {
                 <input
                   id='phone'
                   type='tel'
+                  inputMode='numeric'
+                  required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder='01XXXXXXXXX'
                   className='bg-transparent border-none outline-none w-full pl-11 pr-4 py-3.5 text-base font-semibold text-zinc-800 placeholder-zinc-400'
                 />
+                {phoneChanged && (
+                  <button
+                    type='button'
+                    onClick={handleSendPhoneOtp}
+                    disabled={sendingOtp}
+                    className='shrink-0 mr-2 px-4 py-2 rounded-lg bg-[#E61C24] hover:bg-[#E61C24]/90 disabled:bg-[#E61C24]/50 text-white text-base font-bold transition-colors cursor-pointer'
+                  >
+                    {sendingOtp
+                      ? 'Sending...'
+                      : codeSentForEntered
+                        ? 'Resend code'
+                        : 'Send code'}
+                  </button>
+                )}
               </div>
+              {phoneChanged && (
+                <p className='text-base font-semibold text-zinc-500 select-none'>
+                  To change your number, we&apos;ll send a code to the new
+                  number by SMS.
+                </p>
+              )}
+              {codeSentForEntered && (
+                <div className='space-y-2 pt-1'>
+                  <label
+                    htmlFor='phoneOtp'
+                    className='text-base font-bold text-zinc-700 block'
+                  >
+                    Code sent to {otpSentTo}
+                  </label>
+                  <input
+                    id='phoneOtp'
+                    type='text'
+                    inputMode='numeric'
+                    autoComplete='one-time-code'
+                    maxLength={8}
+                    value={phoneOtp}
+                    onChange={(e) =>
+                      setPhoneOtp(e.target.value.replace(/[^0-9]/g, ''))
+                    }
+                    placeholder='Enter the code'
+                    className='w-full rounded-lg bg-zinc-50 border border-zinc-200 focus:border-[#E61C24]/60 outline-none px-4 py-3.5 text-base font-semibold text-zinc-800 placeholder-zinc-400 tracking-widest'
+                  />
+                </div>
+              )}
             </div>
 
             {/* Change Password Section */}

@@ -2,7 +2,7 @@ import React from 'react';
 import ShopCheckoutFormClient from './ShopCheckoutFormClient';
 
 export const metadata = {
-  title: 'Checkout - Canadian Nest Shop',
+  title: 'Checkout - Canadian Nest School Shop',
   description: 'Complete your shop order checkout.',
 };
 

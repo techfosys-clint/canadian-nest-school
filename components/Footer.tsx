@@ -224,8 +224,8 @@ export default function Footer() {
         aria-hidden='true'
         className='select-none pointer-events-none text-center leading-none overflow-hidden pb-4'
       >
-        <span className='text-[12vw] font-bold text-white/4 uppercase tracking-tight whitespace-nowrap block'>
-          Canadian Nest
+        <span className='text-[7.5vw] font-bold text-white/4 uppercase tracking-tight whitespace-nowrap block'>
+          Canadian Nest School
         </span>
       </div>
     </footer>

@@ -89,7 +89,7 @@ export default function MyOrdersPage() {
           <FiPackage className="text-[#E61C24]" /> My Orders
         </h1>
         <p className="text-base font-semibold text-zinc-450 mt-1">
-          Track your book and merchandise orders from the Canadian Nest Shop.
+          Track your book and merchandise orders from the Canadian Nest School Shop.
         </p>
       </div>
 

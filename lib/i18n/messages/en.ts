@@ -299,13 +299,13 @@ const en: Messages = {
     faqHeadingBefore: 'Frequently Asked',
     faqHeadingAccent: 'Questions',
     faqSubtitle:
-      "Everything you need to know about Canadian Nest. Can't find the answer you're looking for? Feel free to reach out to us.",
+      "Everything you need to know about Canadian Nest School. Can't find the answer you're looking for? Feel free to reach out to us.",
   },
   shop: {
     metaTitle: 'Shop - Canadian Nest School',
     metaDescription:
       'Browse books and learning materials sold by Canadian Nest School.',
-    tag: 'Canadian Nest Shop',
+    tag: 'Canadian Nest School Shop',
     title: 'Books & Learning Materials',
     descriptionBefore:
       'Physical books, guides, and other learning materials to support your ',

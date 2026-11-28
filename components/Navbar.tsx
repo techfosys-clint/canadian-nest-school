@@ -339,7 +339,7 @@ export default function Navbar() {
                             Welcome
                           </p>
                           <p className='text-base text-zinc-550 font-semibold mt-0.5'>
-                            Join Canadian Nest to access premium courses.
+                            Join Canadian Nest School to access premium courses.
                           </p>
                         </div>
 

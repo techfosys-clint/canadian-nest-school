@@ -196,7 +196,7 @@ function CourseCard({
                 C
               </span>
               <span className='text-base font-bold text-zinc-400 uppercase tracking-wider'>
-                Canadian Nest
+                Canadian Nest School
               </span>
             </div>
           )}

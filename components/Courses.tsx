@@ -322,7 +322,7 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                           C
                         </span>
                         <span className='text-sm font-bold text-zinc-500 uppercase tracking-wider'>
-                          Canadian Nest
+                          Canadian Nest School
                         </span>
                       </div>
                       {/* Level badge on image */}
@@ -467,7 +467,7 @@ export default function Courses({ initialCourses, categories }: CoursesProps) {
                               C
                             </span>
                             <span className='text-xs font-bold text-zinc-500 uppercase tracking-wider'>
-                              Canadian Nest
+                              Canadian Nest School
                             </span>
                           </div>
 

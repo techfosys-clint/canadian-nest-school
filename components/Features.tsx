@@ -74,7 +74,7 @@ export default function Features() {
             <div className='w-full h-full absolute inset-0 overflow-hidden rounded-lg shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-zinc-200/80 bg-zinc-950'>
               <iframe
                 src='https://www.youtube-nocookie.com/embed/0qfeLi_pzQU?si=VyI93xJvpKXckiQ3&amp;start=13'
-                title='Canadian Nest Presentation Video'
+                title='Canadian Nest School Presentation Video'
                 frameBorder='0'
                 allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
                 referrerPolicy='strict-origin-when-cross-origin'

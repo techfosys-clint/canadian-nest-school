@@ -11,7 +11,7 @@ import { notFound, redirect } from 'next/navigation';
 import OrderThankYouClient from './OrderThankYouClient';
 
 export const metadata = {
-  title: 'Order Confirmed - Canadian Nest Shop',
+  title: 'Order Confirmed - Canadian Nest School Shop',
   description: 'Thank you for your purchase from Canadian Nest School.',
 };
 

@@ -31,13 +31,13 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   if (locale === "bn") {
     return {
-      title: "কানাডিয়ান নেস্ট - প্রিমিয়াম কোর্স প্ল্যাটফর্ম",
+      title: "Canadian Nest School - ইংরেজি শেখার প্ল্যাটফর্ম",
       description:
         "আন্তর্জাতিক মানের ফনিক্স, স্পোকেন ইংলিশ, IELTS ও শিক্ষক প্রশিক্ষণ কোর্স।",
     };
   }
   return {
-    title: "Canadian Nest - Premium Course Selling Platform",
+    title: "Canadian Nest School - English Learning Platform",
     description:
       "Learn high-demand tech and design skills with industry expert mentors.",
   };

@@ -21,7 +21,7 @@ export async function generateMetadata() {
   const locale = await getLocale()
   const t = getMessages(locale).courses
   return {
-    title: `${t.pageTitle} - Canadian Nest`,
+    title: `${t.pageTitle} - Canadian Nest School`,
     description: t.pageSubtitle,
   }
 }

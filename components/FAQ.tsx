@@ -73,7 +73,7 @@ export default function FAQ({
   eyebrow = 'Got Questions?',
   headingBefore = 'Frequently Asked',
   headingAccent = 'Questions',
-  subtitle = "Everything you need to know about Canadian Nest. Can't find the answer you're looking for? Feel free to reach out to us.",
+  subtitle = "Everything you need to know about Canadian Nest School. Can't find the answer you're looking for? Feel free to reach out to us.",
 }: FAQProps) {
   const [openId, setOpenId] = useState<string | null>(faqs[0]?.id ?? null);
 

@@ -78,7 +78,7 @@ export default function BlogSection({ blogs }: BlogSectionProps) {
 
             {/* Title */}
             <h2 className='text-2xl sm:text-3xl md:text-4xl font-bold text-[#0A163A] tracking-tight leading-[1.2]'>
-              The Canadian Nest{' '}
+              The Canadian Nest School{' '}
               <span className='text-[#E61C24]'>Knowledge Hub</span>
             </h2>
 

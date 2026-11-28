@@ -87,11 +87,11 @@ export default function PaymentHistoryPage() {
             Billing
           </span>
           <h1 className='text-3xl md:text-4xl font-bold font-display text-white mb-3'>
-            Fee Payment History
+            Payment History
           </h1>
           <p className='text-zinc-400 text-base font-semibold leading-relaxed'>
-            Your subscription course fee payments, including first
-            enrollment and renewals.
+            All your course payments: one-time purchases, first monthly
+            payments and renewals.
           </p>
         </div>
       </div>
@@ -109,11 +109,11 @@ export default function PaymentHistoryPage() {
             <FiCreditCard className='h-7 w-7' />
           </div>
           <h2 className='text-xl font-bold text-zinc-800 mb-2'>
-            No fee payments yet
+            No payments yet
           </h2>
           <p className='text-base font-semibold text-zinc-500 max-w-md mx-auto'>
-            When you enroll in or renew a subscription course, those
-            payments will appear here.
+            When you pay for a course or renew a monthly course, the payment
+            will appear here.
           </p>
         </div>
       ) : (
@@ -156,9 +156,11 @@ export default function PaymentHistoryPage() {
                         {row.courseTitle}
                       </td>
                       <td className='px-5 py-4 text-base font-semibold text-zinc-600 capitalize'>
-                        {row.kind === 'enrollment'
-                          ? 'First enrollment'
-                          : 'Renewal'}
+                        {row.kind === 'renewal'
+                          ? 'Renewal'
+                          : row.billingType === 'one_time'
+                            ? 'One-time payment'
+                            : 'First payment'}
                       </td>
                       <td className='px-5 py-4 text-base font-semibold text-zinc-600'>
                         {row.periodStart || row.periodEnd

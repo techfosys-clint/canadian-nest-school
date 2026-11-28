@@ -110,18 +110,18 @@ export default function ReviewsPage() {
 
         <div className='relative z-10 max-w-2xl'>
           <span className='inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-[#E61C24]/20 border border-[#E61C24]/30 text-base font-bold text-[#E61C24] uppercase tracking-wider mb-6'>
-            Reviews Panel
+            Reviews
           </span>
           <h1 className='text-3xl md:text-4xl font-bold font-display text-white mb-4 leading-tight'>
-            Learner{' '}
+            My{' '}
             <span className='text-transparent bg-clip-text bg-linear-to-r from-[#FF4D55] to-white font-bold'>
-              Reviews Hub
+              Reviews
             </span>{' '}
             🌟
           </h1>
           <p className='text-zinc-400 text-base md:text-lg font-semibold leading-relaxed'>
-            Your dynamic course feedback helps shape curriculum quality. Track
-            your logged evaluations and add new course testimonials!
+            Your feedback helps us improve our courses. See the reviews
+            you&apos;ve written and add new ones.
           </p>
         </div>
       </div>
@@ -133,8 +133,8 @@ export default function ReviewsPage() {
             <h2 className='text-2xl font-bold text-zinc-800 tracking-tight font-display'>
               My Submitted Reviews
             </h2>
-            <p className='text-base font-semibold text-zinc-450 mt-1'>
-              Timeline of submitted course course logs
+            <p className='text-base font-semibold text-zinc-500 mt-1'>
+              Course reviews you have submitted
             </p>
           </div>
 
@@ -155,7 +155,7 @@ export default function ReviewsPage() {
                 <FiClock className='h-5 w-5 text-[#E61C24]' />
               </div>
               <h3 className='text-xl font-bold text-zinc-800'>
-                Submitted Logs
+                Submitted Reviews
               </h3>
             </div>
             <span className='text-base font-bold text-[#E61C24] bg-[#E61C24]/10 px-3.5 py-1 rounded-lg'>
@@ -171,8 +171,8 @@ export default function ReviewsPage() {
                     <FiMessageSquare className='h-6 w-6' />
                   </div>
                   <p className='text-base font-semibold text-zinc-400 max-w-xs leading-relaxed'>
-                    You haven&apos;t submitted any reviews yet. Complete your course
-                    lessons and submit your first testimonial!
+                    You haven&apos;t written any reviews yet. You can review a
+                    course any time after you enroll.
                   </p>
                 </div>
               ) : (

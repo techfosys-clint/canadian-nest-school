@@ -130,7 +130,7 @@ export default function DashboardLayout({
     },
     { label: 'My Orders', href: '/dashboard/orders', icon: FiPackage },
     {
-      label: 'Fee History',
+      label: 'Payment History',
       href: '/dashboard/payments',
       icon: FiCreditCard,
     },

@@ -51,7 +51,12 @@ export async function GET() {
       Enrollment.find({
         student: userId,
         paymentStatus: 'completed',
-        billingType: { $in: ['monthly', 'two_month', 'quarterly'] },
+        $or: [
+          { billingType: { $in: ['monthly', 'two_month', 'quarterly'] } },
+          // One-time purchases (older records may have no billingType).
+          // Free enrollments aren't payments, so they're left out.
+          { billingType: { $in: ['one_time', null] }, pricePaid: { $gt: 0 } },
+        ],
       })
         .populate({ path: 'course', select: 'title' })
         .sort({ createdAt: -1 })
@@ -102,7 +107,7 @@ export async function GET() {
         kind: 'enrollment',
         courseId: course?._id?.toString?.() || String(e.course || ''),
         courseTitle: course?.title || 'Course',
-        billingType: e.billingType || 'monthly',
+        billingType: e.billingType || 'one_time',
         // Older paid renewals overwrote pricePaid on the enrollment.
         amount: e.initialPaymentAmount ??
           (renewedEnrollmentIds.has(enrollmentId) ? null : e.pricePaid ?? null),

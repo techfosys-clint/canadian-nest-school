@@ -331,7 +331,7 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
       if (response.ok && data.success && data.redirectUrl) {
         // Paid course — hand off to the EPS payment gateway. The purchase
         // event fires from the dashboard once the callback confirms payment.
-        window.location.href = data.redirectUrl;
+        window.location.assign(data.redirectUrl);
         return;
       }
 
@@ -340,7 +340,7 @@ export default function CheckoutFormClient({ course, initialSelection }: { cours
           event: 'purchase',
           event_id: generateEventId(),
           ecommerce: {
-            transaction_id: data.enrollmentId || `txn_${Date.now()}`,
+            transaction_id: data.enrollmentId || `txn_${generateEventId()}`,
             currency: 'BDT',
             value: finalPrice,
             coupon: appliedCoupon ? appliedCoupon.code : '',

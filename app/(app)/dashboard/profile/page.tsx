@@ -320,7 +320,7 @@ export default function StudentProfile() {
           My Profile
         </h1>
         <p className='text-base font-semibold text-zinc-400 mt-1'>
-          Manage the student’s details, credentials, and profile photo.
+          Manage your account details, password, and profile photo.
         </p>
       </div>
 
@@ -515,7 +515,7 @@ export default function StudentProfile() {
               <FiLock className='text-[#E61C24] h-5 w-5' />
               <span>Change Password</span>
             </h2>
-            <p className='text-sm font-semibold text-zinc-400 -mt-2 mb-4 select-none'>
+            <p className='text-base font-semibold text-zinc-400 -mt-2 mb-4 select-none'>
               {
                 'Leave these fields blank if you do not want to update your password.'
               }

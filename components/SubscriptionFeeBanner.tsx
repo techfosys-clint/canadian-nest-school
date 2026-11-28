@@ -75,7 +75,7 @@ export default function SubscriptionFeeBanner() {
       })
       const data = await res.json()
       if (res.ok && data.success && data.redirectUrl) {
-        window.location.href = data.redirectUrl
+        window.location.assign(data.redirectUrl)
         return
       }
       if (res.ok && data.success) {

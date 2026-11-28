@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
 import CompletedCourseActions from '@/components/CompletedCourseActions';
 import { fetchReviewGatesForCourses } from '@/lib/certificates/downloadClient';
 import type { CompletionReviewState } from '@/lib/reviews/completionGate';
+import CourseCardBadges from '@/components/dashboard/CourseCardBadges';
 
 interface UserSession {
   id: string;
@@ -42,6 +43,7 @@ interface EnrollmentItem {
   id: string;
   course: CourseItem;
   paymentStatus: string;
+  billingType?: string;
   createdAt: string;
 }
 
@@ -198,7 +200,7 @@ export default function MyCoursesPage() {
       });
       const data = await res.json();
       if (res.ok && data.success && data.redirectUrl) {
-        window.location.href = data.redirectUrl;
+        window.location.assign(data.redirectUrl);
         return;
       }
       throw new Error(data.error || 'Renewal failed.');
@@ -248,8 +250,8 @@ export default function MyCoursesPage() {
             🎓
           </h1>
           <p className='text-zinc-400 text-base md:text-lg font-semibold leading-relaxed'>
-            Access your full e-learning catalog, dynamic watch streams, syllabus
-            completion progress, and certificates.
+            Continue your lessons, track your progress, and get your
+            certificates.
           </p>
         </div>
       </div>
@@ -257,7 +259,7 @@ export default function MyCoursesPage() {
       <div className='space-y-6'>
         <div className='flex items-center justify-between'>
           <h2 className='text-2xl font-bold text-zinc-800 tracking-tight font-display'>
-            Active Subscriptions
+            My Courses
           </h2>
           <span className='text-base font-bold text-[#E61C24] bg-[#E61C24]/10 px-3.5 py-1.5 rounded-lg'>
             Total {enrollments.length}
@@ -318,21 +320,20 @@ export default function MyCoursesPage() {
                         height={200}
                       />
                       <div className='absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent opacity-60 pointer-events-none' />
-                      <span className='absolute top-3 left-3 bg-[#E61C24]/10 backdrop-blur-md text-[#E61C24] border border-[#E61C24]/20 px-3 py-1 rounded-lg text-sm font-bold uppercase tracking-wider'>
-                        {course.categories?.[0] &&
-                        typeof course.categories[0] === 'object'
-                          ? course.categories[0].name
-                          : 'LMS'}
-                      </span>
-                      {course.level && (
-                        <span className='absolute bottom-3 right-3 bg-zinc-900/60 backdrop-blur-sm text-zinc-100 px-2.5 py-0.5 rounded-lg text-xs font-semibold capitalize tracking-wide'>
-                          {course.level}
-                        </span>
-                      )}
                     </div>
 
                     {/* Title & Summary */}
                     <div className='p-6 space-y-3.5'>
+                      <CourseCardBadges
+                        categoryName={
+                          course.categories?.[0] &&
+                          typeof course.categories[0] === 'object'
+                            ? course.categories[0].name
+                            : null
+                        }
+                        billingType={enrollment.billingType}
+                        level={course.level}
+                      />
                       <h3
                         onClick={() =>
                           handleResumeLearning(course.slug)
@@ -359,10 +360,10 @@ export default function MyCoursesPage() {
                             : 'EX'}
                         </div>
                         <div className='min-w-0'>
-                          <p className='text-xs font-semibold text-zinc-500 uppercase leading-none'>
+                          <p className='text-base font-semibold text-zinc-500 uppercase leading-none'>
                             Instructor
                           </p>
-                          <p className='text-sm font-bold text-zinc-700 truncate mt-0.5'>
+                          <p className='text-base font-bold text-zinc-700 truncate mt-0.5'>
                             {course.instructors?.[0] &&
                             typeof course.instructors[0] === 'object'
                               ? course.instructors[0].name

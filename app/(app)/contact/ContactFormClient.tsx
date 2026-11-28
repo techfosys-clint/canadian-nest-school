@@ -27,13 +27,15 @@ const infoContainerVariants = {
 }
 
 export default function ContactFormClient() {
-  const { messages } = useLocale()
+  const { messages, locale } = useLocale()
   const t = messages.contact
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [subject, setSubject] = useState('')
   const [message, setMessage] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  // Honeypot: hidden from people, so only spam bots fill it in.
+  const [website, setWebsite] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,9 +51,13 @@ export default function ContactFormClient() {
 
     setSubmitting(true)
     try {
-      // Mock API call delay for high fidelity UX
-      await new Promise((resolve) => setTimeout(resolve, 1200))
-      
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, subject, message, locale, website }),
+      })
+      if (!res.ok) throw new Error(`Contact request failed: ${res.status}`)
+
       Swal.fire({
         icon: 'success',
         title: t.successTitle,
@@ -185,6 +191,7 @@ export default function ContactFormClient() {
                 </label>
                 <input
                   id="name"
+                  maxLength={120}
                   type="text"
                   required
                   value={name}
@@ -201,6 +208,7 @@ export default function ContactFormClient() {
                 </label>
                 <input
                   id="email"
+                  maxLength={200}
                   type="email"
                   required
                   value={email}
@@ -218,6 +226,7 @@ export default function ContactFormClient() {
               </label>
               <input
                 id="subject"
+                maxLength={200}
                 type="text"
                 required
                 value={subject}
@@ -234,6 +243,7 @@ export default function ContactFormClient() {
               </label>
               <textarea
                 id="message"
+                maxLength={5000}
                 required
                 rows={5}
                 value={message}
@@ -242,6 +252,18 @@ export default function ContactFormClient() {
                 className="w-full bg-[#f8fafc] border border-zinc-200 focus:border-[#E61C24] text-zinc-850 rounded-lg p-3 text-base font-semibold outline-none transition-all resize-none"
               />
             </div>
+
+            {/* Honeypot field, hidden from people and screen readers */}
+            <input
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              className="absolute -left-[9999px] h-px w-px opacity-0"
+            />
 
             {/* Submit Button */}
             <button

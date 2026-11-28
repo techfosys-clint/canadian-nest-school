@@ -545,6 +545,7 @@ export default function StaffEditFormClient({
                   { key: 'media', label: 'Media Library' },
                   { key: 'products', label: 'Shop Products' },
                   { key: 'orders', label: 'Shop Orders' },
+                  { key: 'messages', label: 'Contact Messages' },
                 ].map((perm) => {
                   const isChecked = permissions.includes(perm.key);
                   return (

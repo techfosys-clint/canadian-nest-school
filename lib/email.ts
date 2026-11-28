@@ -301,6 +301,80 @@ export async function sendStaffRegistrationEmail(
   }
 }
 
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/** Inbox that receives contact form messages. */
+export function getContactInboxEmail() {
+  return (
+    process.env.CONTACT_INBOX_EMAIL?.trim() ||
+    'info.canadiannestschool@gmail.com'
+  );
+}
+
+/**
+ * Forwards a contact form message to the school inbox. Reply-To is the
+ * visitor, so staff can answer straight from their mail app.
+ */
+export async function sendContactMessageEmail(input: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  receivedAt: Date;
+}) {
+  const transporter = getGmailTransporter();
+  const fromEmail = process.env.GMAIL_USER;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+  if (!transporter) {
+    return false;
+  }
+
+  const name = escapeHtml(input.name);
+  const email = escapeHtml(input.email);
+  const subjectText = escapeHtml(input.subject);
+  const message = escapeHtml(input.message).replace(/\r?\n/g, '<br />');
+  const receivedAt = formatBdDateTime(input.receivedAt, { month: 'long' });
+
+  const htmlContent = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e4e4e7; border-radius: 8px; background-color: #ffffff; color: #1f2937;">
+      <h2 style="color: #E61C24; margin: 0 0 16px; font-weight: bold;">New contact form message</h2>
+      <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 0 0 20px; border: 1px solid #e5e7eb;">
+        <p style="margin: 6px 0; font-size: 16px;"><strong>Name:</strong> ${name}</p>
+        <p style="margin: 6px 0; font-size: 16px;"><strong>Email:</strong> <a href="mailto:${email}" style="color: #E61C24;">${email}</a></p>
+        <p style="margin: 6px 0; font-size: 16px;"><strong>Subject:</strong> ${subjectText}</p>
+        <p style="margin: 6px 0; font-size: 16px;"><strong>Received:</strong> ${receivedAt}</p>
+      </div>
+      <p style="font-size: 16px; color: #1f2937; line-height: 1.6; white-space: normal;">${message}</p>
+      <p style="font-size: 16px; color: #6b7280; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 15px;">
+        Reply to this email to answer the sender directly. All messages are also in the
+        <a href="${appUrl}/admin/messages" style="color: #E61C24;">admin Messages page</a>.
+      </p>
+    </div>
+  `;
+
+  try {
+    await transporter.sendMail({
+      from: `Canadian Nest School <${fromEmail}>`,
+      to: getContactInboxEmail(),
+      replyTo: { name: input.name, address: input.email },
+      subject: `Contact form: ${input.subject.replace(/[\r\n]+/g, ' ').slice(0, 150)}`,
+      html: htmlContent,
+    });
+    return true;
+  } catch (error) {
+    console.error('Failed to send contact message email:', error);
+    return false;
+  }
+}
+
 export async function sendLiveClassReminderEmail(
   toEmail: string,
   instructorName: string,

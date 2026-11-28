@@ -39,6 +39,12 @@ import {
   FiX,
 } from 'react-icons/fi';
 import Swal from 'sweetalert2';
+import {
+  buildCourseDuration,
+  DURATION_UNITS,
+  parseCourseDuration,
+  type DurationUnit,
+} from '@/lib/courseDuration';
 
 interface CategoryOption {
   id: string;
@@ -137,7 +143,14 @@ export default function CourseFormClient({
   const [blockOffsetDays, setBlockOffsetDays] = useState(
     initialData?.blockOffsetDays ?? 2,
   );
-  const [duration, setDuration] = useState(initialData?.duration || '');
+  // Duration is edited as number + unit and saved as text like "14 hours".
+  const [durationAmount, setDurationAmount] = useState(
+    () => parseCourseDuration(initialData?.duration).amount,
+  );
+  const [durationUnit, setDurationUnit] = useState<DurationUnit>(
+    () => parseCourseDuration(initialData?.duration).unit,
+  );
+  const duration = buildCourseDuration(durationAmount, durationUnit);
   const [level, setLevel] = useState<string>(initialData?.level || 'all');
   const [categories, setCategories] = useState<string[]>(
     initialData?.categories?.map((c: any) => c._id || c) ||
@@ -3392,13 +3405,31 @@ export default function CourseFormClient({
               <label className='text-base font-bold text-slate-600'>
                 Course Duration
               </label>
-              <input
-                type='text'
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-                placeholder='e.g. 14 Hours of video lectures'
-                className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
-              />
+              <div className='flex gap-2'>
+                <input
+                  type='number'
+                  min={0}
+                  step='any'
+                  inputMode='decimal'
+                  value={durationAmount}
+                  onChange={(e) => setDurationAmount(e.target.value)}
+                  placeholder='e.g. 14'
+                  aria-label='Course duration amount'
+                  className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none w-full transition-colors'
+                />
+                <select
+                  value={durationUnit}
+                  onChange={(e) => setDurationUnit(e.target.value as DurationUnit)}
+                  aria-label='Course duration unit'
+                  className='bg-slate-100 border border-slate-200 focus:border-[#E61C24]/80 focus:ring-1 focus:ring-[#E61C24]/80 text-slate-800 rounded-lg p-3 text-base font-semibold outline-none transition-colors capitalize'
+                >
+                  {DURATION_UNITS.map((unit) => (
+                    <option key={unit} value={unit} className='capitalize'>
+                      {unit}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 

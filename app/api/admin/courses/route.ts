@@ -1,4 +1,5 @@
 import { validateStudyMaterialBatches } from '@/lib/db/validateStudyMaterialBatches'
+import { taughtByFilter } from '@/lib/auth/staffScope'
 import { parsePaymentPlans } from '@/lib/subscriptions/plans'
 import { isRecurringBillingType } from '@/lib/subscriptions/billing'
 import { NextResponse } from 'next/server'
@@ -61,7 +62,7 @@ export async function GET() {
 
     let query = {}
     if (user.role === 'instructor') {
-      query = { instructor: user._id }
+      query = taughtByFilter(user._id.toString())
     }
 
     const courses = await Course.find(query).select('title _id').sort({ title: 1 }).lean()

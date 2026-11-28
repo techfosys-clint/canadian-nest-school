@@ -3,6 +3,7 @@ import { connectToDatabase } from '@/lib/db/mongodb'
 import { getAuthorizedUser } from '@/lib/auth/auth'
 import { rateLimit } from '@/lib/rateLimit'
 import path from 'path'
+import { detectUploadType, STUDY_MATERIAL_KINDS } from '@/lib/uploadTypes'
 
 export async function POST(request: Request) {
   try {
@@ -33,17 +34,26 @@ export async function POST(request: Request) {
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
     
+    // Type comes from the file's real bytes; the uploaded name/MIME is ignored.
+    const detected = detectUploadType(buffer)
+    if (!detected || !STUDY_MATERIAL_KINDS.includes(detected.kind)) {
+      return NextResponse.json(
+        { error: 'Unsupported file. Upload a PDF, EPUB, MOBI, Word (DOC/DOCX) or ZIP file.' },
+        { status: 400 }
+      )
+    }
+
     const originalName = file.name
-    const fileExt = path.extname(originalName)
-    const baseName = path.basename(originalName, fileExt)
+    const baseName = path.basename(originalName, path.extname(originalName))
       .replace(/[^a-zA-Z0-9]/g, '-') // replace non-alphanumeric with hyphen
       .toLowerCase()
-    
+      .slice(0, 80) || 'material'
+
     const uniqueId = Date.now() + '-' + Math.round(Math.random() * 1e9)
-    const filename = `${baseName}-${uniqueId}${fileExt}`
+    const filename = `${baseName}-${uniqueId}${detected.ext}`
 
     const { uploadToStorage } = await import('@/lib/storage')
-    const fileUrl = await uploadToStorage(buffer, filename, 'study-materials', file.type || 'application/octet-stream')
+    const fileUrl = await uploadToStorage(buffer, filename, 'study-materials', detected.mimeType)
 
     return NextResponse.json({
       success: true,

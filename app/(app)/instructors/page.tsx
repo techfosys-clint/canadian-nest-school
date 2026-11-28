@@ -11,6 +11,7 @@ import { getLocale } from '@/lib/i18n/getLocale'
 import { localizeCategoryName } from '@/lib/i18n/localizeCourse'
 import { getMessages } from '@/lib/i18n/getMessages'
 import InstructorsPageClient from './InstructorsPageClient'
+import { formatCourseDuration } from '@/lib/courseDuration'
 
 export const dynamic = 'force-dynamic'
 
@@ -108,7 +109,7 @@ export default async function InstructorsPage() {
         id: doc.instructor._id.toString(),
         name: doc.instructor.name || doc.instructor.email || 'Instructor',
       } : null,
-      duration: doc.duration || null,
+      duration: formatCourseDuration(doc.duration) || null,
       level: doc.level || 'all',
       status: doc.status || 'draft',
       enrollmentCount: enrollmentMap[cid] || 0,

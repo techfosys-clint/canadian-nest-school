@@ -30,6 +30,7 @@ interface DashboardData {
     totalCourses?: number;
     totalStudents?: number;
     totalEnrollments?: number;
+    completedPayments?: number;
     totalIncome?: number;
     totalRefunded?: number;
     netRevenue?: number;
@@ -113,6 +114,10 @@ const statusColors: Record<string, string> = {
 };
 
 export default function AdminDashboardPage() {
+  useEffect(() => {
+    document.title = 'Dashboard - Canadian Nest School Admin'
+  }, [])
+
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -550,10 +555,10 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
               <p className='text-2xl font-bold text-slate-800 leading-tight'>
-                {summary.totalEnrollments || 0}
+                {summary.completedPayments ?? 0}
               </p>
               <p className='text-base font-semibold text-slate-400'>
-                total transactions completed
+                completed payments (courses, fees, shop)
               </p>
             </div>
 

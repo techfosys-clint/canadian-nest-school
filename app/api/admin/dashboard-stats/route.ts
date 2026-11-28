@@ -1,4 +1,5 @@
 import { listLiveDeliveries, liveLessonQuery } from '@/lib/lessons/delivery'
+import { taughtByFilter } from '@/lib/auth/staffScope'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { User } from '@/lib/db/models/User'
@@ -6,6 +7,8 @@ import { Student } from '@/lib/db/models/Student'
 import { Course } from '@/lib/db/models/Course'
 import { Lesson } from '@/lib/db/models/Lesson'
 import { Enrollment } from '@/lib/db/models/Enrollment'
+import { SubscriptionPayment } from '@/lib/db/models/SubscriptionPayment'
+import { Order } from '@/lib/db/models/Order'
 import { Review } from '@/lib/db/models/Review'
 import { Blog } from '@/lib/db/models/Blog'
 import { FAQ } from '@/lib/db/models/FAQ'
@@ -17,8 +20,8 @@ import {
 } from '@/lib/progress/getCourseProgress'
 import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
-import { checkAndSendLiveClassReminders } from '@/lib/email'
 import { bdTodayYmd } from '@/lib/bdTime'
+import { formatCourseDuration } from '@/lib/courseDuration'
 
 export async function GET() {
   try {
@@ -41,13 +44,6 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized: User not found.' }, { status: 401 })
     }
 
-    // Trigger upcoming live class email reminders in background — only after
-    // confirming the caller is an authenticated staff/admin/instructor, so
-    // this side effect can't be triggered by an unauthenticated request.
-    checkAndSendLiveClassReminders().catch((err) => {
-      console.error('Error in background live class reminders:', err)
-    })
-
     const role = user.role
 
     // ─── ADMIN ROLE DATA ──────────────────────────────────────────────────────
@@ -58,6 +54,8 @@ export async function GET() {
         enrollments,
         pendingReviewsCount,
         recentReviews,
+        renewals,
+        orders,
       ] = await Promise.all([
         Course.countDocuments(),
         Student.countDocuments(),
@@ -69,14 +67,44 @@ export async function GET() {
           .sort({ createdAt: -1 })
           .limit(5)
           .lean(),
+        SubscriptionPayment.find({ paymentStatus: 'completed' })
+          .select('amount updatedAt createdAt')
+          .lean(),
+        Order.find({ paymentStatus: { $in: ['completed', 'refunded'] } })
+          .select('totalAmount paymentStatus createdAt')
+          .lean(),
       ])
 
-      // Aggregations
-      const completedList = enrollments.filter((e) => e.paymentStatus === 'completed')
-      const totalIncome = completedList.reduce((sum, e) => sum + (e.pricePaid || 0), 0)
-      const totalRefunded = enrollments
-        .filter((e) => e.paymentStatus === 'refunded')
-        .reduce((sum, e) => sum + (e.pricePaid || 0), 0)
+      // Every payment actually received: course purchases (first payment),
+      // monthly-fee renewals and shop orders. Refunded items were paid too,
+      // so they count in gross and are taken off once for net revenue.
+      type PaymentEvent = { amount: number; at: Date; refunded: boolean }
+      const payments: PaymentEvent[] = [
+        ...enrollments
+          .filter((e) => e.paymentStatus === 'completed' || e.paymentStatus === 'refunded')
+          .map((e: any) => ({
+            // Older renewals overwrote pricePaid; the first payment is kept separately.
+            amount: Number(e.initialPaymentAmount ?? e.pricePaid ?? 0),
+            at: new Date(e.createdAt),
+            refunded: e.paymentStatus === 'refunded',
+          })),
+        ...renewals.map((p: any) => ({
+          amount: Number(p.amount || 0),
+          at: new Date(p.updatedAt || p.createdAt),
+          refunded: false,
+        })),
+        ...orders.map((o: any) => ({
+          amount: Number(o.totalAmount || 0),
+          at: new Date(o.createdAt),
+          refunded: o.paymentStatus === 'refunded',
+        })),
+      ].filter((p) => p.amount > 0)
+
+      const totalIncome = payments.reduce((sum, p) => sum + p.amount, 0)
+      const totalRefunded = payments
+        .filter((p) => p.refunded)
+        .reduce((sum, p) => sum + p.amount, 0)
+      const completedPayments = payments.filter((p) => !p.refunded)
 
       // Recent 5 transactions
       const recentEnrollments = [...enrollments]
@@ -84,7 +112,10 @@ export async function GET() {
         .slice(0, 5)
         .map((e) => ({
           id: e._id.toString(),
-          studentName: e.student && typeof e.student === 'object' ? (e.student as any).name : 'Unknown Student',
+          studentName:
+            e.student && typeof e.student === 'object'
+              ? (e.student as any).name
+              : (e as any).billingName || 'Unknown Student',
           studentEmail: e.student && typeof e.student === 'object' ? (e.student as any).email : '',
           courseTitle: e.course && typeof e.course === 'object' ? (e.course as any).title : 'Unknown Course',
           pricePaid: e.pricePaid || 0,
@@ -102,9 +133,9 @@ export async function GET() {
         const dayYmd = bdTodayYmd(day)
         const label = days[new Date(`${dayYmd}T12:00:00+06:00`).getUTCDay()]
 
-        const dayIncome = completedList
-          .filter((e) => bdTodayYmd(new Date(e.createdAt)) === dayYmd)
-          .reduce((sum, e) => sum + (e.pricePaid || 0), 0)
+        const dayIncome = completedPayments
+          .filter((p) => bdTodayYmd(p.at) === dayYmd)
+          .reduce((sum, p) => sum + p.amount, 0)
 
         chartData.push({ day: label, income: dayIncome })
       }
@@ -115,6 +146,7 @@ export async function GET() {
           totalCourses,
           totalStudents,
           totalEnrollments: enrollments.length,
+          completedPayments: completedPayments.length,
           totalIncome,
           totalRefunded,
           netRevenue: totalIncome - totalRefunded,
@@ -180,7 +212,7 @@ export async function GET() {
     // ─── INSTRUCTOR ROLE DATA ─────────────────────────────────────────────────
     if (role === 'instructor') {
       // Find courses where this instructor is assigned
-      const instructorCourses = await Course.find({ instructor: user._id })
+      const instructorCourses = await Course.find(taughtByFilter(user._id.toString()))
         .populate('thumbnail')
         .lean()
       const courseIds = instructorCourses.map((c) => c._id)
@@ -233,7 +265,7 @@ export async function GET() {
           studentName:
             enrollment.student && typeof enrollment.student === 'object'
               ? enrollment.student.name
-              : 'Unknown Student',
+              : (enrollment as any).billingName || 'Unknown Student',
           studentEmail:
             enrollment.student && typeof enrollment.student === 'object'
               ? enrollment.student.email
@@ -281,7 +313,7 @@ export async function GET() {
             price: c.price,
             thumbnail: thumbnailUrl,
             level: c.level,
-            duration: c.duration || 'N/A',
+            duration: formatCourseDuration(c.duration) || 'N/A',
           }
         }),
         liveLessons: serializedLiveLessons,

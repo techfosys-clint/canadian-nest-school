@@ -1,31 +1,20 @@
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Submission } from '@/lib/db/models/Submission'
-import { User } from '@/lib/db/models/User'
-import { verifyToken } from '@/lib/auth/auth'
-import { cookies } from 'next/headers'
-
-async function adminCheck() {
-  const cookieStore = await cookies()
-  const payloadToken = cookieStore.get('payload-token')?.value
-  if (!payloadToken) return null
-
-  const decoded = verifyToken(payloadToken)
-  if (!decoded?.id) return null
-
-  const user = await User.findById(decoded.id).lean()
-  if (!user || !['admin', 'staff', 'instructor'].includes(user.role)) return null
-
-  return user
-}
+import { getCourseScope, getStaffUser } from '@/lib/auth/staffScope'
 
 // GET all submissions for administration grading
 export async function GET(request: Request) {
   try {
     await connectToDatabase()
-    const user = await adminCheck()
+    const user = await getStaffUser()
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
+    }
+    // Admins: all; staff: with the Lessons permission; instructors: their courses.
+    const scope = await getCourseScope(user, 'lessons')
+    if (!scope) {
+      return NextResponse.json({ error: 'Forbidden.' }, { status: 403 })
     }
 
     const { searchParams } = new URL(request.url)
@@ -38,6 +27,11 @@ export async function GET(request: Request) {
     if (status) filter.status = status
     if (studentId) filter.student = studentId
     if (courseId) filter.course = courseId
+    if (scope !== 'all') {
+      filter.course = courseId
+        ? (scope.includes(courseId) ? courseId : { $in: [] })
+        : { $in: scope }
+    }
 
     if (type) {
       filter.type = type

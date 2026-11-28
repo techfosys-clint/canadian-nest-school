@@ -18,6 +18,7 @@ import { Review } from '@/lib/db/models/Review';
 import { connectToDatabase } from '@/lib/db/mongodb';
 import { getLocale } from '@/lib/i18n/getLocale';
 import { localizeCategoryName, localizeCourseDoc } from '@/lib/i18n/localizeCourse';
+import { formatCourseDuration } from '@/lib/courseDuration'
 
 export const dynamic = 'force-dynamic';
 
@@ -115,7 +116,7 @@ export default async function Home() {
               name: doc.instructor.name || doc.instructor.email || 'Instructor',
             }
           : null,
-      duration: doc.duration || null,
+      duration: formatCourseDuration(doc.duration) || null,
       level: doc.level || 'all',
       status: doc.status || 'draft',
       enrollmentCount: enrollmentMap[cid] || 0,

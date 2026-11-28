@@ -2,29 +2,14 @@ import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { CertificateRequest } from '@/lib/db/models/CertificateRequest'
 import { Enrollment } from '@/lib/db/models/Enrollment'
-import { User } from '@/lib/db/models/User'
 import {
   calculateCourseProgressPercent,
   getLessonCountsByCourse,
   getLessonIdsByCourse,
   sanitizeCompletedLessons,
 } from '@/lib/progress/getCourseProgress'
-import { verifyToken } from '@/lib/auth/auth'
-import { cookies } from 'next/headers'
+import { getCourseScope, getStaffUser } from '@/lib/auth/staffScope'
 
-async function adminCheck() {
-  const cookieStore = await cookies()
-  const payloadToken = cookieStore.get('payload-token')?.value
-  if (!payloadToken) return null
-
-  const decoded = verifyToken(payloadToken)
-  if (!decoded?.id) return null
-
-  const user = await User.findById(decoded.id).lean()
-  if (!user || !['admin', 'staff', 'instructor'].includes(user.role)) return null
-
-  return user
-}
 
 function enrollmentKey(studentId: string, courseId: string) {
   return `${studentId}:${courseId}`
@@ -34,12 +19,19 @@ function enrollmentKey(studentId: string, courseId: string) {
 export async function GET() {
   try {
     await connectToDatabase()
-    const user = await adminCheck()
+    const user = await getStaffUser()
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
     }
+    // Admins: all; staff: with the Certificates permission; instructors: their courses.
+    const scope = await getCourseScope(user, 'certificates')
+    if (!scope) {
+      return NextResponse.json({ error: 'Forbidden.' }, { status: 403 })
+    }
 
-    const requests = await CertificateRequest.find()
+    const requests = await CertificateRequest.find(
+      scope === 'all' ? {} : { course: { $in: scope } },
+    )
       .populate('student', 'name email phone')
       .populate('course', 'title price')
       .sort({ createdAt: -1 })

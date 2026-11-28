@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { courseHasInstructor } from '@/lib/auth/staffScope'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Course } from '@/lib/db/models/Course'
 import { User } from '@/lib/db/models/User'
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
     }
 
     // Instructors can only toggle their own courses
-    if (user.role === 'instructor' && course.instructor.toString() !== user._id.toString()) {
+    if (user.role === 'instructor' && !courseHasInstructor(course as any, user._id.toString())) {
       return NextResponse.json({ error: 'Forbidden: You do not own this course.' }, { status: 403 })
     }
 

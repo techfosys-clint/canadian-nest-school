@@ -462,16 +462,93 @@ export async function sendLiveClassReminderEmail(
   }
 }
 
+/**
+ * Emails enrolled students (BCC, in small groups) that a live class starts
+ * soon. The button opens their dashboard, where access is checked again.
+ */
+export async function sendStudentLiveClassReminderEmail(
+  studentEmails: string[],
+  courseTitle: string,
+  lessonTitle: string,
+  liveDate: Date,
+  livePlatform: string,
+) {
+  const transporter = getGmailTransporter();
+  const fromEmail = process.env.GMAIL_USER;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+  if (!transporter || studentEmails.length === 0) {
+    return false;
+  }
+
+  const formattedDate = formatBdDateTime(liveDate, {
+    weekday: 'long',
+    month: 'long',
+  });
+
+  const htmlContent = `
+    <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e4e4e7; border-radius: 8px; background-color: #ffffff; color: #1f2937;">
+      <h2 style="color: #E61C24; font-size: 22px; font-weight: bold; margin: 0 0 12px;">Your live class starts soon</h2>
+      <p style="font-size: 16px; color: #4b5563; line-height: 1.6; margin: 0 0 20px;">
+        This is a reminder that your live class is about to begin. Please join on time.
+      </p>
+      <div style="background-color: #f3f4f6; padding: 16px; border-radius: 8px; border: 1px solid #e5e7eb; margin: 0 0 24px;">
+        <p style="margin: 6px 0; font-size: 16px;"><strong>Course:</strong> ${escapeHtml(courseTitle)}</p>
+        <p style="margin: 6px 0; font-size: 16px;"><strong>Class:</strong> ${escapeHtml(lessonTitle)}</p>
+        <p style="margin: 6px 0; font-size: 16px;"><strong>Date &amp; time:</strong> ${formattedDate}</p>
+        <p style="margin: 6px 0; font-size: 16px;"><strong>Platform:</strong> ${escapeHtml(livePlatform.toUpperCase())}</p>
+      </div>
+      <div style="text-align: center; margin: 0 0 24px;">
+        <a href="${appUrl}/dashboard/live-classes" style="background-color: #E61C24; color: #ffffff; font-weight: bold; font-size: 16px; text-decoration: none; padding: 14px 28px; border-radius: 8px; display: inline-block;">
+          Open my live classes
+        </a>
+      </div>
+      <p style="font-size: 16px; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 16px; margin: 0;">
+        Canadian Nest School • Automated reminder
+      </p>
+    </div>
+  `;
+
+  // BCC in groups so students never see each other's addresses and a
+  // single message stays well under Gmail's recipient limits.
+  let allSent = true;
+  for (let i = 0; i < studentEmails.length; i += 50) {
+    try {
+      await transporter.sendMail({
+        from: `Canadian Nest School <${fromEmail}>`,
+        to: fromEmail,
+        bcc: studentEmails.slice(i, i + 50),
+        subject: `Reminder: "${lessonTitle}" live class starts soon`,
+        html: htmlContent,
+      });
+    } catch (error) {
+      console.error('Failed to send student live class reminder:', error);
+      allSent = false;
+    }
+  }
+  return allSent;
+}
+
+/**
+ * Sends reminders for live classes starting within the next 2 hours (or that
+ * started in the last 15 minutes) to the course's instructors and to every
+ * enrolled student of that course/batch. Each class is reminded once.
+ *
+ * Run it every ~10 minutes from a scheduler via /api/cron/live-class-reminders.
+ */
 export async function checkAndSendLiveClassReminders() {
+  const summary = { classes: 0, instructorEmails: 0, studentEmails: 0 };
   try {
     const { connectToDatabase } = await import('@/lib/db/mongodb');
     await connectToDatabase();
 
-    const { listLiveDeliveries, liveLessonQuery } = await import('@/lib/lessons/delivery');
+    const { listLiveDeliveries, liveLessonQuery, resolveLessonDelivery } = await import('@/lib/lessons/delivery');
     const { Lesson } = await import('@/lib/db/models/Lesson');
     const { Course } = await import('@/lib/db/models/Course');
+    const { Enrollment } = await import('@/lib/db/models/Enrollment');
+    await import('@/lib/db/models/Student');
+    await import('@/lib/db/models/User');
 
-    // Find live classes starting in the next 2 hours (or already started in the last 15 minutes) that haven't received a reminder yet
     const now = new Date();
     const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
     const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
@@ -485,53 +562,96 @@ export async function checkAndSendLiveClassReminders() {
         ],
       }],
     }).lean();
-    const upcomingLessons = candidates.flatMap(listLiveDeliveries).filter((lesson) =>
-      lesson.liveDate && lesson.liveDate >= fifteenMinutesAgo && lesson.liveDate <= twoHoursLater &&
-      lesson.liveUrl && !lesson.reminderSent,
-    );
 
-    if (upcomingLessons.length === 0) return;
-
-    for (const lesson of upcomingLessons) {
-      const course = lesson.course;
-      if (!course) continue;
-
-      // Fetch course details to get the instructor
-      const courseDoc = await Course.findById(course).populate(
-        'instructor',
+    for (const lessonDoc of candidates as any[]) {
+      const deliveries = listLiveDeliveries(lessonDoc).filter((d: any) =>
+        d.liveDate && d.liveDate >= fifteenMinutesAgo && d.liveDate <= twoHoursLater &&
+        d.liveUrl && !d.reminderSent,
       );
-      if (!courseDoc || !courseDoc.instructor) continue;
+      if (deliveries.length === 0) continue;
 
-      const instructor = courseDoc.instructor as any;
-      if (!instructor.email) continue;
+      const courseDoc: any = await Course.findById(lessonDoc.course)
+        .populate('instructor', 'name email')
+        .populate('instructors', 'name email')
+        .lean();
+      if (!courseDoc) continue;
 
-      const success = await sendLiveClassReminderEmail(
-        instructor.email,
-        instructor.name,
-        courseDoc.title,
-        lesson.title,
-        lesson.liveDate,
-        lesson.livePlatform || 'zoom',
-        lesson.liveUrl,
-      );
+      const instructors = new Map<string, { name: string; email: string }>();
+      for (const person of [courseDoc.instructor, ...(courseDoc.instructors || [])]) {
+        if (person?.email) instructors.set(String(person.email).toLowerCase(), person);
+      }
 
-      if (success) {
-        if (lesson.deliveryBatchId && !lesson.batch) {
-          await Lesson.updateOne(
-            { _id: lesson._id, batchSettings: { $elemMatch: {
-              batch: lesson.deliveryBatchId, liveDate: lesson.liveDate, liveUrl: lesson.liveUrl,
-            } } },
-            { $set: { 'batchSettings.$.reminderSent': true } },
+      const enrollments: any[] = await Enrollment.find({
+        course: lessonDoc.course,
+        paymentStatus: 'completed',
+        accessStatus: { $ne: 'blocked' },
+      })
+        .populate('student', 'email')
+        .select('student batch')
+        .lean();
+
+      for (const lesson of deliveries as any[]) {
+        const liveTime = new Date(lesson.liveDate).getTime();
+
+        // Students whose own batch resolves to this exact live session.
+        const studentEmails = [...new Set(
+          enrollments
+            .filter((e) => {
+              const mine: any = resolveLessonDelivery(lessonDoc, e.batch ? String(e.batch) : null);
+              return mine?.lessonType === 'live' && mine.liveDate &&
+                new Date(mine.liveDate).getTime() === liveTime && mine.liveUrl === lesson.liveUrl;
+            })
+            .map((e) => e.student?.email)
+            .filter((email): email is string => typeof email === 'string' && email.includes('@'))
+            .map((email) => email.toLowerCase()),
+        )];
+
+        let instructorOk = instructors.size === 0;
+        for (const person of instructors.values()) {
+          const ok = await sendLiveClassReminderEmail(
+            person.email,
+            person.name || 'Instructor',
+            courseDoc.title,
+            lesson.title,
+            lesson.liveDate,
+            lesson.livePlatform || 'zoom',
+            lesson.liveUrl,
           );
-        } else {
-          await Lesson.updateOne(
-            { _id: lesson._id, liveDate: lesson.liveDate, liveUrl: lesson.liveUrl },
-            { $set: { reminderSent: true } },
-          );
+          if (ok) summary.instructorEmails += 1;
+          instructorOk = instructorOk || ok;
+        }
+
+        const studentsOk = studentEmails.length === 0 || await sendStudentLiveClassReminderEmail(
+          studentEmails,
+          courseDoc.title,
+          lesson.title,
+          lesson.liveDate,
+          lesson.livePlatform || 'zoom',
+        );
+        if (studentsOk) summary.studentEmails += studentEmails.length;
+
+        // Mark as reminded once anything went out, so a later run doesn't
+        // email everyone again.
+        if (instructorOk || studentsOk) {
+          summary.classes += 1;
+          if (lesson.deliveryBatchId && !lesson.batch) {
+            await Lesson.updateOne(
+              { _id: lesson._id, batchSettings: { $elemMatch: {
+                batch: lesson.deliveryBatchId, liveDate: lesson.liveDate, liveUrl: lesson.liveUrl,
+              } } },
+              { $set: { 'batchSettings.$.reminderSent': true } },
+            );
+          } else {
+            await Lesson.updateOne(
+              { _id: lesson._id, liveDate: lesson.liveDate, liveUrl: lesson.liveUrl },
+              { $set: { reminderSent: true } },
+            );
+          }
         }
       }
     }
   } catch (error) {
     console.error('Error checking and sending live class reminders:', error);
   }
+  return summary;
 }

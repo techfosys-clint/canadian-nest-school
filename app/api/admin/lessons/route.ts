@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { courseHasInstructor, taughtByFilter } from '@/lib/auth/staffScope'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Lesson } from '@/lib/db/models/Lesson'
 import { Course } from '@/lib/db/models/Course'
@@ -22,7 +23,7 @@ export async function GET(request: Request) {
     const user = await getAuthorizedUser(['admin', 'instructor'])
     if (!user) return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
     const ownedCourses = user.role === 'instructor'
-      ? await Course.find({ instructor: user._id, ...(courseId ? { _id: courseId } : {}) }).distinct('_id')
+      ? await Course.find({ ...taughtByFilter(user._id.toString()), ...(courseId ? { _id: courseId } : {}) }).distinct('_id')
       : null
     const query = ownedCourses ? { course: { $in: ownedCourses } } : courseId ? { course: courseId } : {}
     const lessons = await Lesson.find(query)
@@ -126,7 +127,7 @@ export async function POST(request: Request) {
         { status: 404 }
       )
     }
-    if (user.role === 'instructor' && (course as any).instructor?.toString() !== user._id.toString()) {
+    if (user.role === 'instructor' && !courseHasInstructor(course as any, user._id.toString())) {
       return NextResponse.json(
         {
           success: false,

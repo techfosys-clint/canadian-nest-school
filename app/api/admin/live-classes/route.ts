@@ -1,4 +1,5 @@
 import { listLiveDeliveries, liveLessonQuery } from '@/lib/lessons/delivery'
+import { taughtByFilter } from '@/lib/auth/staffScope'
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Lesson } from '@/lib/db/models/Lesson'
@@ -18,7 +19,7 @@ export async function GET() {
 
     if (user.role === 'instructor') {
       // Instructors only see live classes in their assigned courses (regardless of who created the lesson)
-      const instructorCourses = await Course.find({ instructor: user._id }).select('_id').lean()
+      const instructorCourses = await Course.find(taughtByFilter(user._id.toString())).select('_id').lean()
       const courseIds = instructorCourses.map((c) => c._id)
       lessonsQuery.course = { $in: courseIds }
     }

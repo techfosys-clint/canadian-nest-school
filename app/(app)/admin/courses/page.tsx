@@ -7,8 +7,38 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { FiPlus, FiBookOpen } from 'react-icons/fi'
 import CoursesGridClient from './CoursesGridClient'
+import { formatCourseDuration } from '@/lib/courseDuration'
+import { taughtByFilter } from '@/lib/auth/staffScope'
+
+const PLAN_SUFFIX: Record<string, string> = {
+  monthly: ' / month',
+  two_month: ' / 2 months',
+  quarterly: ' / 3 months',
+}
+
+/** "BDT 4,500" for one-time courses, "BDT 1,500 / month" for subscription ones. */
+function coursePriceLabel(c: any): string {
+  const fmt = (n: number) =>
+    new Intl.NumberFormat('en-BD', { style: 'currency', currency: 'BDT', minimumFractionDigits: 0 }).format(n)
+  const plans: Array<{ type: string; price: number }> = Array.isArray(c.paymentPlans) ? c.paymentPlans : []
+  const recurring = plans.filter((p) => p.type !== 'one_time' && Number(p.price) > 0)
+  const oneTime = plans.find((p) => p.type === 'one_time')
+  if (recurring.length > 0 && !oneTime) {
+    const cheapest = recurring.reduce((a, b) => (Number(b.price) < Number(a.price) ? b : a))
+    return fmt(Number(cheapest.price)) + (PLAN_SUFFIX[cheapest.type] || '')
+  }
+  if (oneTime) return fmt(Number(oneTime.price))
+  if (c.billingType && c.billingType !== 'one_time' && Number(c.monthlyFee) > 0) {
+    return fmt(Number(c.monthlyFee)) + ' / month'
+  }
+  return fmt(Number(c.price || 0))
+}
 
 export const dynamic = 'force-dynamic'
+
+export const metadata = {
+  title: 'Courses Management - Canadian Nest School Admin',
+}
 
 export default async function AdminCoursesPage() {
   await connectToDatabase()
@@ -27,7 +57,9 @@ export default async function AdminCoursesPage() {
   }
 
   // 2. Fetch courses with Mongoose populates
-  const coursesDocs = await Course.find()
+  const coursesDocs = await Course.find(
+    decoded.role === 'instructor' ? taughtByFilter(String(decoded.id)) : {},
+  )
     .populate('category')
     .populate('categories')
     .populate('instructor')
@@ -48,9 +80,10 @@ export default async function AdminCoursesPage() {
       title: c.title,
       slug: c.slug,
       price: c.price,
+      priceLabel: coursePriceLabel(c),
       status: c.status,
       level: c.level,
-      duration: c.duration || 'N/A',
+      duration: formatCourseDuration(c.duration) || 'N/A',
       categoryName: (c.category && typeof c.category === 'object' ? (c.category as any).name : null)
         ?? (c.categories?.[0] && typeof c.categories[0] === 'object' ? (c.categories[0] as any).name : 'Unassigned'),
       instructorName: (c.instructor && typeof c.instructor === 'object' ? (c.instructor as any).name : null)

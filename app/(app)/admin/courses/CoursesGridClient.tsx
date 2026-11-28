@@ -18,6 +18,7 @@ interface CourseItem {
   title: string;
   slug: string;
   price: number;
+  priceLabel?: string;
   status: 'draft' | 'published';
   level: string;
   duration: string;
@@ -384,7 +385,7 @@ export default function CoursesGridClient({ initialCourses, userRole }: Props) {
 
                     {/* Price */}
                     <td className='px-6 py-4 font-bold text-[#E61C24]'>
-                      {formatCurrency(c.price)}
+                      {c.priceLabel || formatCurrency(c.price)}
                     </td>
 
                     {/* Category */}

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { courseHasInstructor } from '@/lib/auth/staffScope'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Lesson } from '@/lib/db/models/Lesson'
 import { Course } from '@/lib/db/models/Course'
@@ -34,7 +35,7 @@ export async function PUT(
 
     // Ownership check
     const course = await Course.findById(lesson.course).lean()
-    if (user.role === 'instructor' && (course as any)?.instructor?.toString() !== user._id.toString()) {
+    if (user.role === 'instructor' && !courseHasInstructor(course as any, user._id.toString())) {
       return NextResponse.json({ error: 'Forbidden: Not your course.' }, { status: 403 })
     }
 
@@ -135,7 +136,7 @@ export async function DELETE(
 
     // Ownership check
     if (user.role === 'instructor') {
-      if ((course as any)?.instructor?.toString() !== user._id.toString()) {
+      if (!courseHasInstructor(course as any, user._id.toString())) {
         return NextResponse.json({ error: 'Forbidden: Not your course.' }, { status: 403 })
       }
     }

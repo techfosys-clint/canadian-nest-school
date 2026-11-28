@@ -1,5 +1,7 @@
-import { hashPassword, verifyToken } from '@/lib/auth/auth'
+import { comparePasswords, hashPassword, verifyToken } from '@/lib/auth/auth'
 import { User } from '@/lib/db/models/User'
+import { Student } from '@/lib/db/models/Student'
+import { isValidBdPhone, normalizePhone } from '@/lib/phone'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { rateLimit } from '@/lib/rateLimit'
 import { cookies } from 'next/headers'
@@ -84,14 +86,59 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json()
-    const { name, phone, designation, bio, profilePic, password } = body
+    const { name, phone, designation, bio, profilePic, password, currentPassword } = body
 
     if (!name || typeof name !== 'string' || !name.trim()) {
       return NextResponse.json({ error: 'Name is required.' }, { status: 400 })
     }
 
+    // Phone: optional for staff, but if given it must be a valid BD mobile
+    // number that no other account (staff or student) already uses.
+    let nextPhone: string | undefined = user.phone
+    if (phone !== undefined) {
+      const trimmed = typeof phone === 'string' ? phone.trim() : ''
+      if (!trimmed) {
+        nextPhone = undefined
+      } else {
+        const normalized = normalizePhone(trimmed)
+        if (!isValidBdPhone(normalized)) {
+          return NextResponse.json(
+            { error: 'Enter a valid mobile number (01XXXXXXXXX).' },
+            { status: 400 },
+          )
+        }
+        if (normalized !== (user.phone ? normalizePhone(user.phone) : '')) {
+          const [userTaken, studentTaken] = await Promise.all([
+            User.exists({ phone: normalized, _id: { $ne: user._id } }),
+            Student.exists({ phone: normalized }),
+          ])
+          if (userTaken || studentTaken) {
+            return NextResponse.json(
+              { error: 'This mobile number is already used by another account.' },
+              { status: 409 },
+            )
+          }
+        }
+        nextPhone = normalized
+      }
+    }
+
+    // Changing the password requires the current one.
+    if (password && String(password).trim()) {
+      const ok =
+        typeof currentPassword === 'string' &&
+        currentPassword.length > 0 &&
+        (await comparePasswords(currentPassword, user.password || ''))
+      if (!ok) {
+        return NextResponse.json(
+          { error: 'Current password is incorrect.' },
+          { status: 400 },
+        )
+      }
+    }
+
     user.name = name.trim()
-    if (phone !== undefined) user.phone = phone || undefined
+    user.phone = nextPhone
     if (designation !== undefined) {
       user.designation = designation || undefined
     }

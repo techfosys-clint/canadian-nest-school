@@ -1,22 +1,29 @@
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { CertificateRequest } from '@/lib/db/models/CertificateRequest'
-import { User } from '@/lib/db/models/User'
-import { verifyToken } from '@/lib/auth/auth'
-import { cookies } from 'next/headers'
+import { getCourseScope, getStaffUser, scopeAllows } from '@/lib/auth/staffScope'
 
-async function adminCheck() {
-  const cookieStore = await cookies()
-  const payloadToken = cookieStore.get('payload-token')?.value
-  if (!payloadToken) return null
-
-  const decoded = verifyToken(payloadToken)
-  if (!decoded?.id) return null
-
-  const user = await User.findById(decoded.id).lean()
-  if (!user || !['admin', 'staff', 'instructor'].includes(user.role)) return null
-
-  return user
+/**
+ * Admins, staff with the Certificates permission, and instructors of the
+ * request's course may change it. Returns the request or an error response.
+ */
+async function loadManageableRequest(id: string) {
+  const user = await getStaffUser()
+  if (!user) {
+    return { error: NextResponse.json({ error: 'Unauthorized.' }, { status: 401 }) }
+  }
+  const scope = await getCourseScope(user, 'certificates')
+  if (!scope) {
+    return { error: NextResponse.json({ error: 'Forbidden.' }, { status: 403 }) }
+  }
+  const req = await CertificateRequest.findById(id)
+  if (!req) {
+    return { error: NextResponse.json({ error: 'Certificate request not found.' }, { status: 404 }) }
+  }
+  if (!scopeAllows(scope, req.course)) {
+    return { error: NextResponse.json({ error: 'Forbidden.' }, { status: 403 }) }
+  }
+  return { req }
 }
 
 // PUT: Update a certificate request status, upload URL, notes
@@ -27,18 +34,12 @@ export async function PUT(
   try {
     await connectToDatabase()
     const { id } = await params
-    const user = await adminCheck()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
-    }
+    const loaded = await loadManageableRequest(id)
+    if (loaded.error) return loaded.error
+    const req = loaded.req
 
     const body = await request.json()
     const { status, certificateUrl, adminNotes } = body
-
-    const req = await CertificateRequest.findById(id)
-    if (!req) {
-      return NextResponse.json({ error: 'Certificate request not found.' }, { status: 404 })
-    }
 
     if (status) {
       if (!['pending', 'approved', 'rejected'].includes(status)) {
@@ -82,17 +83,10 @@ export async function DELETE(
   try {
     await connectToDatabase()
     const { id } = await params
-    const user = await adminCheck()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
-    }
+    const loaded = await loadManageableRequest(id)
+    if (loaded.error) return loaded.error
 
-    const req = await CertificateRequest.findById(id)
-    if (!req) {
-      return NextResponse.json({ error: 'Certificate request not found.' }, { status: 404 })
-    }
-
-    await req.deleteOne()
+    await loaded.req.deleteOne()
 
     return NextResponse.json({ success: true, message: 'Certificate request deleted successfully.' })
 

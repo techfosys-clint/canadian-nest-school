@@ -47,6 +47,10 @@ interface AttendanceLog {
 }
 
 export default function AttendanceAdminPage() {
+  useEffect(() => {
+    document.title = 'Attendance - Canadian Nest School Admin'
+  }, [])
+
   const [batches, setBatches] = useState<BatchItem[]>([])
   const [selectedBatchId, setSelectedBatchId] = useState('')
   const [selectedBatch, setSelectedBatch] = useState<BatchItem | null>(null)

@@ -22,6 +22,20 @@ export default function LiveClassesPageClient() {
   const [refreshing, setRefreshing] = useState(false)
   const [now] = useState(() => Date.now())
 
+  // A class has ended once its start time plus its duration has passed.
+  const hasEnded = (lesson: LiveLesson) => {
+    if (!lesson.liveDate) return false
+    const start = new Date(lesson.liveDate).getTime()
+    return start + (lesson.duration || 60) * 60 * 1000 < now
+  }
+  // Upcoming / in-progress first (soonest first), then ended (most recent first).
+  const upcomingLessons = lessons.filter((l) => !hasEnded(l))
+  const endedLessons = lessons
+    .filter((l) => hasEnded(l))
+    .sort((a, b) => new Date(b.liveDate || 0).getTime() - new Date(a.liveDate || 0).getTime())
+  const orderedLessons = [...upcomingLessons, ...endedLessons]
+  const upcomingCount = upcomingLessons.length
+
   async function fetchLiveLessons() {
     try {
       const res = await fetch('/api/admin/live-classes', { cache: 'no-store' })
@@ -92,14 +106,14 @@ export default function LiveClassesPageClient() {
           <div>
             <div className="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
               <p className="text-base font-bold text-slate-500">
-                Scheduled Streams ({lessons.length} session{lessons.length !== 1 ? 's' : ''})
+                Upcoming ({upcomingCount}) · Ended ({lessons.length - upcomingCount})
               </p>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-base">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold text-sm uppercase tracking-wider font-display">
+                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold text-base uppercase tracking-wider font-display">
                     <th className="px-6 py-3.5">Live Class Topic</th>
                     <th className="px-6 py-3.5">Course Name</th>
                     <th className="px-6 py-3.5">Scheduled Date & Time</th>
@@ -108,7 +122,7 @@ export default function LiveClassesPageClient() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 font-semibold text-slate-700">
-                  {lessons.map((lesson) => {
+                  {orderedLessons.map((lesson) => {
                     const dateObj = lesson.liveDate ? new Date(lesson.liveDate) : null
                     const formattedDate = dateObj
                       ? dateObj.toLocaleString('en-BD', {
@@ -123,9 +137,10 @@ export default function LiveClassesPageClient() {
                       : 'Not Scheduled'
 
                     const isUpcoming = dateObj ? dateObj.getTime() > now : false
+                    const isEnded = hasEnded(lesson)
 
                     return (
-                      <tr key={lesson.id} className="hover:bg-slate-50 transition-colors">
+                      <tr key={lesson.id} className={`hover:bg-slate-50 transition-colors ${isEnded ? 'opacity-60' : ''}`}>
                         {/* Topic */}
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
@@ -150,13 +165,17 @@ export default function LiveClassesPageClient() {
                         </td>
                         {/* Platform */}
                         <td className="px-6 py-4 text-center">
-                          <span className="inline-flex px-2.5 py-1 rounded text-xs font-bold uppercase bg-indigo-50 text-indigo-600 border border-indigo-200 select-none">
+                          <span className="inline-flex px-2.5 py-1 rounded text-base font-bold uppercase bg-indigo-50 text-indigo-600 border border-indigo-200 select-none">
                             {lesson.livePlatform}
                           </span>
                         </td>
                         {/* Action */}
                         <td className="px-6 py-4 text-right">
-                          {lesson.liveUrl ? (
+                          {isEnded ? (
+                            <span className="inline-flex items-center justify-center px-3.5 py-2 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 text-base font-bold whitespace-nowrap select-none">
+                              Ended
+                            </span>
+                          ) : lesson.liveUrl ? (
                             <a
                               href={lesson.liveUrl}
                               target="_blank"
@@ -167,7 +186,7 @@ export default function LiveClassesPageClient() {
                               <FiExternalLink className="h-4 w-4" />
                             </a>
                           ) : (
-                            <span className="inline-flex items-center justify-center px-3.5 py-2 rounded-lg bg-slate-100/40 border border-slate-200 text-slate-400 text-sm font-bold whitespace-nowrap select-none">
+                            <span className="inline-flex items-center justify-center px-3.5 py-2 rounded-lg bg-slate-100/40 border border-slate-200 text-slate-400 text-base font-bold whitespace-nowrap select-none">
                               Link Pending
                             </span>
                           )}

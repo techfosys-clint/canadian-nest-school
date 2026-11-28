@@ -38,7 +38,7 @@ export default async function AdminOrdersPage() {
 
   const orders = orderDocs.map((o: any) => ({
     id: o._id.toString(),
-    studentName: o.student?.name || 'Unknown',
+    studentName: o.student?.name || o.shippingName || 'Unknown',
     studentEmail: o.student?.email || '',
     items: (o.items || []).map((i: any) => ({
       title: i.title,

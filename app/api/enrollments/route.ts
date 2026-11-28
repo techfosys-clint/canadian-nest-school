@@ -214,6 +214,16 @@ export async function POST(request: Request) {
       )
     }
 
+    // Enrollments belong to student accounts. A purchase made from an
+    // admin/staff login would point at the wrong account type and show up
+    // as "Unknown Student", so it's refused.
+    if (!(await Student.exists({ _id: userId }))) {
+      return NextResponse.json(
+        { success: false, error: 'Please log in with a student account to buy. Admin and staff accounts cannot make purchases.', code: 'STUDENT_ACCOUNT_REQUIRED' },
+        { status: 403 }
+      )
+    }
+
     const body = await request.json()
     const { courseId, couponCode, billingName, billingPhone, billingAddress } =
       body

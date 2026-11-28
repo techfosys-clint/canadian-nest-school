@@ -106,6 +106,14 @@ export async function POST(request: Request) {
       );
     }
 
+    // Orders belong to student accounts (see the enrollments route).
+    if (!(await Student.exists({ _id: userId }))) {
+      return NextResponse.json(
+        { success: false, error: 'Please log in with a student account to buy. Admin and staff accounts cannot make purchases.', code: 'STUDENT_ACCOUNT_REQUIRED' },
+        { status: 403 },
+      );
+    }
+
     const body = await request.json();
     const { shippingName, shippingPhone, shippingAddress } = body;
     const lines = normalizeOrderLines(body);

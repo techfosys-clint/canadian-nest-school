@@ -41,6 +41,7 @@ import {
   FiStar,
   FiUsers,
 } from 'react-icons/fi';
+import { formatCourseDuration } from '@/lib/courseDuration'
 
 // ─── Type helpers ─────────────────────────────────────────────────────────────
 
@@ -351,7 +352,7 @@ export default async function CourseDetailPage({ params }: Props) {
               {course.duration && (
                 <span className='flex items-center gap-2'>
                   <FiClock className='h-5 w-5 text-[#E61C24] shrink-0' />
-                  <span>{course.duration}</span>
+                  <span>{formatCourseDuration(course.duration)}</span>
                 </span>
               )}
               {lessonCount > 0 && (
@@ -745,7 +746,7 @@ export default async function CourseDetailPage({ params }: Props) {
                 {course.duration && (
                   <div className='flex items-center gap-3 text-base font-semibold text-zinc-600'>
                     <FiClock className='h-5 w-5 text-[#E61C24] shrink-0' />
-                    <span>{course.duration} on-demand video</span>
+                    <span>{formatCourseDuration(course.duration)} on-demand video</span>
                   </div>
                 )}
 

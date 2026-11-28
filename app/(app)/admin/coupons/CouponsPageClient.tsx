@@ -5,6 +5,15 @@ import { useRouter } from 'next/navigation'
 import { FiPlus, FiEdit, FiTrash2, FiTag } from 'react-icons/fi'
 import Swal from 'sweetalert2'
 
+/** Same rule as checkout (lib/coupons.ts): valid through the end of the expiry day (UTC). */
+function isCouponExpiredDate(expirationDate?: string) {
+  if (!expirationDate) return false
+  const end = new Date(expirationDate)
+  if (Number.isNaN(end.getTime())) return false
+  end.setUTCHours(23, 59, 59, 999)
+  return Date.now() > end.getTime()
+}
+
 interface CouponItem {
   id: string
   code: string
@@ -193,26 +202,41 @@ export default function CouponsPageClient({
                           {coupon.usedCount} Used
                         </span>
                         {coupon.maxUses ? (
-                          <span className="text-xs font-semibold text-slate-400 mt-0.5">
+                          <span className="text-base font-semibold text-slate-400 mt-0.5">
                             Max Limit: {coupon.maxUses}
                           </span>
                         ) : null}
                       </div>
                     </td>
 
-                    {/* Active State Toggle */}
+                    {/* Active State Toggle (expired / used-up coupons can't be redeemed, whatever the toggle says) */}
                     <td className="px-6 py-4">
-                      <button
-                        onClick={() => toggleStatus(coupon)}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all border cursor-pointer select-none uppercase tracking-wide ${
-                          coupon.isActive
-                            ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
-                            : 'bg-slate-100 border-slate-200 text-slate-500'
-                        }`}
-                      >
-                        <span className={`h-1.5 w-1.5 rounded-full ${coupon.isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
-                        <span>{coupon.isActive ? 'Active' : 'Paused'}</span>
-                      </button>
+                      {(() => {
+                        const expired = isCouponExpiredDate(coupon.expirationDate)
+                        const usedUp = !!coupon.maxUses && coupon.usedCount >= Number(coupon.maxUses)
+                        const blocked = expired || usedUp
+                        return (
+                          <div className="flex flex-col items-start gap-1">
+                            <button
+                              onClick={() => toggleStatus(coupon)}
+                              title={coupon.isActive ? 'Pause this coupon' : 'Activate this coupon'}
+                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-base font-bold transition-all border cursor-pointer select-none ${
+                                coupon.isActive && !blocked
+                                  ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
+                                  : 'bg-slate-100 border-slate-200 text-slate-500'
+                              }`}
+                            >
+                              <span className={`h-1.5 w-1.5 rounded-full ${coupon.isActive && !blocked ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+                              <span>{coupon.isActive ? 'Active' : 'Paused'}</span>
+                            </button>
+                            {blocked && (
+                              <span className="px-2.5 py-0.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 text-base font-bold">
+                                {expired ? 'Expired' : 'Used up'}
+                              </span>
+                            )}
+                          </div>
+                        )
+                      })()}
                     </td>
 
                     {/* Edit/Delete Actions */}

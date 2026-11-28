@@ -5,6 +5,7 @@ import { verifyToken } from '@/lib/auth/auth'
 import { cookies } from 'next/headers'
 import { uploadToStorage } from '@/lib/storage'
 import { rateLimit } from '@/lib/rateLimit'
+import { detectUploadType, VIDEO_KINDS } from '@/lib/uploadTypes'
 
 const MAX_VIDEO_SIZE = 500 * 1024 * 1024 // 500MB
 const ALLOWED_TYPES = ['video/mp4', 'video/webm', 'video/quicktime', 'application/x-mkvideo']
@@ -107,6 +108,18 @@ export async function POST(request: Request) {
 
     // 4. Upload to R2
     const buffer = Buffer.from(await file.arrayBuffer())
+    // Confirm it's really a video from its bytes; the name/MIME can be faked.
+    const detected = detectUploadType(buffer)
+    if (!detected || !VIDEO_KINDS.includes(detected.kind)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid video file. Use MP4, WebM, MOV, or MKV',
+          code: 'VALIDATION_ERROR',
+        },
+        { status: 400 }
+      )
+    }
     const baseName = file.name
       .replace(/\.[^.]+$/, '') // remove extension
       .replace(/[^a-zA-Z0-9]/g, '-')
@@ -114,11 +127,10 @@ export async function POST(request: Request) {
       .slice(0, 50) // limit name length
 
     const uniqueId = Date.now() + '-' + Math.random().toString(36).slice(2, 9)
-    const ext = file.name.split('.').pop() || 'mp4'
-    const filename = `${baseName}-${uniqueId}.${ext}`
+    const filename = `${baseName || 'video'}-${uniqueId}${detected.ext}`
 
     // uploadToStorage returns R2 object key (not full URL) when folder is 'study-materials'
-    const objectKey = await uploadToStorage(buffer, filename, 'study-materials', file.type)
+    const objectKey = await uploadToStorage(buffer, filename, 'study-materials', detected.mimeType)
 
     // The stream proxy needs the key used by the storage upload.
     const videoKey = objectKey.includes('/api/study-materials/download?file=')

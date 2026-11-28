@@ -1,4 +1,5 @@
 ﻿import React from 'react'
+import { taughtByFilter } from '@/lib/auth/staffScope'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { connectToDatabase } from '@/lib/db/mongodb'
@@ -29,7 +30,7 @@ export default async function LessonsPage() {
 
   // Fetch courses this user can manage
   const courseQuery: any = sessionUser.role === 'instructor'
-    ? { instructor: sessionUser._id }
+    ? taughtByFilter(sessionUser._id.toString())
     : {}
 
   const coursesDocs = await Course.find(courseQuery).select('title slug status').sort({ title: 1 }).lean()

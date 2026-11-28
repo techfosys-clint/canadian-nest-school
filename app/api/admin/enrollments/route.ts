@@ -95,7 +95,7 @@ export async function GET(request: Request) {
 
     const formattedEnrollments = enrollments.map((e: any) => ({
       id: e._id.toString(),
-      studentName: e.student && typeof e.student === 'object' ? e.student.name : 'Unknown Student',
+      studentName: e.student && typeof e.student === 'object' ? e.student.name : e.billingName || 'Unknown Student',
       studentEmail: e.student && typeof e.student === 'object' ? e.student.email : '',
       courseTitle: e.course && typeof e.course === 'object' ? e.course.title : 'Unknown Course',
       previewSlug: e.course?.status === 'published' ? e.course.slug : null,

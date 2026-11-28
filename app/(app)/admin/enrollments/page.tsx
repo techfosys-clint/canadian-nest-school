@@ -47,6 +47,10 @@ function formatDate(dateStr: string) {
 }
 
 export default function ManageEnrollmentsPage() {
+  useEffect(() => {
+    document.title = 'Enrollments - Canadian Nest School Admin'
+  }, [])
+
   const [enrollments, setEnrollments] = useState<Enrollment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

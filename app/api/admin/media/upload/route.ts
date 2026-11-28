@@ -5,6 +5,7 @@ import { getAuthorizedUser } from '@/lib/auth/auth'
 import { rateLimit } from '@/lib/rateLimit'
 import path from 'path'
 import sharp from 'sharp'
+import { detectUploadType, MEDIA_KINDS } from '@/lib/uploadTypes'
 
 export async function POST(request: Request) {
   try {
@@ -36,15 +37,24 @@ export async function POST(request: Request) {
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
     
+    // Type comes from the file's real bytes; the uploaded name/MIME is ignored.
+    const detected = detectUploadType(buffer)
+    if (!detected || !MEDIA_KINDS.includes(detected.kind)) {
+      return NextResponse.json(
+        { error: 'Unsupported file. Upload a JPG, PNG, WebP or GIF image, an MP4/WebM video, or a PDF.' },
+        { status: 400 }
+      )
+    }
+
     const originalName = file.name
-    const fileExt = path.extname(originalName)
-    const baseName = path.basename(originalName, fileExt)
+    const baseName = path.basename(originalName, path.extname(originalName))
       .replace(/[^a-zA-Z0-9]/g, '-') // replace non-alphanumeric with hyphen
       .toLowerCase()
-    
+      .slice(0, 80) || 'file'
+
     const uniqueId = Date.now() + '-' + Math.round(Math.random() * 1e9)
-    const filename = `${baseName}-${uniqueId}${fileExt}`
-    const mimeType = file.type || 'image/jpeg'
+    const filename = `${baseName}-${uniqueId}${detected.ext}`
+    const mimeType = detected.mimeType
 
     const { uploadToStorage } = await import('@/lib/storage')
 

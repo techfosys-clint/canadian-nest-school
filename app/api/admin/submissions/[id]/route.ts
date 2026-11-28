@@ -1,44 +1,49 @@
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db/mongodb'
 import { Submission } from '@/lib/db/models/Submission'
-import { User } from '@/lib/db/models/User'
-import { verifyToken } from '@/lib/auth/auth'
-import { cookies } from 'next/headers'
+import { getCourseScope, getStaffUser, scopeAllows } from '@/lib/auth/staffScope'
 
-async function adminCheck() {
-  const cookieStore = await cookies()
-  const payloadToken = cookieStore.get('payload-token')?.value
-  if (!payloadToken) return null
-
-  const decoded = verifyToken(payloadToken)
-  if (!decoded?.id) return null
-
-  const user = await User.findById(decoded.id).lean()
-  if (!user || !['admin', 'staff', 'instructor'].includes(user.role)) return null
-
-  return user
+/** Loads a submission the current user may grade, or an error response. */
+async function loadManageableSubmission(id: string) {
+  const user = await getStaffUser()
+  if (!user) {
+    return { error: NextResponse.json({ error: 'Unauthorized.' }, { status: 401 }) }
+  }
+  const scope = await getCourseScope(user, 'lessons')
+  if (!scope) {
+    return { error: NextResponse.json({ error: 'Forbidden.' }, { status: 403 }) }
+  }
+  const submission = await Submission.findById(id)
+  if (!submission) {
+    return { error: NextResponse.json({ error: 'Submission not found.' }, { status: 404 }) }
+  }
+  if (!scopeAllows(scope, submission.course)) {
+    return { error: NextResponse.json({ error: 'Forbidden.' }, { status: 403 }) }
+  }
+  return { submission }
 }
 
 // PUT: Grade a submission
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectToDatabase()
-    const user = await adminCheck()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
-    }
-
     const { id } = await params
+    const loaded = await loadManageableSubmission(id)
+    if (loaded.error) return loaded.error
+    const submission = loaded.submission
+
     const body = await request.json()
     const { marksObtained, feedback, googleDriveLink } = body
 
-    if (typeof marksObtained !== 'number') {
+    if (typeof marksObtained !== 'number' || !Number.isFinite(marksObtained)) {
       return NextResponse.json({ error: 'marksObtained (number) is required.' }, { status: 400 })
     }
-
-    const submission = await Submission.findById(id)
-    if (!submission) {
-      return NextResponse.json({ error: 'Submission not found.' }, { status: 404 })
+    const maxMarks = submission.totalMarks || 100
+    if (marksObtained < 0 || marksObtained > maxMarks) {
+      return NextResponse.json(
+        { error: `Marks must be between 0 and ${maxMarks}.` },
+        { status: 400 },
+      )
     }
 
     submission.marksObtained = marksObtained
@@ -62,13 +67,10 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectToDatabase()
-    const user = await adminCheck()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
-    }
-
     const { id } = await params
-    await Submission.findByIdAndDelete(id)
+    const loaded = await loadManageableSubmission(id)
+    if (loaded.error) return loaded.error
+    await loaded.submission.deleteOne()
 
     return NextResponse.json({ success: true })
   } catch (error: any) {

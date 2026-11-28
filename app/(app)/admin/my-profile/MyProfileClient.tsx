@@ -25,6 +25,7 @@ export default function MyProfileClient() {
   const [designation, setDesignation] = useState('')
   const [bio, setBio] = useState('')
   const [password, setPassword] = useState('')
+  const [currentPassword, setCurrentPassword] = useState('')
   const [role, setRole] = useState('')
   const [profilePicId, setProfilePicId] = useState('')
   const [profilePicUrl, setProfilePicUrl] = useState('')
@@ -91,6 +92,10 @@ export default function MyProfileClient() {
       setError('Password must be at least 6 characters.')
       return
     }
+    if (password && !currentPassword) {
+      setError('Enter your current password to set a new one.')
+      return
+    }
     setSaving(true)
     try {
       const res = await fetch('/api/admin/my-profile', {
@@ -103,6 +108,7 @@ export default function MyProfileClient() {
           bio,
           profilePic: profilePicId || undefined,
           password: password || undefined,
+          currentPassword: password ? currentPassword : undefined,
         }),
       })
       const data = await res.json()
@@ -110,6 +116,7 @@ export default function MyProfileClient() {
         throw new Error(data.error || 'Save failed.')
       }
       setPassword('')
+      setCurrentPassword('')
       await Swal.fire({
         icon: 'success',
         title: 'Profile saved',
@@ -267,10 +274,30 @@ export default function MyProfileClient() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder='Leave blank to keep current password'
+              autoComplete='new-password'
               className='w-full pl-11 pr-4 py-3 rounded-lg bg-slate-100 border border-slate-200 focus:border-[#E61C24]/60 text-slate-800 font-semibold text-base focus:outline-none'
             />
           </div>
         </div>
+
+        {password && (
+          <div className='flex flex-col gap-2'>
+            <label className='text-base font-bold text-slate-600'>
+              Current password
+            </label>
+            <div className='relative'>
+              <FiLock className='absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5' />
+              <input
+                type='password'
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder='Required to change your password'
+                autoComplete='current-password'
+                className='w-full pl-11 pr-4 py-3 rounded-lg bg-slate-100 border border-slate-200 focus:border-[#E61C24]/60 text-slate-800 font-semibold text-base focus:outline-none'
+              />
+            </div>
+          </div>
+        )}
 
         <div className='flex justify-end pt-2'>
           <button

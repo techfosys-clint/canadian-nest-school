@@ -718,7 +718,7 @@ export default function CertificatesPageClient() {
                       <td className='px-6 py-4'>
                         <div>
                           <p className='font-bold text-slate-800 text-base leading-snug'>
-                            {req.student?.name || 'Unknown'}
+                            {req.student?.name || 'Deleted student'}
                           </p>
                           <p className='text-slate-400 text-xs font-semibold mt-0.5'>
                             {req.student?.email || 'N/A'}

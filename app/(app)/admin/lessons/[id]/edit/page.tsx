@@ -1,4 +1,5 @@
 import React from 'react'
+import { taughtByFilter } from '@/lib/auth/staffScope'
 import { redirect, notFound } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { connectToDatabase } from '@/lib/db/mongodb'
@@ -47,7 +48,7 @@ export default async function EditLessonPage({ params, searchParams }: Props) {
   // Fetch lesson
   const lessonDoc = await Lesson.findById(id).lean() as any
   if (!lessonDoc) notFound()
-  if (sessionUser.role === 'instructor' && !(await Course.exists({ _id: lessonDoc.course, instructor: sessionUser._id }))) {
+  if (sessionUser.role === 'instructor' && !(await Course.exists({ _id: lessonDoc.course, ...taughtByFilter(sessionUser._id.toString()) }))) {
     notFound()
   }
 

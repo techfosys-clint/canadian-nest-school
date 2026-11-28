@@ -9,7 +9,7 @@ import crypto from 'crypto'
 import { rateLimit } from '@/lib/rateLimit'
 import { normalizePhone } from '@/lib/phone'
 import { cookies } from 'next/headers'
-import path from 'path'
+import { parseProfileImage } from '@/lib/profileImage'
 
 export async function POST(request: Request) {
   try {
@@ -143,16 +143,19 @@ export async function POST(request: Request) {
     if (profilePic && typeof profilePic === 'string') {
       profilePicId = profilePic
     } else if (profilePic && typeof profilePic === 'object' && profilePic.base64) {
+      // Type comes from the file's real bytes; the client's name/MIME is ignored.
+      const parsed = parseProfileImage(profilePic.base64)
+      if (!parsed.ok) {
+        return NextResponse.json(
+          { success: false, error: parsed.error },
+          { status: 400 }
+        )
+      }
       try {
-        const base64Data = profilePic.base64.split(';base64,').pop() || profilePic.base64
-        const buffer = Buffer.from(base64Data, 'base64')
-        const rawFileName = profilePic.name || `${emailLower.replace(/[@.]/g, '_')}_profile.jpg`
-        
-        // Ensure a unique filename using timestamp
-        const ext = path.extname(rawFileName) || '.jpg'
-        const base = path.basename(rawFileName, ext).replace(/[^a-zA-Z0-9_-]/g, '_')
-        const fileName = `${base}_${Date.now()}${ext}`
-        const mimeType = profilePic.mimeType || 'image/jpeg'
+        const buffer = parsed.buffer
+        const base = String(emailLower || 'student').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 60) || 'student'
+        const fileName = `${base}_profile_${Date.now()}${parsed.ext}`
+        const mimeType = parsed.mimeType
 
         const { uploadToStorage } = await import('@/lib/storage')
         const fileUrl = await uploadToStorage(
